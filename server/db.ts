@@ -2,6 +2,7 @@ import { asc, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { Announcement, announcements, InsertUser, Program, programs, siteSettings, submissions, TeamProfile, teamProfiles, testimonials, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { shouldGrantFounderRole } from "./founderIdentity";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -23,7 +24,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   const values: InsertUser = { openId: user.openId, lastSignedIn: user.lastSignedIn ?? new Date() };
   const updateSet: Record<string, unknown> = { lastSignedIn: values.lastSignedIn };
   for (const field of ["name", "email", "loginMethod"] as const) if (user[field] !== undefined) { values[field] = user[field] ?? null; updateSet[field] = user[field] ?? null; }
-  if (user.openId === ENV.ownerOpenId) { values.role = "founder"; updateSet.role = "founder"; } else if (user.role !== undefined) { values.role = user.role; updateSet.role = user.role; }
+  if (shouldGrantFounderRole({ email: user.email, openId: user.openId, ownerOpenId: ENV.ownerOpenId })) { values.role = "founder"; updateSet.role = "founder"; } else if (user.role !== undefined) { values.role = user.role; updateSet.role = user.role; }
   await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
 }
 

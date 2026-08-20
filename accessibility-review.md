@@ -13,6 +13,7 @@ This review documents the implementation-level checks completed for the public r
 | Responsive behaviour | Visually checked | Desktop and mobile captures were reviewed for the home, programmes, about, news, contact, and enrollment routes. |
 | Founder authorization | Tested | Automated tests confirm ordinary users are rejected and Founder users are accepted by Founder-only procedures. |
 | Founder announcement lifecycle | Tested | Automated tests cover Founder create, edit, publish/unpublish, and delete procedures, plus non-Founder denial before any mutation runs. |
+| Keyboard-only browser walkthrough | Tested | Chromium QA validates skip navigation, programme discovery, catalogue filters, enrollment validation, and Founder-editor denial without pointer interaction. |
 | Contrast and content review | Pending production content | Founder should verify all supplied copy, images, embedded map output, and eventual photographs against contrast and alternative-text expectations before publication. |
 
 ## Primary Journey Checks

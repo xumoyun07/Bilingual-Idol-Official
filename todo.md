@@ -14,7 +14,7 @@
 - [x] Implement relational database schema, typed procedures, and data access for programs, submissions, and announcements.
 - [x] Add SEO metadata, semantic page structure, WCAG 2.1-oriented accessibility support, and reduced-motion behavior.
 - [x] Write automated tests for validation, protected administrative access, and key server procedures.
-- [ ] Verify desktop and mobile layouts, keyboard navigation, focus states, validation feedback, and primary user journeys.
+- [x] Verify desktop and mobile layouts, keyboard navigation, focus states, validation feedback, and primary user journeys.
 - [x] Add database-backed public programme retrieval with an honest no-data fallback until staff enter confirmed programme details.
 - [x] Add an approved-testimonial data flow and staff controls; keep the public section empty until genuine reviews with consent are supplied.
 - [x] Add staff-managed team profiles and operating-hours settings instead of inventing unconfirmed centre information.
@@ -23,6 +23,12 @@
 - [x] Add the Founder role as the highest platform role, separate from Super Admin, with authority to create, edit, publish, and delete managed centre data.
 - [x] Update role-based access checks, founder account bootstrap behavior, dashboard wording, and automated authorization tests for the Founder hierarchy.
 - [ ] Founder acceptance test: enter authentic production content, test keyboard navigation and form submission with the intended Founder account, then confirm publishing readiness.
+- [x] Configure automatic Founder role assignment for the specified account by its verified OAuth e-mail; do not store or handle the supplied password in the application.
+- [x] Verify that the designated Founder can enter the console after OAuth authentication while a regular account remains denied.
+- [x] Replace OAuth-dependent Founder entry with a minimal email-and-password sign-in form without self-registration.
+- [x] Store only a salted password hash in server configuration, establish a secure httpOnly session, and test valid and invalid Founder sign-in paths.
+- [x] Document a keyboard-only walkthrough for public navigation, forms, Founder sidebar, and the announcement editor.
+- [x] Document end-to-end primary journeys for programme discovery, inquiry/enrollment, Founder content management, and access denial states.
 - [x] Add automated Founder authorization tests for announcement creation, editing, publication-state changes, and deletion.
 - [x] Document and verify the Founder announcement-management flow, including denial of access for a non-Founder account.
 - [x] Add Founder editing for existing announcement titles, excerpts, bodies, categories, and publication state.

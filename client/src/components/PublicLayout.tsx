@@ -57,7 +57,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
         {open && <nav className="border-t border-[#e8dcc9] bg-[#fbf8f2] px-4 pb-5 pt-3 lg:hidden" aria-label="Mobile navigation"><div className="site-container grid gap-1">{navigation.map(item => <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={`rounded-xl px-4 py-3 text-sm font-extrabold ${location === item.href ? "bg-[#10253e] text-white" : "text-[#29415b] hover:bg-[#f2eade]"}`}>{item.label}</Link>)}<Link href="/enroll" onClick={() => setOpen(false)} className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-[#f07e5d] px-4 py-3 text-sm font-extrabold text-[#10253e]">Enroll Now <ArrowUpRight size={16} /></Link></div></nav>}
       </header>
-      <main id="main-content">{children}</main>
+      <main id="main-content" tabIndex={-1}>{children}</main>
       <footer className="bg-[#10253e] text-white">
         <div className="site-container grid gap-10 py-14 md:grid-cols-[1.15fr_.8fr_.9fr]">
           <div><div className="flex items-center gap-3"><Mark /><div><p className="font-bold">Bilingual Idol</p><p className="text-[10px] font-extrabold tracking-[.14em] uppercase text-[#a7c6b8]">Language Centre</p></div></div><p className="mt-5 max-w-sm text-sm leading-7 text-white/65">A welcoming place to learn, practise, and connect through language — in Kuala Lumpur and beyond.</p></div>
