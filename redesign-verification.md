@@ -1,0 +1,5 @@
+# Redesign Verification Record
+
+The updated platform preserves its existing Ink, Ivory, Apricot, Sage, and Sand visual foundation while expanding it into a responsive learning ecosystem. The public site now directs visitors to a dedicated learning hub, and Founder users have an additional operations workspace for schedules, materials, teacher touchpoints, payments, and reports. The new `learningItems` database model gives those routes an honest backend-backed source, while keeping drafts and unconfirmed information out of the public learning hub.
+
+The public and Founder journeys were checked at desktop and mobile viewports. The browser QA suite contains seven passing keyboard scenarios, including keyboard switching of the learning hub’s material, payment, and teacher-support paths and denial of unauthenticated Founder learning-data access. All existing automated server and structural tests pass, and the TypeScript compiler reports no errors. The remaining acceptance step is live moderated testing with actual centre users following the usability plan.

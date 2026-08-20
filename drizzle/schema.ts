@@ -88,9 +88,33 @@ export const siteSettings = mysqlTable("siteSettings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const learningItems = mysqlTable("learningItems", {
+  id: int("id").autoincrement().primaryKey(),
+  kind: mysqlEnum("kind", ["schedule", "material", "teacher", "payment", "report"]).notNull(),
+  title: varchar("title", { length: 220 }).notNull(),
+  description: text("description").notNull(),
+  actionUrl: varchar("actionUrl", { length: 2048 }),
+  isPublished: boolean("isPublished").default(false).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const learningSupportRequests = mysqlTable("learningSupportRequests", {
+  id: int("id").autoincrement().primaryKey(),
+  type: mysqlEnum("type", ["teacher", "payment", "report"]).notNull(),
+  contactEmail: varchar("contactEmail", { length: 320 }).notNull(),
+  message: text("message").notNull(),
+  status: mysqlEnum("status", ["new", "reviewed", "resolved"]).default("new").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Program = typeof programs.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;
 export type TeamProfile = typeof teamProfiles.$inferSelect;
+export type LearningItem = typeof learningItems.$inferSelect;
+export type LearningSupportRequest = typeof learningSupportRequests.$inferSelect;

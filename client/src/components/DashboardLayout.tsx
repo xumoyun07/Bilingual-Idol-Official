@@ -19,9 +19,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpenText, ClipboardList, LayoutDashboard, LogOut, Megaphone, PanelLeft } from "lucide-react";
+import { BookOpenText, CalendarRange, ClipboardList, Database, LayoutDashboard, LogOut, Megaphone, PanelLeft } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -29,6 +28,8 @@ import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Overview", path: "/admin" },
+  { icon: CalendarRange, label: "Learning operations", path: "/admin/operations" },
+  { icon: Database, label: "Learning data", path: "/admin/learning-data" },
   { icon: ClipboardList, label: "Submissions", path: "/admin/submissions" },
   { icon: Megaphone, label: "Announcements", path: "/admin/announcements" },
   { icon: Megaphone, label: "Edit announcements", path: "/admin/announcements/edit" },
@@ -72,7 +73,7 @@ export default function DashboardLayout({
             </p>
           </div>
           <Button
-            onClick={() => startLogin()}
+            onClick={() => { window.location.href = "/admin/login"; }}
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
           >

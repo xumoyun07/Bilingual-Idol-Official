@@ -47,6 +47,20 @@ await check("programme filters remain keyboard reachable", async () => {
   await page.keyboard.press("Enter");
 });
 
+await check("learning hub exposes core learning journeys through keyboard navigation", async () => {
+  await page.goto(`${baseUrl}/learning`, { waitUntil: "networkidle" });
+  const learningNavigation = page.locator("aside nav");
+  await learningNavigation.getByRole("button", { name: "Materials", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  if (!await page.getByRole("heading", { name: /make practice feel possible/i }).isVisible()) throw new Error("Materials state did not activate from keyboard control");
+  await learningNavigation.getByRole("button", { name: "Payments", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  if (!await page.getByRole("heading", { name: /service details, without guesswork/i }).isVisible()) throw new Error("Payments state did not activate from keyboard control");
+  await learningNavigation.getByRole("button", { name: "Teacher", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  if (!await page.getByRole("heading", { name: /ask your teacher a learning question/i }).isVisible()) throw new Error("Teacher support request flow is not visible from keyboard navigation");
+});
+
 await check("enrollment form exposes keyboard validation feedback", async () => {
   await page.goto(`${baseUrl}/enroll`, { waitUntil: "networkidle" });
   const form = page.locator("form").last();
@@ -61,6 +75,12 @@ await check("unauthenticated access to Founder editor redirects to sign in", asy
   await page.goto(`${baseUrl}/admin/announcements/edit`, { waitUntil: "networkidle" });
   await page.waitForURL("**/admin/login", { timeout: 10000 });
   if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Founder sign-in form is not visible after protected-route redirect");
+});
+
+await check("unauthenticated access to Founder learning data redirects to sign in", async () => {
+  await page.goto(`${baseUrl}/admin/learning-data`, { waitUntil: "networkidle" });
+  await page.waitForURL("**/admin/login", { timeout: 10000 });
+  if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Founder sign-in form is not visible after learning-data redirect");
 });
 
 await browser.close();
