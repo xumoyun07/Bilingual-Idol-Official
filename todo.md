@@ -28,6 +28,7 @@
 - [x] Replace OAuth-dependent Founder entry with a minimal email-and-password sign-in form without self-registration.
 - [x] Store only a salted password hash in server configuration, establish a secure httpOnly session, and test valid and invalid Founder sign-in paths.
 - [x] Add a visible public “Вход” control in desktop and mobile navigation that opens the Founder sign-in page.
+- [x] Correct the configured Founder e-mail to lektor0780@gmail.com and verify successful password sign-in with the corrected identity.
 - [x] Document a keyboard-only walkthrough for public navigation, forms, Founder sidebar, and the announcement editor.
 - [x] Document end-to-end primary journeys for programme discovery, inquiry/enrollment, Founder content management, and access denial states.
 - [x] Add automated Founder authorization tests for announcement creation, editing, publication-state changes, and deletion.

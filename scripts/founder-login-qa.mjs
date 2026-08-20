@@ -12,7 +12,7 @@ process.stdin.on("end", async () => {
     await page.getByRole("textbox", { name: "Password", exact: true }).fill("incorrect-password");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await page.getByRole("alert", { name: "" }).waitFor({ state: "visible", timeout: 10000 });
-    await page.getByLabel("E-mail").fill("lektor078@gmail.com");
+    await page.getByLabel("E-mail").fill("lektor0780@gmail.com");
     await page.getByRole("textbox", { name: "Password", exact: true }).fill(password.trimEnd());
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await page.waitForURL("**/admin", { timeout: 10000 });
