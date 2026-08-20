@@ -75,3 +75,4 @@
 - [x] Выполнить и документировать финальный WCAG contrast-аудит именно для новых Learning Compass component/color combinations.
 - [x] Захватить и проверить tablet-представления ключевых public, learning и Founder маршрутов после финальной пересборки.
 - [x] Создать concrete route-level Founder components для command header, navigation tabs, metric cards, data tables, form shells и state panels в каждом Founder-маршруте.
+- [x] Закрепить header и боковую навигацию Founder dashboard на всех защищённых маршрутах, чтобы они не смещались при прокрутке и переходах между разделами.

@@ -158,7 +158,7 @@ function DashboardLayoutContent({
       <div className="relative" ref={sidebarRef}>
         <Sidebar
           collapsible="icon"
-          className="compass-rail border-r-0"
+          className="compass-rail fixed inset-y-0 left-0 border-r-0"
           disableTransition={isResizing}
         >
           <SidebarHeader className="h-[4.75rem] justify-center border-b border-[#ded4c2]">
@@ -235,18 +235,27 @@ function DashboardLayoutContent({
           </SidebarFooter>
         </Sidebar>
         <div
-          className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
+          className={`fixed inset-y-0 w-1 cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
           onMouseDown={() => {
             if (isCollapsed) return;
             setIsResizing(true);
           }}
-          style={{ zIndex: 50 }}
+          style={{ zIndex: 50, left: "calc(var(--sidebar-width) - 2px)" }}
         />
       </div>
 
       <SidebarInset>
+        {!isMobile && (
+          <header className="dashboard-fixed-header">
+            <div>
+              <p className="dashboard-fixed-eyebrow">Founder workspace</p>
+              <h2>{activeMenuItem?.label ?? "Overview"}</h2>
+            </div>
+            <span className="dashboard-fixed-status">Protected session</span>
+          </header>
+        )}
         {isMobile && (
-          <div className="flex h-14 items-center justify-between border-b border-[#ded4c2] bg-[#fbf8f2]/95 px-2 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+          <header className="dashboard-fixed-header dashboard-fixed-header-mobile">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="h-9 w-9 rounded-lg bg-background" />
               <div className="flex items-center gap-3">
@@ -257,7 +266,7 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
-          </div>
+          </header>
         )}
         <main className="compass-grid min-h-screen flex-1 bg-[#fbf8f2] p-4 sm:p-6">{children}</main>
       </SidebarInset>
