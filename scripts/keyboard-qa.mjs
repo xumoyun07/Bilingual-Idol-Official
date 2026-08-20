@@ -34,7 +34,7 @@ await check("keyboard activates programme discovery navigation", async () => {
   await page.locator('a[href="/programs"]').first().focus();
   await page.keyboard.press("Enter");
   await page.waitForURL("**/programs");
-  if (!await page.getByRole("heading", { name: /find a path that feels like yours/i }).isVisible()) throw new Error("Programmes heading is not visible after keyboard navigation");
+  if (!await page.getByRole("heading", { name: /find a learning route with the details you need/i }).isVisible()) throw new Error("Programmes heading is not visible after keyboard navigation");
 });
 
 await check("programme filters remain keyboard reachable", async () => {
@@ -48,17 +48,20 @@ await check("programme filters remain keyboard reachable", async () => {
 });
 
 await check("learning hub exposes core learning journeys through keyboard navigation", async () => {
-  await page.goto(`${baseUrl}/learning`, { waitUntil: "networkidle" });
-  const learningNavigation = page.locator("aside nav");
-  await learningNavigation.getByRole("button", { name: "Materials", exact: true }).focus();
+  await page.goto(`${baseUrl}/learning`, { waitUntil: "domcontentloaded" });
+  const learningTab = (name) => page.locator('nav[aria-label="Learning areas"] button').filter({ hasText: name }).first();
+  await learningTab("Materials").waitFor();
+  await learningTab("Materials").focus();
   await page.keyboard.press("Enter");
-  if (!await page.getByRole("heading", { name: /make practice feel possible/i }).isVisible()) throw new Error("Materials state did not activate from keyboard control");
-  await learningNavigation.getByRole("button", { name: "Payments", exact: true }).focus();
+  if (!await page.getByRole("heading", { name: /practice that stays close/i }).isVisible()) throw new Error("Materials state did not activate from keyboard control");
+  await learningTab("Payments").focus();
   await page.keyboard.press("Enter");
-  if (!await page.getByRole("heading", { name: /service details, without guesswork/i }).isVisible()) throw new Error("Payments state did not activate from keyboard control");
-  await learningNavigation.getByRole("button", { name: "Teacher", exact: true }).focus();
+  if (!await page.getByRole("heading", { name: /service details, without guessing/i }).isVisible()) throw new Error("Payments state did not activate from keyboard control");
+  await learningTab("Teacher").focus();
   await page.keyboard.press("Enter");
-  if (!await page.getByRole("heading", { name: /ask your teacher a learning question/i }).isVisible()) throw new Error("Teacher support request flow is not visible from keyboard navigation");
+  const teacherSupport = page.getByText("Ask your teacher a learning question", { exact: true });
+  await teacherSupport.waitFor();
+  if (!await teacherSupport.isVisible()) throw new Error("Teacher support request flow is not visible from keyboard navigation");
 });
 
 await check("enrollment form exposes keyboard validation feedback", async () => {

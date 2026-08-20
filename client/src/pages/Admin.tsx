@@ -3,6 +3,7 @@ import { BadgeCheck, BookOpenText, ClipboardList, FileText, Loader2, Megaphone, 
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
+import { FounderRouteSurface } from "@/components/FounderSurface";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import type { Announcement, Submission } from "../../../drizzle/schema";
@@ -17,7 +18,7 @@ export default function Admin() {
   if (loading) return <div className="grid min-h-screen place-items-center bg-[#fbf8f2]"><Loader2 className="animate-spin text-[#5e8c7b]" /></div>;
   if (!user) return null;
   if (user.role !== "founder") return <div className="grid min-h-screen place-items-center bg-[#fbf8f2] p-5"><div className="max-w-md rounded-[1.5rem] border border-[#f0c8bb] bg-[#fff6f2] p-8 text-center"><ShieldAlert className="mx-auto text-[#c55e44]" size={34} /><h1 className="mt-5 font-display text-4xl text-[#10253e]">Founder access required</h1><p className="mt-3 text-sm leading-6 text-[#53657a]">This console is reserved for the Founder account, the highest role in the platform hierarchy.</p><Link href="/" className="mt-6 inline-flex rounded-full bg-[#10253e] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#f07e5d] hover:text-[#10253e]">Return to website</Link></div></div>;
-  return <DashboardLayout><div className="founder-command"><AdminContent /></div></DashboardLayout>;
+  return <DashboardLayout><div className="founder-command founder-workspace"><FounderRouteSurface route="overview"><AdminContent /></FounderRouteSurface></div></DashboardLayout>;
 }
 
 function AdminContent() {

@@ -61,3 +61,17 @@
 - [x] Capture desktop and mobile evidence for all Founder operational routes after the full visual reset.
 - [x] Add visible success feedback and mutation-error handling to the Founder operations learning-item manager, then verify create, update, and delete states.
 - [x] Re-verify redesigned learning journeys so loading, success, empty, and error states are consistently covered across Founder learning data and Founder operations.
+- [x] Провести повторный аудит всех frontend-маршрутов, компонентов, дизайн-токенов и пользовательских путей по приложенному UI/UX-промпту.
+- [x] Сформировать новую единую дизайн-систему с сохранением базовых цветов бренда, доступной палитрой состояний, не более чем двумя шрифтами и унифицированными компонентами.
+- [x] Полностью пересобрать публичные страницы в новой визуальной концепции без изменения маршрутов, контентной модели и поведения форм.
+- [x] Полностью пересобрать Learning Hub и Founder-консоль в единой системе интерфейса, сохранив авторизацию, данные и все операции CRUD.
+- [x] Проверить новые desktop, tablet и mobile представления, WCAG-контраст, состояния интерактивных элементов и сохранность пользовательских сценариев.
+- [x] Подготовить обновлённую документацию дизайн-системы, реестр изменений и чек-лист качества по приложенному промпту.
+- [x] Пересобрать все Founder content-surfaces (overview, submissions, announcements, content, learning data, operations и announcement editor) в Learning Compass, а не только общий layout и экран входа.
+- [x] Зафиксировать desktop/mobile-доказательства новых Founder-маршрутов и повторно проверить авторизацию и CRUD-потоки после visual rebuild.
+- [x] Задокументировать для каждого Founder-маршрута фактическую пересборку header, sections, cards, tables, forms и state surfaces в Learning Compass до финального acceptance.
+- [x] Удалить обнаруженные временные QA learning items и повторно подтвердить, что в рабочих данных не осталось тестового содержимого.
+- [x] Просмотреть все страницы и общие layout-компоненты, документируя конкретные UI/UX-проблемы и сохраняемые функциональные пути до начала пересборки.
+- [x] Выполнить и документировать финальный WCAG contrast-аудит именно для новых Learning Compass component/color combinations.
+- [x] Захватить и проверить tablet-представления ключевых public, learning и Founder маршрутов после финальной пересборки.
+- [x] Создать concrete route-level Founder components для command header, navigation tabs, metric cards, data tables, form shells и state panels в каждом Founder-маршруте.

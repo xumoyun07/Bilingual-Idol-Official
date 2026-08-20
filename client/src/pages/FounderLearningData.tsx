@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
+import { FounderRouteSurface } from "@/components/FounderSurface";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { BadgeCheck, BookOpen, CheckCircle2, Loader2, Pencil, ShieldAlert, Trash2 } from "lucide-react";
@@ -16,7 +17,7 @@ export default function FounderLearningData() {
   if (loading) return <div className="grid min-h-screen place-items-center bg-[#fbf8f2]"><Loader2 className="animate-spin text-[#5e8c7b]" /></div>;
   if (!user) return null;
   if (user.role !== "founder") return <div className="grid min-h-screen place-items-center bg-[#fbf8f2] p-5"><div className="max-w-md rounded-[1.5rem] border border-[#f0c8bb] bg-[#fff6f2] p-8 text-center"><ShieldAlert className="mx-auto text-[#c55e44]" size={34} /><h1 className="mt-5 font-display text-4xl text-[#10253e]">Founder access required</h1><p className="mt-3 text-sm leading-6 text-[#53657a]">Learning data is available only to the Founder account.</p><Link href="/" className="mt-6 inline-flex rounded-full bg-[#10253e] px-5 py-3 text-sm font-extrabold text-white">Return to website</Link></div></div>;
-  return <DashboardLayout><main className="founder-desk mx-auto max-w-7xl pb-10"><header className="flex flex-col gap-5 border-b border-[#e8dcc9] pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-extrabold tracking-[.14em] text-[#5e8c7b] uppercase">Bilingual Idol · Studio desk</p><h1 className="mt-2 font-display text-4xl text-[#10253e] sm:text-5xl">Publish what is <em className="font-normal text-[#f07e5d]">ready.</em></h1><p className="mt-3 max-w-2xl text-sm leading-6 text-[#5b6d80]">A focused desk for turning confirmed learning information into a calm public learning experience.</p></div><Link href="/learning" className="inline-flex items-center gap-2 text-sm font-extrabold text-[#5e8c7b] hover:text-[#10253e]">Preview language room ↗</Link></header><LearningItemEditor /><SupportRequestInbox /></main></DashboardLayout>;
+  return <DashboardLayout><FounderRouteSurface route="learning-data"><main className="founder-desk founder-workspace mx-auto max-w-7xl pb-10"><header className="flex flex-col gap-5 border-b border-[#e8dcc9] pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-extrabold tracking-[.14em] text-[#5e8c7b] uppercase">Learning Compass · Founder data</p><h1 className="mt-2 font-display text-4xl text-[#10253e] sm:text-5xl">Confirm the detail, then <em className="font-normal text-[#f07e5d]">publish the route.</em></h1><p className="mt-3 max-w-2xl text-sm leading-6 text-[#5b6d80]">Manage verified learning information and route support requests from one protected operational workspace.</p></div><Link href="/learning" className="inline-flex items-center gap-2 text-sm font-extrabold text-[#5e8c7b] hover:text-[#10253e]">Preview learning hub ↗</Link></header><LearningItemEditor /><SupportRequestInbox /></main></FounderRouteSurface></DashboardLayout>;
 }
 
 function LearningItemEditor() {

@@ -24,11 +24,12 @@ async function fillLearningItem(title) {
 }
 async function deleteItem(title) {
   const deleteButton = page.getByRole("button", { name: `Delete ${title}` });
-  if (await deleteButton.count()) {
-    page.once("dialog", dialog => dialog.accept());
-    await deleteButton.click();
-    await page.getByRole("status").filter({ hasText: /removed/i }).waitFor({ timeout: 10000 });
-  }
+  if (!await deleteButton.count()) return false;
+  page.once("dialog", dialog => dialog.accept());
+  await deleteButton.click();
+  await page.getByRole("status").filter({ hasText: /removed/i }).waitFor({ timeout: 10000 });
+  await deleteButton.waitFor({ state: "detached", timeout: 10000 });
+  return true;
 }
 
 try {
