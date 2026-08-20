@@ -76,3 +76,7 @@
 - [x] Захватить и проверить tablet-представления ключевых public, learning и Founder маршрутов после финальной пересборки.
 - [x] Создать concrete route-level Founder components для command header, navigation tabs, metric cards, data tables, form shells и state panels в каждом Founder-маршруте.
 - [x] Закрепить header и боковую навигацию Founder dashboard на всех защищённых маршрутах, чтобы они не смещались при прокрутке и переходах между разделами.
+- [ ] Зафиксировать явное подтверждение Founder acceptance: реальные записи были созданы/изменены/опубликованы, а keyboard-навигация и отправка форм проверены.
+- [x] Сделать первый hero-блок главной страницы точным initial viewport вместе с наложенной public header, без жёстких offsets, клиппинга и дополнительной прокрутки первого экрана.
+- [x] Подтвердить desktop/mobile hero QA измерениями: основной контент, CTA и адаптивная Learning Compass композиция полностью помещаются в initial viewport.
+- [x] Зафиксировать mobile hero как намеренно сокращённую одноколоночную композицию без secondary orientation card, сохраняя обе CTA и языковой ряд в initial viewport.

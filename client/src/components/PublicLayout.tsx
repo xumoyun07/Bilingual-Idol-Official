@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { ArrowUpRight, Menu, Phone, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const navigation = [
   { label: "Home", href: "/" },
@@ -16,6 +16,17 @@ function Mark() { return <span className="compass-brand-seal" aria-hidden="true"
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [location] = useLocation();
+  const headerRef = useRef<HTMLElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  useLayoutEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const syncHeaderHeight = () => setHeaderHeight(Math.round(header.getBoundingClientRect().height));
+    syncHeaderHeight();
+    const observer = new ResizeObserver(syncHeaderHeight);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, [open]);
   useEffect(() => {
     const metadata: Record<string, { title: string; description: string }> = {
       "/": { title: "Bilingual Idol Language Centre | Kuala Lumpur", description: "Thoughtful language learning for children, teens, adults, and professionals in Kuala Lumpur." },
@@ -30,9 +41,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     document.querySelector('meta[name="description"]')?.setAttribute("content", selected.description);
   }, [location]);
   return (
-    <div className="compass-page">
+    <div className="compass-page" style={{ "--public-header-height": `${headerHeight}px` } as CSSProperties}>
       <a className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-[#10253e]" href="#main-content">Skip to content</a>
-      <header className="compass-public-header">
+      <header ref={headerRef} className="compass-public-header">
         <div className="compass-topline"><div className="compass-shell">
           <span className="hidden sm:inline">English · Bahasa Melayu · Mandarin · Arabic · Japanese · Korean</span>
           <span className="sm:hidden">A language community in Kuala Lumpur</span>
