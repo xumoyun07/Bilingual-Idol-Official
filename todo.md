@@ -1,0 +1,29 @@
+# Project TODO
+
+- [x] Extract and reconcile requirements from the supplied brief, PDF, and current website.
+- [x] Establish a refined bilingual visual system with accessible typography, colors, spacing, and motion rules.
+- [x] Build a responsive public information architecture with global navigation, footer, and language-aware content.
+- [x] Create the animated bilingual hero with the exact CTA labels “Enroll Now” and “Learn More”.
+- [x] Build the programs and courses page with searchable/filterable program information by age group, language, and level.
+- [x] Build the About Us page covering the centre history, mission, vision, methodology, and team profiles.
+- [x] Implement a validated enrollment and inquiry flow capturing all specified student, parent, programme, and schedule fields.
+- [x] Build announcements and news views backed by manageable content records.
+- [x] Implement a testimonial section that displays only approved, genuine reviews and ratings; do not fabricate testimonials.
+- [x] Create the contact page with operational details, accessible contact actions, and map integration.
+- [x] Implement protected administration routes for managing applications, inquiries, and announcements.
+- [x] Implement relational database schema, typed procedures, and data access for programs, submissions, and announcements.
+- [x] Add SEO metadata, semantic page structure, WCAG 2.1-oriented accessibility support, and reduced-motion behavior.
+- [x] Write automated tests for validation, protected administrative access, and key server procedures.
+- [ ] Verify desktop and mobile layouts, keyboard navigation, focus states, validation feedback, and primary user journeys.
+- [x] Add database-backed public programme retrieval with an honest no-data fallback until staff enter confirmed programme details.
+- [x] Add an approved-testimonial data flow and staff controls; keep the public section empty until genuine reviews with consent are supplied.
+- [x] Add staff-managed team profiles and operating-hours settings instead of inventing unconfirmed centre information.
+- [x] Extend announcements with publish-state changes and safe deletion controls.
+- [x] Add route-specific metadata management and document a targeted keyboard and form-flow accessibility review.
+- [x] Add the Founder role as the highest platform role, separate from Super Admin, with authority to create, edit, publish, and delete managed centre data.
+- [x] Update role-based access checks, founder account bootstrap behavior, dashboard wording, and automated authorization tests for the Founder hierarchy.
+- [ ] Founder acceptance test: enter authentic production content, test keyboard navigation and form submission with the intended Founder account, then confirm publishing readiness.
+- [x] Add automated Founder authorization tests for announcement creation, editing, publication-state changes, and deletion.
+- [x] Document and verify the Founder announcement-management flow, including denial of access for a non-Founder account.
+- [x] Add Founder editing for existing announcement titles, excerpts, bodies, categories, and publication state.
+- [x] Retest Founder permissions after announcement edit support is added to confirm full create, edit, publish, and delete coverage.
