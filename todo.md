@@ -38,7 +38,7 @@
 - [x] Deliver a design-system guide and product UX documentation for future maintenance and expansion.
 - [x] Implement data-backed schedule, materials, teacher-contact, payment, and report states for the learning hub and Founder operations workspace.
 - [x] Connect the redesigned dashboards to concrete operational data models and Founder-managed empty/loading/error states without inserting fictional records.
-- [ ] Apply and verify skeleton/loading patterns, success feedback, and error states in redesigned key journeys.
+- [x] Apply and verify skeleton/loading patterns, success feedback, and error states in redesigned key journeys.
 - [x] Document a keyboard-only walkthrough for public navigation, forms, Founder sidebar, and the announcement editor.
 - [x] Document end-to-end primary journeys for programme discovery, inquiry/enrollment, Founder content management, and access denial states.
 - [x] Add automated Founder authorization tests for announcement creation, editing, publication-state changes, and deletion.
@@ -46,9 +46,18 @@
 - [x] Add Founder editing for existing announcement titles, excerpts, bodies, categories, and publication state.
 - [x] Retest Founder permissions after announcement edit support is added to confirm full create, edit, publish, and delete coverage.
 - [x] Implement scoped teacher-contact, payment, and report interactions beyond generic learning-item links.
-- [ ] Add visible success feedback for Founder learning-item create, update, and delete actions and verify it end-to-end.
+- [x] Add visible success feedback for Founder learning-item create, update, and delete actions and verify it end-to-end.
 - [x] Document and test role-aware end-to-end steps for the completed learning hub and Founder operations flows.
 - [x] Add a documented public support request → Founder inbox review → status update end-to-end flow.
 - [x] Add an integration test for the role-aware support request journey across learning hub and Founder procedures without persistent test records.
 - [x] Add a documented Founder learning-item lifecycle: create/update/publish in console → visible in public learning hub.
 - [x] Add an integration test for Founder learning-item lifecycle across management procedures and public learning-hub query without persistent test records.
+- [x] Audit why the current redesign appears too similar to the earlier interface and define measurable visual-difference criteria.
+- [x] Create a visibly new editorial studio direction using the retained brand colors with revised layout geometry, type scale, navigation, and component composition.
+- [x] Rebuild the homepage, learning hub, and Founder operational surfaces so the redesign is immediately distinguishable at first glance.
+- [x] Verify the revised desktop and mobile interfaces for visual distinction, usability, and accessible contrast.
+- [x] Apply and verify the Language Atelier reset across remaining Founder overview and operations routes.
+- [x] Document accessible contrast verification for redesigned public and Founder colour pairs.
+- [x] Capture desktop and mobile evidence for all Founder operational routes after the full visual reset.
+- [x] Add visible success feedback and mutation-error handling to the Founder operations learning-item manager, then verify create, update, and delete states.
+- [x] Re-verify redesigned learning journeys so loading, success, empty, and error states are consistently covered across Founder learning data and Founder operations.

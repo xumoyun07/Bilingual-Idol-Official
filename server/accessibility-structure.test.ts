@@ -31,4 +31,13 @@ describe("public accessibility structure", () => {
     expect(dashboard).toContain("tooltip={item.label}");
     expect(dashboard).toContain("onClick={() => setLocation(item.path)}");
   });
+
+  it("exposes loading, success, and error feedback across Founder learning management routes", () => {
+    for (const relativePath of ["pages/FounderLearningData.tsx", "pages/FounderOperations.tsx"]) {
+      const page = read(relativePath);
+      expect(page).toContain("skeleton-shimmer");
+      expect(page).toContain('role="status"');
+      expect(page).toContain('role="alert"');
+    }
+  });
 });
