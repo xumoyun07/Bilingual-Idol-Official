@@ -139,7 +139,7 @@ try {
   await builder.getByRole("button", { name: `Delete ${qaFieldLabel}` }).click();
   const fieldConfirmation = page.getByRole("alertdialog");
   await fieldConfirmation.getByRole("button", { name: "Delete field" }).click({ force: true });
-  await builder.getByText("No additional fields are configured. The create form currently shows only protected access details.", { exact: true }).waitFor({ timeout: 10000 });
+  await builder.getByText("No additional profile fields are configured yet. Add one above; it will then appear here with edit and delete controls.", { exact: true }).waitFor({ timeout: 10000 });
   await builder.getByRole("button", { name: `Remove ${qaSectionTitle}` }).click();
   const sectionConfirmation = page.getByRole("alertdialog");
   await sectionConfirmation.getByRole("button", { name: "Remove section" }).click({ force: true });

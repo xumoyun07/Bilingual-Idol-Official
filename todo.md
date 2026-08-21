@@ -121,3 +121,4 @@
 - [x] Реализовать schema-driven создание пользователя с динамическим рендером section/field layout, runtime validation и сохранением только approved user attributes.
 - [x] Добавить Founder UI для настройки безопасных field metadata и проверить RBAC, validation, порядок полей, create flow и responsive modal behavior.
 - [x] Документировать границы первой Field Builder версии, миграционную стратегию и back-compatibility policy для будущих profile attributes.
+- [x] Показывать в Field Builder уже существующие системные поля формы создания пользователя отдельно от dynamic profile fields, с ясным защищённым статусом и безопасными действиями.
