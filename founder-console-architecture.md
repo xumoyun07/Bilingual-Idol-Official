@@ -60,3 +60,7 @@ Widget rendering is configuration-driven so a future analytics data source can p
 | Browser Users E2E | A self-cleaning temporary account completed create, role/status update, inactive sign-in denial, search, role/status/date filtering, delete confirmation and deletion. Database cleanup was verified as zero remaining QA accounts. |
 | Responsive Founder matrix | Dashboard and Users passed 16 route–viewport checks across 8 target viewports plus 2 tablet orientation checks: zero overflow, fixed chrome preserved and no measured undersized visible button/link targets. |
 | Regression | 26 automated tests passed; TypeScript and whitespace checks passed; keyboard QA passed 8 of 8 scenarios. |
+
+## Optional future launch gates
+
+The owner has elected to retain Founder content-operation acceptance and moderated usability testing as **optional future launch gates**. They do not block the present version, and they are not an instruction to create, alter, publish, delete or otherwise change real centre data. They may be resumed only under a new explicit owner request, with authentic source content and a confirmed intended action where applicable.
