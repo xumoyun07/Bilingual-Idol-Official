@@ -232,6 +232,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .founder-command-title { margin-top: .5rem; font-family: "DM Serif Display", Georgia, serif; font-size: clamp(2rem,4vw,3.1rem); line-height: .98; color: #10253e; }
 .founder-command-description { max-width: 44rem; margin-top: .7rem; color: #53657a; font-size: .9rem; line-height: 1.6; }
 .founder-command-action { flex: none; }
+.founder-command button, .founder-command a[href] { min-height: 3rem; }
+.founder-command a[href] { display: inline-flex; align-items: center; }
 .founder-segmented-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
 .founder-segmented-nav > * { border: 1px solid rgba(16,37,62,.14); border-radius: .65rem; }
 .founder-metric { min-height: 10.5rem; border: 1px solid rgba(16,37,62,.13); border-radius: 1rem; padding: 1.25rem; background: #fff; box-shadow: 0 12px 24px rgba(16,37,62,.05); }

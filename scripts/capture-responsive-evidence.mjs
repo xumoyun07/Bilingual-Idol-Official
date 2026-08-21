@@ -3,7 +3,7 @@ import path from "node:path";
 import { chromium } from "@playwright/test";
 
 const baseUrl = process.env.QA_BASE_URL ?? "http://localhost:3000";
-const outputDir = path.resolve("artifacts/responsive-evidence");
+const outputDir = path.resolve(process.env.QA_EVIDENCE_DIR ?? "/home/ubuntu/webdev-static-assets/bilingual-idol-responsive-evidence");
 const email = process.env.FOUNDER_QA_EMAIL;
 const password = process.env.FOUNDER_QA_PASSWORD;
 await mkdir(outputDir, { recursive: true });

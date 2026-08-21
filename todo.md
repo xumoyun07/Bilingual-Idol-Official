@@ -84,13 +84,19 @@
 - [x] Спроектировать универсальный email/password вход и безопасную role-based маршрутизацию личных dashboard без публичной регистрации.
 - [x] Реализовать личный dashboard для обычного пользователя и сохранить отдельный Founder dashboard с высшим уровнем доступа.
 - [x] Переработать кнопку и экран «Вход» как универсальную точку доступа для всех пользователей.
-- [ ] Проверить login, role redirect, защиту маршрутов, отсутствие Learning Hub и обновлённые desktop/mobile интерфейсы.
+- [x] Проверить login, role redirect, защиту маршрутов, отсутствие Learning Hub и обновлённые desktop/mobile интерфейсы.
 - [x] Удалить `/learning` и Founder learning-маршруты из App, public navigation, homepage CTA и всех внутренних ссылок, затем проверить отсутствие Learning Hub в роутинге.
 - [x] Зафиксировать universal login architecture с credential storage, отсутствием регистрации, post-login role redirects и route protection до начала реализации.
 - [x] Оставить `learningItems` и `learningSupportRequests` как schema-preserved archive без routes, API, UI и application contracts; исключить их из будущих feature migrations по подтверждённому безопасному варианту.
-- [ ] Создать и проверить непубличный test account с валидным scrypt hash: universal login должен привести в `/dashboard`, а `/admin` должен быть недоступен этому account.
-- [ ] Провести responsive-аудит public, universal login, user dashboard и Founder console на 360×640, 390×844, 412×915, 768×1024, 1024×1366, 1366×768, 1920×1080 и 3840×2160.
-- [ ] Зафиксировать карту breakpoints, fluid typography, touch targets и правила предотвращения overflow для всех интерфейсных контуров.
-- [ ] Доработать responsive CSS и компоненты: navigation, grids, hero, forms, cards, tables, dialogs и fixed Founder rail/header.
-- [ ] Проверить отсутствие горизонтального overflow, clip/overlap, минимальные touch targets 48px и корректную смену ориентации на целевых мобильных и tablet размерах.
+- [x] Создать и проверить непубличный test account с валидным scrypt hash: universal login должен привести в `/dashboard`, а `/admin` должен быть недоступен этому account.
+- [x] Провести responsive-аудит public, universal login, user dashboard и Founder console на 360×640, 390×844, 412×915, 768×1024, 1024×1366, 1366×768, 1920×1080 и 3840×2160.
+- [x] Зафиксировать карту breakpoints, fluid typography, touch targets и правила предотвращения overflow для всех интерфейсных контуров.
+- [x] Доработать responsive CSS и компоненты: navigation, grids, hero, forms, cards, tables, dialogs и fixed Founder rail/header.
+- [x] Проверить отсутствие горизонтального overflow, clip/overlap, минимальные touch targets 48px и корректную смену ориентации на целевых мобильных и tablet размерах.
 - [x] Подготовить отчёт с таблицей результатов, скриншотами ключевых разрешений, ограничениями кроссбраузерной проверки и рекомендациями по производительности.
+- [x] Создать изолированный непубличный QA-аккаунт с ролью `user` только для проверки universal login и личного dashboard.
+- [x] Проверить в браузере QA-цепочку: `/login` → `/dashboard`, запрет `/admin` и адаптивность личного dashboard на целевых размерах.
+- [x] Удалить временный QA-аккаунт, подтвердить очистку данных и обновить responsive-report результатом проверки.
+- [x] Проверить `/admin/submissions`, `/admin/announcements`, `/admin/announcements/edit` и `/admin/content` в full 8-viewport Founder matrix.
+- [x] Проверить portrait↔landscape resize для tablet, personal dashboard и ключевых Founder routes с явной проверкой overflow/clip/overlap.
+- [x] Задокументировать responsive rules для public, login, personal dashboard, Founder routes и dialog/modal behavior; подтвердить source review, что production routes не монтируют dialog/modal surface, и зафиксировать критерии QA для будущего использования.
