@@ -36,8 +36,8 @@ try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
-  await page.locator("#founder-email").fill(email);
-  await page.locator("#founder-password").fill(password);
+  await page.locator("#sign-in-email").fill(email);
+  await page.locator("#sign-in-password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL("**/dashboard", { timeout: 10000 });
   await page.getByRole("heading", { name: "Welcome back, Responsive QA User." }).waitFor({ timeout: 10000 });
@@ -89,9 +89,11 @@ try {
   if (orientation.overflow > 1 || !orientation.cardInsideViewport) throw new Error(`Dashboard orientation QA failed: ${JSON.stringify(orientation)}`);
 
   await page.goto(`${baseUrl}/admin`, { waitUntil: "networkidle" });
-  await page.getByRole("heading", { name: "Founder access required" }).waitFor({ timeout: 10000 });
+  await page.waitForURL("**/dashboard", { timeout: 10000 });
+  await page.getByRole("heading", { name: "Welcome back, Responsive QA User." }).waitFor({ timeout: 10000 });
   const denialUrl = new URL(page.url()).pathname;
-  if (denialUrl !== "/admin") throw new Error(`Expected protected /admin denial screen, received ${denialUrl}`);
+  if (denialUrl !== "/dashboard") throw new Error(`Expected private /admin redirect to dashboard, received ${denialUrl}`);
+  if (await page.getByText("Founder", { exact: true }).count()) throw new Error("Non-Founder dashboard disclosed Founder identity");
 
   await page.goto(`${baseUrl}/dashboard`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Welcome back, Responsive QA User." }).waitFor({ timeout: 10000 });

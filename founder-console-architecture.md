@@ -2,20 +2,20 @@
 
 ## Purpose and scope
 
-The Founder console is reduced to two protected modules: **Dashboard** and **Users**. Legacy Founder screens for submissions, announcements, content and announcement editing are removed from Founder navigation and application routes. The related Founder tRPC mutation/list procedures are also removed. Database records and public-site read/create contracts remain intact where the public website still requires them.
+The private control console is reduced to two protected modules: **Dashboard** and **Users**. Its authority and modules are not exposed in public navigation, universal sign-in copy, non-Founder dashboard copy, user directories or non-Founder API error responses. Legacy management screens for submissions, announcements, content and announcement editing are removed from protected navigation and application routes.
 
 ## Role governance
 
 | Role | Platform meaning | Users module authority |
 |---|---|---|
-| `founder` | Highest platform authority | Full access. Founder accounts are protected from edit, deactivation and deletion through the Users module. |
+| `founder` | Internal private control authority | Full access. This role and its records are excluded from all user-visible directories and detail responses. |
 | `super_admin` | Senior operational authority | May be issued and managed by Founder only. |
 | `admin` | Administrative operator | May be issued and managed by Founder only. |
 | `marketing` | Communications and marketing operator | May be issued and managed by Founder only. |
 | `teacher` | Educator account | May be issued and managed by Founder only. |
 | `student` | Learner account | May be issued and managed by Founder only. |
 
-The former generic `user` role is migrated to `student` for issued platform accounts. The enum retains `user` only as an internal compatibility value for framework-generated service/session identities; it is never selectable from the Founder interface. Founder is intentionally not selectable in create or edit forms, preventing the console from issuing a second high-authority account or allowing privilege escalation. A Founder cannot deactivate, delete or alter a Founder record through this module.
+The former generic `user` role is migrated to `student` for issued platform accounts. The enum retains `user` only as an internal compatibility value for framework-generated service/session identities; it is never selectable from the private control interface. The internal `founder` value is intentionally not selectable, listed, returned by user detail, or discoverable through a role filter.
 
 ## Users module contract
 
@@ -33,16 +33,16 @@ The deletion confirmation is a client safety barrier; the server separately enfo
 
 ## Dynamic Field Builder contract
 
-The **Configure create form** control in the Users module opens a Founder-only configuration dialog for every field used by the account-creation form. The runtime **New user** modal reads the active schema and renders the configured base and profile fields directly from that metadata, so a Founder can change the account-creation profile without a frontend deployment or code change.
+The **Configure create form** control in the Users module opens a private configuration dialog for every field used by the account-creation form. The runtime **New user** modal reads the active schema and renders the configured fields directly from that metadata, so the form can change without a frontend deployment or code change.
 
 | Contract element | Storage and behaviour | Safety boundary |
 |---|---|---|
-| Sections | `userFormSections` stores title, icon, sort order and active state. A section organizes fields visually; it does not own user values. | Removing a section moves its fields to the ungrouped “Other details” area. No field definition or profile value is deleted by that action. |
-| Fields | `userFormFields` stores a generated stable key, visible label, supported type, required flag, order, placeholder, dropdown options, optional section, and active state. | Only six v1 types are accepted: `text`, `textarea`, `number`, `date`, `dropdown`, and `checkbox`. Image/file uploads, e-mail and password fields are excluded. |
+| Groups | `userFormSections` stores title, icon, sort order and active state. A group organises fields visually; it does not own user values. | Removing a group leaves its fields ungrouped. No field definition or value is deleted by that action. |
+| Fields | `userFormFields` stores a generated stable key, visible label, supported type, required flag, order, placeholder, dropdown options, optional group, and active state. | Only six configurable types are accepted: `text`, `textarea`, `number`, `date`, `dropdown`, and `checkbox`. |
 | Values | `userProfileValues` stores the EAV tuple `{ userId, fieldId, value }` with one value per user/field pair. | Values are never accepted as arbitrary columns. The server maps only submitted active field keys to known field IDs after validation. |
-| Base account fields | `siteSettings.user_create_system_fields_v1` persists the label, required flag, active/deleted state and display order for name, e-mail, role, password and account status. | Each field can be renamed, made optional, deleted from the form and restored. A deleted value is generated internally when a database account column requires one. |
+| Account-backed fields | `siteSettings.user_create_system_fields_v1` persists the label, required flag, visibility, display order and optional group assignment for name, e-mail, role, password and account status. | Each is presented as an ordinary field: it can be renamed, made optional, hidden from the form and restored. A hidden database-required value is generated internally. |
 
-The `users.formSchema`, `updateSystemFields`, `createSection`, `updateSection`, `removeSection`, `createField`, `updateField`, `removeField` and `reorderFields` procedures are all guarded by `founderProcedure`. The standard `users.create` procedure accepts optional base-account values plus an optional `profileValues` map. It validates active required fields on the server, then writes the account and approved EAV rows in one database transaction. A failed profile validation creates neither an account nor partial profile rows.
+The `users.formSchema`, `updateSystemFields`, `createSection`, `updateSection`, `removeSection`, `createField`, `updateField`, `removeField` and `reorderFields` procedures are all guarded by the private-role procedure. The standard `users.create` procedure accepts optional account-backed inputs plus an optional EAV values map. It validates active required fields on the server, then writes the account and approved EAV rows in one database transaction. A failed validation creates neither an account nor partial profile rows.
 
 | Field type | Server validation rule |
 |---|---|
@@ -52,21 +52,21 @@ The `users.formSchema`, `updateSystemFields`, `createSection`, `updateSection`, 
 | `dropdown` | A configured, normalized option only. |
 | `checkbox` | Literal `true` or `false`. |
 
-Required active fields are enforced server-side even if a browser is modified. Unknown, inactive or deleted profile keys are rejected. Empty optional values are omitted rather than stored. Field labels are converted to collision-resistant stable keys when metadata is created; labels may later change without losing the field identity used by stored values.
+Required visible fields are enforced server-side even if a browser is modified. Unknown, inactive or deleted keys are rejected. Empty optional values are omitted rather than stored. Field labels are converted to collision-resistant stable keys when metadata is created; labels may later change without losing the field identity used by stored values.
 
 The existing configurable-field list is orderable. A Founder can drag a row by its visible grip to move it; the client submits the complete ordered list of field IDs to `reorderFields`. The server rejects an incomplete list, an unknown ID or a duplicate ID, then updates all `sortOrder` values in a single transaction. The same list exposes 48px **move up** and **move down** controls as a keyboard and touch fallback. The runtime create form refreshes its schema when opened, so it renders the persisted order rather than a stale client cache.
 
 ### Lifecycle, migration and compatibility policy
 
-Migration `0008_eager_doctor_octopus.sql` adds only the three Field Builder tables. It does not rewrite the existing `users` table, so existing accounts remain valid with no additional profile values. Adding a section or field is backwards compatible because missing optional EAV rows are represented as empty values; a new field can be marked required only for future create-form submissions.
+Migration `0008_eager_doctor_octopus.sql` adds only the three Field Builder tables. It does not rewrite the existing `users` table, so existing accounts remain valid with no stored values for newly configured fields. Adding a group or field is backwards compatible because missing optional EAV rows are represented as empty values; a new field can be marked required only for future create-form submissions.
 
-Deleting a profile field deletes its associated EAV values as part of the managed data lifecycle. Deleting a base account field hides it from the create form rather than deleting a database column. The server generates an internal e-mail, password hash, name or default role/status if a deleted field is needed to form a valid account record; an account issued without a supplied e-mail and password is created inactive. Deleting a user deletes that user’s EAV profile values in the same transaction. The initial interface intentionally configures this capability only for the **create** form; presenting or editing historical dynamic values in existing-user detail is a separate future scope and must preserve the same validation and authorization rules.
+Deleting an EAV field deletes its associated values as part of the managed data lifecycle. Hiding an account-backed field removes it from the create form rather than deleting a database column. The server generates an internal e-mail, password hash, name or default role/status when a hidden field is required to form a valid account record; an account issued without a supplied e-mail and password is created inactive. Deleting a user deletes that user’s EAV values in the same transaction. The initial interface intentionally configures this capability only for the **create** form.
 
-> The Field Builder controls the visibility, labels and required status of base account fields in the create form. It does not expose raw password hashes or alter the database-column types that maintain account integrity.
+> The Field Builder controls field labels, visibility, required status and user-created group assignment. It does not expose raw password hashes or alter database-column types that maintain account integrity.
 
 ## Users navigation and modal interaction contract
 
-The Users page is divided into six local role modules: **Students**, **Teachers**, **Marketing**, **Admins**, **Super admins** and **Founders**. Selecting a module fixes the directory to that account type and resets its independent query, activity-state and registration-date filters. The Founder module remains visible for oversight, but Founder records are protected from modification and removal.
+The Users page is divided into five local role modules: **Students**, **Teachers**, **Marketing**, **Admins** and **Super admins**. Selecting a module fixes the directory to that account type and resets its independent query, activity-state and registration-date filters. Private control records are excluded server-side from list, role-filter and detail responses.
 
 Account actions are deliberately contained in modal windows. The **New user** control opens a validated creation modal, a directory row opens a detail/edit modal, and deletion requires a separate confirmation modal. This keeps list navigation stable while preserving keyboard escape, focus containment and an explicit destructive-action boundary.
 
@@ -86,22 +86,22 @@ Widget rendering is configuration-driven so a future analytics data source can p
 
 | Route | Module | Access |
 |---|---|---|
-| `/admin` | Dashboard | Founder only |
-| `/admin/users` | Users | Founder only |
-| `/admin/*` | Not found / safe route fallback | No legacy Founder module is exposed |
+| `/admin` | Private dashboard | Private control account only; all other authenticated roles are silently redirected to `/dashboard`. |
+| `/admin/users` | Private Users control | Private control account only; all other authenticated roles are silently redirected to `/dashboard`. |
+| `/admin/*` | Not found / safe route fallback | No legacy or private control module is exposed. |
 
 ## Verification record
 
 | Check | Result |
 |---|---|
 | Role migration | Existing database `user` records were migrated to `student`; the designated Founder record was retained. The internal enum compatibility value is not issuable through Users. |
-| Users unit coverage | Founder guard, permitted role validation, list filters, create delegation and protected Founder-target errors are covered. |
-| Field Builder unit coverage | Server validation covers required values, dropdown option allowlists, number/date/checkbox formats, optional omissions and unsupported metadata types. Router coverage verifies Founder-only Field Builder access, rejects unsupported field types, requires a duplicate-free full field order, and permits the Founder to edit or remove every base create-form field. |
-| Browser Users E2E | A self-cleaning temporary account completed all six role modules, keyboard modal close/reopen, Field Builder section and two profile fields creation, persisted drag-and-drop ordering, schema-driven user creation, EAV persistence verification, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. The test then removes the temporary fields and section; database cleanup was verified. |
+| Users unit coverage | Private-role guard, permitted role validation, excluded private records, list filters and create delegation are covered. |
+| Field Builder unit coverage | Server validation covers required values, dropdown option allowlists, number/date/checkbox formats, optional omissions and unsupported metadata types. Router coverage verifies private Field Builder access, rejects unsupported field types, requires a duplicate-free full field order, and permits configuration of every account-backed field. |
+| Browser Users E2E | A self-cleaning temporary account completed all five visible role modules, keyboard modal close/reopen, Field Builder group and two field creation, persisted drag-and-drop ordering, schema-driven user creation, EAV persistence verification, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. A standard account was silently redirected from `/admin/users` to `/dashboard` with no private-role disclosure. The test then removes only its temporary fields and group; database cleanup was verified. |
 | Responsive Founder matrix | Dashboard and Users passed 16 route–viewport checks across 8 target viewports plus 2 tablet orientation checks: zero overflow, fixed chrome preserved and no measured undersized visible button/link targets. |
 | Users modal layout | Create modal passed 4 mobile/tablet layout checks: zero overflow, dialog bounds inside viewport and no measured undersized control hit areas. |
-| Base-field browser QA | Founder renamed a base label, confirmed it persisted, removed `Account active`, confirmed it was absent from New user, then restored both labels and visibility to their original state. |
-| Regression | 33 automated tests passed; TypeScript and whitespace checks passed. The expanded self-cleaning Users E2E completed 15 checks, including drag-and-drop persistence, create-form ordering and cleanup. |
+| Field browser QA | A field label was renamed and restored; a field was hidden, confirmed absent from New user, then restored. Group selectors are available for every account-backed field and every configurable field. |
+| Regression | 33 automated tests passed; TypeScript and whitespace checks passed. The expanded self-cleaning Users E2E completed 16 checks, including drag-and-drop persistence, create-form ordering, cleanup and non-Founder private-console isolation. |
 
 ## Optional future launch gates
 

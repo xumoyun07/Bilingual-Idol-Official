@@ -48,7 +48,7 @@ export default function DashboardLayout({
   const { loading, user } = useAuth();
 
   useEffect(() => {
-    if (!loading && user && !["admin", "super_admin", "founder"].includes(user.role)) window.location.href = "/dashboard";
+    if (!loading && user && user.role !== "founder") window.location.replace("/dashboard");
   }, [loading, user]);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (!["admin", "super_admin", "founder"].includes(user.role)) return <DashboardLayoutSkeleton />
+  if (user.role !== "founder") return <DashboardLayoutSkeleton />
 
   return (
     <SidebarProvider
@@ -249,7 +249,7 @@ function DashboardLayoutContent({
         {!isMobile && (
           <header className="dashboard-fixed-header">
             <div>
-              <p className="dashboard-fixed-eyebrow">Founder workspace</p>
+              <p className="dashboard-fixed-eyebrow">Private workspace</p>
               <h2>{activeMenuItem?.label ?? "Overview"}</h2>
             </div>
             <span className="dashboard-fixed-status">Protected session</span>

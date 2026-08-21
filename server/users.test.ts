@@ -50,6 +50,7 @@ describe("Users router", () => {
     const result = await appRouter.createCaller(context("founder")).users.list({ query: "ari", role: "student", isActive: true, createdFrom: "2026-01-01", page: 0, pageSize: 25 });
     expect(list).toHaveBeenCalledWith(expect.objectContaining({ query: "ari", role: "student", isActive: true, createdFrom: "2026-01-01" }));
     expect(result.rows).toEqual([account]);
+    await expect(appRouter.createCaller(context("founder")).users.list({ role: "founder" as never })).rejects.toBeInstanceOf(TRPCError);
   });
 
   it("allows Founder to create only issued, non-Founder roles", async () => {
@@ -69,13 +70,13 @@ describe("Users router", () => {
     await expect(caller.users.createField({ label: "Unsafe", fieldType: "email" as never, isRequired: false, sortOrder: 2, isActive: true })).rejects.toBeInstanceOf(TRPCError);
   });
 
-  it("allows Founder to edit or delete every base create-form field", async () => {
+  it("allows private configuration of every account-backed form field and its group", async () => {
     const fields = [
-      { id: "name" as const, label: "Learner name", isRequired: false, isActive: false, sortOrder: 0 },
-      { id: "email" as const, label: "Contact e-mail", isRequired: false, isActive: false, sortOrder: 1 },
-      { id: "role" as const, label: "Access type", isRequired: false, isActive: true, sortOrder: 2 },
-      { id: "password" as const, label: "Access phrase", isRequired: false, isActive: false, sortOrder: 3 },
-      { id: "isActive" as const, label: "Enable sign-in", isRequired: false, isActive: false, sortOrder: 4 },
+      { id: "name" as const, label: "Learner name", isRequired: false, isActive: false, sortOrder: 0, sectionId: null },
+      { id: "email" as const, label: "Contact e-mail", isRequired: false, isActive: false, sortOrder: 1, sectionId: null },
+      { id: "role" as const, label: "Access type", isRequired: false, isActive: true, sortOrder: 2, sectionId: 7 },
+      { id: "password" as const, label: "Access phrase", isRequired: false, isActive: false, sortOrder: 3, sectionId: null },
+      { id: "isActive" as const, label: "Enable sign-in", isRequired: false, isActive: false, sortOrder: 4, sectionId: null },
     ];
     const update = vi.spyOn(db, "updateUserSystemFields").mockResolvedValue(fields.map(field => ({ ...field, inputType: field.id === "role" ? "role" : field.id === "isActive" ? "checkbox" : field.id })) as never);
     await expect(appRouter.createCaller(context("admin")).users.updateSystemFields({ fields })).rejects.toMatchObject({ code: "FORBIDDEN" });

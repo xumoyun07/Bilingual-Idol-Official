@@ -27,7 +27,6 @@ function Router() {
     <Route path="/enroll" component={Enroll} />
     <Route path="/login" component={FounderLogin} />
     <Route path="/dashboard" component={UserDashboard} />
-    <Route path="/admin/login" component={FounderLogin} />
     <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />
     <Route path="/404" component={NotFound} />

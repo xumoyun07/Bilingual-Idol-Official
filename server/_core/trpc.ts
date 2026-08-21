@@ -49,7 +49,7 @@ export const founderProcedure = t.procedure.use(
     const { ctx, next } = opts;
 
     if (!ctx.user || ctx.user.role !== 'founder') {
-      throw new TRPCError({ code: "FORBIDDEN", message: "Founder access is required." });
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
     }
 
     return next({

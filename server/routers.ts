@@ -17,15 +17,6 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    founderAuthStatus: publicProcedure.query(() => ({ configured: isFounderAuthConfigured() })),
-    founderLogin: publicProcedure.input(z.object({ email: z.string().email().max(320), password: z.string().min(1).max(256) })).mutation(async ({ ctx, input }) => {
-      if (!isFounderAuthConfigured()) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Founder sign-in is not configured." });
-      if (!verifyFounderCredentials(input.email, input.password)) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid e-mail or password." });
-      await db.upsertUser({ openId: FOUNDER_OPEN_ID, name: "Founder", email: FOUNDER_EMAIL, loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
-      const token = await sdk.createSessionToken(FOUNDER_OPEN_ID, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
-      ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
-      return { success: true } as const;
-    }),
     login: publicProcedure.input(z.object({ email: z.string().email().max(320), password: z.string().min(1).max(256) })).mutation(async ({ ctx, input }) => {
       const email = input.email.trim().toLowerCase();
       if (isFounderAuthConfigured() && verifyFounderCredentials(email, input.password)) {

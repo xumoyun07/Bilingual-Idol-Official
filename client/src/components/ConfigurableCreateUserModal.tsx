@@ -7,7 +7,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 
 type ManagedRole = "student" | "teacher" | "marketing" | "admin" | "super_admin";
 type Draft = { name: string; email: string; password: string; role: ManagedRole; isActive: boolean };
-type SystemField = { id: "name" | "email" | "role" | "password" | "isActive"; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number };
+type SystemField = { id: "name" | "email" | "role" | "password" | "isActive"; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
 const roles: ManagedRole[] = ["student", "teacher", "marketing", "admin", "super_admin"];
 const roleLabels: Record<ManagedRole, string> = { student: "Student", teacher: "Teacher", marketing: "Marketing", admin: "Admin", super_admin: "Super admin" };
 
@@ -17,7 +17,7 @@ export function ConfigurableCreateUserModal({ draft, setDraft, profileValues, se
   const fields = (schema.data?.fields ?? []) as DynamicField[];
   const sections = (schema.data?.sections ?? []) as DynamicSection[];
   return <form data-testid="users-modal-form" onSubmit={onSubmit}>
-    <DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-left"><p className="founder-command-eyebrow">Issue new access</p><DialogTitle className="font-display text-4xl text-[#10253e]">Create user</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">This form follows the active Field Builder configuration. Deleted base fields are safely generated in the background so the account record remains valid.</DialogDescription></DialogHeader>
+    <DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-left"><p className="founder-command-eyebrow">Issue new access</p><DialogTitle className="font-display text-4xl text-[#10253e]">Create user</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">This form follows the active Field Builder configuration. Hidden fields are safely generated in the background when needed so the account record remains valid.</DialogDescription></DialogHeader>
     <div className="px-6 py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>Account action needs attention</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}{schema.isLoading ? <div className="grid min-h-48 place-items-center"><Loader2 className="animate-spin text-[#397563]" /></div> : <><div className="grid gap-4 sm:grid-cols-2">{systemFields.map(field => <SystemInput key={field.id} field={field} draft={draft} setDraft={setDraft} />)}</div><DynamicUserProfileFields fields={fields} sections={sections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /></>}</div>
     <DialogFooter className="border-t border-[#e6dccd] bg-white px-6 py-5"><div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-end"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">Cancel</Button><Button type="submit" disabled={pending || schema.isLoading} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}Create user</Button></div></DialogFooter>
   </form>;

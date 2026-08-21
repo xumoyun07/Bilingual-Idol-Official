@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, like, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
 import { Announcement, announcements, InsertUser, Program, programs, siteSettings, Submission, submissions, TeamProfile, teamProfiles, testimonials, User, userFormFields, userFormSections, userProfileValues, users } from "../drizzle/schema";
@@ -78,6 +78,7 @@ export async function listManagedUsers(filters: ManagedUserFilters = {}) {
     const pattern = `%${query}%`;
     conditions.push(or(like(users.name, pattern), like(users.email, pattern), like(users.openId, pattern), like(users.loginMethod, pattern)));
   }
+  conditions.push(ne(users.role, "founder"));
   if (filters.role) conditions.push(eq(users.role, filters.role));
   if (filters.isActive !== undefined) conditions.push(eq(users.isActive, filters.isActive));
   if (filters.createdFrom) conditions.push(gte(users.createdAt, new Date(`${filters.createdFrom}T00:00:00.000Z`)));
@@ -95,20 +96,20 @@ export async function listManagedUsers(filters: ManagedUserFilters = {}) {
 export async function getManagedUser(id: number) {
   const database = requireDatabase(await getDb());
   const row = (await database.select().from(users).where(eq(users.id, id)).limit(1))[0];
-  return row ? safeManagedUser(row) : undefined;
+  return row && row.role !== "founder" ? safeManagedUser(row) : undefined;
 }
 
 type UserProfileValuesInput = Record<string, string>;
 export const userSystemFieldIds = ["name", "email", "role", "password", "isActive"] as const;
 export type UserSystemFieldId = (typeof userSystemFieldIds)[number];
-export type RuntimeUserSystemField = { id: UserSystemFieldId; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number };
+export type RuntimeUserSystemField = { id: UserSystemFieldId; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
 const systemFieldSettingsKey = "user_create_system_fields_v1";
 const defaultSystemFields: RuntimeUserSystemField[] = [
-  { id: "name", label: "Full name", inputType: "text", isRequired: true, isActive: true, sortOrder: 0 },
-  { id: "email", label: "E-mail", inputType: "email", isRequired: true, isActive: true, sortOrder: 1 },
-  { id: "role", label: "User type", inputType: "role", isRequired: true, isActive: true, sortOrder: 2 },
-  { id: "password", label: "Initial password", inputType: "password", isRequired: true, isActive: true, sortOrder: 3 },
-  { id: "isActive", label: "Account active", inputType: "checkbox", isRequired: false, isActive: true, sortOrder: 4 },
+  { id: "name", label: "Full name", inputType: "text", isRequired: true, isActive: true, sortOrder: 0, sectionId: null },
+  { id: "email", label: "E-mail", inputType: "email", isRequired: true, isActive: true, sortOrder: 1, sectionId: null },
+  { id: "role", label: "User type", inputType: "role", isRequired: true, isActive: true, sortOrder: 2, sectionId: null },
+  { id: "password", label: "Initial password", inputType: "password", isRequired: true, isActive: true, sortOrder: 3, sectionId: null },
+  { id: "isActive", label: "Account active", inputType: "checkbox", isRequired: false, isActive: true, sortOrder: 4, sectionId: null },
 ];
 
 function normaliseSystemFields(raw: unknown): RuntimeUserSystemField[] {
@@ -122,6 +123,7 @@ function normaliseSystemFields(raw: unknown): RuntimeUserSystemField[] {
       isRequired: typeof field?.isRequired === "boolean" ? field.isRequired : defaultField.isRequired,
       isActive: typeof field?.isActive === "boolean" ? field.isActive : defaultField.isActive,
       sortOrder: typeof field?.sortOrder === "number" && Number.isInteger(field.sortOrder) && field.sortOrder >= 0 ? field.sortOrder : defaultField.sortOrder,
+      sectionId: typeof field?.sectionId === "number" && Number.isInteger(field.sectionId) && field.sectionId > 0 ? field.sectionId : null,
     };
   }).sort((a, b) => a.sortOrder - b.sortOrder || userSystemFieldIds.indexOf(a.id) - userSystemFieldIds.indexOf(b.id));
 }

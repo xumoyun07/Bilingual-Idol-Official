@@ -31,34 +31,34 @@ try {
   browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
   await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
-  await page.locator("#founder-email").fill(founderEmail);
-  await page.locator("#founder-password").fill(founderPassword);
+  await page.locator("#sign-in-email").fill(founderEmail);
+  await page.locator("#sign-in-password").fill(founderPassword);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL("**/admin", { timeout: 10000 });
   await page.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: /people, organised by responsibility/i }).waitFor({ timeout: 10000 });
-  pass("Founder opens role-separated Users console", "Founder session reached /admin/users");
+  pass("Private account opens role-separated Users console", "Private control session reached /admin/users");
 
   const modules = page.locator('nav[aria-label="User type modules"]');
-  for (const role of ["Students", "Teachers", "Marketing", "Admins", "Super admins", "Founders"]) {
+  for (const role of ["Students", "Teachers", "Marketing", "Admins", "Super admins"]) {
     await modules.getByRole("button", { name: `Type ${role}`, exact: true }).click();
     await page.getByRole("heading", { name: new RegExp(`${role} directory`, "i") }).waitFor({ timeout: 10000 });
   }
   await modules.getByRole("button", { name: "Type Students", exact: true }).click();
-  pass("Role mini-navigation", "All six user type modules opened their own directory surface");
+  pass("Role mini-navigation", "All five visible user type modules opened their own directory surface");
 
   await page.getByRole("button", { name: "Configure create form" }).click();
   const builder = page.getByRole("dialog");
   await builder.getByRole("heading", { name: "Field Builder" }).waitFor({ timeout: 10000 });
   await builder.locator("#section-title").fill(qaSectionTitle);
-  await builder.getByRole("button", { name: "Add section" }).click();
+  await builder.getByRole("button", { name: "Add group" }).click();
   await builder.locator("span").filter({ hasText: qaSectionTitle }).first().waitFor({ timeout: 10000 });
   await builder.getByRole("textbox", { name: "Label", exact: true }).fill(qaFieldLabel);
-  await builder.locator("select").first().selectOption("dropdown");
+  await builder.locator('select:has(option[value="dropdown"])').selectOption("dropdown");
   await builder.getByRole("textbox", { name: /options/i }).fill("Beginner\nAdvanced");
-  await builder.locator("select").nth(1).selectOption({ label: qaSectionTitle });
+  await builder.locator("select").last().selectOption({ label: qaSectionTitle });
   await builder.getByLabel("Required field").check();
-  await builder.getByRole("button", { name: "Add field" }).click();
+  await builder.getByRole("button", { name: "Create field" }).click();
   await builder.locator("p").filter({ hasText: qaFieldLabel }).first().waitFor({ timeout: 10000 });
   const [[sectionRow]] = await database.execute("SELECT id FROM userFormSections WHERE title = ?", [qaSectionTitle]);
   const [[fieldRow]] = await database.execute("SELECT id, `key` FROM userFormFields WHERE label = ?", [qaFieldLabel]);
@@ -67,14 +67,14 @@ try {
   qaFieldKey = String(fieldRow.key);
   if (!qaSectionId || !qaFieldId) throw new Error("Field Builder metadata was not persisted");
   await builder.getByRole("textbox", { name: "Label", exact: true }).fill(qaFieldTwoLabel);
-  await builder.locator("select").nth(1).selectOption({ label: qaSectionTitle });
-  await builder.getByRole("button", { name: "Add field" }).click();
+  await builder.locator("select").last().selectOption({ label: qaSectionTitle });
+  await builder.getByRole("button", { name: "Create field" }).click();
   await builder.locator("p").filter({ hasText: qaFieldTwoLabel }).first().waitFor({ timeout: 10000 });
   const [[fieldTwoRow]] = await database.execute("SELECT id, `key` FROM userFormFields WHERE label = ?", [qaFieldTwoLabel]);
   qaFieldTwoId = Number(fieldTwoRow.id);
   qaFieldTwoKey = String(fieldTwoRow.key);
   if (!qaFieldTwoId) throw new Error("Second Field Builder metadata field was not persisted");
-  pass("Field Builder schema configuration", "Founder created a temporary section and two editable profile fields through the modal builder");
+  pass("Field Builder schema configuration", "Temporary group and two editable fields were created through the modal builder");
   const fieldTwoCard = builder.locator('[draggable="true"]').filter({ hasText: qaFieldTwoLabel });
   const fieldOneCard = builder.locator('[draggable="true"]').filter({ hasText: qaFieldLabel });
   await fieldTwoCard.dragTo(fieldOneCard);
@@ -103,6 +103,19 @@ try {
   await dialog.getByRole("textbox", { name: "Initial password" }).fill("temporary-qa-password");
   const runtimeKeys = await dialog.locator("[data-profile-field-key]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-profile-field-key")));
   if (runtimeKeys.findIndex(key => key === qaFieldTwoKey) > runtimeKeys.findIndex(key => key === qaFieldKey)) throw new Error("Create form did not use persisted dynamic field order");
+  const runtimeFields = dialog.locator("[data-profile-field-key]");
+  for (let index = 0; index < await runtimeFields.count(); index += 1) {
+    const field = runtimeFields.nth(index);
+    if (await field.getAttribute("data-profile-field-key") === qaFieldKey) continue;
+    const select = field.locator("select");
+    const textarea = field.locator("textarea");
+    const checkbox = field.locator('input[type="checkbox"]');
+    const input = field.locator("input").first();
+    if (await select.count()) { if (await select.locator("option").count() > 1) await select.selectOption({ index: 1 }); }
+    else if (await checkbox.count()) await checkbox.check();
+    else if (await textarea.count()) await textarea.fill("Temporary QA value");
+    else if (await input.count()) { const type = await input.getAttribute("type"); await input.fill(type === "date" ? "2026-01-02" : type === "number" ? "1" : "Temporary QA value"); }
+  }
   await dialog.getByLabel(qaFieldLabel).selectOption(qaFieldValue);
   await page.waitForTimeout(100);
   await dialog.getByTestId("users-modal-form").evaluate(form => form.requestSubmit());
@@ -110,6 +123,17 @@ try {
   await page.getByText(qaName, { exact: true }).first().waitFor({ timeout: 10000 });
   const [[userRow]] = await database.execute("SELECT id FROM users WHERE email = ?", [qaEmail]);
   qaUserId = Number(userRow.id);
+  const memberPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  await memberPage.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
+  await memberPage.locator("#sign-in-email").fill(qaEmail);
+  await memberPage.locator("#sign-in-password").fill("temporary-qa-password");
+  await memberPage.getByRole("button", { name: "Sign in" }).click();
+  await memberPage.waitForURL("**/dashboard", { timeout: 10000 });
+  await memberPage.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
+  await memberPage.waitForURL("**/dashboard", { timeout: 10000 });
+  if (await memberPage.getByText("Founder", { exact: true }).count()) throw new Error("Non-Founder private dashboard disclosed Founder identity");
+  await memberPage.close();
+  pass("Private console isolation", "A regular account was redirected from /admin/users to its dashboard without Founder disclosure");
   const [[profileRow]] = await database.execute("SELECT value FROM userProfileValues WHERE userId = ? AND fieldId = ?", [qaUserId, qaFieldId]);
   if (profileRow.value !== qaFieldValue) throw new Error("Dynamic profile value was not persisted with the created account");
   pass("Modal create user", "Student account was created through the focused create modal");
@@ -126,8 +150,8 @@ try {
 
   const inactivePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await inactivePage.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
-  await inactivePage.locator("#founder-email").fill(qaEmail);
-  await inactivePage.locator("#founder-password").fill("temporary-qa-password");
+  await inactivePage.locator("#sign-in-email").fill(qaEmail);
+  await inactivePage.locator("#sign-in-password").fill("temporary-qa-password");
   await inactivePage.getByRole("button", { name: "Sign in" }).click();
   await inactivePage.getByText("Invalid e-mail or password.", { exact: true }).waitFor({ timeout: 10000 });
   await inactivePage.close();
@@ -170,11 +194,10 @@ try {
   const fieldConfirmation = page.getByRole("alertdialog");
   await fieldConfirmation.getByRole("button", { name: "Delete field" }).click({ force: true });
   await builder.getByRole("button", { name: `Delete ${qaFieldLabel}` }).waitFor({ state: "detached", timeout: 10000 });
-  await builder.getByText("No additional profile fields are configured yet. Add one above; it will then appear here with edit, delete and reorder controls.", { exact: true }).waitFor({ timeout: 10000 });
   await builder.getByRole("button", { name: `Remove ${qaSectionTitle}` }).click();
   const sectionConfirmation = page.getByRole("alertdialog");
   await sectionConfirmation.getByRole("button", { name: "Remove section" }).click({ force: true });
-  await builder.getByText("No sections yet. New fields can also stay in Other details.", { exact: true }).waitFor({ timeout: 10000 });
+  await builder.getByRole("button", { name: `Remove ${qaSectionTitle}` }).waitFor({ state: "detached", timeout: 10000 });
   const [[fieldCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormFields WHERE id IN (?, ?)", [qaFieldId, qaFieldTwoId]);
   const [[sectionCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormSections WHERE id = ?", [qaSectionId]);
   if (Number(fieldCount.count) !== 0 || Number(sectionCount.count) !== 0) throw new Error("Temporary Field Builder metadata cleanup was incomplete");

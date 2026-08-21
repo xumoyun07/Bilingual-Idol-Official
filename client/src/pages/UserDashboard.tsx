@@ -4,7 +4,7 @@ import { ArrowLeft, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "wouter";
 
-const OPERATIONS_ROLES = ["admin", "super_admin", "founder"];
+const OPERATIONS_ROLES = ["founder"];
 
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });

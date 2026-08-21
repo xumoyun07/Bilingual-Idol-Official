@@ -15,7 +15,7 @@ const profileInput = z.object({
   isActive: z.boolean(),
 });
 const passwordInput = z.string().min(10, "Use at least 10 characters for the password.").max(256);
-const systemFieldInput = z.object({ id: z.enum(["name", "email", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100) });
+const systemFieldInput = z.object({ id: z.enum(["name", "email", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100), sectionId: z.number().int().positive().nullable().default(null) });
 const createProfileInput = z.object({ name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160).optional(), email: z.string().trim().email("Enter a valid e-mail address.").max(320).optional(), role: managedRole.optional(), isActive: z.boolean().optional() });
 
 function userError(error: unknown): never {
@@ -26,7 +26,7 @@ function userError(error: unknown): never {
 export const usersRouter = router({
   list: founderProcedure.input(z.object({
     query: z.string().trim().max(160).optional(),
-    role: z.enum(["user", "student", "teacher", "marketing", "admin", "super_admin", "founder"]).optional(),
+    role: z.enum(["user", "student", "teacher", "marketing", "admin", "super_admin"]).optional(),
     isActive: z.boolean().optional(),
     createdFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     createdTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -35,7 +35,7 @@ export const usersRouter = router({
   })).query(({ input }) => db.listManagedUsers(input)),
   byId: founderProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input }) => {
     const account = await db.getManagedUser(input.id);
-    if (!account) throw new TRPCError({ code: "NOT_FOUND", message: "Account not found." });
+    if (!account || account.role === "founder") throw new TRPCError({ code: "NOT_FOUND", message: "Account not found." });
     return account;
   }),
   formSchema: founderProcedure.query(() => db.getUserFormSchema(true)),
