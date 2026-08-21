@@ -22,7 +22,7 @@
 - [x] Add route-specific metadata management and document a targeted keyboard and form-flow accessibility review.
 - [x] Add the Founder role as the highest platform role, separate from Super Admin, with authority to create, edit, publish, and delete managed centre data.
 - [x] Update role-based access checks, founder account bootstrap behavior, dashboard wording, and automated authorization tests for the Founder hierarchy.
-- [ ] Founder acceptance test: enter authentic production content, test keyboard navigation and form submission with the intended Founder account, then confirm publishing readiness.
+- [ ] Founder acceptance test: enter authentic production content, test keyboard navigation and form submission with the intended Founder account, then confirm publishing readiness. **Owner-deferred:** no content-operation action was requested or performed.
 - [x] Configure automatic Founder role assignment for the specified account by its verified OAuth e-mail; do not store or handle the supplied password in the application.
 - [x] Verify that the designated Founder can enter the console after OAuth authentication while a regular account remains denied.
 - [x] Replace OAuth-dependent Founder entry with a minimal email-and-password sign-in form without self-registration.
@@ -76,7 +76,7 @@
 - [x] Захватить и проверить tablet-представления ключевых public, learning и Founder маршрутов после финальной пересборки.
 - [x] Создать concrete route-level Founder components для command header, navigation tabs, metric cards, data tables, form shells и state panels в каждом Founder-маршруте.
 - [x] Закрепить header и боковую навигацию Founder dashboard на всех защищённых маршрутах, чтобы они не смещались при прокрутке и переходах между разделами.
-- [ ] Зафиксировать явное подтверждение Founder acceptance: реальные записи были созданы/изменены/опубликованы, а keyboard-навигация и отправка форм проверены.
+- [ ] Зафиксировать явное подтверждение Founder acceptance: реальные записи были созданы/изменены/опубликованы, а keyboard-навигация и отправка форм проверены. **Owner-deferred:** read-only acceptance completed; real content operations skipped by user instruction.
 - [x] Сделать первый hero-блок главной страницы точным initial viewport вместе с наложенной public header, без жёстких offsets, клиппинга и дополнительной прокрутки первого экрана.
 - [x] Подтвердить desktop/mobile hero QA измерениями: основной контент, CTA и адаптивная Learning Compass композиция полностью помещаются в initial viewport.
 - [x] Зафиксировать mobile hero как намеренно сокращённую одноколоночную композицию без secondary orientation card, сохраняя обе CTA и языковой ряд в initial viewport.
@@ -101,4 +101,5 @@
 - [x] Проверить portrait↔landscape resize для tablet, personal dashboard и ключевых Founder routes с явной проверкой overflow/clip/overlap.
 - [x] Задокументировать responsive rules для public, login, personal dashboard, Founder routes и dialog/modal behavior; подтвердить source review, что production routes не монтируют dialog/modal surface, и зафиксировать критерии QA для будущего использования.
 - [x] Выполнить Founder acceptance sign-in и проверить защищённые content-management workflows с реальным Founder session без создания или публикации данных.
-- [ ] Получить отдельное подтверждение конкретного реального контента перед созданием, изменением или публикацией Founder-managed records.
+- [ ] Получить отдельное подтверждение конкретного реального контента перед созданием, изменением или публикацией Founder-managed records. **Owner-deferred:** user instructed the project to skip this step.
+- [x] Зафиксировать, что content-operation acceptance (создание, изменение, публикация и удаление) пропущен по явному указанию пользователя без изменения рабочих данных.

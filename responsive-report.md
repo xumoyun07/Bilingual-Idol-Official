@@ -139,7 +139,7 @@ The stated product target is an LCP of **2.5 seconds or less on simulated 3G mob
 | Open item | Why it remains open | Required closure |
 |---|---|---|
 | Cross-browser review | Automated evidence is Chromium-only | Manually validate Firefox, Safari and Yandex Browser in their native environments |
-| Founder acceptance | Real centre content and publishing actions have not been acceptance-tested with the Founder | Enter authentic content, test keyboard/form workflows, and record approval |
+| Founder content-operation acceptance | The owner instructed the project to skip content creation, editing, publication and deletion at this stage | No content operation was performed; resume only when the owner supplies authentic content and an explicit intended action |
 | Moderated usability testing | Target-group sessions have not yet occurred | Recruit representative users, run moderated sessions and prioritise findings |
 
 ## Reproduction

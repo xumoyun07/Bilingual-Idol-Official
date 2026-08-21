@@ -23,6 +23,10 @@ The review did not create, modify, publish, unpublish or delete a centre record.
 
 > To complete Founder acceptance, supply the exact content record(s) to create or modify and state whether each record must remain a draft or be published. A final confirmation is required immediately before a public publication or deletion action.
 
+## Owner decision
+
+After the read-only Founder acceptance review, the owner explicitly instructed the project to **skip this content-operation step**. Accordingly, no real content was supplied, no form submission was made, and no create, edit, publication, unpublication or deletion action was performed. This is recorded as an owner-deferred acceptance stage, not as a completed production-content acceptance.
+
 ## Related automated evidence
 
 The companion responsive evidence validates the same protected routes at five routes by eight viewports, with zero overflow, fixed-layout or measured button/link target failures. See `responsive-report.md` for the full route matrix, screenshots and raw evidence links.
