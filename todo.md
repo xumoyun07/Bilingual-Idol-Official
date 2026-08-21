@@ -100,3 +100,5 @@
 - [x] Проверить `/admin/submissions`, `/admin/announcements`, `/admin/announcements/edit` и `/admin/content` в full 8-viewport Founder matrix.
 - [x] Проверить portrait↔landscape resize для tablet, personal dashboard и ключевых Founder routes с явной проверкой overflow/clip/overlap.
 - [x] Задокументировать responsive rules для public, login, personal dashboard, Founder routes и dialog/modal behavior; подтвердить source review, что production routes не монтируют dialog/modal surface, и зафиксировать критерии QA для будущего использования.
+- [x] Выполнить Founder acceptance sign-in и проверить защищённые content-management workflows с реальным Founder session без создания или публикации данных.
+- [ ] Получить отдельное подтверждение конкретного реального контента перед созданием, изменением или публикацией Founder-managed records.
