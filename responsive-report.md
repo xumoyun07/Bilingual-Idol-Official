@@ -6,7 +6,7 @@
 
 ## Executive summary
 
-The public platform, universal login screen and Founder console were rechecked after targeted responsive fixes. The completed automated public matrix contains **56 route–viewport checks** (seven current public routes at eight target sizes), with **zero horizontal-overflow failures** and **zero primary-CTA touch-target failures**. The protected Founder console contains **five authenticated layout checks**, again with **zero overflow or fixed-layout failures**.
+The public platform, universal login screen and Founder console were rechecked after targeted responsive fixes. The completed automated public matrix contains **56 route–viewport checks** (seven current public routes at eight target sizes), with **zero horizontal-overflow failures** and **zero primary-CTA touch-target failures**. The protected Founder console contains **eight authenticated layout checks**, again with **zero overflow or fixed-layout failures**.
 
 The main corrections remove 40px desktop header CTA overrides, set the mobile navigation trigger to an explicit 48×48px control, and raise key Founder navigation, profile and mobile-menu controls to a 48px minimum. The public shell also contains resilient horizontal-overflow protection and media sizing rules. No fictional content, reviews or learner data were introduced during this work.
 
@@ -36,14 +36,21 @@ The protected QA logs in with the configured Founder account, evaluates document
 
 | Viewport | Overflow | Fixed workspace header | Fixed navigation rail | Status |
 |---|---:|---|---|---|
+| 360×640 | 0px | Top remains 0px after scroll | Compact mobile mode; rail is not rendered as a permanent control | Pass |
 | 390×844 | 0px | Top remains 0px after scroll | Compact mobile mode; rail is not rendered as a permanent control | Pass |
+| 412×915 | 0px | Top remains 0px after scroll | Compact mobile mode; rail is not rendered as a permanent control | Pass |
 | 768×1024 | 0px | Top remains 0px after scroll | Present at top 0px in captured state | Pass |
 | 1024×1366 | 0px | Top remains 0px after scroll | Top remains 0px after scroll | Pass |
 | 1366×768 | 0px | Top remains 0px after scroll | Top remains 0px after scroll | Pass |
 | 1920×1080 | 0px | Top remains 0px after scroll | Top remains 0px after scroll | Pass |
-| **Total** | **0 failures** | **5/5 passing** | **All applicable desktop checks passing** | **Pass** |
+| 3840×2160 | 0px | Top remains 0px after scroll | Top remains 0px after scroll | Pass |
+| **Total** | **0 failures** | **8/8 passing** | **All applicable desktop checks passing** | **Pass** |
 
-The raw, reproducible output is preserved in [`public-qa.json`](/manus-storage/public-qa_d911ff04.json) and [`founder-qa.json`](/manus-storage/founder-qa_1a78100a.json).
+The raw, reproducible output is preserved in [`public-qa.json`](/manus-storage/public-qa_d911ff04.json) and [`founder-qa-full.json`](/manus-storage/founder-qa-full_271aaca1.json).
+
+### Orientation resize
+
+An additional same-session resize test loaded each current public route at 360×640 and changed it to 640×360. All **7/7** routes retained zero horizontal overflow and no navigation menu was left open after the resize. The raw result is preserved in [`orientation-qa.json`](/manus-storage/orientation-qa_363418fe.json).
 
 ## Implemented responsive rules
 
@@ -106,7 +113,6 @@ The stated product target is an LCP of **2.5 seconds or less on simulated 3G mob
 |---|---|---|
 | Non-Founder account journey | No centre-issued non-Founder account has been supplied or provisioned for safe testing | Create a private scrypt-hashed test account, verify `/login` → `/dashboard`, and verify that `/admin` is denied |
 | Full Founder 8-viewport matrix | The Founder console has five authenticated dimensions in this report, while public routes cover all eight target dimensions | Repeat authenticated Founder QA at 360×640, 412×915 and 3840×2160 if full matrix parity is required |
-| Orientation-change evidence | Portrait dimensions are covered; an explicit resize/orientation automation run has not yet been recorded | Add portrait-to-landscape checks at mobile and tablet sizes |
 | Cross-browser review | Automated evidence is Chromium-only | Manually validate Firefox, Safari and Yandex Browser in their native environments |
 | Founder acceptance | Real centre content and publishing actions have not been acceptance-tested with the Founder | Enter authentic content, test keyboard/form workflows, and record approval |
 | Moderated usability testing | Target-group sessions have not yet occurred | Recruit representative users, run moderated sessions and prioritise findings |

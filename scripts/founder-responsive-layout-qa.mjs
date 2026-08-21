@@ -5,7 +5,9 @@ const email = process.env.FOUNDER_QA_EMAIL;
 const password = process.env.FOUNDER_QA_PASSWORD;
 if (!email || !password) throw new Error("FOUNDER_QA_EMAIL and FOUNDER_QA_PASSWORD are required");
 
-const viewports = [[390, 844], [768, 1024], [1024, 1366], [1366, 768], [1920, 1080]];
+const viewports = [
+  [360, 640], [390, 844], [412, 915], [768, 1024], [1024, 1366], [1366, 768], [1920, 1080], [3840, 2160],
+];
 const browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
 const checks = [];
 const failures = [];
