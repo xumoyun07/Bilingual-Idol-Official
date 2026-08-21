@@ -71,8 +71,8 @@ await check("enrollment form exposes keyboard validation feedback", async () => 
   if (invalidControls < 1 || alerts < 1) throw new Error("Expected invalid controls and alert feedback after keyboard submission");
 });
 
-await check("unauthenticated access to Founder editor redirects to universal sign in", async () => {
-  await page.goto(`${baseUrl}/admin/announcements/edit`, { waitUntil: "networkidle" });
+await check("unauthenticated access to Founder Users redirects to universal sign in", async () => {
+  await page.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
   await page.waitForURL("**/login", { timeout: 10000 });
   if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Universal sign-in form is not visible after protected-route redirect");
 });

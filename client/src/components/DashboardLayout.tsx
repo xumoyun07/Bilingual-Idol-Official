@@ -20,18 +20,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpenText, ClipboardList, LayoutDashboard, LogOut, Megaphone, PanelLeft } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, UsersRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Overview", path: "/admin" },
-  { icon: ClipboardList, label: "Submissions", path: "/admin/submissions" },
-  { icon: Megaphone, label: "Announcements", path: "/admin/announcements" },
-  { icon: Megaphone, label: "Edit announcements", path: "/admin/announcements/edit" },
-  { icon: BookOpenText, label: "Content", path: "/admin/content" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+  { icon: UsersRound, label: "Users", path: "/admin/users" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

@@ -5,7 +5,6 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
-import AnnouncementEditor from "./pages/AnnouncementEditor";
 import Contact from "./pages/Contact";
 import Enroll from "./pages/Enroll";
 import FounderLogin from "./pages/FounderLogin";
@@ -29,8 +28,7 @@ function Router() {
     <Route path="/login" component={FounderLogin} />
     <Route path="/dashboard" component={UserDashboard} />
     <Route path="/admin/login" component={FounderLogin} />
-    <Route path="/admin/announcements/edit" component={AnnouncementEditor} />
-    <Route path="/admin/:rest*?" component={Admin} />
+    <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />
     <Route path="/404" component={NotFound} />
     <Route component={NotFound} />

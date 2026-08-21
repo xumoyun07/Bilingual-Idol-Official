@@ -103,3 +103,10 @@
 - [x] Выполнить Founder acceptance sign-in и проверить защищённые content-management workflows с реальным Founder session без создания или публикации данных.
 - [ ] Получить отдельное подтверждение конкретного реального контента перед созданием, изменением или публикацией Founder-managed records. **Owner-deferred:** user instructed the project to skip this step.
 - [x] Зафиксировать, что content-operation acceptance (создание, изменение, публикация и удаление) пропущен по явному указанию пользователя без изменения рабочих данных.
+- [x] Определить финальную иерархию ролей `founder`, `super_admin`, `admin`, `marketing`, `teacher`, `student` и разрешённые действия Users module.
+- [x] Удалить из Founder navigation и routing все прежние content, submissions и announcements modules, оставив только Dashboard и Users.
+- [x] Подготовить масштабируемый Founder Dashboard shell для metric widgets, chart widgets и quick-action blocks без фиктивных аналитических данных.
+- [x] Реализовать защищённый Users backend: создание, чтение, обновление, безопасное удаление, поиск, фильтры и detail view.
+- [x] Реализовать Users interface с формой создания/редактирования, подтверждением удаления, search и role/status/date filters.
+- [x] Добавить unit и browser проверки role permissions, CRUD validation, search/filter behaviour и responsive Users workflow.
+- [x] Документировать архитектуру будущих Dashboard widgets и Users role-governance, затем выполнить final regression check.

@@ -8,7 +8,7 @@ export const users = mysqlTable("users", {
   passwordHash: text("passwordHash"),
   isActive: boolean("isActive").default(true).notNull(),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "student", "teacher", "marketing", "admin", "super_admin", "founder"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "student", "teacher", "marketing", "admin", "super_admin", "founder"]).default("student").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

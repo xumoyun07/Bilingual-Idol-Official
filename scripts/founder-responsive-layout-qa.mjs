@@ -8,7 +8,7 @@ if (!email || !password) throw new Error("FOUNDER_QA_EMAIL and FOUNDER_QA_PASSWO
 const viewports = [
   [360, 640], [390, 844], [412, 915], [768, 1024], [1024, 1366], [1366, 768], [1920, 1080], [3840, 2160],
 ];
-const routes = ["/admin", "/admin/submissions", "/admin/announcements", "/admin/announcements/edit", "/admin/content"];
+const routes = ["/admin", "/admin/users"];
 const browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
 const checks = [];
 const orientationChecks = [];
@@ -69,7 +69,7 @@ try {
     await orientationPage.setViewportSize({ width: 1024, height: 768 });
     await orientationPage.waitForTimeout(150);
     const result = await orientationPage.evaluate(() => {
-      const surface = document.querySelector(".founder-route-surface")?.getBoundingClientRect();
+      const surface = document.querySelector(".founder-command")?.getBoundingClientRect();
       return {
         route: window.location.pathname,
         from: "768×1024",

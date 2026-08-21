@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { TRPCError } from "@trpc/server";
 import type { TrpcContext } from "./_core/context";
-import { submissionsRouter, submissionInput } from "./routers/submissions";
+import { submissionInput } from "./routers/submissions";
 import { founderProcedure, router } from "./_core/trpc";
 
 function contextFor(role: "user" | "founder"): TrpcContext {
@@ -53,16 +53,6 @@ describe("submission input validation", () => {
     });
 
     expect(result.success).toBe(false);
-  });
-});
-
-describe("submission admin access", () => {
-  it("prevents a signed-in non-founder from listing submissions", async () => {
-    const caller = submissionsRouter.createCaller(contextFor("user"));
-
-    await expect(caller.list()).rejects.toMatchObject<Partial<TRPCError>>({
-      code: "FORBIDDEN",
-    });
   });
 });
 

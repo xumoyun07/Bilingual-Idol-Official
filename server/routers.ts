@@ -10,6 +10,7 @@ import { FOUNDER_OPEN_ID, isFounderAuthConfigured, verifyFounderCredentials } fr
 import { FOUNDER_EMAIL } from "./founderIdentity";
 import { contentRouter } from "./routers/content";
 import { submissionsRouter } from "./routers/submissions";
+import { usersRouter } from "./routers/users";
 import { dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 
 export const appRouter = router({
@@ -47,6 +48,7 @@ export const appRouter = router({
   }),
   content: contentRouter,
   submissions: submissionsRouter,
+  users: usersRouter,
 });
 
 export type AppRouter = typeof appRouter;

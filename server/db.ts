@@ -1,8 +1,10 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, gte, like, lte, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { Announcement, announcements, InsertUser, Program, programs, siteSettings, submissions, TeamProfile, teamProfiles, testimonials, users } from "../drizzle/schema";
+import { randomUUID } from "node:crypto";
+import { Announcement, announcements, InsertUser, Program, programs, siteSettings, Submission, submissions, TeamProfile, teamProfiles, testimonials, User, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
+import { createUserPasswordHash } from "./userAuth";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -43,6 +45,100 @@ export async function getUserByEmail(email: string) {
 export async function recordUserSignIn(openId: string) {
   const db = requireDatabase(await getDb());
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.openId, openId));
+}
+
+export const founderManagedRoles = ["student", "teacher", "marketing", "admin", "super_admin"] as const;
+export type FounderManagedRole = (typeof founderManagedRoles)[number];
+export type ManagedUser = Omit<User, "passwordHash">;
+export type ManagedUserFilters = {
+  query?: string;
+  role?: User["role"];
+  isActive?: boolean;
+  createdFrom?: string;
+  createdTo?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+function safeManagedUser(row: User): ManagedUser {
+  const { passwordHash: _passwordHash, ...safe } = row;
+  return safe;
+}
+
+function normaliseEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+export async function listManagedUsers(filters: ManagedUserFilters = {}) {
+  const database = requireDatabase(await getDb());
+  const conditions = [];
+  const query = filters.query?.trim();
+  if (query) {
+    const pattern = `%${query}%`;
+    conditions.push(or(like(users.name, pattern), like(users.email, pattern), like(users.openId, pattern), like(users.loginMethod, pattern)));
+  }
+  if (filters.role) conditions.push(eq(users.role, filters.role));
+  if (filters.isActive !== undefined) conditions.push(eq(users.isActive, filters.isActive));
+  if (filters.createdFrom) conditions.push(gte(users.createdAt, new Date(`${filters.createdFrom}T00:00:00.000Z`)));
+  if (filters.createdTo) conditions.push(lte(users.createdAt, new Date(`${filters.createdTo}T23:59:59.999Z`)));
+  const whereClause = conditions.length ? and(...conditions) : undefined;
+  const pageSize = Math.min(Math.max(filters.pageSize ?? 25, 1), 100);
+  const page = Math.max(filters.page ?? 0, 0);
+  const [rows, countRows] = await Promise.all([
+    database.select().from(users).where(whereClause).orderBy(desc(users.createdAt)).limit(pageSize).offset(page * pageSize),
+    database.select({ count: sql<number>`count(*)` }).from(users).where(whereClause),
+  ]);
+  return { rows: rows.map(safeManagedUser), total: Number(countRows[0]?.count ?? 0), page, pageSize };
+}
+
+export async function getManagedUser(id: number) {
+  const database = requireDatabase(await getDb());
+  const row = (await database.select().from(users).where(eq(users.id, id)).limit(1))[0];
+  return row ? safeManagedUser(row) : undefined;
+}
+
+export async function createManagedUser(input: { name: string; email: string; password: string; role: FounderManagedRole; isActive: boolean }) {
+  const database = requireDatabase(await getDb());
+  const email = normaliseEmail(input.email);
+  if (await getUserByEmail(email)) throw new Error("An account with this e-mail already exists.");
+  const result = await database.insert(users).values({
+    openId: `issued:${randomUUID()}`,
+    name: input.name.trim(),
+    email,
+    passwordHash: createUserPasswordHash(input.password),
+    isActive: input.isActive,
+    loginMethod: "issued_by_founder",
+    role: input.role,
+    lastSignedIn: new Date(),
+  });
+  const created = await getManagedUser(Number(result[0].insertId));
+  if (!created) throw new Error("The account could not be created.");
+  return created;
+}
+
+export async function updateManagedUser(id: number, input: { name: string; email: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
+  const database = requireDatabase(await getDb());
+  const existing = await getManagedUser(id);
+  if (!existing) throw new Error("Account not found.");
+  if (existing.role === "founder") throw new Error("Founder accounts cannot be changed in Users.");
+  const email = normaliseEmail(input.email);
+  const matchingEmail = await getUserByEmail(email);
+  if (matchingEmail && matchingEmail.id !== id) throw new Error("An account with this e-mail already exists.");
+  const values: Partial<InsertUser> = { name: input.name.trim(), email, role: input.role, isActive: input.isActive };
+  if (input.password) values.passwordHash = createUserPasswordHash(input.password);
+  await database.update(users).set(values).where(eq(users.id, id));
+  const updated = await getManagedUser(id);
+  if (!updated) throw new Error("The account could not be updated.");
+  return updated;
+}
+
+export async function deleteManagedUser(id: number) {
+  const database = requireDatabase(await getDb());
+  const existing = await getManagedUser(id);
+  if (!existing) throw new Error("Account not found.");
+  if (existing.role === "founder") throw new Error("Founder accounts cannot be deleted in Users.");
+  await database.delete(users).where(eq(users.id, id));
+  return { success: true } as const;
 }
 
 export type SubmissionInput = { type: "enrollment" | "inquiry"; studentName: string; studentAge: number; parentName: string; parentEmail: string; parentPhone: string; programInterest: string; preferredSchedule: string; message?: string; source?: string; };
