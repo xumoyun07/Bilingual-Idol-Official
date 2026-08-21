@@ -167,6 +167,18 @@ export async function deleteUserFormField(id: number) {
   return { success: true } as const;
 }
 
+export async function reorderUserFormFields(fieldIds: number[]) {
+  const database = requireDatabase(await getDb());
+  const existing = await database.select({ id: userFormFields.id }).from(userFormFields);
+  const existingIds = existing.map(field => field.id).sort((a, b) => a - b);
+  const submittedIds = [...fieldIds].sort((a, b) => a - b);
+  if (existingIds.length !== submittedIds.length || existingIds.some((id, index) => id !== submittedIds[index])) throw new Error("The submitted field order must include every configured field exactly once.");
+  await database.transaction(async tx => {
+    for (let index = 0; index < fieldIds.length; index += 1) await tx.update(userFormFields).set({ sortOrder: index }).where(eq(userFormFields.id, fieldIds[index]));
+  });
+  return getUserFormSchema(true);
+}
+
 async function validatedProfileRows(values: UserProfileValuesInput) {
   const { fields } = await getUserFormSchema(false);
   return Object.entries(validateProfileValues(fields, values)).map(([fieldId, value]) => ({ fieldId: Number(fieldId), value }));

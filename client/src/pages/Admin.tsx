@@ -92,7 +92,7 @@ function UsersModule() {
 
   function fromAccount(account: Pick<ManagedAccount, "name" | "email" | "role" | "isActive">): AccountDraft { return { name: account.name ?? "", email: account.email ?? "", password: "", role: account.role === "user" || account.role === "founder" ? "student" : account.role, isActive: account.isActive }; }
   function chooseCategory(next: CategoryRole) { setCategory(next); setSearch(""); setStatus("all"); setCreatedFrom(""); setCreatedTo(""); setSelectedId(null); }
-  function openCreate() { setSelectedId(null); setProfileValues({}); setDraft({ ...blankDraft, role: category === "founder" ? "student" : category }); setModal("create"); }
+  async function openCreate() { await utils.users.formSchema.invalidate(); setSelectedId(null); setProfileValues({}); setDraft({ ...blankDraft, role: category === "founder" ? "student" : category }); setModal("create"); }
   function openDetail(id: number) { setSelectedId(id); setModal("detail"); }
   function closeModal() { setModal(null); setSelectedId(null); setProfileValues({}); setDraft(blankDraft); }
   function clearFilters() { setSearch(""); setStatus("all"); setCreatedFrom(""); setCreatedTo(""); }

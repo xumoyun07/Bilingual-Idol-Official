@@ -69,6 +69,14 @@ describe("Users router", () => {
     await expect(caller.users.createField({ label: "Unsafe", fieldType: "email" as never, isRequired: false, sortOrder: 2, isActive: true })).rejects.toBeInstanceOf(TRPCError);
   });
 
+  it("allows only Founder to persist a complete dynamic field order", async () => {
+    await expect(appRouter.createCaller(context("admin")).users.reorderFields({ fieldIds: [7, 3] })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    const reorder = vi.spyOn(db, "reorderUserFormFields").mockResolvedValue({ sections: [], fields: [] });
+    await appRouter.createCaller(context("founder")).users.reorderFields({ fieldIds: [7, 3] });
+    expect(reorder).toHaveBeenCalledWith([7, 3]);
+    await expect(appRouter.createCaller(context("founder")).users.reorderFields({ fieldIds: [7, 7] })).rejects.toBeInstanceOf(TRPCError);
+  });
+
   it("converts protected Founder-target mutation errors into safe client errors", async () => {
     vi.spyOn(db, "updateManagedUser").mockRejectedValue(new Error("Founder accounts cannot be changed in Users."));
     const caller = appRouter.createCaller(context("founder"));

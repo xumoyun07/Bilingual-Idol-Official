@@ -13,12 +13,16 @@ const qaEmail = `users-qa-${runId}@bilingualidol.invalid`;
 const qaName = "Users QA Temporary";
 const qaSectionTitle = `QA profile ${runId.slice(0, 8)}`;
 const qaFieldLabel = `QA learning level ${runId.slice(0, 8)}`;
+const qaFieldTwoLabel = `QA learning preference ${runId.slice(0, 8)}`;
 const qaFieldValue = "Advanced";
 const checks = [];
 let browser;
 let database;
 let qaUserId;
 let qaFieldId;
+let qaFieldTwoId;
+let qaFieldKey;
+let qaFieldTwoKey;
 let qaSectionId;
 function pass(name, detail) { checks.push({ name, status: "passed", detail }); }
 
@@ -57,11 +61,31 @@ try {
   await builder.getByRole("button", { name: "Add field" }).click();
   await builder.locator("p").filter({ hasText: qaFieldLabel }).first().waitFor({ timeout: 10000 });
   const [[sectionRow]] = await database.execute("SELECT id FROM userFormSections WHERE title = ?", [qaSectionTitle]);
-  const [[fieldRow]] = await database.execute("SELECT id FROM userFormFields WHERE label = ?", [qaFieldLabel]);
+  const [[fieldRow]] = await database.execute("SELECT id, `key` FROM userFormFields WHERE label = ?", [qaFieldLabel]);
   qaSectionId = Number(sectionRow.id);
   qaFieldId = Number(fieldRow.id);
+  qaFieldKey = String(fieldRow.key);
   if (!qaSectionId || !qaFieldId) throw new Error("Field Builder metadata was not persisted");
-  pass("Field Builder schema configuration", "Founder created a temporary section and required dropdown field through the modal builder");
+  await builder.getByRole("textbox", { name: "Label" }).fill(qaFieldTwoLabel);
+  await builder.locator("select").nth(1).selectOption({ label: qaSectionTitle });
+  await builder.getByRole("button", { name: "Add field" }).click();
+  await builder.locator("p").filter({ hasText: qaFieldTwoLabel }).first().waitFor({ timeout: 10000 });
+  const [[fieldTwoRow]] = await database.execute("SELECT id, `key` FROM userFormFields WHERE label = ?", [qaFieldTwoLabel]);
+  qaFieldTwoId = Number(fieldTwoRow.id);
+  qaFieldTwoKey = String(fieldTwoRow.key);
+  if (!qaFieldTwoId) throw new Error("Second Field Builder metadata field was not persisted");
+  pass("Field Builder schema configuration", "Founder created a temporary section and two editable profile fields through the modal builder");
+  const fieldTwoCard = builder.locator('[draggable="true"]').filter({ hasText: qaFieldTwoLabel });
+  const fieldOneCard = builder.locator('[draggable="true"]').filter({ hasText: qaFieldLabel });
+  await fieldTwoCard.dragTo(fieldOneCard);
+  let dragOrderPersisted = false;
+  for (let attempt = 0; attempt < 25; attempt += 1) {
+    const [orderedFieldRows] = await database.execute("SELECT label FROM userFormFields WHERE id IN (?, ?) ORDER BY sortOrder ASC", [qaFieldId, qaFieldTwoId]);
+    if (orderedFieldRows.map(row => row.label).join("|") === `${qaFieldTwoLabel}|${qaFieldLabel}`) { dragOrderPersisted = true; break; }
+    await page.waitForTimeout(200);
+  }
+  if (!dragOrderPersisted) throw new Error("Drag-and-drop field order was not persisted");
+  pass("Field Builder drag-and-drop ordering", "Dragging a profile field saved its new sortOrder on the server");
   await builder.getByRole("button", { name: "Done" }).click();
   await builder.waitFor({ state: "hidden", timeout: 10000 });
 
@@ -77,6 +101,8 @@ try {
   await dialog.getByRole("textbox", { name: "E-mail" }).fill(qaEmail);
   await dialog.getByLabel("User type").selectOption("student");
   await dialog.getByRole("textbox", { name: "Initial password" }).fill("temporary-qa-password");
+  const runtimeKeys = await dialog.locator("[data-profile-field-key]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-profile-field-key")));
+  if (runtimeKeys.findIndex(key => key === qaFieldTwoKey) > runtimeKeys.findIndex(key => key === qaFieldKey)) throw new Error("Create form did not use persisted dynamic field order");
   await dialog.getByLabel(qaFieldLabel).selectOption(qaFieldValue);
   await page.waitForTimeout(100);
   await dialog.getByTestId("users-modal-form").evaluate(form => form.requestSubmit());
@@ -136,15 +162,20 @@ try {
 
   await page.getByRole("button", { name: "Configure create form" }).click();
   await builder.getByRole("heading", { name: "Field Builder" }).waitFor({ timeout: 10000 });
+  await builder.getByRole("button", { name: `Delete ${qaFieldTwoLabel}` }).click();
+  const fieldTwoConfirmation = page.getByRole("alertdialog");
+  await fieldTwoConfirmation.getByRole("button", { name: "Delete field" }).click({ force: true });
+  await builder.getByRole("button", { name: `Delete ${qaFieldTwoLabel}` }).waitFor({ state: "detached", timeout: 10000 });
   await builder.getByRole("button", { name: `Delete ${qaFieldLabel}` }).click();
   const fieldConfirmation = page.getByRole("alertdialog");
   await fieldConfirmation.getByRole("button", { name: "Delete field" }).click({ force: true });
-  await builder.getByText("No additional profile fields are configured yet. Add one above; it will then appear here with edit and delete controls.", { exact: true }).waitFor({ timeout: 10000 });
+  await builder.getByRole("button", { name: `Delete ${qaFieldLabel}` }).waitFor({ state: "detached", timeout: 10000 });
+  await builder.getByText("No additional profile fields are configured yet. Add one above; it will then appear here with edit, delete and reorder controls.", { exact: true }).waitFor({ timeout: 10000 });
   await builder.getByRole("button", { name: `Remove ${qaSectionTitle}` }).click();
   const sectionConfirmation = page.getByRole("alertdialog");
   await sectionConfirmation.getByRole("button", { name: "Remove section" }).click({ force: true });
   await builder.getByText("No sections yet. New fields can also stay in Other details.", { exact: true }).waitFor({ timeout: 10000 });
-  const [[fieldCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormFields WHERE id = ?", [qaFieldId]);
+  const [[fieldCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormFields WHERE id IN (?, ?)", [qaFieldId, qaFieldTwoId]);
   const [[sectionCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormSections WHERE id = ?", [qaSectionId]);
   if (Number(fieldCount.count) !== 0 || Number(sectionCount.count) !== 0) throw new Error("Temporary Field Builder metadata cleanup was incomplete");
   pass("Self-cleaning Field Builder QA", "Temporary field and section were removed after EAV workflow verification");
@@ -153,10 +184,13 @@ try {
   if (database) {
     if (qaUserId) await database.execute("DELETE FROM userProfileValues WHERE userId = ?", [qaUserId]);
     if (qaFieldId) await database.execute("DELETE FROM userProfileValues WHERE fieldId = ?", [qaFieldId]);
+    if (qaFieldTwoId) await database.execute("DELETE FROM userProfileValues WHERE fieldId = ?", [qaFieldTwoId]);
     await database.execute("DELETE FROM users WHERE email = ?", [qaEmail]);
     if (qaFieldId) await database.execute("DELETE FROM userFormFields WHERE id = ?", [qaFieldId]);
+    if (qaFieldTwoId) await database.execute("DELETE FROM userFormFields WHERE id = ?", [qaFieldTwoId]);
     if (qaSectionId) await database.execute("DELETE FROM userFormSections WHERE id = ?", [qaSectionId]);
     await database.execute("DELETE FROM userFormFields WHERE label = ?", [qaFieldLabel]);
+    await database.execute("DELETE FROM userFormFields WHERE label = ?", [qaFieldTwoLabel]);
     await database.execute("DELETE FROM userFormSections WHERE title = ?", [qaSectionTitle]);
   }
   await database?.end();

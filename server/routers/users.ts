@@ -55,6 +55,9 @@ export const usersRouter = router({
   removeField: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
     try { return await db.deleteUserFormField(input.id); } catch (error) { return userError(error); }
   }),
+  reorderFields: founderProcedure.input(z.object({ fieldIds: z.array(z.number().int().positive()).min(1).max(200).refine(ids => new Set(ids).size === ids.length, "Each field can appear only once.") })).mutation(async ({ input }) => {
+    try { return await db.reorderUserFormFields(input.fieldIds); } catch (error) { return userError(error); }
+  }),
   create: founderProcedure.input(profileInput.extend({ password: passwordInput, profileValues })).mutation(async ({ input }) => {
     try { return await db.createManagedUser(input); } catch (error) { return userError(error); }
   }),

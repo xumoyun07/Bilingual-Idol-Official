@@ -41,7 +41,7 @@ The **Configure create form** control in the Users module opens a Founder-only c
 | Fields | `userFormFields` stores a generated stable key, visible label, supported type, required flag, order, placeholder, dropdown options, optional section, and active state. | Only six v1 types are accepted: `text`, `textarea`, `number`, `date`, `dropdown`, and `checkbox`. Image/file uploads, e-mail and password fields are excluded. |
 | Values | `userProfileValues` stores the EAV tuple `{ userId, fieldId, value }` with one value per user/field pair. | Values are never accepted as arbitrary columns. The server maps only submitted active field keys to known field IDs after validation. |
 
-The `users.formSchema`, `createSection`, `updateSection`, `removeSection`, `createField`, `updateField` and `removeField` procedures are all guarded by `founderProcedure`. The standard `users.create` procedure accepts an optional `profileValues` map in addition to protected core account attributes. It validates values on the server, then writes the account and approved EAV rows in one database transaction. A failed profile validation creates neither an account nor partial profile rows.
+The `users.formSchema`, `createSection`, `updateSection`, `removeSection`, `createField`, `updateField`, `removeField` and `reorderFields` procedures are all guarded by `founderProcedure`. The standard `users.create` procedure accepts an optional `profileValues` map in addition to protected core account attributes. It validates values on the server, then writes the account and approved EAV rows in one database transaction. A failed profile validation creates neither an account nor partial profile rows.
 
 | Field type | Server validation rule |
 |---|---|
@@ -52,6 +52,8 @@ The `users.formSchema`, `createSection`, `updateSection`, `removeSection`, `crea
 | `checkbox` | Literal `true` or `false`. |
 
 Required fields are enforced server-side even if a browser is modified. Unknown, inactive or deleted field keys are rejected. Empty optional values are omitted rather than stored. Field labels are converted to collision-resistant stable keys when metadata is created; labels may later change without losing the field identity used by stored values.
+
+The existing configurable-field list is orderable. A Founder can drag a row by its visible grip to move it; the client submits the complete ordered list of field IDs to `reorderFields`. The server rejects an incomplete list, an unknown ID or a duplicate ID, then updates all `sortOrder` values in a single transaction. The same list exposes 48px **move up** and **move down** controls as a keyboard and touch fallback. The runtime create form refreshes its schema when opened, so it renders the persisted order rather than a stale client cache.
 
 ### Lifecycle, migration and compatibility policy
 
@@ -93,11 +95,11 @@ Widget rendering is configuration-driven so a future analytics data source can p
 |---|---|
 | Role migration | Existing database `user` records were migrated to `student`; the designated Founder record was retained. The internal enum compatibility value is not issuable through Users. |
 | Users unit coverage | Founder guard, permitted role validation, list filters, create delegation and protected Founder-target errors are covered. |
-| Field Builder unit coverage | Server validation covers required values, dropdown option allowlists, number/date/checkbox formats, optional omissions and unsupported metadata types. Router coverage verifies Founder-only Field Builder access and rejects unsupported field types. |
-| Browser Users E2E | A self-cleaning temporary account completed all six role modules, keyboard modal close/reopen, Field Builder section and required dropdown creation, schema-driven user creation, EAV persistence verification, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. The test then removes the temporary field and section; database cleanup was verified. |
+| Field Builder unit coverage | Server validation covers required values, dropdown option allowlists, number/date/checkbox formats, optional omissions and unsupported metadata types. Router coverage verifies Founder-only Field Builder access, rejects unsupported field types, and requires a duplicate-free full field order. |
+| Browser Users E2E | A self-cleaning temporary account completed all six role modules, keyboard modal close/reopen, Field Builder section and two profile fields creation, persisted drag-and-drop ordering, schema-driven user creation, EAV persistence verification, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. The test then removes the temporary fields and section; database cleanup was verified. |
 | Responsive Founder matrix | Dashboard and Users passed 16 route–viewport checks across 8 target viewports plus 2 tablet orientation checks: zero overflow, fixed chrome preserved and no measured undersized visible button/link targets. |
 | Users modal layout | Create modal passed 4 mobile/tablet layout checks: zero overflow, dialog bounds inside viewport and no measured undersized control hit areas. |
-| Regression | 31 automated tests passed; TypeScript and whitespace checks passed. The expanded self-cleaning Users E2E completed 14 checks, including Field Builder EAV persistence and cleanup. |
+| Regression | 32 automated tests passed; TypeScript and whitespace checks passed. The expanded self-cleaning Users E2E completed 15 checks, including drag-and-drop persistence, create-form ordering and cleanup. |
 
 ## Optional future launch gates
 
