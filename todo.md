@@ -111,3 +111,8 @@
 - [x] Добавить unit и browser проверки role permissions, CRUD validation, search/filter behaviour и responsive Users workflow.
 - [x] Документировать архитектуру будущих Dashboard widgets и Users role-governance, затем выполнить final regression check.
 - [x] Зафиксировать Founder content-acceptance и moderated usability-testing как опциональные future launch gates без изменений в продукте до нового явного запроса владельца.
+- [x] Разделить Users module на role-specific mini-navigation для Student, Teacher, Marketing, Admin, Super admin и защищённого Founder view.
+- [x] Открывать выбранную role category как самостоятельный filtered user list с локальными search, status и date filters.
+- [x] Перенести создание пользователя в доступное modal окно с validation и безопасным role selection.
+- [x] Перенести detail, редактирование и удаление существующего пользователя в modal workflow с protected Founder state и delete confirmation.
+- [x] Проверить role-category navigation, modal CRUD, filters/search, keyboard focus и responsive Users interface без persistent QA accounts.

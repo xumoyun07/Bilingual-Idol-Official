@@ -14,7 +14,6 @@ const qaName = "Users QA Temporary";
 const checks = [];
 let browser;
 let database;
-
 function pass(name, detail) { checks.push({ name, status: "passed", detail }); }
 
 try {
@@ -27,27 +26,43 @@ try {
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL("**/admin", { timeout: 10000 });
   await page.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
-  await page.getByRole("heading", { name: /one clear view of every account/i }).waitFor({ timeout: 10000 });
-  pass("Founder opens two-module Users console", "Founder session reached /admin/users");
+  await page.getByRole("heading", { name: /people, organised by responsibility/i }).waitFor({ timeout: 10000 });
+  pass("Founder opens role-separated Users console", "Founder session reached /admin/users");
 
-  await page.getByRole("textbox", { name: "Full name" }).fill(qaName);
-  await page.getByRole("textbox", { name: "E-mail" }).fill(qaEmail);
-  await page.getByLabel("Role").last().selectOption("student");
-  await page.getByRole("textbox", { name: "Initial password" }).fill("temporary-qa-password");
+  const modules = page.locator('nav[aria-label="User type modules"]');
+  for (const role of ["Students", "Teachers", "Marketing", "Admins", "Super admins", "Founders"]) {
+    await modules.getByRole("button", { name: `Type ${role}`, exact: true }).click();
+    await page.getByRole("heading", { name: new RegExp(`${role} directory`, "i") }).waitFor({ timeout: 10000 });
+  }
+  await modules.getByRole("button", { name: "Type Students", exact: true }).click();
+  pass("Role mini-navigation", "All six user type modules opened their own directory surface");
+
+  await page.getByRole("button", { name: "New user" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("heading", { name: "Create user" }).waitFor({ timeout: 10000 });
+  await page.keyboard.press("Escape");
+  await dialog.waitFor({ state: "hidden", timeout: 10000 });
+  pass("Modal keyboard lifecycle", "Create modal closed with Escape and did not create data");
+  await page.getByRole("button", { name: "New user" }).click();
+  await dialog.getByRole("heading", { name: "Create user" }).waitFor({ timeout: 10000 });
+  await dialog.getByRole("textbox", { name: "Full name" }).fill(qaName);
+  await dialog.getByRole("textbox", { name: "E-mail" }).fill(qaEmail);
+  await dialog.getByLabel("User type").selectOption("student");
+  await dialog.getByRole("textbox", { name: "Initial password" }).fill("temporary-qa-password");
   await page.waitForTimeout(100);
-  await page.locator("form").filter({ hasText: "Create user" }).evaluate(form => form.requestSubmit());
+  await dialog.getByTestId("users-modal-form").evaluate(form => form.requestSubmit());
+  await dialog.getByRole("heading", { name: "Edit user" }).waitFor({ timeout: 10000 });
   await page.getByText(qaName, { exact: true }).first().waitFor({ timeout: 10000 });
-  await page.getByTestId("users-editor-form").getByRole("button", { name: "Save changes" }).waitFor({ timeout: 10000 });
-  pass("Create issued user", "Student account was created through Founder UI");
+  pass("Modal create user", "Student account was created through the focused create modal");
 
-  await page.getByRole("textbox", { name: "Full name" }).fill("Users QA Marketing");
-  await page.getByLabel("Role").last().selectOption("marketing");
-  await page.getByLabel("Account active").uncheck();
+  await dialog.getByRole("textbox", { name: "Full name" }).fill("Users QA Marketing");
+  await dialog.getByLabel("User type").selectOption("marketing");
+  await dialog.getByLabel("Account active").uncheck();
   await page.waitForTimeout(100);
-  await page.getByTestId("users-editor-form").evaluate(form => form.requestSubmit());
+  await dialog.getByTestId("users-modal-form").evaluate(form => form.requestSubmit());
   await page.getByText("Users QA Marketing", { exact: true }).first().waitFor({ timeout: 10000 });
   await page.getByText("Paused", { exact: true }).first().waitFor({ timeout: 10000 });
-  pass("Edit role and active status", "Temporary account changed to marketing and paused");
+  pass("Modal edit role and active status", "Temporary account moved to Marketing and was paused");
 
   const inactivePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await inactivePage.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
@@ -58,25 +73,28 @@ try {
   await inactivePage.close();
   pass("Deactivation blocks sign-in", "Paused account was rejected by universal password login");
 
-  await page.getByPlaceholder("Search name, e-mail, ID or sign-in method").fill("Marketing");
-  await page.getByText("1 account found", { exact: true }).waitFor({ timeout: 10000 });
-  pass("Search directory", "Search returned the edited QA account only");
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  await modules.getByRole("button", { name: "Type Marketing", exact: true }).click();
+  await page.getByPlaceholder(/Search marketing/i).fill("Marketing");
+  await page.getByText("1 account in this type", { exact: true }).waitFor({ timeout: 10000 });
+  pass("Role-specific local search", "Marketing module returned the edited account only");
 
-  await page.getByLabel("Role").first().selectOption("marketing");
   await page.getByLabel("Status").selectOption("inactive");
   await page.getByLabel("From").fill("2000-01-01");
-  await page.getByText("1 account found", { exact: true }).waitFor({ timeout: 10000 });
-  pass("Filter by role, status and registration date", "Marketing + inactive + date-from filter retained the QA account");
+  await page.getByText("1 account in this type", { exact: true }).waitFor({ timeout: 10000 });
+  pass("Role-specific filters", "Marketing status and registration-date filters retained the QA account");
 
-  await page.getByRole("button", { name: "Delete account" }).click({ force: true });
-  const dialog = page.getByRole("alertdialog");
-  await dialog.getByRole("heading", { name: "Delete this account?" }).waitFor({ timeout: 10000 });
-  pass("Delete safeguard", "Confirmation dialog appeared before deletion");
+  await page.getByText("Users QA Marketing", { exact: true }).click();
+  await dialog.getByRole("heading", { name: "Edit user" }).waitFor({ timeout: 10000 });
   await dialog.getByRole("button", { name: "Delete account" }).click({ force: true });
-  await page.getByText("No matching accounts", { exact: true }).waitFor({ timeout: 10000 });
+  const confirmation = page.getByRole("alertdialog");
+  await confirmation.getByRole("heading", { name: "Delete this account?" }).waitFor({ timeout: 10000 });
+  pass("Modal delete safeguard", "Destructive action required a separate confirmation dialog");
+  await confirmation.getByRole("button", { name: "Delete account" }).click({ force: true });
+  await page.getByText("No marketing yet", { exact: true }).waitFor({ timeout: 10000 });
   const [[row]] = await database.execute("SELECT COUNT(*) AS count FROM users WHERE email = ?", [qaEmail]);
   if (Number(row.count) !== 0) throw new Error("Deleted account remains in the database");
-  pass("Delete account", "Confirmed deletion removed the temporary account from the database");
+  pass("Modal delete account", "Confirmed deletion removed the temporary account from the database");
   await page.close();
 } finally {
   if (database) await database.execute("DELETE FROM users WHERE email = ?", [qaEmail]);

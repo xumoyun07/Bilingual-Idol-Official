@@ -31,6 +31,12 @@ The module is guarded server-side by `founderProcedure`; no other role can list 
 
 The deletion confirmation is a client safety barrier; the server separately enforces the role and target restrictions. Deactivation blocks future password sign-ins, while retained account details remain available to the Founder until deletion is explicitly confirmed.
 
+## Users navigation and modal interaction contract
+
+The Users page is divided into six local role modules: **Students**, **Teachers**, **Marketing**, **Admins**, **Super admins** and **Founders**. Selecting a module fixes the directory to that account type and resets its independent query, activity-state and registration-date filters. The Founder module remains visible for oversight, but Founder records are protected from modification and removal.
+
+Account actions are deliberately contained in modal windows. The **New user** control opens a validated creation modal, a directory row opens a detail/edit modal, and deletion requires a separate confirmation modal. This keeps list navigation stable while preserving keyboard escape, focus containment and an explicit destructive-action boundary.
+
 ## Dashboard widget contract
 
 The Dashboard contains no invented analytics or placeholder measurements. It declares three composable widget zones:
@@ -57,8 +63,9 @@ Widget rendering is configuration-driven so a future analytics data source can p
 |---|---|
 | Role migration | Existing database `user` records were migrated to `student`; the designated Founder record was retained. The internal enum compatibility value is not issuable through Users. |
 | Users unit coverage | Founder guard, permitted role validation, list filters, create delegation and protected Founder-target errors are covered. |
-| Browser Users E2E | A self-cleaning temporary account completed create, role/status update, inactive sign-in denial, search, role/status/date filtering, delete confirmation and deletion. Database cleanup was verified as zero remaining QA accounts. |
+| Browser Users E2E | A self-cleaning temporary account completed all six role modules, keyboard modal close/reopen, modal create, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. Database cleanup was verified as zero remaining QA accounts. |
 | Responsive Founder matrix | Dashboard and Users passed 16 route–viewport checks across 8 target viewports plus 2 tablet orientation checks: zero overflow, fixed chrome preserved and no measured undersized visible button/link targets. |
+| Users modal layout | Create modal passed 4 mobile/tablet layout checks: zero overflow, dialog bounds inside viewport and no measured undersized control hit areas. |
 | Regression | 26 automated tests passed; TypeScript and whitespace checks passed; keyboard QA passed 8 of 8 scenarios. |
 
 ## Optional future launch gates
