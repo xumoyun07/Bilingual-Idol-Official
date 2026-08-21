@@ -31,6 +31,36 @@ The module is guarded server-side by `founderProcedure`; no other role can list 
 
 The deletion confirmation is a client safety barrier; the server separately enforces the role and target restrictions. Deactivation blocks future password sign-ins, while retained account details remain available to the Founder until deletion is explicitly confirmed.
 
+## Dynamic Field Builder contract
+
+The **Configure create form** control in the Users module opens a Founder-only configuration dialog for safe, additional profile attributes. It does not expose system identity, authorization or credential attributes. The runtime **New user** modal reads the active form schema and renders grouped fields directly from that metadata, so a Founder can extend the account-creation profile without a frontend deployment or code change.
+
+| Contract element | Storage and behaviour | Safety boundary |
+|---|---|---|
+| Sections | `userFormSections` stores title, icon, sort order and active state. A section organizes fields visually; it does not own user values. | Removing a section moves its fields to the ungrouped “Other details” area. No field definition or profile value is deleted by that action. |
+| Fields | `userFormFields` stores a generated stable key, visible label, supported type, required flag, order, placeholder, dropdown options, optional section, and active state. | Only six v1 types are accepted: `text`, `textarea`, `number`, `date`, `dropdown`, and `checkbox`. Image/file uploads, e-mail and password fields are excluded. |
+| Values | `userProfileValues` stores the EAV tuple `{ userId, fieldId, value }` with one value per user/field pair. | Values are never accepted as arbitrary columns. The server maps only submitted active field keys to known field IDs after validation. |
+
+The `users.formSchema`, `createSection`, `updateSection`, `removeSection`, `createField`, `updateField` and `removeField` procedures are all guarded by `founderProcedure`. The standard `users.create` procedure accepts an optional `profileValues` map in addition to protected core account attributes. It validates values on the server, then writes the account and approved EAV rows in one database transaction. A failed profile validation creates neither an account nor partial profile rows.
+
+| Field type | Server validation rule |
+|---|---|
+| `text` / `textarea` | Trimmed string within the configured request limits. |
+| `number` | Finite numeric representation. |
+| `date` | ISO calendar-date value that parses to a real date. |
+| `dropdown` | A configured, normalized option only. |
+| `checkbox` | Literal `true` or `false`. |
+
+Required fields are enforced server-side even if a browser is modified. Unknown, inactive or deleted field keys are rejected. Empty optional values are omitted rather than stored. Field labels are converted to collision-resistant stable keys when metadata is created; labels may later change without losing the field identity used by stored values.
+
+### Lifecycle, migration and compatibility policy
+
+Migration `0008_eager_doctor_octopus.sql` adds only the three Field Builder tables. It does not rewrite the existing `users` table, so existing accounts remain valid with no additional profile values. Adding a section or field is backwards compatible because missing optional EAV rows are represented as empty values; a new field can be marked required only for future create-form submissions.
+
+Deleting a field deletes its associated EAV values as part of the managed data lifecycle. Deleting a user deletes that user’s EAV profile values in the same transaction. The initial interface intentionally configures this capability only for the **create** form; presenting or editing historical dynamic values in existing-user detail is a separate future scope and must preserve the same validation and authorization rules.
+
+> The Field Builder extends profiles; it never alters platform identity, role authority, password storage, login state or account-active controls. Those system fields remain owned by the Users contract.
+
 ## Users navigation and modal interaction contract
 
 The Users page is divided into six local role modules: **Students**, **Teachers**, **Marketing**, **Admins**, **Super admins** and **Founders**. Selecting a module fixes the directory to that account type and resets its independent query, activity-state and registration-date filters. The Founder module remains visible for oversight, but Founder records are protected from modification and removal.
@@ -63,10 +93,11 @@ Widget rendering is configuration-driven so a future analytics data source can p
 |---|---|
 | Role migration | Existing database `user` records were migrated to `student`; the designated Founder record was retained. The internal enum compatibility value is not issuable through Users. |
 | Users unit coverage | Founder guard, permitted role validation, list filters, create delegation and protected Founder-target errors are covered. |
-| Browser Users E2E | A self-cleaning temporary account completed all six role modules, keyboard modal close/reopen, modal create, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. Database cleanup was verified as zero remaining QA accounts. |
+| Field Builder unit coverage | Server validation covers required values, dropdown option allowlists, number/date/checkbox formats, optional omissions and unsupported metadata types. Router coverage verifies Founder-only Field Builder access and rejects unsupported field types. |
+| Browser Users E2E | A self-cleaning temporary account completed all six role modules, keyboard modal close/reopen, Field Builder section and required dropdown creation, schema-driven user creation, EAV persistence verification, role/status update, inactive sign-in denial, local search, role/status/date filtering, modal delete confirmation and deletion. The test then removes the temporary field and section; database cleanup was verified. |
 | Responsive Founder matrix | Dashboard and Users passed 16 route–viewport checks across 8 target viewports plus 2 tablet orientation checks: zero overflow, fixed chrome preserved and no measured undersized visible button/link targets. |
 | Users modal layout | Create modal passed 4 mobile/tablet layout checks: zero overflow, dialog bounds inside viewport and no measured undersized control hit areas. |
-| Regression | 26 automated tests passed; TypeScript and whitespace checks passed; keyboard QA passed 8 of 8 scenarios. |
+| Regression | 31 automated tests passed; TypeScript and whitespace checks passed. The expanded self-cleaning Users E2E completed 14 checks, including Field Builder EAV persistence and cleanup. |
 
 ## Optional future launch gates
 

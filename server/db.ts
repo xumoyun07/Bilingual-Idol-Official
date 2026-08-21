@@ -1,10 +1,11 @@
 import { and, asc, desc, eq, gte, like, lte, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, siteSettings, Submission, submissions, TeamProfile, teamProfiles, testimonials, User, users } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, siteSettings, Submission, submissions, TeamProfile, teamProfiles, testimonials, User, userFormFields, userFormSections, userProfileValues, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
+import { normaliseOptions, parseFieldOptions, type RuntimeUserField, type UserFieldType, validateProfileValues } from "./userFieldSchema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -97,19 +98,99 @@ export async function getManagedUser(id: number) {
   return row ? safeManagedUser(row) : undefined;
 }
 
-export async function createManagedUser(input: { name: string; email: string; password: string; role: FounderManagedRole; isActive: boolean }) {
+type UserProfileValuesInput = Record<string, string>;
+
+function toRuntimeField(field: typeof userFormFields.$inferSelect): RuntimeUserField {
+  return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive };
+}
+
+export async function getUserFormSchema(includeInactive = false) {
+  const database = requireDatabase(await getDb());
+  const [sections, fields] = await Promise.all([
+    database.select().from(userFormSections).where(includeInactive ? undefined : eq(userFormSections.isActive, true)).orderBy(asc(userFormSections.sortOrder), asc(userFormSections.id)),
+    database.select().from(userFormFields).where(includeInactive ? undefined : eq(userFormFields.isActive, true)).orderBy(asc(userFormFields.sortOrder), asc(userFormFields.id)),
+  ]);
+  return { sections, fields: fields.map(toRuntimeField) };
+}
+
+function safeFieldKey(label: string) {
+  const stem = label.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 55) || "custom_field";
+  return `${stem}_${randomUUID().replace(/-/g, "").slice(0, 12)}`;
+}
+
+export async function createUserFormSection(input: { title: string; icon?: string; sortOrder: number; isActive: boolean }) {
+  const database = requireDatabase(await getDb());
+  const result = await database.insert(userFormSections).values({ title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive });
+  return (await database.select().from(userFormSections).where(eq(userFormSections.id, Number(result[0].insertId))).limit(1))[0];
+}
+
+export async function updateUserFormSection(id: number, input: { title: string; icon?: string; sortOrder: number; isActive: boolean }) {
+  const database = requireDatabase(await getDb());
+  await database.update(userFormSections).set({ title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive }).where(eq(userFormSections.id, id));
+  return (await database.select().from(userFormSections).where(eq(userFormSections.id, id)).limit(1))[0];
+}
+
+export async function deleteUserFormSection(id: number) {
+  const database = requireDatabase(await getDb());
+  await database.transaction(async tx => {
+    await tx.update(userFormFields).set({ sectionId: null }).where(eq(userFormFields.sectionId, id));
+    await tx.delete(userFormSections).where(eq(userFormSections.id, id));
+  });
+  return { success: true } as const;
+}
+
+type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean };
+
+export async function createUserFormField(input: FormFieldInput) {
+  const database = requireDatabase(await getDb());
+  const options = normaliseOptions(input.fieldType, input.options);
+  const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive });
+  const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, Number(result[0].insertId))).limit(1))[0];
+  return toRuntimeField(field);
+}
+
+export async function updateUserFormField(id: number, input: FormFieldInput) {
+  const database = requireDatabase(await getDb());
+  const options = normaliseOptions(input.fieldType, input.options);
+  await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive }).where(eq(userFormFields.id, id));
+  const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, id)).limit(1))[0];
+  if (!field) throw new Error("Field not found.");
+  return toRuntimeField(field);
+}
+
+export async function deleteUserFormField(id: number) {
+  const database = requireDatabase(await getDb());
+  await database.transaction(async tx => {
+    await tx.delete(userProfileValues).where(eq(userProfileValues.fieldId, id));
+    await tx.delete(userFormFields).where(eq(userFormFields.id, id));
+  });
+  return { success: true } as const;
+}
+
+async function validatedProfileRows(values: UserProfileValuesInput) {
+  const { fields } = await getUserFormSchema(false);
+  return Object.entries(validateProfileValues(fields, values)).map(([fieldId, value]) => ({ fieldId: Number(fieldId), value }));
+}
+
+export async function createManagedUser(input: { name: string; email: string; password: string; role: FounderManagedRole; isActive: boolean; profileValues?: UserProfileValuesInput }) {
   const database = requireDatabase(await getDb());
   const email = normaliseEmail(input.email);
   if (await getUserByEmail(email)) throw new Error("An account with this e-mail already exists.");
-  const result = await database.insert(users).values({
-    openId: `issued:${randomUUID()}`,
-    name: input.name.trim(),
-    email,
-    passwordHash: createUserPasswordHash(input.password),
-    isActive: input.isActive,
-    loginMethod: "issued_by_founder",
-    role: input.role,
-    lastSignedIn: new Date(),
+  const profileRows = await validatedProfileRows(input.profileValues ?? {});
+  const result = await database.transaction(async tx => {
+    const created = await tx.insert(users).values({
+      openId: `issued:${randomUUID()}`,
+      name: input.name.trim(),
+      email,
+      passwordHash: createUserPasswordHash(input.password),
+      isActive: input.isActive,
+      loginMethod: "issued_by_founder",
+      role: input.role,
+      lastSignedIn: new Date(),
+    });
+    const userId = Number(created[0].insertId);
+    if (profileRows.length) await tx.insert(userProfileValues).values(profileRows.map(row => ({ userId, fieldId: row.fieldId, value: row.value })));
+    return created;
   });
   const created = await getManagedUser(Number(result[0].insertId));
   if (!created) throw new Error("The account could not be created.");
@@ -137,7 +218,10 @@ export async function deleteManagedUser(id: number) {
   const existing = await getManagedUser(id);
   if (!existing) throw new Error("Account not found.");
   if (existing.role === "founder") throw new Error("Founder accounts cannot be deleted in Users.");
-  await database.delete(users).where(eq(users.id, id));
+  await database.transaction(async tx => {
+    await tx.delete(userProfileValues).where(eq(userProfileValues.userId, id));
+    await tx.delete(users).where(eq(users.id, id));
+  });
   return { success: true } as const;
 }
 

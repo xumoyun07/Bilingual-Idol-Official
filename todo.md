@@ -116,3 +116,8 @@
 - [x] Перенести создание пользователя в доступное modal окно с validation и безопасным role selection.
 - [x] Перенести detail, редактирование и удаление существующего пользователя в modal workflow с protected Founder state и delete confirmation.
 - [x] Проверить role-category navigation, modal CRUD, filters/search, keyboard focus и responsive Users interface без persistent QA accounts.
+- [x] Сформировать безопасный Field Builder scope для Users create form на основе приложенного Dynamic Schema / EAV примера, исключив неактуальные image upload и непроверенные profile attributes.
+- [x] Добавить Founder-only schema contract для пользовательской формы: sections, supported field types, required flags, ordering, placeholders и dropdown options.
+- [x] Реализовать schema-driven создание пользователя с динамическим рендером section/field layout, runtime validation и сохранением только approved user attributes.
+- [x] Добавить Founder UI для настройки безопасных field metadata и проверить RBAC, validation, порядок полей, create flow и responsive modal behavior.
+- [x] Документировать границы первой Field Builder версии, миграционную стратегию и back-compatibility policy для будущих profile attributes.

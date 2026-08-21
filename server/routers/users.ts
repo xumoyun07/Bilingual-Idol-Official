@@ -4,6 +4,10 @@ import * as db from "../db";
 import { founderProcedure, router } from "../_core/trpc";
 
 const managedRole = z.enum(["student", "teacher", "marketing", "admin", "super_admin"]);
+const dynamicFieldType = z.enum(["text", "textarea", "number", "date", "dropdown", "checkbox"]);
+const profileValues = z.record(z.string().max(80), z.string().max(4000)).default({});
+const sectionInput = z.object({ title: z.string().trim().min(2).max(160), icon: z.string().trim().max(64).optional(), sortOrder: z.number().int().min(0).max(10000), isActive: z.boolean() });
+const fieldInput = z.object({ label: z.string().trim().min(2).max(160), fieldType: dynamicFieldType, isRequired: z.boolean(), sortOrder: z.number().int().min(0).max(10000), placeholder: z.string().trim().max(255).optional(), options: z.array(z.string().trim().min(1).max(100)).max(30).optional().default([]), sectionId: z.number().int().positive().nullable().optional(), isActive: z.boolean() });
 const profileInput = z.object({
   name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160),
   email: z.string().trim().email("Enter a valid e-mail address.").max(320),
@@ -32,7 +36,26 @@ export const usersRouter = router({
     if (!account) throw new TRPCError({ code: "NOT_FOUND", message: "Account not found." });
     return account;
   }),
-  create: founderProcedure.input(profileInput.extend({ password: passwordInput })).mutation(async ({ input }) => {
+  formSchema: founderProcedure.query(() => db.getUserFormSchema(true)),
+  createSection: founderProcedure.input(sectionInput).mutation(async ({ input }) => {
+    try { return await db.createUserFormSection(input); } catch (error) { return userError(error); }
+  }),
+  updateSection: founderProcedure.input(sectionInput.extend({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+    try { const { id, ...section } = input; return await db.updateUserFormSection(id, section); } catch (error) { return userError(error); }
+  }),
+  removeSection: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+    try { return await db.deleteUserFormSection(input.id); } catch (error) { return userError(error); }
+  }),
+  createField: founderProcedure.input(fieldInput).mutation(async ({ input }) => {
+    try { return await db.createUserFormField(input); } catch (error) { return userError(error); }
+  }),
+  updateField: founderProcedure.input(fieldInput.extend({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+    try { const { id, ...field } = input; return await db.updateUserFormField(id, field); } catch (error) { return userError(error); }
+  }),
+  removeField: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+    try { return await db.deleteUserFormField(input.id); } catch (error) { return userError(error); }
+  }),
+  create: founderProcedure.input(profileInput.extend({ password: passwordInput, profileValues })).mutation(async ({ input }) => {
     try { return await db.createManagedUser(input); } catch (error) { return userError(error); }
   }),
   update: founderProcedure.input(profileInput.extend({ id: z.number().int().positive(), password: passwordInput.optional().or(z.literal("")) })).mutation(async ({ input }) => {

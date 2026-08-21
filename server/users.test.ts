@@ -60,6 +60,15 @@ describe("Users router", () => {
     await expect(caller.users.create({ name: "Invalid Founder", email: "founder@example.test", password: "sufficient-password", role: "founder" as never, isActive: true })).rejects.toBeInstanceOf(TRPCError);
   });
 
+  it("keeps Field Builder schema and metadata actions Founder-only", async () => {
+    await expect(appRouter.createCaller(context("admin")).users.formSchema()).rejects.toMatchObject({ code: "FORBIDDEN" });
+    const createField = vi.spyOn(db, "createUserFormField").mockResolvedValue({ id: 7, key: "preferred_language_test", label: "Preferred language", fieldType: "dropdown", isRequired: true, placeholder: null, options: ["English"], sectionId: null, sortOrder: 1, isActive: true });
+    const caller = appRouter.createCaller(context("founder"));
+    await caller.users.createField({ label: "Preferred language", fieldType: "dropdown", isRequired: true, sortOrder: 1, options: ["English"], sectionId: null, isActive: true });
+    expect(createField).toHaveBeenCalledWith(expect.objectContaining({ fieldType: "dropdown", options: ["English"], sectionId: null }));
+    await expect(caller.users.createField({ label: "Unsafe", fieldType: "email" as never, isRequired: false, sortOrder: 2, isActive: true })).rejects.toBeInstanceOf(TRPCError);
+  });
+
   it("converts protected Founder-target mutation errors into safe client errors", async () => {
     vi.spyOn(db, "updateManagedUser").mockRejectedValue(new Error("Founder accounts cannot be changed in Users."));
     const caller = appRouter.createCaller(context("founder"));

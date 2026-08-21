@@ -1,4 +1,4 @@
-import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -13,6 +13,42 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
+
+export const userFormSections = mysqlTable("userFormSections", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 160 }).notNull(),
+  icon: varchar("icon", { length: 64 }).default("ClipboardList").notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const userFormFields = mysqlTable("userFormFields", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 80 }).notNull().unique(),
+  label: varchar("label", { length: 160 }).notNull(),
+  fieldType: mysqlEnum("fieldType", ["text", "textarea", "number", "date", "dropdown", "checkbox"]).notNull(),
+  isRequired: boolean("isRequired").default(false).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  placeholder: varchar("placeholder", { length: 255 }),
+  optionsJson: text("optionsJson"),
+  sectionId: int("sectionId"),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const userProfileValues = mysqlTable("userProfileValues", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  fieldId: int("fieldId").notNull(),
+  value: text("value").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  userFieldUnique: uniqueIndex("userProfileValues_user_field_unique").on(table.userId, table.fieldId),
+}));
 
 export const programs = mysqlTable("programs", {
   id: int("id").autoincrement().primaryKey(),
@@ -118,6 +154,9 @@ export const archivedLearningSupportRequests = mysqlTable("learningSupportReques
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+export type UserFormSection = typeof userFormSections.$inferSelect;
+export type UserFormField = typeof userFormFields.$inferSelect;
+export type UserProfileValue = typeof userProfileValues.$inferSelect;
 export type Program = typeof programs.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;

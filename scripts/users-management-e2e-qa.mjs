@@ -11,9 +11,15 @@ if (!founderEmail || !founderPassword || !databaseUrl) throw new Error("FOUNDER_
 const runId = randomUUID();
 const qaEmail = `users-qa-${runId}@bilingualidol.invalid`;
 const qaName = "Users QA Temporary";
+const qaSectionTitle = `QA profile ${runId.slice(0, 8)}`;
+const qaFieldLabel = `QA learning level ${runId.slice(0, 8)}`;
+const qaFieldValue = "Advanced";
 const checks = [];
 let browser;
 let database;
+let qaUserId;
+let qaFieldId;
+let qaSectionId;
 function pass(name, detail) { checks.push({ name, status: "passed", detail }); }
 
 try {
@@ -37,6 +43,28 @@ try {
   await modules.getByRole("button", { name: "Type Students", exact: true }).click();
   pass("Role mini-navigation", "All six user type modules opened their own directory surface");
 
+  await page.getByRole("button", { name: "Configure create form" }).click();
+  const builder = page.getByRole("dialog");
+  await builder.getByRole("heading", { name: "Field Builder" }).waitFor({ timeout: 10000 });
+  await builder.locator("#section-title").fill(qaSectionTitle);
+  await builder.getByRole("button", { name: "Add section" }).click();
+  await builder.locator("span").filter({ hasText: qaSectionTitle }).first().waitFor({ timeout: 10000 });
+  await builder.getByRole("textbox", { name: "Label" }).fill(qaFieldLabel);
+  await builder.getByLabel("Type").selectOption("dropdown");
+  await builder.getByRole("textbox", { name: /options/i }).fill("Beginner\nAdvanced");
+  await builder.locator("select").nth(1).selectOption({ label: qaSectionTitle });
+  await builder.getByLabel("Required field").check();
+  await builder.getByRole("button", { name: "Add field" }).click();
+  await builder.locator("p").filter({ hasText: qaFieldLabel }).first().waitFor({ timeout: 10000 });
+  const [[sectionRow]] = await database.execute("SELECT id FROM userFormSections WHERE title = ?", [qaSectionTitle]);
+  const [[fieldRow]] = await database.execute("SELECT id FROM userFormFields WHERE label = ?", [qaFieldLabel]);
+  qaSectionId = Number(sectionRow.id);
+  qaFieldId = Number(fieldRow.id);
+  if (!qaSectionId || !qaFieldId) throw new Error("Field Builder metadata was not persisted");
+  pass("Field Builder schema configuration", "Founder created a temporary section and required dropdown field through the modal builder");
+  await builder.getByRole("button", { name: "Done" }).click();
+  await builder.waitFor({ state: "hidden", timeout: 10000 });
+
   await page.getByRole("button", { name: "New user" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("heading", { name: "Create user" }).waitFor({ timeout: 10000 });
@@ -49,11 +77,17 @@ try {
   await dialog.getByRole("textbox", { name: "E-mail" }).fill(qaEmail);
   await dialog.getByLabel("User type").selectOption("student");
   await dialog.getByRole("textbox", { name: "Initial password" }).fill("temporary-qa-password");
+  await dialog.getByLabel(qaFieldLabel).selectOption(qaFieldValue);
   await page.waitForTimeout(100);
   await dialog.getByTestId("users-modal-form").evaluate(form => form.requestSubmit());
   await dialog.getByRole("heading", { name: "Edit user" }).waitFor({ timeout: 10000 });
   await page.getByText(qaName, { exact: true }).first().waitFor({ timeout: 10000 });
+  const [[userRow]] = await database.execute("SELECT id FROM users WHERE email = ?", [qaEmail]);
+  qaUserId = Number(userRow.id);
+  const [[profileRow]] = await database.execute("SELECT value FROM userProfileValues WHERE userId = ? AND fieldId = ?", [qaUserId, qaFieldId]);
+  if (profileRow.value !== qaFieldValue) throw new Error("Dynamic profile value was not persisted with the created account");
   pass("Modal create user", "Student account was created through the focused create modal");
+  pass("EAV profile persistence", "Required dropdown value was server-validated and stored against the temporary user");
 
   await dialog.getByRole("textbox", { name: "Full name" }).fill("Users QA Marketing");
   await dialog.getByLabel("User type").selectOption("marketing");
@@ -95,9 +129,36 @@ try {
   const [[row]] = await database.execute("SELECT COUNT(*) AS count FROM users WHERE email = ?", [qaEmail]);
   if (Number(row.count) !== 0) throw new Error("Deleted account remains in the database");
   pass("Modal delete account", "Confirmed deletion removed the temporary account from the database");
+
+  const [[profileCount]] = await database.execute("SELECT COUNT(*) AS count FROM userProfileValues WHERE userId = ?", [qaUserId]);
+  if (Number(profileCount.count) !== 0) throw new Error("Deleted account retained dynamic profile values");
+  pass("Dynamic profile cleanup", "Account deletion removed its EAV profile values in the same managed workflow");
+
+  await page.getByRole("button", { name: "Configure create form" }).click();
+  await builder.getByRole("heading", { name: "Field Builder" }).waitFor({ timeout: 10000 });
+  await builder.getByRole("button", { name: `Delete ${qaFieldLabel}` }).click();
+  const fieldConfirmation = page.getByRole("alertdialog");
+  await fieldConfirmation.getByRole("button", { name: "Delete field" }).click({ force: true });
+  await builder.getByText("No additional fields are configured. The create form currently shows only protected access details.", { exact: true }).waitFor({ timeout: 10000 });
+  await builder.getByRole("button", { name: `Remove ${qaSectionTitle}` }).click();
+  const sectionConfirmation = page.getByRole("alertdialog");
+  await sectionConfirmation.getByRole("button", { name: "Remove section" }).click({ force: true });
+  await builder.getByText("No sections yet. New fields can also stay in Other details.", { exact: true }).waitFor({ timeout: 10000 });
+  const [[fieldCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormFields WHERE id = ?", [qaFieldId]);
+  const [[sectionCount]] = await database.execute("SELECT COUNT(*) AS count FROM userFormSections WHERE id = ?", [qaSectionId]);
+  if (Number(fieldCount.count) !== 0 || Number(sectionCount.count) !== 0) throw new Error("Temporary Field Builder metadata cleanup was incomplete");
+  pass("Self-cleaning Field Builder QA", "Temporary field and section were removed after EAV workflow verification");
   await page.close();
 } finally {
-  if (database) await database.execute("DELETE FROM users WHERE email = ?", [qaEmail]);
+  if (database) {
+    if (qaUserId) await database.execute("DELETE FROM userProfileValues WHERE userId = ?", [qaUserId]);
+    if (qaFieldId) await database.execute("DELETE FROM userProfileValues WHERE fieldId = ?", [qaFieldId]);
+    await database.execute("DELETE FROM users WHERE email = ?", [qaEmail]);
+    if (qaFieldId) await database.execute("DELETE FROM userFormFields WHERE id = ?", [qaFieldId]);
+    if (qaSectionId) await database.execute("DELETE FROM userFormSections WHERE id = ?", [qaSectionId]);
+    await database.execute("DELETE FROM userFormFields WHERE label = ?", [qaFieldLabel]);
+    await database.execute("DELETE FROM userFormSections WHERE title = ?", [qaSectionTitle]);
+  }
   await database?.end();
   await browser?.close();
 }
