@@ -123,3 +123,4 @@
 - [x] Документировать границы первой Field Builder версии, миграционную стратегию и back-compatibility policy для будущих profile attributes.
 - [x] Показывать в Field Builder уже существующие системные поля формы создания пользователя отдельно от dynamic profile fields, с ясным защищённым статусом и безопасными действиями.
 - [x] Добавить доступное drag-and-drop изменение порядка dynamic profile fields в Field Builder с сохранением `sortOrder` и проверкой применения порядка в create form.
+- [x] Проверить и сохранить mobile navigation visual edit: белый текст меню и CTA на его фактическом фоне без потери контраста.
