@@ -15,6 +15,8 @@ const profileInput = z.object({
   isActive: z.boolean(),
 });
 const passwordInput = z.string().min(10, "Use at least 10 characters for the password.").max(256);
+const systemFieldInput = z.object({ id: z.enum(["name", "email", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100) });
+const createProfileInput = z.object({ name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160).optional(), email: z.string().trim().email("Enter a valid e-mail address.").max(320).optional(), role: managedRole.optional(), isActive: z.boolean().optional() });
 
 function userError(error: unknown): never {
   const message = error instanceof Error ? error.message : "The account action could not be completed.";
@@ -37,6 +39,9 @@ export const usersRouter = router({
     return account;
   }),
   formSchema: founderProcedure.query(() => db.getUserFormSchema(true)),
+  updateSystemFields: founderProcedure.input(z.object({ fields: z.array(systemFieldInput).length(5) })).mutation(async ({ input }) => {
+    try { return await db.updateUserSystemFields(input.fields); } catch (error) { return userError(error); }
+  }),
   createSection: founderProcedure.input(sectionInput).mutation(async ({ input }) => {
     try { return await db.createUserFormSection(input); } catch (error) { return userError(error); }
   }),
@@ -58,7 +63,7 @@ export const usersRouter = router({
   reorderFields: founderProcedure.input(z.object({ fieldIds: z.array(z.number().int().positive()).min(1).max(200).refine(ids => new Set(ids).size === ids.length, "Each field can appear only once.") })).mutation(async ({ input }) => {
     try { return await db.reorderUserFormFields(input.fieldIds); } catch (error) { return userError(error); }
   }),
-  create: founderProcedure.input(profileInput.extend({ password: passwordInput, profileValues })).mutation(async ({ input }) => {
+  create: founderProcedure.input(createProfileInput.extend({ password: passwordInput.optional(), profileValues })).mutation(async ({ input }) => {
     try { return await db.createManagedUser(input); } catch (error) { return userError(error); }
   }),
   update: founderProcedure.input(profileInput.extend({ id: z.number().int().positive(), password: passwordInput.optional().or(z.literal("")) })).mutation(async ({ input }) => {

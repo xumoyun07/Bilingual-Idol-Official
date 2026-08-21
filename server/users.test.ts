@@ -69,6 +69,23 @@ describe("Users router", () => {
     await expect(caller.users.createField({ label: "Unsafe", fieldType: "email" as never, isRequired: false, sortOrder: 2, isActive: true })).rejects.toBeInstanceOf(TRPCError);
   });
 
+  it("allows Founder to edit or delete every base create-form field", async () => {
+    const fields = [
+      { id: "name" as const, label: "Learner name", isRequired: false, isActive: false, sortOrder: 0 },
+      { id: "email" as const, label: "Contact e-mail", isRequired: false, isActive: false, sortOrder: 1 },
+      { id: "role" as const, label: "Access type", isRequired: false, isActive: true, sortOrder: 2 },
+      { id: "password" as const, label: "Access phrase", isRequired: false, isActive: false, sortOrder: 3 },
+      { id: "isActive" as const, label: "Enable sign-in", isRequired: false, isActive: false, sortOrder: 4 },
+    ];
+    const update = vi.spyOn(db, "updateUserSystemFields").mockResolvedValue(fields.map(field => ({ ...field, inputType: field.id === "role" ? "role" : field.id === "isActive" ? "checkbox" : field.id })) as never);
+    await expect(appRouter.createCaller(context("admin")).users.updateSystemFields({ fields })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await appRouter.createCaller(context("founder")).users.updateSystemFields({ fields });
+    expect(update).toHaveBeenCalledWith(fields);
+    const create = vi.spyOn(db, "createManagedUser").mockResolvedValue(account);
+    await expect(appRouter.createCaller(context("founder")).users.create({})).resolves.toEqual(account);
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ profileValues: {} }));
+  });
+
   it("allows only Founder to persist a complete dynamic field order", async () => {
     await expect(appRouter.createCaller(context("admin")).users.reorderFields({ fieldIds: [7, 3] })).rejects.toMatchObject({ code: "FORBIDDEN" });
     const reorder = vi.spyOn(db, "reorderUserFormFields").mockResolvedValue({ sections: [], fields: [] });

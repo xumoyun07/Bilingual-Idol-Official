@@ -99,6 +99,48 @@ export async function getManagedUser(id: number) {
 }
 
 type UserProfileValuesInput = Record<string, string>;
+export const userSystemFieldIds = ["name", "email", "role", "password", "isActive"] as const;
+export type UserSystemFieldId = (typeof userSystemFieldIds)[number];
+export type RuntimeUserSystemField = { id: UserSystemFieldId; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number };
+const systemFieldSettingsKey = "user_create_system_fields_v1";
+const defaultSystemFields: RuntimeUserSystemField[] = [
+  { id: "name", label: "Full name", inputType: "text", isRequired: true, isActive: true, sortOrder: 0 },
+  { id: "email", label: "E-mail", inputType: "email", isRequired: true, isActive: true, sortOrder: 1 },
+  { id: "role", label: "User type", inputType: "role", isRequired: true, isActive: true, sortOrder: 2 },
+  { id: "password", label: "Initial password", inputType: "password", isRequired: true, isActive: true, sortOrder: 3 },
+  { id: "isActive", label: "Account active", inputType: "checkbox", isRequired: false, isActive: true, sortOrder: 4 },
+];
+
+function normaliseSystemFields(raw: unknown): RuntimeUserSystemField[] {
+  const candidate = Array.isArray(raw) ? raw : [];
+  const configured = new Map(candidate.filter((field): field is Partial<RuntimeUserSystemField> & { id: UserSystemFieldId } => Boolean(field && typeof field === "object" && userSystemFieldIds.includes((field as { id?: string }).id as UserSystemFieldId))).map(field => [field.id, field]));
+  return defaultSystemFields.map(defaultField => {
+    const field = configured.get(defaultField.id);
+    return {
+      ...defaultField,
+      label: typeof field?.label === "string" && field.label.trim().length >= 2 ? field.label.trim().slice(0, 160) : defaultField.label,
+      isRequired: typeof field?.isRequired === "boolean" ? field.isRequired : defaultField.isRequired,
+      isActive: typeof field?.isActive === "boolean" ? field.isActive : defaultField.isActive,
+      sortOrder: typeof field?.sortOrder === "number" && Number.isInteger(field.sortOrder) && field.sortOrder >= 0 ? field.sortOrder : defaultField.sortOrder,
+    };
+  }).sort((a, b) => a.sortOrder - b.sortOrder || userSystemFieldIds.indexOf(a.id) - userSystemFieldIds.indexOf(b.id));
+}
+
+export async function getUserSystemFields() {
+  const database = requireDatabase(await getDb());
+  const setting = (await database.select().from(siteSettings).where(eq(siteSettings.key, systemFieldSettingsKey)).limit(1))[0];
+  if (!setting) return defaultSystemFields;
+  try { return normaliseSystemFields(JSON.parse(setting.value)); } catch { return defaultSystemFields; }
+}
+
+export async function updateUserSystemFields(fields: Array<Omit<RuntimeUserSystemField, "inputType">>) {
+  const database = requireDatabase(await getDb());
+  const ids = fields.map(field => field.id);
+  if (fields.length !== userSystemFieldIds.length || new Set(ids).size !== userSystemFieldIds.length || userSystemFieldIds.some(id => !ids.includes(id))) throw new Error("The system field configuration must include each base field exactly once.");
+  const normalised = normaliseSystemFields(fields);
+  await database.insert(siteSettings).values({ key: systemFieldSettingsKey, value: JSON.stringify(normalised) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(normalised) } });
+  return normalised;
+}
 
 function toRuntimeField(field: typeof userFormFields.$inferSelect): RuntimeUserField {
   return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive };
@@ -106,11 +148,12 @@ function toRuntimeField(field: typeof userFormFields.$inferSelect): RuntimeUserF
 
 export async function getUserFormSchema(includeInactive = false) {
   const database = requireDatabase(await getDb());
-  const [sections, fields] = await Promise.all([
+  const [sections, fields, systemFields] = await Promise.all([
     database.select().from(userFormSections).where(includeInactive ? undefined : eq(userFormSections.isActive, true)).orderBy(asc(userFormSections.sortOrder), asc(userFormSections.id)),
     database.select().from(userFormFields).where(includeInactive ? undefined : eq(userFormFields.isActive, true)).orderBy(asc(userFormFields.sortOrder), asc(userFormFields.id)),
+    getUserSystemFields(),
   ]);
-  return { sections, fields: fields.map(toRuntimeField) };
+  return { sections, fields: fields.map(toRuntimeField), systemFields: includeInactive ? systemFields : systemFields.filter(field => field.isActive) };
 }
 
 function safeFieldKey(label: string) {
@@ -184,20 +227,26 @@ async function validatedProfileRows(values: UserProfileValuesInput) {
   return Object.entries(validateProfileValues(fields, values)).map(([fieldId, value]) => ({ fieldId: Number(fieldId), value }));
 }
 
-export async function createManagedUser(input: { name: string; email: string; password: string; role: FounderManagedRole; isActive: boolean; profileValues?: UserProfileValuesInput }) {
+export async function createManagedUser(input: { name?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
   const database = requireDatabase(await getDb());
-  const email = normaliseEmail(input.email);
-  if (await getUserByEmail(email)) throw new Error("An account with this e-mail already exists.");
+  const systemFields = await getUserSystemFields();
+  const supplied: Record<UserSystemFieldId, unknown> = { name: input.name, email: input.email, role: input.role, password: input.password, isActive: input.isActive };
+  for (const field of systemFields) if (field.isActive && field.isRequired && (supplied[field.id] === undefined || supplied[field.id] === "")) throw new Error(`${field.label} is required by the current create form.`);
+  const suppliedEmail = input.email ? normaliseEmail(input.email) : undefined;
+  if (suppliedEmail && await getUserByEmail(suppliedEmail)) throw new Error("An account with this e-mail already exists.");
+  const email = suppliedEmail ?? `issued-${randomUUID()}@pending.bilingualidol.invalid`;
+  const credentialsIssued = Boolean(input.email && input.password);
+  const password = input.password ?? randomUUID().replace(/-/g, "") + randomUUID().replace(/-/g, "");
   const profileRows = await validatedProfileRows(input.profileValues ?? {});
   const result = await database.transaction(async tx => {
     const created = await tx.insert(users).values({
       openId: `issued:${randomUUID()}`,
-      name: input.name.trim(),
+      name: input.name?.trim() || "Unnamed account",
       email,
-      passwordHash: createUserPasswordHash(input.password),
-      isActive: input.isActive,
-      loginMethod: "issued_by_founder",
-      role: input.role,
+      passwordHash: createUserPasswordHash(password),
+      isActive: input.isActive ?? credentialsIssued,
+      loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
+      role: input.role ?? "student",
       lastSignedIn: new Date(),
     });
     const userId = Number(created[0].insertId);

@@ -53,8 +53,8 @@ try {
   await builder.locator("#section-title").fill(qaSectionTitle);
   await builder.getByRole("button", { name: "Add section" }).click();
   await builder.locator("span").filter({ hasText: qaSectionTitle }).first().waitFor({ timeout: 10000 });
-  await builder.getByRole("textbox", { name: "Label" }).fill(qaFieldLabel);
-  await builder.getByLabel("Type").selectOption("dropdown");
+  await builder.getByRole("textbox", { name: "Label", exact: true }).fill(qaFieldLabel);
+  await builder.locator("select").first().selectOption("dropdown");
   await builder.getByRole("textbox", { name: /options/i }).fill("Beginner\nAdvanced");
   await builder.locator("select").nth(1).selectOption({ label: qaSectionTitle });
   await builder.getByLabel("Required field").check();
@@ -66,7 +66,7 @@ try {
   qaFieldId = Number(fieldRow.id);
   qaFieldKey = String(fieldRow.key);
   if (!qaSectionId || !qaFieldId) throw new Error("Field Builder metadata was not persisted");
-  await builder.getByRole("textbox", { name: "Label" }).fill(qaFieldTwoLabel);
+  await builder.getByRole("textbox", { name: "Label", exact: true }).fill(qaFieldTwoLabel);
   await builder.locator("select").nth(1).selectOption({ label: qaSectionTitle });
   await builder.getByRole("button", { name: "Add field" }).click();
   await builder.locator("p").filter({ hasText: qaFieldTwoLabel }).first().waitFor({ timeout: 10000 });
