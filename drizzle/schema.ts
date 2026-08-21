@@ -5,6 +5,8 @@ export const users = mysqlTable("users", {
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  passwordHash: text("passwordHash"),
+  isActive: boolean("isActive").default(true).notNull(),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "student", "teacher", "marketing", "admin", "super_admin", "founder"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -88,7 +90,11 @@ export const siteSettings = mysqlTable("siteSettings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-export const learningItems = mysqlTable("learningItems", {
+/**
+ * Legacy archive only. These tables are intentionally retained by the user's
+ * safe-removal decision and have no routes, tRPC procedures, UI, or app types.
+ */
+export const archivedLearningItems = mysqlTable("learningItems", {
   id: int("id").autoincrement().primaryKey(),
   kind: mysqlEnum("kind", ["schedule", "material", "teacher", "payment", "report"]).notNull(),
   title: varchar("title", { length: 220 }).notNull(),
@@ -100,7 +106,7 @@ export const learningItems = mysqlTable("learningItems", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-export const learningSupportRequests = mysqlTable("learningSupportRequests", {
+export const archivedLearningSupportRequests = mysqlTable("learningSupportRequests", {
   id: int("id").autoincrement().primaryKey(),
   type: mysqlEnum("type", ["teacher", "payment", "report"]).notNull(),
   contactEmail: varchar("contactEmail", { length: 320 }).notNull(),
@@ -116,5 +122,3 @@ export type Program = typeof programs.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;
 export type TeamProfile = typeof teamProfiles.$inferSelect;
-export type LearningItem = typeof learningItems.$inferSelect;
-export type LearningSupportRequest = typeof learningSupportRequests.$inferSelect;

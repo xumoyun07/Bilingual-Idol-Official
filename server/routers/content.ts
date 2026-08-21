@@ -41,20 +41,6 @@ const teamInput = z.object({
   isPublished: z.boolean(),
   sortOrder: z.number().int().min(0).max(999),
 });
-const learningItemInput = z.object({
-  kind: z.enum(["schedule", "material", "teacher", "payment", "report"]),
-  title: z.string().min(3).max(220),
-  description: z.string().min(8).max(6000),
-  actionUrl: z.string().url().max(2048).nullable(),
-  isPublished: z.boolean(),
-  sortOrder: z.number().int().min(0).max(999),
-});
-const learningSupportRequestInput = z.object({
-  type: z.enum(["teacher", "payment", "report"]),
-  contactEmail: z.string().email().max(320),
-  message: z.string().min(8).max(4000),
-});
-
 export const contentRouter = router({
   publicAnnouncements: publicProcedure.query(() => db.listPublicAnnouncements()),
   publicPrograms: publicProcedure.query(() => db.listPublicPrograms()),
@@ -62,8 +48,6 @@ export const contentRouter = router({
   publicTestimonials: publicProcedure.query(() => db.listPublicTestimonials()),
   publicTeamProfiles: publicProcedure.query(() => db.listPublicTeamProfiles()),
   siteSettings: publicProcedure.query(() => db.listSiteSettings()),
-  publicLearningItems: publicProcedure.query(() => db.listPublicLearningItems()),
-  createLearningSupportRequest: publicProcedure.input(learningSupportRequestInput).mutation(({ input }) => db.createLearningSupportRequest(input)),
   announcements: founderProcedure.query(() => db.listAnnouncements()),
   createAnnouncement: founderProcedure.input(announcementInput).mutation(({ input }) =>
     db.createAnnouncement({
@@ -87,10 +71,4 @@ export const contentRouter = router({
   createTeamProfile: founderProcedure.input(teamInput).mutation(({ input }) => db.createTeamProfile(input)),
   updateTeamProfile: founderProcedure.input(z.object({ id: z.number().int().positive(), data: teamInput })).mutation(({ input }) => db.updateTeamProfile(input.id, input.data)),
   deleteTeamProfile: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => db.deleteTeamProfile(input.id)),
-  learningItems: founderProcedure.query(() => db.listLearningItems()),
-  createLearningItem: founderProcedure.input(learningItemInput).mutation(({ input }) => db.createLearningItem(input)),
-  updateLearningItem: founderProcedure.input(z.object({ id: z.number().int().positive(), data: learningItemInput })).mutation(({ input }) => db.updateLearningItem(input.id, input.data)),
-  deleteLearningItem: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => db.deleteLearningItem(input.id)),
-  learningSupportRequests: founderProcedure.query(() => db.listLearningSupportRequests()),
-  updateLearningSupportRequestStatus: founderProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "reviewed", "resolved"]) })).mutation(({ input }) => db.updateLearningSupportRequestStatus(input.id, input.status)),
 });

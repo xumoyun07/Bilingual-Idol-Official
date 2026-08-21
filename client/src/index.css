@@ -42,8 +42,10 @@
 }
 
 * { border-color: var(--border); }
-html { scroll-behavior: smooth; }
-body { background: var(--background); color: var(--foreground); font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
+html { max-width: 100%; overflow-x: clip; scroll-behavior: smooth; }
+body { max-width: 100%; overflow-x: clip; background: var(--background); color: var(--foreground); font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
+img, picture, video, canvas, svg { max-width: 100%; }
+img, video { height: auto; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button, a { transition: color 180ms var(--ease-out), background-color 180ms var(--ease-out), border-color 180ms var(--ease-out), transform 160ms var(--ease-out), box-shadow 180ms var(--ease-out); }
 button:active, .pressable:active { transform: scale(0.97); }
@@ -145,7 +147,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .compass-ink { background: #10253e; color: #fff; }
 .compass-paper { background: #fbf8f2; background-image: radial-gradient(circle at 2px 2px, rgba(16,37,62,.045) 1px, transparent 0); background-size: 18px 18px; }
 .compass-page-marker { display: grid; place-items: center; width: 3rem; height: 3rem; border: 1px solid rgba(16,37,62,.16); border-radius: 50%; color: #10253e; font: 700 .78rem/1 "Manrope", sans-serif; letter-spacing: .06em; }
-.compass-btn-primary, .compass-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 2.9rem; padding: .75rem 1.1rem; border-radius: .8rem; font-size: .875rem; font-weight: 800; }
+.compass-btn-primary, .compass-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 3rem; padding: .75rem 1.1rem; border-radius: .8rem; font-size: .875rem; font-weight: 800; }
 .compass-btn-primary { background: #10253e; color: #fff; box-shadow: inset 0 -3px 0 rgba(255,255,255,.1); }
 .compass-btn-primary:hover { background: #ef795b; color: #10253e; }
 .compass-btn-secondary { border: 1px solid rgba(16,37,62,.25); background: #fff; color: #10253e; }
@@ -169,7 +171,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .compass-nav-link:hover, .compass-nav-link[aria-current="page"] { color: #10253e; }
 .compass-nav-link:hover::after, .compass-nav-link[aria-current="page"]::after { transform: scaleX(1); }
 .compass-mobile-menu { border-top: 1px solid rgba(16,37,62,.12); background: #fbf8f2; padding: .75rem 1rem 1rem; }
-.compass-mobile-menu a { display: flex; min-height: 2.85rem; align-items: center; border-bottom: 1px solid rgba(16,37,62,.09); color: #10253e; font-size: .9rem; font-weight: 800; }
+.compass-mobile-menu a { display: flex; min-height: 3rem; align-items: center; border-bottom: 1px solid rgba(16,37,62,.09); color: #10253e; font-size: .9rem; font-weight: 800; }
 .compass-footer { border-top: 1px solid rgba(255,255,255,.12); background: #10253e; color: #fff; }
 .compass-footer a { color: rgba(255,255,255,.7); }
 .compass-footer a:hover { color: #f3b59f; }
@@ -240,3 +242,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .founder-state { border-radius: .8rem; padding: 1rem; }.founder-state-empty { border: 1px dashed rgba(16,37,62,.28); background: #fbf8f2; }.founder-state-success { border: 1px solid #bddfcf; background: #e7f0eb; color: #245d4c; }.founder-state-error { border: 1px solid #efc4b8; background: #fff0ed; color: #a34732; }
 @media (max-width: 640px) { .founder-command-header { align-items: flex-start; flex-direction: column; }.founder-metric { min-height: 9rem; } }
 @media (max-width: 640px) { .founder-route-metrics { grid-template-columns: 1fr; }.founder-route-surface > .founder-state { display: block; } }
+@media (max-width: 1023px) { .compass-public-header button[aria-label*="navigation"] { width: 3rem !important; height: 3rem !important; } }
+@media (min-width: 1440px) { .compass-shell { width: min(100% - 6rem, 82rem); } }

@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BookOpenText, CalendarRange, ClipboardList, Database, LayoutDashboard, LogOut, Megaphone, PanelLeft } from "lucide-react";
+import { BookOpenText, ClipboardList, LayoutDashboard, LogOut, Megaphone, PanelLeft } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -28,8 +28,6 @@ import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Overview", path: "/admin" },
-  { icon: CalendarRange, label: "Learning operations", path: "/admin/operations" },
-  { icon: Database, label: "Learning data", path: "/admin/learning-data" },
   { icon: ClipboardList, label: "Submissions", path: "/admin/submissions" },
   { icon: Megaphone, label: "Announcements", path: "/admin/announcements" },
   { icon: Megaphone, label: "Edit announcements", path: "/admin/announcements/edit" },
@@ -53,6 +51,10 @@ export default function DashboardLayout({
   const { loading, user } = useAuth();
 
   useEffect(() => {
+    if (!loading && user && !["admin", "super_admin", "founder"].includes(user.role)) window.location.href = "/dashboard";
+  }, [loading, user]);
+
+  useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
@@ -73,7 +75,7 @@ export default function DashboardLayout({
             </p>
           </div>
           <Button
-            onClick={() => { window.location.href = "/admin/login"; }}
+            onClick={() => { window.location.href = "/login"; }}
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
           >
@@ -83,6 +85,8 @@ export default function DashboardLayout({
       </div>
     );
   }
+
+  if (!["admin", "super_admin", "founder"].includes(user.role)) return <DashboardLayoutSkeleton />
 
   return (
     <SidebarProvider
@@ -165,7 +169,7 @@ function DashboardLayoutContent({
             <div className="flex items-center gap-3 px-2 transition-all w-full">
               <button
                 onClick={toggleSidebar}
-                className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[#e7f0eb] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
+                className="h-12 w-12 flex items-center justify-center rounded-lg hover:bg-[#e7f0eb] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
                 aria-label="Toggle navigation"
               >
                 <PanelLeft className="h-4 w-4 text-muted-foreground" />
@@ -190,7 +194,7 @@ function DashboardLayoutContent({
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-11 rounded-lg transition-all font-semibold ${isActive ? "bg-[#10253e] text-white hover:bg-[#10253e] hover:text-white" : "hover:bg-[#e7f0eb]"}`}
+                      className={`h-12 rounded-lg transition-all font-semibold ${isActive ? "bg-[#10253e] text-white hover:bg-[#10253e] hover:text-white" : "hover:bg-[#e7f0eb]"}`}
                     >
                       <item.icon
                         className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
@@ -206,7 +210,7 @@ function DashboardLayoutContent({
           <SidebarFooter className="border-t border-[#ded4c2] p-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <button className="flex min-h-12 items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <Avatar className="h-9 w-9 border shrink-0">
                     <AvatarFallback className="text-xs font-medium">
                       {user?.name?.charAt(0).toUpperCase()}
@@ -257,7 +261,7 @@ function DashboardLayoutContent({
         {isMobile && (
           <header className="dashboard-fixed-header dashboard-fixed-header-mobile">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9 rounded-lg bg-background" />
+              <SidebarTrigger className="h-12 w-12 rounded-lg bg-background" />
               <div className="flex items-center gap-3">
                 <div className="flex flex-col gap-1">
                   <span className="tracking-tight text-foreground">

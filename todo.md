@@ -80,3 +80,17 @@
 - [x] Сделать первый hero-блок главной страницы точным initial viewport вместе с наложенной public header, без жёстких offsets, клиппинга и дополнительной прокрутки первого экрана.
 - [x] Подтвердить desktop/mobile hero QA измерениями: основной контент, CTA и адаптивная Learning Compass композиция полностью помещаются в initial viewport.
 - [x] Зафиксировать mobile hero как намеренно сокращённую одноколоночную композицию без secondary orientation card, сохраняя обе CTA и языковой ряд в initial viewport.
+- [x] Аудировать и удалить все public routes, навигационные ссылки, CTA и контентные зависимости Learning Hub.
+- [x] Спроектировать универсальный email/password вход и безопасную role-based маршрутизацию личных dashboard без публичной регистрации.
+- [x] Реализовать личный dashboard для обычного пользователя и сохранить отдельный Founder dashboard с высшим уровнем доступа.
+- [x] Переработать кнопку и экран «Вход» как универсальную точку доступа для всех пользователей.
+- [ ] Проверить login, role redirect, защиту маршрутов, отсутствие Learning Hub и обновлённые desktop/mobile интерфейсы.
+- [x] Удалить `/learning` и Founder learning-маршруты из App, public navigation, homepage CTA и всех внутренних ссылок, затем проверить отсутствие Learning Hub в роутинге.
+- [x] Зафиксировать universal login architecture с credential storage, отсутствием регистрации, post-login role redirects и route protection до начала реализации.
+- [x] Оставить `learningItems` и `learningSupportRequests` как schema-preserved archive без routes, API, UI и application contracts; исключить их из будущих feature migrations по подтверждённому безопасному варианту.
+- [ ] Создать и проверить непубличный test account с валидным scrypt hash: universal login должен привести в `/dashboard`, а `/admin` должен быть недоступен этому account.
+- [ ] Провести responsive-аудит public, universal login, user dashboard и Founder console на 360×640, 390×844, 412×915, 768×1024, 1024×1366, 1366×768, 1920×1080 и 3840×2160.
+- [ ] Зафиксировать карту breakpoints, fluid typography, touch targets и правила предотвращения overflow для всех интерфейсных контуров.
+- [ ] Доработать responsive CSS и компоненты: navigation, grids, hero, forms, cards, tables, dialogs и fixed Founder rail/header.
+- [ ] Проверить отсутствие горизонтального overflow, clip/overlap, минимальные touch targets 48px и корректную смену ориентации на целевых мобильных и tablet размерах.
+- [ ] Подготовить отчёт с таблицей результатов, скриншотами ключевых разрешений, ограничениями кроссбраузерной проверки и рекомендациями по производительности.

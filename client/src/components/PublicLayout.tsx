@@ -4,7 +4,6 @@ import { CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "rea
 
 const navigation = [
   { label: "Home", href: "/" },
-  { label: "Learning hub", href: "/learning" },
   { label: "Programmes", href: "/programs" },
   { label: "About", href: "/about" },
   { label: "News", href: "/news" },
@@ -59,12 +58,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
             <a href="https://wa.me/60367310449" target="_blank" rel="noreferrer" className="text-sm font-bold text-[#405269] hover:text-[#10253e]">WhatsApp</a>
-            <Link href="/admin/login" className="compass-btn-secondary !min-h-10 !px-3" aria-label="Вход в Founder console">Вход</Link>
-            <Link href="/enroll" className="compass-btn-primary !min-h-10">Enroll Now <ArrowUpRight size={16} aria-hidden="true" /></Link>
+            <Link href="/login" className="compass-btn-secondary !px-3" aria-label="Вход в личный кабинет">Вход</Link>
+            <Link href="/enroll" className="compass-btn-primary">Enroll Now <ArrowUpRight size={16} aria-hidden="true" /></Link>
           </div>
-          <button className="grid h-10 w-10 place-items-center rounded-lg border border-[#cbbba4] text-[#10253e] lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open}>{open ? <X /> : <Menu />}</button>
+          <button className="grid h-12 w-12 place-items-center rounded-lg border border-[#cbbba4] text-[#10253e] lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open}>{open ? <X /> : <Menu />}</button>
         </div>
-        {open && <nav className="compass-mobile-menu lg:hidden" aria-label="Mobile navigation"><div className="compass-shell">{navigation.map(item => <Link key={item.href} href={item.href} onClick={() => setOpen(false)} aria-current={location === item.href ? "page" : undefined}>{item.label}</Link>)}<div className="mt-4 flex gap-3"><Link href="/admin/login" onClick={() => setOpen(false)} className="compass-btn-secondary flex-1">Вход</Link><Link href="/enroll" onClick={() => setOpen(false)} className="compass-btn-primary flex-1">Enroll Now</Link></div></div></nav>}
+        {open && <nav className="compass-mobile-menu lg:hidden" aria-label="Mobile navigation"><div className="compass-shell">{navigation.map(item => <Link key={item.href} href={item.href} onClick={() => setOpen(false)} aria-current={location === item.href ? "page" : undefined}>{item.label}</Link>)}<div className="mt-4 flex gap-3"><Link href="/login" onClick={() => setOpen(false)} className="compass-btn-secondary flex-1">Вход</Link><Link href="/enroll" onClick={() => setOpen(false)} className="compass-btn-primary flex-1">Enroll Now</Link></div></div></nav>}
       </header>
       <main id="main-content" tabIndex={-1}>{children}</main>
       <footer className="compass-footer">

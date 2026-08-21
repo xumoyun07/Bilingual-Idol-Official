@@ -32,12 +32,13 @@ describe("public accessibility structure", () => {
     expect(dashboard).toContain("onClick={() => setLocation(item.path)}");
   });
 
-  it("exposes loading, success, and error feedback across Founder learning management routes", () => {
-    for (const relativePath of ["pages/FounderLearningData.tsx", "pages/FounderOperations.tsx"]) {
-      const page = read(relativePath);
-      expect(page).toContain("skeleton-shimmer");
-      expect(page).toContain('role="status"');
-      expect(page).toContain('role="alert"');
-    }
+  it("exposes accessible auth feedback and an honest private dashboard state", () => {
+    const login = read("pages/FounderLogin.tsx");
+    const dashboard = read("pages/UserDashboard.tsx");
+    expect(login).toContain("trpc.auth.login");
+    expect(login).toContain('role="alert"');
+    expect(login).toContain("login.isPending");
+    expect(dashboard).toContain('redirectPath: "/login"');
+    expect(dashboard).toContain("No account information is published yet.");
   });
 });

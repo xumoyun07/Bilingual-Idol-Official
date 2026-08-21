@@ -47,21 +47,18 @@ await check("programme filters remain keyboard reachable", async () => {
   await page.keyboard.press("Enter");
 });
 
-await check("learning hub exposes core learning journeys through keyboard navigation", async () => {
-  await page.goto(`${baseUrl}/learning`, { waitUntil: "domcontentloaded" });
-  const learningTab = (name) => page.locator('nav[aria-label="Learning areas"] button').filter({ hasText: name }).first();
-  await learningTab("Materials").waitFor();
-  await learningTab("Materials").focus();
-  await page.keyboard.press("Enter");
-  if (!await page.getByRole("heading", { name: /practice that stays close/i }).isVisible()) throw new Error("Materials state did not activate from keyboard control");
-  await learningTab("Payments").focus();
-  await page.keyboard.press("Enter");
-  if (!await page.getByRole("heading", { name: /service details, without guessing/i }).isVisible()) throw new Error("Payments state did not activate from keyboard control");
-  await learningTab("Teacher").focus();
-  await page.keyboard.press("Enter");
-  const teacherSupport = page.getByText("Ask your teacher a learning question", { exact: true });
-  await teacherSupport.waitFor();
-  if (!await teacherSupport.isVisible()) throw new Error("Teacher support request flow is not visible from keyboard navigation");
+await check("removed Learning Hub route resolves to an accessible not-found state", async () => {
+  await page.goto(`${baseUrl}/learning`, { waitUntil: "networkidle" });
+  if (!await page.getByRole("heading", { name: /this route is not on the map/i }).isVisible()) throw new Error("Removed learning route did not resolve to the not-found state");
+});
+
+await check("universal sign-in fields are keyboard reachable", async () => {
+  await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
+  const email = page.getByRole("textbox", { name: "E-mail" });
+  await email.focus();
+  await page.keyboard.type("member@example.com");
+  if (await email.inputValue() !== "member@example.com") throw new Error("Universal e-mail field did not receive keyboard input");
+  await page.getByRole("textbox", { name: "Password" }).focus();
 });
 
 await check("enrollment form exposes keyboard validation feedback", async () => {
@@ -74,16 +71,16 @@ await check("enrollment form exposes keyboard validation feedback", async () => 
   if (invalidControls < 1 || alerts < 1) throw new Error("Expected invalid controls and alert feedback after keyboard submission");
 });
 
-await check("unauthenticated access to Founder editor redirects to sign in", async () => {
+await check("unauthenticated access to Founder editor redirects to universal sign in", async () => {
   await page.goto(`${baseUrl}/admin/announcements/edit`, { waitUntil: "networkidle" });
-  await page.waitForURL("**/admin/login", { timeout: 10000 });
-  if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Founder sign-in form is not visible after protected-route redirect");
+  await page.waitForURL("**/login", { timeout: 10000 });
+  if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Universal sign-in form is not visible after protected-route redirect");
 });
 
-await check("unauthenticated access to Founder learning data redirects to sign in", async () => {
-  await page.goto(`${baseUrl}/admin/learning-data`, { waitUntil: "networkidle" });
-  await page.waitForURL("**/admin/login", { timeout: 10000 });
-  if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Founder sign-in form is not visible after learning-data redirect");
+await check("unauthenticated access to a personal dashboard redirects to universal sign in", async () => {
+  await page.goto(`${baseUrl}/dashboard`, { waitUntil: "networkidle" });
+  await page.waitForURL("**/login", { timeout: 10000 });
+  if (!await page.getByRole("heading", { name: /welcome back/i }).isVisible()) throw new Error("Universal sign-in form is not visible after dashboard redirect");
 });
 
 await browser.close();

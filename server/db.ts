@@ -1,6 +1,6 @@
 import { asc, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { Announcement, announcements, InsertUser, LearningItem, learningItems, LearningSupportRequest, learningSupportRequests, Program, programs, siteSettings, submissions, TeamProfile, teamProfiles, testimonials, users } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, siteSettings, submissions, TeamProfile, teamProfiles, testimonials, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 
@@ -34,6 +34,17 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+export async function getUserByEmail(email: string) {
+  const db = await getDb(); if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email.trim().toLowerCase())).limit(1);
+  return result[0];
+}
+
+export async function recordUserSignIn(openId: string) {
+  const db = requireDatabase(await getDb());
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.openId, openId));
+}
+
 export type SubmissionInput = { type: "enrollment" | "inquiry"; studentName: string; studentAge: number; parentName: string; parentEmail: string; parentPhone: string; programInterest: string; preferredSchedule: string; message?: string; source?: string; };
 
 export async function createSubmission(input: SubmissionInput) {
@@ -62,16 +73,6 @@ export async function updateTeamProfile(id: number, input: Omit<TeamProfile, "id
 export async function deleteTeamProfile(id: number) { const db = requireDatabase(await getDb()); await db.delete(teamProfiles).where(eq(teamProfiles.id, id)); return { success: true }; }
 export async function listSiteSettings() { const db = requireDatabase(await getDb()); const rows = await db.select().from(siteSettings); return Object.fromEntries(rows.map(row => [row.key, row.value])); }
 export async function updateSiteSettings(values: Record<string, string>) { const db = requireDatabase(await getDb()); for (const [key, value] of Object.entries(values)) await db.insert(siteSettings).values({ key, value }).onDuplicateKeyUpdate({ set: { value } }); return { success: true }; }
-
-export async function listPublicLearningItems() { const db = requireDatabase(await getDb()); return db.select().from(learningItems).where(eq(learningItems.isPublished, true)).orderBy(asc(learningItems.sortOrder), desc(learningItems.createdAt)); }
-export async function listLearningItems() { const db = requireDatabase(await getDb()); return db.select().from(learningItems).orderBy(asc(learningItems.sortOrder), desc(learningItems.createdAt)); }
-export async function createLearningItem(input: Omit<LearningItem, "id" | "createdAt" | "updatedAt">) { const db = requireDatabase(await getDb()); const result = await db.insert(learningItems).values(input); return { id: Number(result[0].insertId) }; }
-export async function updateLearningItem(id: number, input: Omit<LearningItem, "id" | "createdAt" | "updatedAt">) { const db = requireDatabase(await getDb()); await db.update(learningItems).set(input).where(eq(learningItems.id, id)); return { success: true }; }
-export async function deleteLearningItem(id: number) { const db = requireDatabase(await getDb()); await db.delete(learningItems).where(eq(learningItems.id, id)); return { success: true }; }
-
-export async function createLearningSupportRequest(input: Pick<LearningSupportRequest, "type" | "contactEmail" | "message">) { const db = requireDatabase(await getDb()); const result = await db.insert(learningSupportRequests).values(input); return { id: Number(result[0].insertId) }; }
-export async function listLearningSupportRequests() { const db = requireDatabase(await getDb()); return db.select().from(learningSupportRequests).orderBy(desc(learningSupportRequests.createdAt)); }
-export async function updateLearningSupportRequestStatus(id: number, status: "new" | "reviewed" | "resolved") { const db = requireDatabase(await getDb()); await db.update(learningSupportRequests).set({ status }).where(eq(learningSupportRequests.id, id)); return { success: true }; }
 
 export async function listPublicAnnouncements() { const db = requireDatabase(await getDb()); return db.select().from(announcements).where(eq(announcements.isPublished, true)).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)); }
 export async function listAnnouncements() { const db = requireDatabase(await getDb()); return db.select().from(announcements).orderBy(desc(announcements.createdAt)); }
