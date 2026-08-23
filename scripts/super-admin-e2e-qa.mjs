@@ -28,6 +28,16 @@ try {
   inserted = true;
   browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  async function assertActiveSidebarItem(activeLabel, inactiveLabels) {
+    const sidebar = page.locator(".compass-rail");
+    const active = sidebar.getByRole("button", { name: activeLabel, exact: true });
+    const activeStyle = await active.evaluate(element => ({ background: getComputedStyle(element).backgroundColor, icon: getComputedStyle(element.querySelector("svg")).color }));
+    if (activeStyle.background !== "rgb(16, 37, 62)" || activeStyle.icon !== "rgb(243, 181, 159)") throw new Error(`${activeLabel} did not receive the active background and icon colour`);
+    for (const label of inactiveLabels) {
+      const style = await sidebar.getByRole("button", { name: label, exact: true }).evaluate(element => ({ background: getComputedStyle(element).backgroundColor, icon: getComputedStyle(element.querySelector("svg")).color }));
+      if (style.background === "rgb(16, 37, 62)" || style.icon === "rgb(243, 181, 159)") throw new Error(`${label} incorrectly retained active sidebar styling`);
+    }
+  }
   await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
   await page.locator("#sign-in-email").fill(email);
   await page.locator("#sign-in-password").fill(password);
@@ -38,6 +48,8 @@ try {
 
   await page.goto(`${baseUrl}/super-admin/users`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: /people, managed within your scope/i }).waitFor({ timeout: 10000 });
+  await assertActiveSidebarItem("Users", ["Dashboard", "Audit logs"]);
+  pass("Most-specific sidebar state", "Users alone has active background and apricot icon; Dashboard and Audit logs are inactive");
   const modules = page.locator('nav[aria-label="User type modules"]');
   for (const role of ["Students", "Teachers", "Marketing", "Admins"]) await modules.getByRole("button", { name: `Type ${role}`, exact: true }).waitFor({ timeout: 10000 });
   if (await modules.getByRole("button", { name: "Type Super admins", exact: true }).count()) throw new Error("Super admin module exposed peer Super admins");
@@ -51,6 +63,11 @@ try {
   if (roleValues.includes("super_admin")) throw new Error("Super admin create form exposed peer Super admin role");
   await page.keyboard.press("Escape");
   pass("Scoped create form", "Create form excludes Super admin role and provides no Field Builder entry point");
+
+  await page.goto(`${baseUrl}/super-admin/audit-logs`, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: /audit logs/i }).waitFor({ timeout: 10000 });
+  await assertActiveSidebarItem("Audit logs", ["Dashboard", "Users"]);
+  pass("Audit sidebar state", "Audit logs alone has active background and apricot icon after route navigation");
 
   await page.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
   await page.waitForURL("**/super-admin", { timeout: 10000 });

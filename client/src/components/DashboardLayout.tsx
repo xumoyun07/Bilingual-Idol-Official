@@ -131,7 +131,9 @@ function DashboardLayoutContent({
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const menuItems = workspaceMenu[role];
-  const activeMenuItem = menuItems.find(item => location === item.path || location.startsWith(`${item.path}/`));
+  const activeMenuItem = menuItems
+    .filter(item => location === item.path || location.startsWith(`${item.path}/`))
+    .sort((left, right) => right.path.length - left.path.length)[0];
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -200,17 +202,17 @@ function DashboardLayoutContent({
           <SidebarContent className="gap-0">
               <SidebarMenu className="px-3 py-4">
               {menuItems.map(item => {
-                const isActive = location === item.path || location.startsWith(`${item.path}/`);
+                const isActive = activeMenuItem?.path === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-12 rounded-lg transition-all font-semibold ${isActive ? "bg-[#10253e] text-white hover:bg-[#10253e] hover:text-white" : "hover:bg-[#e7f0eb]"}`}
+                      className={`h-12 rounded-lg transition-all font-semibold ${isActive ? "bg-[#10253e] text-white hover:bg-[#10253e] hover:text-white" : "text-[#29415b] hover:bg-[#e7f0eb]"}`}
                     >
                       <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                        className={`h-4 w-4 ${isActive ? "text-[#f3b59f]" : "text-[#53657a]"}`}
                       />
                       <span>{item.label}</span>
                     </SidebarMenuButton>

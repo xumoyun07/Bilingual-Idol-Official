@@ -143,3 +143,4 @@
 - [x] Реализовать адаптивный Founder Students Profile UI: список, detail profile, add/edit/delete dialogs, history и document preview.
 - [x] Проверить Students Profile RBAC, CRUD, history, supported documents, search/filter/pagination и desktop/mobile workflows без persistent QA records.
 - [x] Подготовить Students Profile architecture/user documentation и сохранить проверенный milestone checkpoint.
+- [x] Исправить fixed sidebar active state: только current dashboard route активна, а icon и text меняют цвет вместе для Founder/Super admin.
