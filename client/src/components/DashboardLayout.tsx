@@ -185,7 +185,7 @@ function DashboardLayoutContent({
               <button
                 onClick={toggleSidebar}
                 className="h-12 w-12 flex items-center justify-center rounded-lg hover:bg-[#e7f0eb] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
-                aria-label="Toggle navigation"
+                aria-label="Toggle navigation" style={{marginLeft: '-17px', marginTop: '1px'}}
               >
                 <PanelLeft className="h-4 w-4 text-muted-foreground" />
               </button>
