@@ -3,6 +3,11 @@ import type { TrpcContext } from "./_core/context";
 import * as db from "./db";
 import { appRouter } from "./routers";
 
+vi.mock("./audit", async importOriginal => {
+  const actual = await importOriginal<typeof import("./audit")>();
+  return { ...actual, writeAuditEvent: vi.fn().mockResolvedValue(1) };
+});
+
 function context(role: "founder" | "super_admin" | "admin" | null): TrpcContext {
   return {
     user: role ? { id: 9, openId: `${role}:test`, name: role, email: `${role}@example.test`, passwordHash: null, isActive: true, loginMethod: "test", role, createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() } : null,

@@ -129,3 +129,10 @@
 - [x] Убрать раскрытие существования Founder, его консоли, модулей и истории действий из всех non-Founder маршрутов, UI и API-ответов; подтвердить разграничение доступа тестами.
 - [x] Создать отдельный Super admin dashboard с модулем Users и role-based redirect после универсального входа.
 - [x] Ограничить Super admin Users API и UI: без Field Builder, без вкладки Super admins, без list/detail/create/update/delete управления другими Super admin.
+- [x] Спроектировать Audit logs data model, RBAC matrix и event taxonomy для Founder/Super admin с учётом минимизации чувствительных данных.
+- [x] Добавить индексированное хранение Audit logs, server-side audit event writer и защищённый paginated/filterable/searchable API только для Founder/Super admin.
+- [x] Реализовать Audit logs dashboard с таблицей, подсказками поиска, фильтрами, pagination и CSV/PDF export без раскрытия секретных значений.
+- [ ] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление.
+- [x] Добавить unit/integration/browser проверки Audit logs RBAC, search, filters, exports, archival controls и подготовить user/technical documentation.
+- [x] Реализовать Founder-only manual archive/restore и cron-authenticated idempotent handler `/api/scheduled/audit-log-rotation` без создания Heartbeat job до deploy/explicit approval.
+- [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.

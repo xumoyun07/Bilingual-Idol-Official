@@ -64,6 +64,20 @@
       "when": 1787346404397,
       "tag": "0008_eager_doctor_octopus",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1787470886981,
+      "tag": "0009_tense_power_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1787470960410,
+      "tag": "0010_ambiguous_spirit",
+      "breakpoints": true
     }
   ]
 }

@@ -2,6 +2,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "../db";
 import { founderProcedure, router } from "../_core/trpc";
+import * as audit from "../audit";
+import type { Request } from "express";
+import type { User } from "../../drizzle/schema";
 
 const managedRole = z.enum(["student", "teacher", "marketing", "admin", "super_admin"]);
 const dynamicFieldType = z.enum(["text", "textarea", "number", "date", "dropdown", "checkbox"]);
@@ -23,6 +26,11 @@ function userError(error: unknown): never {
   throw new TRPCError({ code: "BAD_REQUEST", message });
 }
 
+type AuditContext = { user: Pick<User, "id" | "role">; req: Request };
+async function recordUserAudit(ctx: AuditContext, event: Omit<audit.AuditEventInput, "actor" | "request">) {
+  try { await audit.writeAuditEvent({ ...event, actor: ctx.user, request: ctx.req }); } catch (error) { console.error("[audit] Could not persist Users event", error); }
+}
+
 export const usersRouter = router({
   list: founderProcedure.input(z.object({
     query: z.string().trim().max(160).optional(),
@@ -39,40 +47,42 @@ export const usersRouter = router({
     return account;
   }),
   formSchema: founderProcedure.query(() => db.getUserFormSchema(true)),
-  updateSystemFields: founderProcedure.input(z.object({ fields: z.array(systemFieldInput).length(5) })).mutation(async ({ input }) => {
-    try { return await db.updateUserSystemFields(input.fields); } catch (error) { return userError(error); }
+  updateSystemFields: founderProcedure.input(z.object({ fields: z.array(systemFieldInput).length(5) })).mutation(async ({ ctx, input }) => {
+    try { const result = await db.updateUserSystemFields(input.fields); await recordUserAudit(ctx, { action: "user_field.system_update", targetType: "user_form", description: "Updated configured user form fields.", metadata: { fields: input.fields.length } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_field.system_update", targetType: "user_form", description: "User form field update failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  createSection: founderProcedure.input(sectionInput).mutation(async ({ input }) => {
-    try { return await db.createUserFormSection(input); } catch (error) { return userError(error); }
+  createSection: founderProcedure.input(sectionInput).mutation(async ({ ctx, input }) => {
+    try { const result = await db.createUserFormSection(input); await recordUserAudit(ctx, { action: "user_group.create", targetType: "user_group", targetId: result.id, description: "Created a user field group.", metadata: { active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_group.create", targetType: "user_group", description: "User field group creation failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  updateSection: founderProcedure.input(sectionInput.extend({ id: z.number().int().positive() })).mutation(async ({ input }) => {
-    try { const { id, ...section } = input; return await db.updateUserFormSection(id, section); } catch (error) { return userError(error); }
+  updateSection: founderProcedure.input(sectionInput.extend({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+    try { const { id, ...section } = input; const result = await db.updateUserFormSection(id, section); await recordUserAudit(ctx, { action: "user_group.update", targetType: "user_group", targetId: id, description: "Updated a user field group.", metadata: { active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_group.update", targetType: "user_group", targetId: input.id, description: "User field group update failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  removeSection: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
-    try { return await db.deleteUserFormSection(input.id); } catch (error) { return userError(error); }
+  removeSection: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+    try { const result = await db.deleteUserFormSection(input.id); await recordUserAudit(ctx, { action: "user_group.delete", targetType: "user_group", targetId: input.id, description: "Deleted a user field group." }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_group.delete", targetType: "user_group", targetId: input.id, description: "User field group deletion failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  createField: founderProcedure.input(fieldInput).mutation(async ({ input }) => {
-    try { return await db.createUserFormField(input); } catch (error) { return userError(error); }
+  createField: founderProcedure.input(fieldInput).mutation(async ({ ctx, input }) => {
+    try { const result = await db.createUserFormField(input); await recordUserAudit(ctx, { action: "user_field.create", targetType: "user_field", targetId: result.id, description: "Created a user form field.", metadata: { fieldType: result.fieldType, active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_field.create", targetType: "user_field", description: "User form field creation failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  updateField: founderProcedure.input(fieldInput.extend({ id: z.number().int().positive() })).mutation(async ({ input }) => {
-    try { const { id, ...field } = input; return await db.updateUserFormField(id, field); } catch (error) { return userError(error); }
+  updateField: founderProcedure.input(fieldInput.extend({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+    try { const { id, ...field } = input; const result = await db.updateUserFormField(id, field); await recordUserAudit(ctx, { action: "user_field.update", targetType: "user_field", targetId: id, description: "Updated a user form field.", metadata: { fieldType: result.fieldType, active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_field.update", targetType: "user_field", targetId: input.id, description: "User form field update failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  removeField: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
-    try { return await db.deleteUserFormField(input.id); } catch (error) { return userError(error); }
+  removeField: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+    try { const result = await db.deleteUserFormField(input.id); await recordUserAudit(ctx, { action: "user_field.delete", targetType: "user_field", targetId: input.id, description: "Deleted a user form field." }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_field.delete", targetType: "user_field", targetId: input.id, description: "User form field deletion failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  reorderFields: founderProcedure.input(z.object({ fieldIds: z.array(z.number().int().positive()).min(1).max(200).refine(ids => new Set(ids).size === ids.length, "Each field can appear only once.") })).mutation(async ({ input }) => {
-    try { return await db.reorderUserFormFields(input.fieldIds); } catch (error) { return userError(error); }
+  reorderFields: founderProcedure.input(z.object({ fieldIds: z.array(z.number().int().positive()).min(1).max(200).refine(ids => new Set(ids).size === ids.length, "Each field can appear only once.") })).mutation(async ({ ctx, input }) => {
+    try { const result = await db.reorderUserFormFields(input.fieldIds); await recordUserAudit(ctx, { action: "user_field.reorder", targetType: "user_form", description: "Reordered user form fields.", metadata: { fieldCount: input.fieldIds.length } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_field.reorder", targetType: "user_form", description: "User form field reorder failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  create: founderProcedure.input(createProfileInput.extend({ password: passwordInput.optional(), profileValues })).mutation(async ({ input }) => {
-    try { return await db.createManagedUser(input); } catch (error) { return userError(error); }
+  create: founderProcedure.input(createProfileInput.extend({ password: passwordInput.optional(), profileValues })).mutation(async ({ ctx, input }) => {
+    try { const result = await db.createManagedUser(input); await recordUserAudit(ctx, { action: "user.create", targetType: "user", targetId: result.id, targetRole: result.role, description: "Created a managed user account.", metadata: { role: result.role, active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user.create", targetType: "user", targetRole: input.role ?? null, description: "Managed user creation failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  update: founderProcedure.input(profileInput.extend({ id: z.number().int().positive(), password: passwordInput.optional().or(z.literal("")) })).mutation(async ({ input }) => {
+  update: founderProcedure.input(profileInput.extend({ id: z.number().int().positive(), password: passwordInput.optional().or(z.literal("")) })).mutation(async ({ ctx, input }) => {
     try {
       const { id, password, ...profile } = input;
-      return await db.updateManagedUser(id, { ...profile, password: password || undefined });
-    } catch (error) { return userError(error); }
+      const result = await db.updateManagedUser(id, { ...profile, password: password || undefined });
+      await recordUserAudit(ctx, { action: "user.update", targetType: "user", targetId: id, targetRole: result.role, description: "Updated a managed user account.", metadata: { role: result.role, active: result.isActive } });
+      return result;
+    } catch (error) { await recordUserAudit(ctx, { action: "user.update", targetType: "user", targetId: input.id, targetRole: input.role, description: "Managed user update failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
-  remove: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
-    try { return await db.deleteManagedUser(input.id); } catch (error) { return userError(error); }
+  remove: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+    try { const result = await db.deleteManagedUser(input.id); await recordUserAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Deleted a managed user account." }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Managed user deletion failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
 });

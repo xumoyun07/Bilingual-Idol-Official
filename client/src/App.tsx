@@ -28,8 +28,10 @@ function Router() {
     <Route path="/enroll" component={Enroll} />
     <Route path="/login" component={FounderLogin} />
     <Route path="/dashboard" component={UserDashboard} />
+    <Route path="/super-admin/audit-logs" component={SuperAdmin} />
     <Route path="/super-admin/users" component={SuperAdmin} />
     <Route path="/super-admin" component={SuperAdmin} />
+    <Route path="/admin/audit-logs" component={Admin} />
     <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />
     <Route path="/404" component={NotFound} />

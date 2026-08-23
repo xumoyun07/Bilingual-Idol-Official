@@ -4,6 +4,11 @@ import type { TrpcContext } from "./_core/context";
 import * as db from "./db";
 import { appRouter } from "./routers";
 
+vi.mock("./audit", async importOriginal => {
+  const actual = await importOriginal<typeof import("./audit")>();
+  return { ...actual, writeAuditEvent: vi.fn().mockResolvedValue(1) };
+});
+
 function context(role: "founder" | "admin" | "student" | null): TrpcContext {
   return {
     user: role ? {

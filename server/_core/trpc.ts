@@ -77,3 +77,14 @@ export const superAdminProcedure = t.procedure.use(
     });
   }),
 );
+
+/** Exact-role access for the shared audit workspace. Founder-only controls still use founderProcedure. */
+export const auditProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !["founder", "super_admin"].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);

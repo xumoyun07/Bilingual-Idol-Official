@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import DashboardLayout from "@/components/DashboardLayout";
 import { ConfigurableCreateUserModal } from "@/components/ConfigurableCreateUserModal";
 import { trpc } from "@/lib/trpc";
+import AuditLogs from "./AuditLogs";
 import { AlertCircle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleSlash, GraduationCap, Loader2, Megaphone, Plus, Search, Shield, Trash2, UserPlus, UsersRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -41,6 +42,7 @@ export default function SuperAdmin() {
 
 function SuperAdminConsole() {
   const [location] = useLocation();
+  if (location === "/super-admin/audit-logs") return <AuditLogs role="super_admin" />;
   return <div className="founder-command founder-workspace mx-auto w-full max-w-[88rem] pb-10">{location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}</div>;
 }
 

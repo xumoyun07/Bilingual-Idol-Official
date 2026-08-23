@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, UsersRound } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, ScrollText, UsersRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,10 +32,12 @@ const workspaceMenu: Record<DashboardRole, { icon: typeof LayoutDashboard; label
   founder: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: UsersRound, label: "Users", path: "/admin/users" },
+    { icon: ScrollText, label: "Audit logs", path: "/admin/audit-logs" },
   ],
   super_admin: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/super-admin" },
     { icon: UsersRound, label: "Users", path: "/super-admin/users" },
+    { icon: ScrollText, label: "Audit logs", path: "/super-admin/audit-logs" },
   ],
 };
 

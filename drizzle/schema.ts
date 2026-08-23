@@ -1,4 +1,4 @@
-import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { boolean, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -126,6 +126,60 @@ export const siteSettings = mysqlTable("siteSettings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const auditLogs = mysqlTable("auditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  actorUserId: int("actorUserId"),
+  actorRole: varchar("actorRole", { length: 32 }),
+  action: varchar("action", { length: 100 }).notNull(),
+  targetType: varchar("targetType", { length: 100 }).notNull(),
+  targetId: varchar("targetId", { length: 160 }),
+  targetRole: varchar("targetRole", { length: 32 }),
+  description: varchar("description", { length: 500 }).notNull(),
+  isSuccess: boolean("isSuccess").default(true).notNull(),
+  ipAddress: varchar("ipAddress", { length: 64 }),
+  browser: varchar("browser", { length: 160 }),
+  operatingSystem: varchar("operatingSystem", { length: 160 }),
+  userAgent: varchar("userAgent", { length: 512 }),
+  metadataJson: text("metadataJson"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({
+  createdAtIndex: index("auditLogs_createdAt_idx").on(table.createdAt),
+  actorIndex: index("auditLogs_actor_idx").on(table.actorUserId, table.createdAt),
+  actorRoleIndex: index("auditLogs_actorRole_idx").on(table.actorRole, table.createdAt),
+  actionIndex: index("auditLogs_action_idx").on(table.action, table.createdAt),
+  targetIndex: index("auditLogs_target_idx").on(table.targetType, table.targetId),
+  targetRoleIndex: index("auditLogs_targetRole_idx").on(table.targetRole, table.createdAt),
+  successIndex: index("auditLogs_success_idx").on(table.isSuccess, table.createdAt),
+  ipIndex: index("auditLogs_ip_idx").on(table.ipAddress, table.createdAt),
+}));
+
+export const auditLogArchives = mysqlTable("auditLogArchives", {
+  id: int("id").autoincrement().primaryKey(),
+  originalLogId: int("originalLogId").notNull().unique(),
+  actorUserId: int("actorUserId"),
+  actorRole: varchar("actorRole", { length: 32 }),
+  action: varchar("action", { length: 100 }).notNull(),
+  targetType: varchar("targetType", { length: 100 }).notNull(),
+  targetId: varchar("targetId", { length: 160 }),
+  targetRole: varchar("targetRole", { length: 32 }),
+  description: varchar("description", { length: 500 }).notNull(),
+  isSuccess: boolean("isSuccess").default(true).notNull(),
+  ipAddress: varchar("ipAddress", { length: 64 }),
+  browser: varchar("browser", { length: 160 }),
+  operatingSystem: varchar("operatingSystem", { length: 160 }),
+  userAgent: varchar("userAgent", { length: 512 }),
+  metadataJson: text("metadataJson"),
+  createdAt: timestamp("createdAt").notNull(),
+  archivedAt: timestamp("archivedAt").defaultNow().notNull(),
+  archivedByUserId: int("archivedByUserId"),
+}, table => ({
+  archivedAtIndex: index("auditLogArchives_archivedAt_idx").on(table.archivedAt),
+  createdAtIndex: index("auditLogArchives_createdAt_idx").on(table.createdAt),
+  actorIndex: index("auditLogArchives_actor_idx").on(table.actorUserId, table.createdAt),
+  actionIndex: index("auditLogArchives_action_idx").on(table.action, table.createdAt),
+  targetRoleIndex: index("auditLogArchives_targetRole_idx").on(table.targetRole, table.createdAt),
+}));
+
 /**
  * Legacy archive only. These tables are intentionally retained by the user's
  * safe-removal decision and have no routes, tRPC procedures, UI, or app types.
@@ -161,3 +215,5 @@ export type Program = typeof programs.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;
 export type TeamProfile = typeof teamProfiles.$inferSelect;
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type AuditLogArchive = typeof auditLogArchives.$inferSelect;

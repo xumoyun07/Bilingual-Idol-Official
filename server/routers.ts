@@ -11,6 +11,7 @@ import { FOUNDER_EMAIL } from "./founderIdentity";
 import { contentRouter } from "./routers/content";
 import { submissionsRouter } from "./routers/submissions";
 import { superAdminUsersRouter } from "./routers/superAdminUsers";
+import { auditRouter } from "./routers/audit";
 import { usersRouter } from "./routers/users";
 import { dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 
@@ -41,6 +42,7 @@ export const appRouter = router({
   content: contentRouter,
   submissions: submissionsRouter,
   superAdminUsers: superAdminUsersRouter,
+  audit: auditRouter,
   users: usersRouter,
 });
 
