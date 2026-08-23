@@ -26,10 +26,18 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
-  { icon: UsersRound, label: "Users", path: "/admin/users" },
-];
+type DashboardRole = "founder" | "super_admin";
+
+const workspaceMenu: Record<DashboardRole, { icon: typeof LayoutDashboard; label: string; path: string }[]> = {
+  founder: [
+    { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+    { icon: UsersRound, label: "Users", path: "/admin/users" },
+  ],
+  super_admin: [
+    { icon: LayoutDashboard, label: "Dashboard", path: "/super-admin" },
+    { icon: UsersRound, label: "Users", path: "/super-admin/users" },
+  ],
+};
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -38,22 +46,24 @@ const MAX_WIDTH = 480;
 
 export default function DashboardLayout({
   children,
+  role = "founder",
 }: {
   children: React.ReactNode;
+  role?: DashboardRole;
 }) {
   const [sidebarWidth, setSidebarWidth] = useState(() => {
-    const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+    const saved = localStorage.getItem(`${role}-${SIDEBAR_WIDTH_KEY}`);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
 
   useEffect(() => {
-    if (!loading && user && user.role !== "founder") window.location.replace("/dashboard");
-  }, [loading, user]);
+    if (!loading && user && user.role !== role) window.location.replace(user.role === "founder" ? "/admin" : user.role === "super_admin" ? "/super-admin" : "/dashboard");
+  }, [loading, role, user]);
 
   useEffect(() => {
-    localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
-  }, [sidebarWidth]);
+    localStorage.setItem(`${role}-${SIDEBAR_WIDTH_KEY}`, sidebarWidth.toString());
+  }, [role, sidebarWidth]);
 
   if (loading) {
     return <DashboardLayoutSkeleton />
@@ -65,10 +75,10 @@ export default function DashboardLayout({
         <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
           <div className="flex flex-col items-center gap-6">
             <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Staff sign in
+              Dashboard sign in
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires a signed-in administrator account.
+              Access to this dashboard requires a signed-in authorised account.
             </p>
           </div>
           <Button
@@ -83,7 +93,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (user.role !== "founder") return <DashboardLayoutSkeleton />
+  if (user.role !== role) return <DashboardLayoutSkeleton />
 
   return (
     <SidebarProvider
@@ -93,7 +103,7 @@ export default function DashboardLayout({
         } as CSSProperties
       }
     >
-      <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
+      <DashboardLayoutContent setSidebarWidth={setSidebarWidth} role={role}>
         {children}
       </DashboardLayoutContent>
     </SidebarProvider>
@@ -103,11 +113,13 @@ export default function DashboardLayout({
 type DashboardLayoutContentProps = {
   children: React.ReactNode;
   setSidebarWidth: (width: number) => void;
+  role: DashboardRole;
 };
 
 function DashboardLayoutContent({
   children,
   setSidebarWidth,
+  role,
 }: DashboardLayoutContentProps) {
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
@@ -115,6 +127,7 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const menuItems = workspaceMenu[role];
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
 
@@ -249,7 +262,7 @@ function DashboardLayoutContent({
         {!isMobile && (
           <header className="dashboard-fixed-header">
             <div>
-              <p className="dashboard-fixed-eyebrow">Private workspace</p>
+              <p className="dashboard-fixed-eyebrow">{role === "founder" ? "Private workspace" : "Operations workspace"}</p>
               <h2>{activeMenuItem?.label ?? "Overview"}</h2>
             </div>
             <span className="dashboard-fixed-status">Protected session</span>

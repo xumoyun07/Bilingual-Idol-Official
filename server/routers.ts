@@ -10,6 +10,7 @@ import { FOUNDER_OPEN_ID, isFounderAuthConfigured, verifyFounderCredentials } fr
 import { FOUNDER_EMAIL } from "./founderIdentity";
 import { contentRouter } from "./routers/content";
 import { submissionsRouter } from "./routers/submissions";
+import { superAdminUsersRouter } from "./routers/superAdminUsers";
 import { usersRouter } from "./routers/users";
 import { dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 
@@ -39,6 +40,7 @@ export const appRouter = router({
   }),
   content: contentRouter,
   submissions: submissionsRouter,
+  superAdminUsers: superAdminUsersRouter,
   users: usersRouter,
 });
 

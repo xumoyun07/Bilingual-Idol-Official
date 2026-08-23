@@ -127,3 +127,5 @@
 - [x] Убрать protected-mode из Field Builder: показать базовые и profile fields в одном editable/deletable списке, сохранив работоспособное создание аккаунта.
 - [x] Перестроить Field Builder в единый список «Поля» без терминов base/additional; создавать организацию формы только через пользовательские группы.
 - [x] Убрать раскрытие существования Founder, его консоли, модулей и истории действий из всех non-Founder маршрутов, UI и API-ответов; подтвердить разграничение доступа тестами.
+- [x] Создать отдельный Super admin dashboard с модулем Users и role-based redirect после универсального входа.
+- [x] Ограничить Super admin Users API и UI: без Field Builder, без вкладки Super admins, без list/detail/create/update/delete управления другими Super admin.

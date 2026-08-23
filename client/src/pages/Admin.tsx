@@ -31,7 +31,7 @@ const categoryItems: { role: CategoryRole; icon: typeof UsersRound }[] = [
 
 export default function Admin() {
   const { user, loading } = useAuth();
-  useEffect(() => { if (!loading && !user) window.location.replace("/login"); else if (!loading && user?.role !== "founder") window.location.replace("/dashboard"); }, [loading, user]);
+  useEffect(() => { if (!loading && !user) window.location.replace("/login"); else if (!loading && user?.role !== "founder") window.location.replace(user?.role === "super_admin" ? "/super-admin" : "/dashboard"); }, [loading, user]);
   if (loading) return <div className="grid min-h-screen place-items-center bg-[#fbf8f2]"><Loader2 className="animate-spin text-[#397563]" /></div>;
   if (!user || user.role !== "founder") return null;
   return <DashboardLayout><FounderConsole /></DashboardLayout>;

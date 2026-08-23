@@ -60,3 +60,20 @@ export const founderProcedure = t.procedure.use(
     });
   }),
 );
+
+export const superAdminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+
+    if (!ctx.user || ctx.user.role !== "super_admin") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user: ctx.user,
+      },
+    });
+  }),
+);

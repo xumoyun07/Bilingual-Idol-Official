@@ -13,6 +13,7 @@ import News from "./pages/News";
 import NotFound from "./pages/NotFound";
 import ProgramDetail from "./pages/ProgramDetail";
 import Programs from "./pages/Programs";
+import SuperAdmin from "./pages/SuperAdmin";
 import UserDashboard from "./pages/UserDashboard";
 
 function Router() {
@@ -27,6 +28,8 @@ function Router() {
     <Route path="/enroll" component={Enroll} />
     <Route path="/login" component={FounderLogin} />
     <Route path="/dashboard" component={UserDashboard} />
+    <Route path="/super-admin/users" component={SuperAdmin} />
+    <Route path="/super-admin" component={SuperAdmin} />
     <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />
     <Route path="/404" component={NotFound} />

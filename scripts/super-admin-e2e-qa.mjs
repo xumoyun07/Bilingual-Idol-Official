@@ -1,0 +1,66 @@
+import { randomBytes, randomUUID, scryptSync } from "node:crypto";
+import mysql from "mysql2/promise";
+import { chromium } from "@playwright/test";
+
+const baseUrl = process.env.QA_BASE_URL ?? "http://localhost:3000";
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) throw new Error("DATABASE_URL is required");
+
+const runId = randomUUID();
+const email = `super-admin-qa-${runId}@bilingualidol.invalid`;
+const openId = `super-admin-qa:${runId}`;
+const password = randomBytes(24).toString("base64url");
+const salt = randomBytes(16).toString("hex");
+const passwordHash = `scrypt:${salt}:${scryptSync(password, salt, 64).toString("hex")}`;
+const checks = [];
+let browser;
+let database;
+let inserted = false;
+
+function pass(name, detail) { checks.push({ name, status: "passed", detail }); }
+
+try {
+  database = await mysql.createConnection(databaseUrl);
+  await database.execute(
+    "INSERT INTO users (openId, name, email, passwordHash, isActive, loginMethod, role, createdAt, updatedAt, lastSignedIn) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW())",
+    [openId, "Super admin QA", email, passwordHash, true, "qa-automation", "super_admin"],
+  );
+  inserted = true;
+  browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
+  await page.locator("#sign-in-email").fill(email);
+  await page.locator("#sign-in-password").fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL("**/super-admin", { timeout: 10000 });
+  await page.getByRole("heading", { name: /manage access with clear boundaries/i }).waitFor({ timeout: 10000 });
+  pass("Super admin post-login routing", "Universal sign-in opened the separate Super admin dashboard");
+
+  await page.goto(`${baseUrl}/super-admin/users`, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: /people, managed within your scope/i }).waitFor({ timeout: 10000 });
+  const modules = page.locator('nav[aria-label="User type modules"]');
+  for (const role of ["Students", "Teachers", "Marketing", "Admins"]) await modules.getByRole("button", { name: `Type ${role}`, exact: true }).waitFor({ timeout: 10000 });
+  if (await modules.getByRole("button", { name: "Type Super admins", exact: true }).count()) throw new Error("Super admin module exposed peer Super admins");
+  if (await page.getByRole("button", { name: "Configure create form", exact: true }).count()) throw new Error("Super admin module exposed Field Builder");
+  pass("Scoped Users navigation", "Only Students, Teachers, Marketing and Admins are visible; no Field Builder action is rendered");
+
+  await page.getByRole("button", { name: "New user" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("heading", { name: "Create user" }).waitFor({ timeout: 10000 });
+  const roleValues = await dialog.getByLabel("User type").locator("option").evaluateAll(options => options.map(option => option.getAttribute("value")));
+  if (roleValues.includes("super_admin")) throw new Error("Super admin create form exposed peer Super admin role");
+  await page.keyboard.press("Escape");
+  pass("Scoped create form", "Create form excludes Super admin role and provides no Field Builder entry point");
+
+  await page.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
+  await page.waitForURL("**/super-admin", { timeout: 10000 });
+  pass("Private console isolation", "Super admin is redirected away from private control routes to its own dashboard");
+  await page.close();
+  console.log(JSON.stringify({ status: "passed", checks }, null, 2));
+} finally {
+  await browser?.close();
+  if (inserted && database) await database.execute("DELETE FROM users WHERE openId = ? AND loginMethod = ?", [openId, "qa-automation"]);
+  await database?.end();
+}
+
+process.exit(0);

@@ -50,6 +50,8 @@ export async function recordUserSignIn(openId: string) {
 
 export const founderManagedRoles = ["student", "teacher", "marketing", "admin", "super_admin"] as const;
 export type FounderManagedRole = (typeof founderManagedRoles)[number];
+export const superAdminManagedRoles = ["student", "teacher", "marketing", "admin"] as const;
+export type SuperAdminManagedRole = (typeof superAdminManagedRoles)[number];
 export type ManagedUser = Omit<User, "passwordHash">;
 export type ManagedUserFilters = {
   query?: string;
@@ -97,6 +99,35 @@ export async function getManagedUser(id: number) {
   const database = requireDatabase(await getDb());
   const row = (await database.select().from(users).where(eq(users.id, id)).limit(1))[0];
   return row && row.role !== "founder" ? safeManagedUser(row) : undefined;
+}
+
+export async function listSuperAdminManagedUsers(filters: ManagedUserFilters = {}) {
+  const database = requireDatabase(await getDb());
+  const conditions = [ne(users.role, "founder"), ne(users.role, "super_admin")];
+  const query = filters.query?.trim();
+  if (query) {
+    const pattern = `%${query}%`;
+    const searchCondition = or(like(users.name, pattern), like(users.email, pattern), like(users.openId, pattern), like(users.loginMethod, pattern));
+    if (searchCondition) conditions.push(searchCondition);
+  }
+  if (filters.role && superAdminManagedRoles.includes(filters.role as SuperAdminManagedRole)) conditions.push(eq(users.role, filters.role));
+  if (filters.isActive !== undefined) conditions.push(eq(users.isActive, filters.isActive));
+  if (filters.createdFrom) conditions.push(gte(users.createdAt, new Date(`${filters.createdFrom}T00:00:00.000Z`)));
+  if (filters.createdTo) conditions.push(lte(users.createdAt, new Date(`${filters.createdTo}T23:59:59.999Z`)));
+  const whereClause = and(...conditions);
+  const pageSize = Math.min(Math.max(filters.pageSize ?? 25, 1), 100);
+  const page = Math.max(filters.page ?? 0, 0);
+  const [rows, countRows] = await Promise.all([
+    database.select().from(users).where(whereClause).orderBy(desc(users.createdAt)).limit(pageSize).offset(page * pageSize),
+    database.select({ count: sql<number>`count(*)` }).from(users).where(whereClause),
+  ]);
+  return { rows: rows.map(safeManagedUser), total: Number(countRows[0]?.count ?? 0), page, pageSize };
+}
+
+export async function getSuperAdminManagedUser(id: number) {
+  const database = requireDatabase(await getDb());
+  const row = (await database.select().from(users).where(and(eq(users.id, id), ne(users.role, "founder"), ne(users.role, "super_admin"))).limit(1))[0];
+  return row ? safeManagedUser(row) : undefined;
 }
 
 type UserProfileValuesInput = Record<string, string>;
@@ -260,6 +291,11 @@ export async function createManagedUser(input: { name?: string; email?: string; 
   return created;
 }
 
+export async function createSuperAdminManagedUser(input: { name?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+  if (input.role && !superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
+  return createManagedUser(input);
+}
+
 export async function updateManagedUser(id: number, input: { name: string; email: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
   const database = requireDatabase(await getDb());
   const existing = await getManagedUser(id);
@@ -276,6 +312,12 @@ export async function updateManagedUser(id: number, input: { name: string; email
   return updated;
 }
 
+export async function updateSuperAdminManagedUser(id: number, input: { name: string; email: string; password?: string; role: SuperAdminManagedRole; isActive: boolean }) {
+  if (!superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
+  if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
+  return updateManagedUser(id, input);
+}
+
 export async function deleteManagedUser(id: number) {
   const database = requireDatabase(await getDb());
   const existing = await getManagedUser(id);
@@ -286,6 +328,11 @@ export async function deleteManagedUser(id: number) {
     await tx.delete(users).where(eq(users.id, id));
   });
   return { success: true } as const;
+}
+
+export async function deleteSuperAdminManagedUser(id: number) {
+  if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
+  return deleteManagedUser(id);
 }
 
 export type SubmissionInput = { type: "enrollment" | "inquiry"; studentName: string; studentAge: number; parentName: string; parentEmail: string; parentPhone: string; programInterest: string; preferredSchedule: string; message?: string; source?: string; };

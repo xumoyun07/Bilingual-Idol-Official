@@ -18,10 +18,10 @@ describe("universal user credentials", () => {
     expect(verifyUserPasswordHash(password, "scrypt:salt:not-a-hex-digest")).toBe(false);
   });
 
-  it("routes only the private control account to its console and all other roles to private dashboards", () => {
+  it("routes private control and Super admin accounts to their separate dashboards", () => {
     expect(dashboardPathForRole("founder")).toBe("/admin");
     expect(dashboardPathForRole("admin")).toBe("/dashboard");
-    expect(dashboardPathForRole("super_admin")).toBe("/dashboard");
+    expect(dashboardPathForRole("super_admin")).toBe("/super-admin");
     expect(dashboardPathForRole("student")).toBe("/dashboard");
     expect(dashboardPathForRole("user")).toBe("/dashboard");
   });
