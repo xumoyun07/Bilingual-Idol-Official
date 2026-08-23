@@ -17,7 +17,7 @@ const filtersInput = z.object({
   isSuccess: z.boolean().optional(),
   source: sourceInput.default("active"),
 });
-const listInput = filtersInput.extend({ page: z.number().int().min(0).default(0), pageSize: z.number().int().min(1).max(100).default(25) });
+const listInput = filtersInput.extend({ page: z.number().int().min(0).default(0), pageSize: z.literal(10).default(10) });
 
 function scopeFor(user: { id: number; role: string }): AuditScope {
   if (user.role === "founder" || user.role === "super_admin") return { role: user.role, userId: user.id };

@@ -17,6 +17,7 @@ let browser;
 let database;
 let inserted = false;
 let userId;
+const marker = `pagination-qa-${runId}`;
 
 function pass(name, detail) { checks.push({ name, status: "passed", detail }); }
 
@@ -28,6 +29,17 @@ try {
   );
   userId = Number(insertResult.insertId);
   inserted = true;
+  const paginationRows = [
+    ["solo", 1],
+    ...Array.from({ length: 10 }, (_, index) => ["exact", index + 1]),
+    ...Array.from({ length: 11 }, (_, index) => ["many", index + 1]),
+  ];
+  for (const [bucket, sequence] of paginationRows) {
+    await database.execute(
+      "INSERT INTO auditLogs (actorUserId, actorRole, action, targetType, targetId, targetRole, description, isSuccess, ipAddress, browser, operatingSystem, userAgent, metadataJson, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+      [userId, "super_admin", "audit.pagination_qa", "audit_log", `${bucket}-${sequence}`, null, `${marker}-${bucket}-${sequence}`, true, "127.0.0.1", "QA Browser", "Linux", "pagination-qa", "{}"],
+    );
+  }
   browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, acceptDownloads: true });
   await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
@@ -55,6 +67,30 @@ try {
   const hasDesktopOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   if (hasDesktopOverflow) throw new Error("Desktop Audit logs route caused horizontal document overflow");
   pass("Scoped Audit data", "Reloaded scoped list uses complete responsive event cards with no Founder/private activity or horizontal overflow");
+
+  if (await cards.count() !== 10) throw new Error(`Expected exactly 10 Audit records on the first page, received ${await cards.count()}`);
+  await page.getByText(/Page 1 of [3-9]/, { exact: false }).waitFor({ timeout: 10000 });
+  if (!await page.getByRole("button", { name: "Previous", exact: true }).isDisabled()) throw new Error("Previous was enabled on the first Audit page");
+  if (await page.getByRole("button", { name: "Next", exact: true }).isDisabled()) throw new Error("Next was disabled despite more than 10 Audit records");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByText(/Page 2 of [3-9]/, { exact: false }).waitFor({ timeout: 10000 });
+  if (await cards.count() !== 10) throw new Error(`Expected exactly 10 Audit records on page two, received ${await cards.count()}`);
+  if (await page.getByRole("button", { name: "Previous", exact: true }).isDisabled()) throw new Error("Previous remained disabled on page two");
+  await page.getByRole("button", { name: "Page 2, current page", exact: true }).waitFor({ timeout: 10000 });
+  pass("Ten-record paginated list", "More than 10 matching records render as pages of exactly 10 cards with current page indicator and boundary-aware navigation");
+
+  const search = page.getByPlaceholder("Search ID, description, IP, browser, action or object");
+  await search.fill(`${marker}-solo-1`);
+  await page.getByText("Page 1 of 1", { exact: true }).waitFor({ timeout: 10000 });
+  if (await cards.count() !== 1) throw new Error("Filtered under-ten Audit list did not return exactly one record");
+  if (!await page.getByRole("button", { name: "Previous", exact: true }).isDisabled() || !await page.getByRole("button", { name: "Next", exact: true }).isDisabled()) throw new Error("Boundary controls were enabled for a single filtered page");
+  pass("Filtered under-ten reset", "Changing the query from page two reset Audit pagination to page one and disabled both boundaries for a one-record result");
+
+  await search.fill(`${marker}-exact`);
+  await page.getByText("Page 1 of 1", { exact: true }).waitFor({ timeout: 10000 });
+  if (await cards.count() !== 10) throw new Error(`Exactly-ten filtered Audit list returned ${await cards.count()} records instead of 10`);
+  if (!await page.getByRole("button", { name: "Previous", exact: true }).isDisabled() || !await page.getByRole("button", { name: "Next", exact: true }).isDisabled()) throw new Error("Boundary controls were enabled for an exactly-ten single page");
+  pass("Exactly-ten filtered page", "A 10-record filtered result remained on one page with both navigation boundaries disabled");
 
   const [download] = await Promise.all([
     page.waitForEvent("download"),

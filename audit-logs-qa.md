@@ -22,6 +22,10 @@ At the constrained desktop workspace width, the active Founder list now renders 
 
 The updated self-cleaning Super admin E2E passed again after the refactor: the responsive event-card representation exposed no Founder/private activity and no desktop document overflow; the scoped CSV flow still passed; and the 390×844 viewport still had no horizontal document overflow.
 
+## Fixed ten-record pagination — 2026-08-23
+
+The self-cleaning Super admin QA inserted 22 scoped temporary pagination events and removed them in `finally`. It confirmed that a result above ten entries renders exactly ten cards per page with numeric current-page state; moving to page two works and enables Previous. Changing the search from page two to a one-record query reset the list to Page 1 of 1 and disabled both navigation boundaries. A second query returning exactly ten records remained a single page with both boundaries disabled. CSV export and the mobile no-overflow check still passed.
+
 ## Remaining browser checks
 
 - Verify Founder archive tab, manual zero/eligible-record behaviour and restore selection with self-cleaning data only.

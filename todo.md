@@ -137,3 +137,4 @@
 - [x] Реализовать Founder-only manual archive/restore и cron-authenticated idempotent handler `/api/scheduled/audit-log-rotation` без создания Heartbeat job до deploy/explicit approval.
 - [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.
 - [x] Устранить responsive overflow правой части Audit Logs: таблица, filters, actions и pagination должны полностью помещаться в viewport без потери доступа к данным.
+- [x] Зафиксировать Audit Logs pagination на 10 записей, добавить доступные numeric page indicators и проверить reset/filter/boundary behavior для выборок <10, =10 и >10 записей.

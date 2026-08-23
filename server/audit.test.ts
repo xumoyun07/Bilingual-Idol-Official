@@ -44,13 +44,14 @@ describe("Audit logs security and contract", () => {
     }
   });
 
-  it("passes an exact Super admin scope into audit list and records the interaction without sensitive filter values", async () => {
-    const list = vi.spyOn(audit, "listAuditLogs").mockResolvedValue({ rows: [activeRow], total: 1, page: 0, pageSize: 25, source: "active" });
+  it("enforces ten-record pages while passing exact Super admin scope into audit list", async () => {
+    const list = vi.spyOn(audit, "listAuditLogs").mockResolvedValue({ rows: [activeRow], total: 1, page: 0, pageSize: 10, source: "active" });
     const write = vi.spyOn(audit, "writeAuditEvent").mockResolvedValue(1);
-    const result = await appRouter.createCaller(context("super_admin")).audit.list({ query: "203.0", actorRole: "student", page: 0, pageSize: 25 });
+    const result = await appRouter.createCaller(context("super_admin")).audit.list({ query: "203.0", actorRole: "student", page: 0, pageSize: 10 });
     expect(result.rows).toEqual([expect.objectContaining({ id: 41 })]);
     expect(list).toHaveBeenCalledWith(expect.objectContaining({ query: "203.0", actorRole: "student" }), { role: "super_admin", userId: 2 });
     expect(write).toHaveBeenCalledWith(expect.objectContaining({ action: "audit.view", metadata: expect.objectContaining({ filtered: expect.any(Array) }) }));
+    await expect(appRouter.createCaller(context("super_admin")).audit.list({ pageSize: 25 as never })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
   it("exports only rows returned by the server-scoped data source and applies CSV formula hardening", async () => {
