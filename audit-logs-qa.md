@@ -16,6 +16,12 @@ The self-cleaning QA created a temporary Super admin, signed in through universa
 
 Founder archive-tab QA confirmed the Founder-only Archive tab and restore-selection guidance are present. With no eligible archived data, the interface rendered an explicit zero-record empty state rather than inserting sample rows.
 
+## Responsive overflow remediation — 2026-08-23
+
+At the constrained desktop workspace width, the active Founder list now renders compact, complete event cards instead of a horizontally overflowing wide table. The filter panel wraps into available columns, and the CSV/PDF actions, archive controls, filters, pagination and all event fields remain reachable without the right edge leaving the viewport. The full comparison table remains available on ultra-wide desktop screens.
+
+The updated self-cleaning Super admin E2E passed again after the refactor: the responsive event-card representation exposed no Founder/private activity and no desktop document overflow; the scoped CSV flow still passed; and the 390×844 viewport still had no horizontal document overflow.
+
 ## Remaining browser checks
 
 - Verify Founder archive tab, manual zero/eligible-record behaviour and restore selection with self-cleaning data only.

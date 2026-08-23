@@ -47,12 +47,14 @@ try {
 
   await page.reload({ waitUntil: "networkidle" });
   await page.getByRole("heading", { name: /matching event/i }).waitFor({ timeout: 10000 });
-  const table = page.locator("table");
-  await table.waitFor({ timeout: 10000 });
-  const tableText = (await table.textContent() ?? "").toLowerCase();
-  if (tableText.includes("founder")) throw new Error("Super admin scoped audit table leaked Founder activity");
-  if (tableText.includes("private workspace")) throw new Error("Super admin scoped audit table leaked private-control activity");
-  pass("Scoped Audit data", "Reloaded scoped list shows only the current Super admin audit interaction and no Founder/private activity");
+  const cards = page.getByTestId("audit-log-card");
+  await cards.first().waitFor({ timeout: 10000 });
+  const cardsText = (await cards.allTextContents()).join(" ").toLowerCase();
+  if (cardsText.includes("founder")) throw new Error("Super admin scoped audit cards leaked Founder activity");
+  if (cardsText.includes("private workspace")) throw new Error("Super admin scoped audit cards leaked private-control activity");
+  const hasDesktopOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  if (hasDesktopOverflow) throw new Error("Desktop Audit logs route caused horizontal document overflow");
+  pass("Scoped Audit data", "Reloaded scoped list uses complete responsive event cards with no Founder/private activity or horizontal overflow");
 
   const [download] = await Promise.all([
     page.waitForEvent("download"),

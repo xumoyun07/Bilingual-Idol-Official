@@ -136,3 +136,4 @@
 - [x] Добавить unit/integration/browser проверки Audit logs RBAC, search, filters, exports, archival controls и подготовить user/technical documentation.
 - [x] Реализовать Founder-only manual archive/restore и cron-authenticated idempotent handler `/api/scheduled/audit-log-rotation` без создания Heartbeat job до deploy/explicit approval.
 - [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.
+- [x] Устранить responsive overflow правой части Audit Logs: таблица, filters, actions и pagination должны полностью помещаться в viewport без потери доступа к данным.
