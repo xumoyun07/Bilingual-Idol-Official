@@ -17,10 +17,9 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { GraduationCap, LayoutDashboard, LogOut, PanelLeft, ScrollText, UsersRound } from "lucide-react";
+import { GraduationCap, LayoutDashboard, LogOut, ScrollText, UsersRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -100,6 +99,7 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider
+      open={true}
       style={
         {
           "--sidebar-width": `${sidebarWidth}px`,
@@ -126,8 +126,6 @@ function DashboardLayoutContent({
 }: DashboardLayoutContentProps) {
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
-  const { state, toggleSidebar } = useSidebar();
-  const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const menuItems = workspaceMenu[role];
@@ -135,12 +133,6 @@ function DashboardLayoutContent({
     .filter(item => location === item.path || location.startsWith(`${item.path}/`))
     .sort((left, right) => right.path.length - left.path.length)[0];
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (isCollapsed) {
-      setIsResizing(false);
-    }
-  }, [isCollapsed]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -181,21 +173,10 @@ function DashboardLayoutContent({
           disableTransition={isResizing}
         >
           <SidebarHeader className="h-[4.75rem] justify-center border-b border-[#ded4c2]">
-            <div className="flex items-center gap-3 px-2 transition-all w-full">
-              <button
-                onClick={toggleSidebar}
-                className="h-12 w-12 flex items-center justify-center rounded-lg hover:bg-[#e7f0eb] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
-                aria-label="Toggle navigation" style={{marginLeft: '-17px', marginTop: '1px'}}
-              >
-                <PanelLeft className="h-4 w-4 text-muted-foreground" />
-              </button>
-              {!isCollapsed ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate text-[#10253e]">
-                    Bilingual Idol
-                  </span>
-                </div>
-              ) : null}
+            <div className="flex items-center px-5 transition-all w-full">
+              <span className="font-semibold tracking-tight truncate text-[#10253e]">
+                Bilingual Idol
+              </span>
             </div>
           </SidebarHeader>
 
@@ -254,9 +235,8 @@ function DashboardLayoutContent({
           </SidebarFooter>
         </Sidebar>
         <div
-          className={`fixed inset-y-0 w-1 cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
+          className="fixed inset-y-0 w-1 cursor-col-resize hover:bg-primary/20 transition-colors"
           onMouseDown={() => {
-            if (isCollapsed) return;
             setIsResizing(true);
           }}
           style={{ zIndex: 50, left: "calc(var(--sidebar-width) - 2px)" }}

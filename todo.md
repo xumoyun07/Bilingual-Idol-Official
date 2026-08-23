@@ -145,3 +145,4 @@
 - [x] Подготовить Students Profile architecture/user documentation и сохранить проверенный milestone checkpoint.
 - [x] Исправить fixed sidebar active state: только current dashboard route активна, а icon и text меняют цвет вместе для Founder/Super admin.
 - [x] Проверить и сохранить user visual edit toggle navigation button: margin-left -17px и margin-top 1px без layout regression.
+- [x] Убрать toggle navigation button в desktop sidebar, сохранив mobile menu control и responsive layout.

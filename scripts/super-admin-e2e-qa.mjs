@@ -44,7 +44,9 @@ try {
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL("**/super-admin", { timeout: 10000 });
   await page.getByRole("heading", { name: /manage access with clear boundaries/i }).waitFor({ timeout: 10000 });
+  if (await page.getByRole("button", { name: "Toggle navigation", exact: true }).count()) throw new Error("Desktop sidebar still renders a collapse control");
   pass("Super admin post-login routing", "Universal sign-in opened the separate Super admin dashboard");
+  pass("Desktop fixed sidebar", "Desktop workspace has no collapse control");
 
   await page.goto(`${baseUrl}/super-admin/users`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: /people, managed within your scope/i }).waitFor({ timeout: 10000 });
@@ -72,6 +74,13 @@ try {
   await page.goto(`${baseUrl}/admin/users`, { waitUntil: "networkidle" });
   await page.waitForURL("**/super-admin", { timeout: 10000 });
   pass("Private console isolation", "Super admin is redirected away from private control routes to its own dashboard");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${baseUrl}/super-admin/users`, { waitUntil: "networkidle" });
+  const mobileTrigger = page.getByRole("button", { name: "Toggle Sidebar", exact: true });
+  await mobileTrigger.waitFor({ timeout: 10000 });
+  await mobileTrigger.click();
+  await page.getByRole("button", { name: "Users", exact: true }).last().waitFor({ timeout: 10000 });
+  pass("Mobile navigation control", "Mobile header retains an accessible Sidebar trigger and opens the workspace navigation");
   await page.close();
   console.log(JSON.stringify({ status: "passed", checks }, null, 2));
 } finally {
