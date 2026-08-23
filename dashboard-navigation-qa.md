@@ -9,3 +9,5 @@ The subsequent `/admin/students` check showed **Students Profile** as the only d
 The self-cleaning Super admin E2E then passed six checks. On `/super-admin/users`, Users alone had the active navy background and apricot icon while Dashboard/Audit logs were inactive. On `/super-admin/audit-logs`, Audit logs alone received the same active treatment. The QA account was removed by the harness.
 
 After removing the desktop collapse control, Founder desktop review confirmed that the fixed expanded sidebar retained branding and navigation while no Toggle navigation button was rendered. The Super admin self-cleaning QA then passed eight checks, including absence of the desktop collapse control and an accessible mobile `Toggle Sidebar` trigger that opens the mobile navigation at 390×844.
+
+The mobile drawer now has an explicit opaque navy background (`rgb(16, 37, 62)`) instead of a transparent surface. The extended Super admin E2E passed nine checks at 390×844, including its computed background and the apricot active item with ink text contrast.

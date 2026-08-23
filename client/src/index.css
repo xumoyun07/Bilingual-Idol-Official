@@ -187,6 +187,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .compass-status-error { border: 1px solid #efc4b8; border-radius: .75rem; background: #fff0ed; color: #a34732; }
 @media (min-width: 768px) { .compass-shell { width: min(100% - 4rem, 75rem); } }
 .compass-rail { background: #fff; color: #10253e; }
+@media (max-width: 767px) {
+  [data-sidebar="sidebar"][data-mobile="true"], [data-sidebar="sidebar"][data-mobile="true"] > div:last-child {
+    background: #10253e !important;
+    color: #fff !important;
+  }
+  [data-sidebar="sidebar"][data-mobile="true"] > div:last-child { box-shadow: 18px 0 44px rgba(2, 16, 35, .28); }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="header"] { border-color: rgba(255,255,255,.16) !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="header"] .text-\[\#10253e\] { color: #fff !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"] { color: rgba(255,255,255,.86) !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"] svg { color: #f3b59f !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"]:hover { background: rgba(255,255,255,.11) !important; color: #fff !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"][data-active="true"] { background: #ef795b !important; color: #10253e !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"][data-active="true"] svg { color: #10253e !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="footer"] { border-color: rgba(255,255,255,.16) !important; color: #fff !important; }
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="footer"] .text-muted-foreground { color: rgba(255,255,255,.66) !important; }
+}
 .founder-command, .founder-desk { padding: clamp(1rem, 2vw, 2rem); background: transparent; background-image: none; }
 .founder-command .mx-auto.max-w-6xl > div:first-child, .founder-command .mx-auto.max-w-7xl > header, .founder-desk > header { border: 1px solid rgba(16,37,62,.15); border-radius: 1rem; background: #fff; color: #10253e; box-shadow: 0 14px 32px rgba(16,37,62,.06); }
 .founder-command .mx-auto.max-w-6xl > div:first-child::after, .founder-command .mx-auto.max-w-7xl > header::after, .founder-desk > header::after { color: rgba(16,37,62,.045); }

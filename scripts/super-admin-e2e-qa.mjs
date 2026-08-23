@@ -80,7 +80,14 @@ try {
   await mobileTrigger.waitFor({ timeout: 10000 });
   await mobileTrigger.click();
   await page.getByRole("button", { name: "Users", exact: true }).last().waitFor({ timeout: 10000 });
+  const mobileSidebar = page.locator('[data-sidebar="sidebar"][data-mobile="true"]');
+  const sidebarBackground = await mobileSidebar.evaluate(element => getComputedStyle(element).backgroundColor);
+  if (sidebarBackground !== "rgb(16, 37, 62)") throw new Error(`Mobile sidebar background must be opaque navy, received ${sidebarBackground}`);
+  const activeMobileItem = mobileSidebar.getByRole("button", { name: "Users", exact: true });
+  const activeMobileStyle = await activeMobileItem.evaluate(element => ({ background: getComputedStyle(element).backgroundColor, text: getComputedStyle(element).color }));
+  if (activeMobileStyle.background !== "rgb(239, 121, 91)" || activeMobileStyle.text !== "rgb(16, 37, 62)") throw new Error("Mobile active navigation lacks the contrast treatment");
   pass("Mobile navigation control", "Mobile header retains an accessible Sidebar trigger and opens the workspace navigation");
+  pass("Mobile opaque sidebar", "Drawer uses opaque navy background with a high-contrast apricot active navigation item");
   await page.close();
   console.log(JSON.stringify({ status: "passed", checks }, null, 2));
 } finally {
