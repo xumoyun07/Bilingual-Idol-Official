@@ -6,12 +6,14 @@ import { getDb } from "./db";
 export const auditActions = [
   "audit.view", "audit.search", "audit.export_csv", "audit.export_pdf", "audit.archive", "audit.restore",
   "user.create", "user.update", "user.delete",
+  "student_profile.create", "student_profile.update", "student_profile.delete",
+  "student_document.upload", "student_document.delete",
   "user_group.create", "user_group.update", "user_group.delete",
   "user_field.create", "user_field.update", "user_field.delete", "user_field.reorder", "user_field.system_update",
 ] as const;
 export type AuditAction = (typeof auditActions)[number];
 
-export const auditTargetTypes = ["audit_log", "user", "user_group", "user_field", "user_form"] as const;
+export const auditTargetTypes = ["audit_log", "user", "student_profile", "student_document", "user_group", "user_field", "user_form"] as const;
 export type AuditTargetType = (typeof auditTargetTypes)[number];
 export type AuditSource = "active" | "archive";
 export type AuditScope = { role: "founder" | "super_admin"; userId: number };

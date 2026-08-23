@@ -138,3 +138,8 @@
 - [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.
 - [x] Устранить responsive overflow правой части Audit Logs: таблица, filters, actions и pagination должны полностью помещаться в viewport без потери доступа к данным.
 - [x] Зафиксировать Audit Logs pagination на 10 записей, добавить доступные numeric page indicators и проверить reset/filter/boundary behavior для выборок <10, =10 и >10 записей.
+- [x] Спроектировать Founder-only Students Profile data model: информация о студенте, attendance, level, course, documents и history изменений.
+- [x] Добавить защищённый storage/API layer для Student Profile CRUD, search/filter/pagination, history и ограниченных документов PDF/DOCX/JPG/PNG.
+- [x] Реализовать адаптивный Founder Students Profile UI: список, detail profile, add/edit/delete dialogs, history и document preview.
+- [x] Проверить Students Profile RBAC, CRUD, history, supported documents, search/filter/pagination и desktop/mobile workflows без persistent QA records.
+- [x] Подготовить Students Profile architecture/user documentation и сохранить проверенный milestone checkpoint.

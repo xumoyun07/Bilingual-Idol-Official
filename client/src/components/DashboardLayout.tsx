@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, ScrollText, UsersRound } from "lucide-react";
+import { GraduationCap, LayoutDashboard, LogOut, PanelLeft, ScrollText, UsersRound } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,6 +32,7 @@ const workspaceMenu: Record<DashboardRole, { icon: typeof LayoutDashboard; label
   founder: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: UsersRound, label: "Users", path: "/admin/users" },
+    { icon: GraduationCap, label: "Students Profile", path: "/admin/students" },
     { icon: ScrollText, label: "Audit logs", path: "/admin/audit-logs" },
   ],
   super_admin: [
@@ -130,7 +131,7 @@ function DashboardLayoutContent({
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const menuItems = workspaceMenu[role];
-  const activeMenuItem = menuItems.find(item => item.path === location);
+  const activeMenuItem = menuItems.find(item => location === item.path || location.startsWith(`${item.path}/`));
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -199,7 +200,7 @@ function DashboardLayoutContent({
           <SidebarContent className="gap-0">
               <SidebarMenu className="px-3 py-4">
               {menuItems.map(item => {
-                const isActive = location === item.path;
+                const isActive = location === item.path || location.startsWith(`${item.path}/`);
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton

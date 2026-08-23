@@ -1,4 +1,4 @@
-import { boolean, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { boolean, date, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -180,6 +180,56 @@ export const auditLogArchives = mysqlTable("auditLogArchives", {
   targetRoleIndex: index("auditLogArchives_targetRole_idx").on(table.targetRole, table.createdAt),
 }));
 
+export const studentProfiles = mysqlTable("studentProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  guardianName: varchar("guardianName", { length: 160 }),
+  guardianPhone: varchar("guardianPhone", { length: 64 }),
+  contactEmail: varchar("contactEmail", { length: 320 }),
+  dateOfBirth: date("dateOfBirth"),
+  address: text("address"),
+  notes: text("notes"),
+  attendedSessions: int("attendedSessions").default(0).notNull(),
+  totalSessions: int("totalSessions").default(0).notNull(),
+  currentLevel: varchar("currentLevel", { length: 120 }),
+  courseName: varchar("courseName", { length: 180 }),
+  courseCode: varchar("courseCode", { length: 80 }),
+  courseStartDate: date("courseStartDate"),
+  courseEndDate: date("courseEndDate"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  studentUserUnique: uniqueIndex("studentProfiles_user_unique").on(table.userId),
+  levelIndex: index("studentProfiles_level_idx").on(table.currentLevel),
+  courseIndex: index("studentProfiles_course_idx").on(table.courseName),
+}));
+
+export const studentDocuments = mysqlTable("studentDocuments", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  fileSize: int("fileSize").notNull(),
+  storageKey: varchar("storageKey", { length: 512 }).notNull(),
+  uploadedByUserId: int("uploadedByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({
+  studentIndex: index("studentDocuments_student_idx").on(table.studentId, table.createdAt),
+  uploaderIndex: index("studentDocuments_uploader_idx").on(table.uploadedByUserId, table.createdAt),
+}));
+
+export const studentProfileHistory = mysqlTable("studentProfileHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  actorUserId: int("actorUserId").notNull(),
+  eventType: varchar("eventType", { length: 80 }).notNull(),
+  changesJson: text("changesJson"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({
+  studentHistoryIndex: index("studentProfileHistory_student_idx").on(table.studentId, table.createdAt),
+  actorHistoryIndex: index("studentProfileHistory_actor_idx").on(table.actorUserId, table.createdAt),
+}));
+
 /**
  * Legacy archive only. These tables are intentionally retained by the user's
  * safe-removal decision and have no routes, tRPC procedures, UI, or app types.
@@ -217,3 +267,6 @@ export type Announcement = typeof announcements.$inferSelect;
 export type TeamProfile = typeof teamProfiles.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type AuditLogArchive = typeof auditLogArchives.$inferSelect;
+export type StudentProfile = typeof studentProfiles.$inferSelect;
+export type StudentDocument = typeof studentDocuments.$inferSelect;
+export type StudentProfileHistory = typeof studentProfileHistory.$inferSelect;

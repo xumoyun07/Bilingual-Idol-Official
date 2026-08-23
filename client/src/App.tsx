@@ -32,6 +32,8 @@ function Router() {
     <Route path="/super-admin/users" component={SuperAdmin} />
     <Route path="/super-admin" component={SuperAdmin} />
     <Route path="/admin/audit-logs" component={Admin} />
+    <Route path="/admin/students/:studentId" component={Admin} />
+    <Route path="/admin/students" component={Admin} />
     <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />
     <Route path="/404" component={NotFound} />
