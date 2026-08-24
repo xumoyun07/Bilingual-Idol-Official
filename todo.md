@@ -192,3 +192,5 @@
 - [x] Повторно проверить responsive layout, reduced-motion fallback and interaction regressions; сохранить checkpoint.
 - [x] Проверить user-applied rounded public header and Hero visual edits against grid, viewport and responsive layout rules.
 - [x] Выполнить desktop/mobile visual and regression QA for the verified visual edits; сохранить checkpoint.
+- [x] Проверить generated header/Home visual edits for invalid JSX, fixed-width overflow and mobile layout risk.
+- [x] Нормализовать intended visual spacing into valid responsive styles and verify desktop/mobile presentation; сохранить checkpoint.

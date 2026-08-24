@@ -14,6 +14,7 @@ describe("minimal frontend rewrite", () => {
     expect(layout).toContain("Programmes");
     expect(layout).toContain('{ label: "News", href: "/news" }');
     expect(layout).toContain("Make an enquiry");
+    expect(layout).toContain("simple-public-header--refined");
   });
 
   it("keeps public journeys task-first and avoids hard-coded storage media in rewritten routes", () => {
@@ -21,6 +22,8 @@ describe("minimal frontend rewrite", () => {
     const programmes = read("pages/Programs.tsx");
     const contact = read("pages/Contact.tsx");
     expect(home).toContain("Choose a clear next step.");
+    expect(home).toContain("simple-home-intro--refined");
+    expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");
     expect(contact).toContain("Get in touch with the centre.");
@@ -63,6 +66,7 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("animation: bilc-grid-drift");
     expect(css).toContain("Dynamic grid visibility correction");
     expect(css).toContain("background-color: #f8faff");
+    expect(css).toContain("Responsive normalization of visual-editor refinements");
     expect(css).toContain("@keyframes bilc-page-reveal");
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");

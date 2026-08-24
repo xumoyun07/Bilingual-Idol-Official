@@ -31,7 +31,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const close = () => setOpen(false);
   return <div className="simple-public-shell">
     <a className="simple-skip-link" href="#main-content">Skip to content</a>
-    <header className="simple-public-header" style={{borderRadius: '31px'}}>
+    <header className="simple-public-header simple-public-header--refined">
       <div className="simple-public-bar">
         <Link href="/" className="simple-brand" aria-label="Bilingual Idol Language Centre home" onClick={close}><span aria-hidden="true">BI</span><strong>Bilingual Idol<small>Language Centre</small></strong></Link>
         <nav className="simple-public-nav" aria-label="Primary navigation">{primaryNavigation.map(item => <Link key={item.href} href={item.href} aria-current={location === item.href ? "page" : undefined}>{item.label}</Link>)}</nav>
@@ -40,7 +40,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </div>
       {open && <nav className="simple-mobile-nav" aria-label="Mobile navigation">{primaryNavigation.map(item => <Link key={item.href} href={item.href} onClick={close} aria-current={location === item.href ? "page" : undefined}>{item.label}</Link>)}<Link href="/login" onClick={close}>Sign in</Link><Link href="/enroll" className="simple-button" onClick={close}>Make an enquiry</Link></nav>}
     </header>
-    <main id="main-content" tabIndex={-1}>{children}</main>
+    <main id="main-content" className="simple-public-main" tabIndex={-1}>{children}</main>
     <footer className="simple-public-footer"><div><strong>Bilingual Idol Language Centre</strong><span>Setapak, Kuala Lumpur</span></div><nav aria-label="Footer navigation"><Link href="/news">News</Link><Link href="/contact">Contact</Link><a href="mailto:info@bilingualidol.edu.my">Email</a></nav></footer>
   </div>;
 }
