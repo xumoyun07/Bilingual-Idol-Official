@@ -23,6 +23,7 @@ describe("minimal frontend rewrite", () => {
     const contact = read("pages/Contact.tsx");
     expect(home).toContain("Choose a clear next step.");
     expect(home).toContain("simple-home-intro--refined");
+    expect(home).toContain("simple-home-intro--desktop-geometry");
     expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");
@@ -67,6 +68,8 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("Dynamic grid visibility correction");
     expect(css).toContain("background-color: #f8faff");
     expect(css).toContain("Responsive normalization of visual-editor refinements");
+    expect(css).toContain("Approved desktop geometry, translated into an adaptive layout");
+    expect(css).toContain("width: 1321px");
     expect(css).toContain("@keyframes bilc-page-reveal");
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");

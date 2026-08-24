@@ -194,3 +194,5 @@
 - [x] Выполнить desktop/mobile visual and regression QA for the verified visual edits; сохранить checkpoint.
 - [x] Проверить generated header/Home visual edits for invalid JSX, fixed-width overflow and mobile layout risk.
 - [x] Нормализовать intended visual spacing into valid responsive styles and verify desktop/mobile presentation; сохранить checkpoint.
+- [x] Проверить latest approved desktop header/Hero geometry against current responsive composition.
+- [x] Сохранить approved desktop geometry and adapt it safely to mobile without fixed-width overflow; выполнить QA и checkpoint.
