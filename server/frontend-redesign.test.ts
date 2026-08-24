@@ -24,6 +24,8 @@ describe("minimal frontend rewrite", () => {
     expect(home).toContain("Choose a clear next step.");
     expect(home).toContain("simple-home-intro--refined");
     expect(home).toContain("simple-home-intro--desktop-geometry");
+    expect(home).toContain("simple-home-intro--mobile-480");
+    expect(home).toContain("simple-home-start-panel");
     expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");
@@ -70,6 +72,8 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("Responsive normalization of visual-editor refinements");
     expect(css).toContain("Approved desktop geometry, translated into an adaptive layout");
     expect(css).toContain("width: 1321px");
+    expect(css).toContain("Mobile-only Hero height and desktop Home spacing");
+    expect(css).toContain("height: 480px");
     expect(css).toContain("@keyframes bilc-page-reveal");
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");

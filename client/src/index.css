@@ -482,6 +482,28 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .simple-home-intro--desktop-geometry { width: 100%; height: calc(100svh - 4.5rem - 18px); margin: 18px 0 0; border-radius: 20px; }
 }
 
+/* Mobile-only Hero height and desktop Home spacing from visual editor settings. */
+@media (max-width: 767px) {
+  .simple-home-intro--mobile-480 { height: 480px; min-height: 480px; }
+}
+@media (min-width: 768px) and (max-width: 1399px) {
+  .simple-public-header--refined { width: calc(100% - 2.5rem); margin: .75rem 1.25rem 0; border-radius: 21px; }
+  .simple-home-intro--desktop-geometry { width: 100%; height: calc(100svh - 4.5rem - 24px); margin: 24px 0 0; }
+}
+@media (min-width: 1400px) {
+  .simple-home-start-panel { width: 1324px; margin: 66px 1px 0 -53px; padding: 40px; }
+  .simple-home-language-panel { width: 1322px; margin: 75px 0 0 -50px; }
+  .simple-home-language-panel > div { padding-left: 35px; }
+  .simple-home-programmes-geometry { width: 1326px; margin: 61px 0 0 -54px; }
+  .simple-contact-strip--geometry { width: 1328px; margin-left: -54px; padding-left: 34px; }
+}
+@media (max-width: 1399px) {
+  .simple-home-start-panel { margin-top: 32px; padding: 40px; }
+  .simple-home-language-panel { margin-top: 48px; }
+  .simple-home-programmes-geometry { margin-top: 48px; }
+  .simple-contact-strip--geometry { margin-top: 64px; }
+}
+
 /* Dynamic grid visibility correction — declared after visual-theme overrides. */
 .simple-public-shell {
   background-color: #f8faff;

@@ -197,3 +197,5 @@
 - [x] Проверить latest approved desktop header/Hero geometry against current responsive composition.
 - [x] Сохранить approved desktop geometry and adapt it safely to mobile without fixed-width overflow; выполнить QA и checkpoint.
 - [x] Проверить 21px public-header radius adjustment across approved desktop/mobile geometry; выполнить QA и checkpoint.
+- [x] Проверить latest generated Home edits, including mobile-only Hero height and desktop-only spacing values, for invalid JSX and breakpoint conflicts.
+- [x] Перенести requested Home geometry into semantic responsive CSS, verify desktop/mobile layout and save checkpoint.
