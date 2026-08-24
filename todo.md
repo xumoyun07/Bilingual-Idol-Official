@@ -152,3 +152,8 @@
 - [x] Переработать public pages, базовые UI patterns и dashboard surfaces для простой, последовательной и responsive навигации.
 - [x] Провести desktop/tablet/mobile QA: media loading, interactive controls, accessibility and error-free frontend flows.
 - [x] Документировать frontend redesign и сохранить проверенный checkpoint.
+- [x] Провести functional UX audit и зафиксировать минимальную role-based information architecture для малого учебного центра.
+- [x] Полностью переписать shared frontend foundations и public user journeys, удалив decorative elements без практической ценности.
+- [x] Полностью переписать dashboard workflows для staff, students и teachers в практичном responsive UI без изменения access-control semantics.
+- [ ] Провести moderated usability test с реальными learner/parent, teacher и centre staff representatives по подготовленному protocol; это внешний launch gate и не может быть сфабрикован.
+- [x] Документировать новую frontend architecture, automated QA и moderated usability protocol; сохранить проверенный minimal-UX checkpoint.
