@@ -166,3 +166,8 @@
 - [x] Интегрировать supplied Hero photo, card photography и необходимые public demo media без изменения user dashboards; сохранить video slot только как future replacement option.
 - [x] Провести access-control, loading, performance, responsive и full-regression QA для public media integration.
 - [x] Подготовить media architecture и QA report, затем сохранить verified checkpoint.
+- [x] Извлечь и зафиксировать подтверждённые сведения из BILC price list, company profile и current official website.
+- [x] Определить и применить минималистичную public visual theme на базе официальной палитры бренда без изменения dashboard UI.
+- [x] Заполнить public pages только подтверждёнными сведениями об учебном центре, программах и контактных сценариях.
+- [x] Проверить visual consistency, accessibility, responsive layout, content accuracy и regression public journeys.
+- [x] Подготовить design/content-source documentation и сохранить verified checkpoint.

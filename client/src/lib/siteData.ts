@@ -26,3 +26,11 @@ export const PROGRAMS: Program[] = [
 ];
 
 export const PROGRAM_CATEGORIES = ["All", "Kids", "English", "World Languages", "Professional"] as const;
+
+export const OFFICIAL_PROGRAMME_GUIDE = [
+  { title: "General English", detail: "1, 3, 6, 9 or 12 months · 5 days/week", fee: "Tuition from RM 2,950", note: "Registration and placement fees are listed separately in the 2026 guide." },
+  { title: "IELTS Preparation", detail: "Express 4 weeks · Intensive 8 weeks · Premium 12 weeks", fee: "RM 3,500–RM 9,900", note: "Includes placement test, progress assessment, learning materials and certificate of completion." },
+  { title: "Summer Camp", detail: "Junior English 2 weeks · International and Leadership camps 4 weeks", fee: "RM 4,400–RM 7,600", note: "Packages list English classes, activities/trips, learning materials and certificates." },
+  { title: "Private English Lessons", detail: "Silver 10 hours · Gold 20 hours · Platinum 40 hours", fee: "RM 1,800–RM 5,800", note: "Personalised lesson packages." },
+  { title: "Executive English", detail: "Business English 1 month · Executive Communication 2 months · Corporate Masterclass customised", fee: "RM 3,800–RM 6,600", note: "Corporate English Masterclass is quoted on request." },
+] as const;

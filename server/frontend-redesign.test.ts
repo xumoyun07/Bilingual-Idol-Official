@@ -15,14 +15,29 @@ describe("minimal frontend rewrite", () => {
     expect(layout).toContain("Make an enquiry");
   });
 
-  it("keeps public journeys task-first and removes media-led decoration from rewritten routes", () => {
+  it("keeps public journeys task-first and avoids hard-coded storage media in rewritten routes", () => {
     const home = read("pages/Home.tsx");
     const programmes = read("pages/Programs.tsx");
     const contact = read("pages/Contact.tsx");
-    expect(home).toContain("What do you need today?");
+    expect(home).toContain("Choose a clear next step.");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");
     expect(contact).toContain("Get in touch with the centre.");
+  });
+
+  it("uses the documented royal-blue public theme and source-confirmed programme guidance", () => {
+    const css = read("index.css");
+    const programmes = read("pages/Programs.tsx");
+    const home = read("pages/Home.tsx");
+    const guide = read("lib/siteData.ts");
+    expect(css).toContain("2026 minimal blue public theme");
+    expect(css).toContain("--bilc-blue: #173fad");
+    expect(css).toContain(".simple-programme-guide");
+    expect(programmes).toContain("OFFICIAL_PROGRAMME_GUIDE");
+    expect(programmes).toContain("2026 fee guide");
+    expect(home).toContain("Language options");
+    expect(guide).toContain("IELTS Preparation");
+    expect(guide).toContain("RM 3,500–RM 9,900");
   });
 
   it("uses clear touch-target, responsive and restrained workspace foundations", () => {
