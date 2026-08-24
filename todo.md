@@ -176,3 +176,5 @@
 - [x] Провести cross-project responsive, accessibility, interaction and regression QA for public, auth and protected routes.
 - [x] Подготовить full-project theme/QA documentation and save a verified checkpoint.
 - [x] Проверить и корректно применить пользовательский vertical spacing для Home enquiry CTA, затем сохранить verification checkpoint.
+- [x] Воспроизвести и исправить dashboard blocks, где текст или controls касаются внутренней границы без consistent padding and base styling.
+- [x] Проверить corrected dashboard block surfaces на desktop/mobile и сохранить verification checkpoint.
