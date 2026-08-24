@@ -184,3 +184,6 @@
 - [x] Реализовать server-backed News pagination: 6 posts per page, 3×2 grid, previous/next and numeric page controls.
 - [x] Проверить News cards, modal, pagination, responsive layout, accessibility and regression behavior.
 - [x] Подготовить News architecture/QA documentation and save a verified checkpoint.
+- [x] Провести audit current surface layering and motion foundations across public, auth and dashboard UI.
+- [x] Добавить scoped dynamic grid background, entrance effects and smooth scrolling with reduced-motion safeguards.
+- [x] Проверить grid/motion layering, performance, responsiveness, accessibility and regressions; сохранить checkpoint.

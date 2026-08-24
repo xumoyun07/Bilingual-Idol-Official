@@ -53,6 +53,19 @@ describe("minimal frontend rewrite", () => {
     expect(dashboard).toContain("Sign out");
   });
 
+  it("provides a scoped dynamic grid and non-essential motion fallback across all app surfaces", () => {
+    const css = read("index.css");
+    expect(css).toContain("Dynamic blue grid and motion layer");
+    expect(css).toContain(".simple-public-shell, .auth-page, .member-page");
+    expect(css).toContain(".workspace-surface::before");
+    expect(css).toContain("background-attachment: fixed");
+    expect(css).toContain("animation: bilc-grid-drift");
+    expect(css).toContain("@keyframes bilc-page-reveal");
+    expect(css).toContain("@keyframes bilc-item-reveal");
+    expect(css).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(css).toContain("animation: none !important");
+  });
+
   it("keeps universal sign-in semantics while using the practical auth surface", () => {
     const login = read("pages/FounderLogin.tsx");
     const css = read("index.css");

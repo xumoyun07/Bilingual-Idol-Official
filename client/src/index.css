@@ -368,6 +368,51 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 639px) { .auth-header, .member-header { padding-right: 1rem; padding-left: 1rem; }.auth-back { font-size: 0; }.auth-back svg { width: 18px; height: 18px; }.auth-content { padding-top: 3rem; }.auth-form-panel { padding: 1.25rem; }.member-content { padding-top: 3rem; }.member-header .auth-brand small { display: none; }.workspace-page .founder-command-action { width: 100%; }.workspace-page .founder-command-action > * { width: 100%; }.workspace-page .founder-command-action button, .workspace-page .founder-command-action a { justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .auth-page *, .member-page *, .workspace-page * { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 
+/* Dynamic blue grid and motion layer — shared by public, access and workspace views. */
+html { scroll-padding-top: 5.25rem; }
+.simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  background-color: var(--blue-mist, #f4f7fc);
+  background-image:
+    linear-gradient(rgb(23 63 173 / .055) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .055) 1px, transparent 1px),
+    radial-gradient(circle at 12% 16%, rgb(71 113 223 / .13), transparent 26rem),
+    radial-gradient(circle at 88% 68%, rgb(23 63 173 / .08), transparent 30rem);
+  background-size: 32px 32px, 32px 32px, auto, auto;
+  background-attachment: fixed;
+}
+.simple-public-shell::before, .auth-page::before, .member-page::before, .minimal-auth-state::before, .minimal-dashboard-inset::before, .workspace-surface::before {
+  position: absolute;
+  z-index: 0;
+  width: 26rem;
+  height: 26rem;
+  top: 24%;
+  right: -14rem;
+  border: 1px solid rgb(23 63 173 / .12);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(99 136 230 / .12), transparent 66%);
+  box-shadow: 0 0 0 3rem rgb(23 63 173 / .018), 0 0 0 7rem rgb(23 63 173 / .012);
+  content: "";
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  animation: bilc-grid-drift 14s var(--ease-in-out) infinite alternate;
+}
+.simple-public-shell > *, .auth-page > *, .member-page > *, .minimal-auth-state > *, .minimal-dashboard-inset > *, .workspace-surface > * { position: relative; z-index: 1; }
+.simple-section-tint, .auth-help, .member-status, .workspace-page .founder-panel-sand { background-image: linear-gradient(rgb(23 63 173 / .038) 1px, transparent 1px), linear-gradient(90deg, rgb(23 63 173 / .038) 1px, transparent 1px); background-size: 26px 26px; }
+.simple-public-shell main, .auth-content, .member-content, .minimal-dashboard-main, .workspace-page { animation: bilc-page-reveal 360ms var(--ease-out) both; }
+.simple-public-shell main :is(.simple-task-card, .simple-programme-guide article, .simple-news-card), .workspace-page :is(.founder-panel, .founder-metric, article), .member-content > *, .auth-content > * { animation: bilc-item-reveal 420ms var(--ease-out) both; }
+.simple-public-shell main :is(.simple-task-card, .simple-programme-guide article, .simple-news-card):nth-child(2), .workspace-page :is(.founder-panel, .founder-metric, article):nth-child(2), .member-content > *:nth-child(2), .auth-content > *:nth-child(2) { animation-delay: 70ms; }
+.simple-public-shell main :is(.simple-task-card, .simple-programme-guide article, .simple-news-card):nth-child(3), .workspace-page :is(.founder-panel, .founder-metric, article):nth-child(3) { animation-delay: 130ms; }
+@keyframes bilc-page-reveal { from { opacity: 0; transform: translate3d(0, 12px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes bilc-item-reveal { from { opacity: 0; transform: translate3d(0, 10px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes bilc-grid-drift { from { transform: translate3d(-1.25rem, -1rem, 0) scale(.96); opacity: .55; } to { transform: translate3d(1rem, 1.25rem, 0) scale(1.04); opacity: .9; } }
+@media (prefers-reduced-motion: reduce) {
+  .simple-public-shell::before, .auth-page::before, .member-page::before, .minimal-auth-state::before, .minimal-dashboard-inset::before, .workspace-surface::before { animation: none !important; }
+  .simple-public-shell main, .auth-content, .member-content, .minimal-dashboard-main, .workspace-page, .simple-public-shell main :is(.simple-task-card, .simple-programme-guide article, .simple-news-card), .workspace-page :is(.founder-panel, .founder-metric, article), .member-content > *, .auth-content > * { animation: none !important; }
+}
+
 /* 2026 minimal blue public theme — isolated from auth and dashboard surfaces. */
 .simple-public-shell { --bilc-blue: #173fad; --bilc-blue-dark: #102c7b; --bilc-ink: #10253e; --bilc-mist: #f4f7fc; --bilc-line: #d9e2f1; --bilc-sand: #f4e8d5; background: #fff; color: var(--bilc-ink); }
 .simple-public-shell :is(a, button, input, select, textarea):focus-visible { outline: 3px solid color-mix(in srgb, var(--bilc-blue) 72%, white); outline-offset: 3px; }
