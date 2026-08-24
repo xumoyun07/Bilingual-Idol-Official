@@ -24,7 +24,7 @@ export default function FounderLogin() {
     login.mutate({ email, password });
   }
 
-  return <main className="auth-page">
+  return <main className="auth-page blue-auth-page">
     <header className="auth-header">
       <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
         <span aria-hidden="true">BI</span>

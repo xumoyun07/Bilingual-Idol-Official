@@ -36,13 +36,13 @@ export default function DashboardLayout({ children, role = "founder" }: { childr
   if (loading || (user && user.role !== role)) return <DashboardLayoutSkeleton />;
   if (!user) return <DashboardSignIn />;
 
-  return <SidebarProvider open style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
+  return <SidebarProvider open className="blue-workspace" style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
     <DashboardShell role={role}>{children}</DashboardShell>
   </SidebarProvider>;
 }
 
 function DashboardSignIn() {
-  return <main className="minimal-auth-state"><div><p className="minimal-eyebrow">Secure workspace</p><h1>Sign in to continue</h1><p>Use the e-mail and password issued for your account.</p><Button className="mt-7 min-h-12 w-full rounded-lg" onClick={() => { window.location.href = "/login"; }}>Sign in</Button></div></main>;
+  return <main className="minimal-auth-state blue-auth-state"><div><p className="minimal-eyebrow">Secure workspace</p><h1>Sign in to continue</h1><p>Use the e-mail and password issued for your account.</p><Button className="mt-7 min-h-12 w-full rounded-lg" onClick={() => { window.location.href = "/login"; }}>Sign in</Button></div></main>;
 }
 
 function DashboardShell({ children, role }: { children: React.ReactNode; role: DashboardRole }) {
@@ -68,7 +68,7 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="minimal-sidebar-footer">
-        <div className="flex min-w-0 items-center gap-3 group-data-[collapsible=icon]:justify-center"><Avatar className="h-9 w-9 border border-[#d9e1e6]"><AvatarFallback className="bg-[#e9f1f4] text-xs font-bold text-[#264653]">{user?.name?.slice(0, 1).toUpperCase() || "U"}</AvatarFallback></Avatar><div className="min-w-0 group-data-[collapsible=icon]:hidden"><p className="truncate text-sm font-semibold text-[#1f3442]">{user?.name || "Account"}</p><p className="truncate text-xs text-[#61727c]">{user?.email || ""}</p></div></div>
+        <div className="flex min-w-0 items-center gap-3 group-data-[collapsible=icon]:justify-center"><Avatar className="h-9 w-9 border border-[#d9e2f1]"><AvatarFallback className="bg-[#e8eeff] text-xs font-bold text-[#173fad]">{user?.name?.slice(0, 1).toUpperCase() || "U"}</AvatarFallback></Avatar><div className="min-w-0 group-data-[collapsible=icon]:hidden"><p className="truncate text-sm font-semibold text-[#10253e]">{user?.name || "Account"}</p><p className="truncate text-xs text-[#566983]">{user?.email || ""}</p></div></div>
         <button className="minimal-signout group-data-[collapsible=icon]:justify-center" onClick={logout}><LogOut size={16} /><span className="group-data-[collapsible=icon]:hidden">Sign out</span></button>
       </SidebarFooter>
     </Sidebar>

@@ -171,3 +171,7 @@
 - [x] Заполнить public pages только подтверждёнными сведениями об учебном центре, программах и контактных сценариях.
 - [x] Проверить visual consistency, accessibility, responsive layout, content accuracy и regression public journeys.
 - [x] Подготовить design/content-source documentation и сохранить verified checkpoint.
+- [x] Провести visual inventory universal sign-in и всех role-based dashboard surfaces against the minimal blue public theme.
+- [x] Определить and apply unified minimal blue tokens, hierarchy and component rules across sign-in and dashboards without changing functionality.
+- [x] Провести cross-project responsive, accessibility, interaction and regression QA for public, auth and protected routes.
+- [x] Подготовить full-project theme/QA documentation and save a verified checkpoint.

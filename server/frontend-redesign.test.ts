@@ -59,6 +59,7 @@ describe("minimal frontend rewrite", () => {
     expect(login).toContain('autoComplete="current-password"');
     expect(login).toContain('role="alert"');
     expect(login).toContain("auth-page");
+    expect(login).toContain("blue-auth-page");
     expect(css).toContain(".auth-page");
     expect(css).toContain(".auth-submit");
   });
@@ -71,6 +72,7 @@ describe("minimal frontend rewrite", () => {
     const students = read("pages/StudentsProfile.tsx");
     const css = read("index.css");
     expect(personal).toContain("member-page");
+    expect(personal).toContain("blue-member-page");
     expect(personal).toContain('redirectPath: "/login"');
     expect(admin).toContain("workspace-page founder-command");
     expect(superAdmin).toContain("workspace-page founder-command");
@@ -78,6 +80,10 @@ describe("minimal frontend rewrite", () => {
     expect(students).toContain("workspace-page founder-command");
     expect(css).toContain(".workspace-page");
     expect(css).toContain("content: none");
+    expect(css).toContain("Full-project minimal blue system");
+    expect(css).toContain(".blue-workspace");
+    const dashboard = read("components/DashboardLayout.tsx");
+    expect(dashboard).toContain('className="blue-workspace"');
   });
 
   it("loads public media by published slot while keeping management restricted to the founder workspace", () => {

@@ -51,7 +51,7 @@ try {
   const desktopSidebar = page.locator('[data-sidebar="sidebar"]').first();
   const overview = desktopSidebar.getByRole("button", { name: "Overview", exact: true });
   const overviewStyle = await overview.evaluate(element => ({ background: getComputedStyle(element).backgroundColor, icon: getComputedStyle(element.querySelector("svg")).color }));
-  if (overviewStyle.background !== "rgb(38, 70, 83)" || overviewStyle.icon !== "rgb(244, 199, 185)") throw new Error("Desktop active navigation lacks the redesigned colour treatment");
+  if (overviewStyle.background !== "rgb(23, 63, 173)" || overviewStyle.icon !== "rgb(255, 255, 255)") throw new Error("Desktop active navigation lacks the approved blue-theme treatment");
   pass("Desktop persistent navigation", "The fixed workspace rail marks the active route with colour and icon treatment");
 
   await page.goto(`${baseUrl}/super-admin/users`, { waitUntil: "networkidle" });
@@ -80,7 +80,7 @@ try {
   const mobileSidebar = page.locator('[data-sidebar="sidebar"][data-mobile="true"]');
   await mobileSidebar.getByRole("button", { name: "Users", exact: true }).waitFor({ timeout: 10000 });
   const mobileStyle = await mobileSidebar.getByRole("button", { name: "Users", exact: true }).evaluate(element => ({ background: getComputedStyle(element).backgroundColor, text: getComputedStyle(element).color, icon: getComputedStyle(element.querySelector("svg")).color }));
-  if (mobileStyle.background !== "rgb(38, 70, 83)" || mobileStyle.text !== "rgb(255, 255, 255)" || mobileStyle.icon !== "rgb(244, 199, 185)") throw new Error("Mobile active navigation lacks the redesigned contrast treatment");
+  if (mobileStyle.background !== "rgb(23, 63, 173)" || mobileStyle.text !== "rgb(255, 255, 255)" || mobileStyle.icon !== "rgb(255, 255, 255)") throw new Error(`Mobile active navigation lacks the approved blue-theme contrast treatment: ${JSON.stringify(mobileStyle)}`);
   pass("Mobile drawer and responsive layout", "The navigation trigger opened an opaque drawer with readable active state and no horizontal overflow");
 
   console.log(JSON.stringify({ status: "passed", checks }, null, 2));
