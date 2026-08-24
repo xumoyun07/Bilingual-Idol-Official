@@ -389,3 +389,6 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Dashboard block rhythm: restore interior spacing after the minimal shell override. */
 .blue-workspace .workspace-page .founder-command-header { border: 1px solid var(--blue-line) !important; border-radius: 1rem; background: #fff; padding: clamp(1.25rem, 3vw, 2rem); box-shadow: 0 12px 26px rgb(23 63 173 / .055) !important; }.blue-workspace .workspace-page .founder-command-header > div { min-width: 0; }.blue-workspace .workspace-page .founder-command-header .founder-command-description { margin-bottom: 0; }.blue-workspace .workspace-page .founder-panel > .border-b:first-child { margin-right: 0; margin-left: 0; }.blue-workspace .workspace-page .founder-panel > :is(.grid, .flex, .divide-y, [role="status"]) { min-width: 0; }
+
+/* First-view Home Hero: the header remains in normal flow, so the Hero fills exactly the remaining viewport. */
+.simple-home-intro { height: calc(100svh - 4.5rem); min-height: 0; }

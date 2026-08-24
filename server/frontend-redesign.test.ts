@@ -44,6 +44,7 @@ describe("minimal frontend rewrite", () => {
     const css = read("index.css");
     const dashboard = read("components/DashboardLayout.tsx");
     expect(css).toContain(".simple-public-shell");
+    expect(css).toContain("height: calc(100svh - 4.5rem)");
     expect(css).toContain("min-height: 3rem");
     expect(css).toContain("@media (max-width: 900px)");
     expect(dashboard).toContain("minimal-sidebar");

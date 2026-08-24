@@ -178,3 +178,4 @@
 - [x] Проверить и корректно применить пользовательский vertical spacing для Home enquiry CTA, затем сохранить verification checkpoint.
 - [x] Воспроизвести и исправить dashboard blocks, где текст или controls касаются внутренней границы без consistent padding and base styling.
 - [x] Проверить corrected dashboard block surfaces на desktop/mobile и сохранить verification checkpoint.
+- [x] Настроить Home Hero ровно на доступную высоту первого viewport под public header без нижнего зазора или overflow; проверить на desktop/tablet/mobile и сохранить checkpoint.
