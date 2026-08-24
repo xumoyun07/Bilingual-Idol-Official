@@ -74,6 +74,8 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("width: 1321px");
     expect(css).toContain("Mobile-only Hero height and desktop Home spacing");
     expect(css).toContain("height: 480px");
+    expect(css).toContain("Public action spacing from visual editor");
+    expect(css).toContain("gap: 25px");
     expect(css).toContain("@keyframes bilc-page-reveal");
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");

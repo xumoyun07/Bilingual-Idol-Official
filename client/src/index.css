@@ -504,6 +504,11 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .simple-contact-strip--geometry { margin-top: 64px; }
 }
 
+/* Public action spacing from visual editor: one coherent desktop gap, no repeated inline margins. */
+@media (min-width: 1280px) {
+  .simple-public-actions { gap: 25px; }
+}
+
 /* Dynamic grid visibility correction — declared after visual-theme overrides. */
 .simple-public-shell {
   background-color: #f8faff;

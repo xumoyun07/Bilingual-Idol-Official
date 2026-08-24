@@ -199,3 +199,5 @@
 - [x] Проверить 21px public-header radius adjustment across approved desktop/mobile geometry; выполнить QA и checkpoint.
 - [x] Проверить latest generated Home edits, including mobile-only Hero height and desktop-only spacing values, for invalid JSX and breakpoint conflicts.
 - [x] Перенести requested Home geometry into semantic responsive CSS, verify desktop/mobile layout and save checkpoint.
+- [x] Проверить generated public-action 25px margin edits for duplicate desktop spacing and mobile impact.
+- [x] Нормализовать requested public-action spacing in responsive styles, verify navigation and save checkpoint.
