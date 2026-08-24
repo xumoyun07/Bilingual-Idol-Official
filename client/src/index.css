@@ -450,3 +450,29 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 .news-manager-summary { display: grid; gap: 1rem; }.news-manager-summary > div:first-child { display: grid; gap: .2rem; }.news-manager-summary strong { color: var(--blue-primary); font-size: 2rem; line-height: 1; }.news-manager-summary span, .news-manager-summary p { color: #566983; font-size: .86rem; line-height: 1.55; }.news-manager-row { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: 1rem 1.25rem; }.news-manager-thumb { display: grid; width: 3.5rem; height: 3.5rem; place-items: center; overflow: hidden; border: 1px solid var(--blue-line); border-radius: .7rem; background: var(--blue-mist); color: var(--blue-primary); }.news-manager-thumb img { width: 100%; height: 100%; object-fit: cover; }.news-manager-row strong { color: var(--blue-ink); font-size: .95rem; }.news-manager-row p { display: -webkit-box; overflow: hidden; margin-top: .25rem; color: #566983; font-size: .8rem; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }.news-manager-row small { display: block; margin-top: .3rem; color: #71809a; font-size: .72rem; text-transform: capitalize; }.news-manager-status { display: inline-flex; border: 1px solid var(--blue-line); border-radius: 999px; padding: .12rem .45rem; color: #60708a; font-size: .62rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }.news-manager-status.is-live { border-color: #badccb; background: #eef7f1; color: #27614e; }.news-manager-edit { min-height: 3rem; border-color: var(--blue-line); color: var(--blue-primary); }.news-manager-empty { display: grid; min-height: 20rem; place-items: center; align-content: center; gap: .8rem; padding: 2rem; color: #8491a3; text-align: center; }.news-manager-empty h3 { color: var(--blue-ink); font-size: 1.3rem; font-weight: 800; }.news-manager-empty p { max-width: 26rem; color: #566983; font-size: .88rem; line-height: 1.55; }.news-manager-dialog { border-color: var(--blue-line); border-radius: 1rem; background: #fff; }.news-manager-dialog h2 { color: var(--blue-ink); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -.035em; }.news-manager-dialog p { color: #566983; line-height: 1.55; }.news-manager-field { display: grid; gap: .45rem; color: #52647d; font-size: .72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }.news-manager-field :is(input, select, textarea) { width: 100%; border: 1px solid var(--blue-line); border-radius: .65rem; background: #fff; padding: .75rem; color: var(--blue-ink); font-size: .9rem; font-weight: 500; letter-spacing: normal; text-transform: none; }.news-manager-field :is(input, select) { min-height: 3rem; }.news-manager-field textarea { resize: vertical; }.news-manager-field :is(input, select, textarea):focus { outline: 0; border-color: var(--blue-primary); box-shadow: 0 0 0 3px rgb(23 63 173 / .14); }.news-manager-field input[type="file"] { padding: .55rem; }.news-manager-help { color: #71809a; font-size: .72rem; font-weight: 500; letter-spacing: normal; text-transform: none; }.news-manager-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--blue-line); border-radius: .75rem; background: var(--blue-mist); padding: 1rem; }.news-manager-toggle strong { display: block; color: var(--blue-ink); font-size: .88rem; }.news-manager-toggle small { display: block; margin-top: .25rem; color: #60708a; font-size: .76rem; line-height: 1.4; }.news-manager-toggle input { width: 1.2rem; height: 1.2rem; accent-color: var(--blue-primary); }
 @media (min-width: 768px) { .news-manager-summary { grid-template-columns: 12rem minmax(0, 1fr); align-items: center; } }
 @media (max-width: 639px) { .news-manager-row { grid-template-columns: 2.8rem minmax(0, 1fr); gap: .75rem; padding: 1rem; }.news-manager-thumb { width: 2.8rem; height: 2.8rem; }.news-manager-edit { grid-column: 2; justify-self: start; }.news-manager-edit span { display: inline; } }
+
+/* Dynamic grid visibility correction — declared after visual-theme overrides. */
+.simple-public-shell {
+  background-color: #f8faff;
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 10% 14%, rgb(62 105 216 / .16), transparent 28rem),
+    radial-gradient(circle at 92% 64%, rgb(23 63 173 / .105), transparent 31rem);
+  background-size: 32px 32px, 32px 32px, auto, auto;
+  background-attachment: fixed;
+}
+.auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface {
+  background-color: #f3f6ff;
+  background-image:
+    linear-gradient(rgb(23 63 173 / .065) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .065) 1px, transparent 1px),
+    radial-gradient(circle at 12% 12%, rgb(93 130 225 / .14), transparent 26rem),
+    radial-gradient(circle at 92% 72%, rgb(23 63 173 / .09), transparent 30rem);
+  background-size: 30px 30px, 30px 30px, auto, auto;
+  background-attachment: fixed;
+}
+.simple-public-shell :is(.simple-route-page, .simple-public-page), .auth-content, .member-content, .minimal-dashboard-main, .workspace-page { position: relative; }
+@media (max-width: 767px) {
+  .simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface { background-attachment: scroll; }
+}

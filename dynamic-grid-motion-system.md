@@ -30,3 +30,9 @@ The update adds `bilc-page-reveal`, `bilc-item-reveal` and `bilc-grid-drift` key
 | Overflow regression | Passed | A targeted browser measurement at 1440px reported matching document, body and viewport widths after the decorative orb was constrained. |
 | Visual review | Passed | Desktop public, access and workspace surfaces plus 390px Home, access and News views retained readable hierarchy, functional controls and unclipped content. |
 | Motion accessibility | Covered | Static test coverage asserts the scoped grid, transform-only keyframes and `prefers-reduced-motion` animation fallback. |
+
+## Visibility Refinement
+
+The first implementation was present but later blue-theme declarations overrode its background layers on several surfaces, making the grid too faint. The correction is deliberately declared after those theme rules. It applies a clearly visible but low-contrast 32px public grid and 30px access/workspace grid, with mist-blue radial depth. Opaque cards, forms and dialogs remain visual resting surfaces above the grid.
+
+The corrected presentation was reviewed at 1440px on Programmes, News, sign-in and the protected News workspace. It is visibly present behind each surface without affecting text contrast, card clarity or the Hero media treatment. Responsive QA at 1440px, 768px and 390px completed without horizontal overflow; mobile falls back from fixed to scrolling background attachment for stable rendering.

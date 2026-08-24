@@ -60,6 +60,8 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain(".workspace-surface::before");
     expect(css).toContain("background-attachment: fixed");
     expect(css).toContain("animation: bilc-grid-drift");
+    expect(css).toContain("Dynamic grid visibility correction");
+    expect(css).toContain("background-color: #f8faff");
     expect(css).toContain("@keyframes bilc-page-reveal");
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");

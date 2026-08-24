@@ -187,3 +187,6 @@
 - [x] Провести audit current surface layering and motion foundations across public, auth and dashboard UI.
 - [x] Добавить scoped dynamic grid background, entrance effects and smooth scrolling with reduced-motion safeguards.
 - [x] Проверить grid/motion layering, performance, responsiveness, accessibility and regressions; сохранить checkpoint.
+- [x] Проверить current preview for visibility of the dynamic grid, entrance effects and smooth scrolling across all visual surface variants.
+- [x] Усилить и унифицировать dynamic grid/motion treatment where required without reducing readability or accessibility.
+- [x] Повторно проверить responsive layout, reduced-motion fallback and interaction regressions; сохранить checkpoint.
