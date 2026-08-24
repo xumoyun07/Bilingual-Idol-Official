@@ -126,6 +126,25 @@ export const siteSettings = mysqlTable("siteSettings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const publicMedia = mysqlTable("publicMedia", {
+  id: int("id").autoincrement().primaryKey(),
+  slot: varchar("slot", { length: 80 }).notNull().unique(),
+  label: varchar("label", { length: 160 }).notNull(),
+  kind: mysqlEnum("kind", ["image", "video"]).notNull(),
+  altText: varchar("altText", { length: 255 }).notNull(),
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  fileSize: int("fileSize").notNull(),
+  storageKey: varchar("storageKey", { length: 512 }).notNull(),
+  publicUrl: varchar("publicUrl", { length: 1024 }).notNull(),
+  isPublished: boolean("isPublished").default(true).notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  publicIndex: index("publicMedia_public_idx").on(table.isPublished, table.kind),
+  creatorIndex: index("publicMedia_creator_idx").on(table.createdByUserId, table.updatedAt),
+}));
+
 export const auditLogs = mysqlTable("auditLogs", {
   id: int("id").autoincrement().primaryKey(),
   actorUserId: int("actorUserId"),
@@ -265,6 +284,7 @@ export type Program = typeof programs.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;
 export type TeamProfile = typeof teamProfiles.$inferSelect;
+export type PublicMedia = typeof publicMedia.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type AuditLogArchive = typeof auditLogArchives.$inferSelect;
 export type StudentProfile = typeof studentProfiles.$inferSelect;

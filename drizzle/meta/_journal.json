@@ -85,6 +85,13 @@
       "when": 1787493511736,
       "tag": "0011_icy_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1787547433732,
+      "tag": "0012_mute_bastion",
+      "breakpoints": true
     }
   ]
 }

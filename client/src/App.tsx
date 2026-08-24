@@ -9,6 +9,7 @@ import Contact from "./pages/Contact";
 import Enroll from "./pages/Enroll";
 import FounderLogin from "./pages/FounderLogin";
 import Home from "./pages/Home";
+import MediaLibrary from "./pages/MediaLibrary";
 import News from "./pages/News";
 import NotFound from "./pages/NotFound";
 import ProgramDetail from "./pages/ProgramDetail";
@@ -34,6 +35,7 @@ function Router() {
     <Route path="/admin/audit-logs" component={Admin} />
     <Route path="/admin/students/:studentId" component={Admin} />
     <Route path="/admin/students" component={Admin} />
+    <Route path="/admin/media" component={MediaLibrary} />
     <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />
     <Route path="/404" component={NotFound} />

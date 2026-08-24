@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, siteSettings, Submission, submissions, TeamProfile, teamProfiles, testimonials, User, userFormFields, userFormSections, userProfileValues, users } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, testimonials, User, userFormFields, userFormSections, userProfileValues, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
@@ -363,6 +363,17 @@ export async function updateTeamProfile(id: number, input: Omit<TeamProfile, "id
 export async function deleteTeamProfile(id: number) { const db = requireDatabase(await getDb()); await db.delete(teamProfiles).where(eq(teamProfiles.id, id)); return { success: true }; }
 export async function listSiteSettings() { const db = requireDatabase(await getDb()); const rows = await db.select().from(siteSettings); return Object.fromEntries(rows.map(row => [row.key, row.value])); }
 export async function updateSiteSettings(values: Record<string, string>) { const db = requireDatabase(await getDb()); for (const [key, value] of Object.entries(values)) await db.insert(siteSettings).values({ key, value }).onDuplicateKeyUpdate({ set: { value } }); return { success: true }; }
+
+export async function listPublicMedia() { const database = requireDatabase(await getDb()); return database.select({ slot: publicMedia.slot, kind: publicMedia.kind, altText: publicMedia.altText, publicUrl: publicMedia.publicUrl, mimeType: publicMedia.mimeType, fileSize: publicMedia.fileSize }).from(publicMedia).where(eq(publicMedia.isPublished, true)).orderBy(asc(publicMedia.slot)); }
+export async function listManagedPublicMedia() { const database = requireDatabase(await getDb()); return database.select().from(publicMedia).orderBy(asc(publicMedia.slot)); }
+export async function getManagedPublicMedia(id: number) { const database = requireDatabase(await getDb()); return (await database.select().from(publicMedia).where(eq(publicMedia.id, id)).limit(1))[0]; }
+export async function upsertPublicMedia(input: Omit<PublicMedia, "id" | "createdAt" | "updatedAt">) {
+  const database = requireDatabase(await getDb());
+  await database.insert(publicMedia).values(input).onDuplicateKeyUpdate({ set: { label: input.label, kind: input.kind, altText: input.altText, mimeType: input.mimeType, fileSize: input.fileSize, storageKey: input.storageKey, publicUrl: input.publicUrl, isPublished: input.isPublished, createdByUserId: input.createdByUserId } });
+  return (await database.select().from(publicMedia).where(eq(publicMedia.slot, input.slot)).limit(1))[0];
+}
+export async function updatePublicMedia(id: number, input: Pick<PublicMedia, "label" | "altText" | "isPublished">) { const database = requireDatabase(await getDb()); await database.update(publicMedia).set(input).where(eq(publicMedia.id, id)); return getManagedPublicMedia(id); }
+export async function deletePublicMedia(id: number) { const database = requireDatabase(await getDb()); await database.delete(publicMedia).where(eq(publicMedia.id, id)); return { success: true } as const; }
 
 export async function listPublicAnnouncements() { const db = requireDatabase(await getDb()); return db.select().from(announcements).where(eq(announcements.isPublished, true)).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)); }
 export async function listAnnouncements() { const db = requireDatabase(await getDb()); return db.select().from(announcements).orderBy(desc(announcements.createdAt)); }

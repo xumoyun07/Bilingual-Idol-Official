@@ -14,6 +14,7 @@ import { superAdminUsersRouter } from "./routers/superAdminUsers";
 import { auditRouter } from "./routers/audit";
 import { studentsRouter } from "./routers/students";
 import { usersRouter } from "./routers/users";
+import { mediaRouter } from "./routers/media";
 import { dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 
 export const appRouter = router({
@@ -46,6 +47,7 @@ export const appRouter = router({
   audit: auditRouter,
   students: studentsRouter,
   users: usersRouter,
+  media: mediaRouter,
 });
 
 export type AppRouter = typeof appRouter;

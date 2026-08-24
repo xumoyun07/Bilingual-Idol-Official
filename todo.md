@@ -161,3 +161,8 @@
 - [x] Переработать UI/UX экрана входа и всех user-facing dashboards в единый minimal practical visual system.
 - [x] Проверить redesigned auth/dashboard flows на desktop, tablet и mobile, включая interactive controls, performance и regression scenarios.
 - [x] Подготовить test report для redesigned auth/dashboard surfaces и сохранить verified checkpoint.
+- [x] Провести audit public media surfaces, storage contracts и founder-only access controls без изменения dashboard UI.
+- [x] Спроектировать и реализовать founder-only management для добавления, изменения и удаления демонстрационного media inventory публичного сайта.
+- [x] Интегрировать supplied Hero photo, card photography и необходимые public demo media без изменения user dashboards; сохранить video slot только как future replacement option.
+- [x] Провести access-control, loading, performance, responsive и full-regression QA для public media integration.
+- [x] Подготовить media architecture и QA report, затем сохранить verified checkpoint.

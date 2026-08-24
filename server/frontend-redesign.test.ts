@@ -64,4 +64,24 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain(".workspace-page");
     expect(css).toContain("content: none");
   });
+
+  it("loads public media by published slot while keeping management restricted to the founder workspace", () => {
+    const home = read("pages/Home.tsx");
+    const programmes = read("pages/Programs.tsx");
+    const detail = read("pages/ProgramDetail.tsx");
+    const mediaPage = read("pages/MediaLibrary.tsx");
+    const router = read("../../server/routers/media.ts");
+    const app = read("App.tsx");
+    expect(home).toContain("trpc.media.publicList.useQuery");
+    expect(home).toContain('data-hero-video="true"');
+    expect(home).toContain('loading="lazy"');
+    expect(programmes).toContain('slot === "programmes_listing"');
+    expect(detail).toContain('slot === "programme_detail"');
+    expect(router).toContain("publicList: publicProcedure");
+    expect(router).toContain("upload: founderProcedure");
+    expect(router).toContain("update: founderProcedure");
+    expect(router).toContain("remove: founderProcedure");
+    expect(mediaPage).toContain("DashboardLayout role=\"founder\"");
+    expect(app).toContain('path="/admin/media"');
+  });
 });

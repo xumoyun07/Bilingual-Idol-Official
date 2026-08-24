@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { GraduationCap, LayoutDashboard, LogOut, ScrollText, UsersRound } from "lucide-react";
+import { FileImage, GraduationCap, LayoutDashboard, LogOut, ScrollText, UsersRound } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
@@ -14,6 +14,7 @@ const menuByRole: Record<DashboardRole, { icon: typeof LayoutDashboard; label: s
     { icon: LayoutDashboard, label: "Overview", path: "/admin" },
     { icon: UsersRound, label: "Users", path: "/admin/users" },
     { icon: GraduationCap, label: "Students", path: "/admin/students" },
+    { icon: FileImage, label: "Media", path: "/admin/media" },
     { icon: ScrollText, label: "Audit logs", path: "/admin/audit-logs" },
   ],
   super_admin: [
