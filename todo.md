@@ -147,3 +147,8 @@
 - [x] Проверить и сохранить user visual edit toggle navigation button: margin-left -17px и margin-top 1px без layout regression.
 - [x] Убрать toggle navigation button в desktop sidebar, сохранив mobile menu control и responsive layout.
 - [x] Исправить прозрачный фон mobile dashboard sidebar drawer, сохранив контраст текста, icons и active states.
+- [x] Провести полный UI inventory и определить обновлённую design/media system для public и dashboard interfaces.
+- [x] Подобрать и интегрировать оптимизированные брендовые media assets через project storage без локальных media в frontend.
+- [x] Переработать public pages, базовые UI patterns и dashboard surfaces для простой, последовательной и responsive навигации.
+- [x] Провести desktop/tablet/mobile QA: media loading, interactive controls, accessibility and error-free frontend flows.
+- [x] Документировать frontend redesign и сохранить проверенный checkpoint.
