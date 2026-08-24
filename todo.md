@@ -175,3 +175,4 @@
 - [x] Определить and apply unified minimal blue tokens, hierarchy and component rules across sign-in and dashboards without changing functionality.
 - [x] Провести cross-project responsive, accessibility, interaction and regression QA for public, auth and protected routes.
 - [x] Подготовить full-project theme/QA documentation and save a verified checkpoint.
+- [x] Проверить и корректно применить пользовательский vertical spacing для Home enquiry CTA, затем сохранить verification checkpoint.
