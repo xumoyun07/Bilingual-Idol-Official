@@ -66,7 +66,7 @@ export default function AuditLogs({ role }: { role: AuditRole }) {
   function toggleArchive(id: number) { setSelectedArchiveIds(ids => ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]); }
   function goToPage(nextPage: number) { setPage(Math.min(Math.max(0, nextPage), totalPages - 1)); }
 
-  return <main className="founder-command founder-workspace mx-auto w-full min-w-0 max-w-[96rem] pb-10">
+  return <main className="workspace-page founder-command founder-workspace mx-auto w-full min-w-0 max-w-[96rem] pb-10">
     <header className="founder-command-header min-w-0">
       <div className="min-w-0"><p className="founder-command-eyebrow">{isFounder ? "Control centre" : "Operations"} · Audit logs</p><h1 className="founder-command-title">Review sensitive activity with clear scope.</h1><p className="founder-command-description">UTC-based events are stored with indexed filters and rendered in your local time. {isFounder ? "You can also review archived records and restore selected entries." : "Private-control and peer Super admin activity is excluded from this workspace."}</p></div>
       <div className="founder-command-action flex shrink-0 flex-wrap gap-2"><Button type="button" variant="outline" disabled={isPending} onClick={() => exportCsv.mutate(filters)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><FileSpreadsheet size={16} />CSV</Button><Button type="button" variant="outline" disabled={isPending} onClick={() => exportPdf.mutate(filters)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><FileText size={16} />PDF</Button></div>

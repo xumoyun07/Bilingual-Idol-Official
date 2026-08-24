@@ -10,7 +10,7 @@ import { UserFieldBuilder } from "@/components/UserFieldBuilder";
 import { trpc } from "@/lib/trpc";
 import AuditLogs from "./AuditLogs";
 import { StudentProfileDetail, StudentsProfileList } from "./StudentsProfile";
-import { AlertCircle, ArrowUpRight, BarChart3, CalendarDays, Check, ChevronRight, CircleSlash, GraduationCap, LayoutDashboard, Loader2, Megaphone, Pencil, Plus, Search, Settings2, Shield, ShieldCheck, Trash2, UserPlus, UsersRound, X } from "lucide-react";
+import { AlertCircle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleSlash, GraduationCap, Loader2, Megaphone, Pencil, Plus, Search, Settings2, Shield, ShieldCheck, Trash2, UserPlus, UsersRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 
@@ -45,25 +45,18 @@ function FounderConsole() {
   if (location === "/admin/students") return <StudentsProfileList />;
   const studentMatch = location.match(/^\/admin\/students\/(\d+)$/);
   if (studentMatch) return <StudentProfileDetail studentId={Number(studentMatch[1])} />;
-  return <div className="founder-command founder-workspace mx-auto w-full max-w-[88rem] pb-10">{location === "/admin/users" ? <UsersModule /> : <DashboardModule />}</div>;
+  return <div className="workspace-page founder-command founder-workspace mx-auto w-full max-w-[88rem] pb-10">{location === "/admin/users" ? <UsersModule /> : <DashboardModule />}</div>;
 }
 
 function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
   return <header className="founder-command-header"><div><p className="founder-command-eyebrow">{eyebrow}</p><h1 className="founder-command-title">{title}</h1><p className="founder-command-description">{description}</p></div>{action ? <div className="founder-command-action">{action}</div> : null}</header>;
 }
 
-const widgetZones = [
-  { icon: BarChart3, label: "Metric widgets", description: "KPI cards and change indicators will connect to an approved analytics source." },
-  { icon: LayoutDashboard, label: "Insight widgets", description: "Charts and distributions have a typed, empty-state-ready slot." },
-  { icon: CircleSlash, label: "Quick actions", description: "Permission-aware operational shortcuts can be added without changing the shell." },
-];
-
 function DashboardModule() {
   return <>
-    <ModuleHeader eyebrow="Control centre · Dashboard" title="A calm base for the next decisions." description="This dashboard is ready for real analytics, chart widgets and permission-aware quick actions. No invented activity or performance numbers are shown." action={<Link href="/admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />Open Users<ArrowUpRight size={16} /></Link>} />
-    <section className="mt-6 grid gap-4 lg:grid-cols-3" aria-label="Future dashboard widget zones">{widgetZones.map(({ icon: Icon, label, description }) => <article key={label} className="founder-panel founder-panel-paper min-h-56"><span className="grid h-11 w-11 place-items-center rounded-xl bg-[#e7f0eb] text-[#397563]"><Icon size={20} /></span><h2 className="mt-8 font-display text-3xl text-[#10253e]">{label}</h2><p className="mt-3 text-sm leading-6 text-[#53657a]">{description}</p><span className="mt-7 inline-flex rounded-full border border-[#d8cfbf] px-3 py-1 text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">Data source pending</span></article>)}</section>
-    <section className="founder-panel founder-panel-sand mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="founder-command-eyebrow">Quick action</p><h2 className="mt-2 font-display text-3xl text-[#10253e]">Manage the platform’s access.</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[#53657a]">Create, review, filter, update and safely remove issued accounts from one protected workspace.</p></div><Link href="/admin/users" className="compass-btn-secondary inline-flex items-center gap-2"><UserPlus size={17} />Manage users<ChevronRight size={16} /></Link></section>
-    <section className="founder-state founder-state-empty mt-6"><p className="font-semibold text-[#10253e]">Analytics is intentionally empty.</p><p className="mt-1 text-sm leading-6 text-[#53657a]">Connect a confirmed analytics source later; the dashboard accepts metric, insight and quick-action widget contracts without an interface rewrite.</p></section>
+    <ModuleHeader eyebrow="Control centre · Dashboard" title="Manage centre access." description="Use this workspace to manage issued accounts, student records and audit evidence. Activity metrics appear only when a confirmed data source is connected." action={<Link href="/admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />Open Users<ArrowUpRight size={16} /></Link>} />
+    <section className="founder-panel founder-panel-paper mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="founder-command-eyebrow">Primary task</p><h2 className="mt-2 font-display text-3xl text-[#10253e]">Manage issued accounts.</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[#53657a]">Create, review, filter, update and safely remove accounts from one protected directory.</p></div><Link href="/admin/users" className="compass-btn-secondary inline-flex items-center gap-2"><UserPlus size={17} />Manage users<ChevronRight size={16} /></Link></section>
+    <section className="founder-state founder-state-empty mt-6"><p className="font-semibold text-[#10253e]">No live analytics are connected.</p><p className="mt-1 text-sm leading-6 text-[#53657a]">The workspace can accept approved metrics later without changing the account-management flow.</p></section>
   </>;
 }
 

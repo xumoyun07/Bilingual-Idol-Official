@@ -43,7 +43,7 @@ export default function SuperAdmin() {
 function SuperAdminConsole() {
   const [location] = useLocation();
   if (location === "/super-admin/audit-logs") return <AuditLogs role="super_admin" />;
-  return <div className="founder-command founder-workspace mx-auto w-full max-w-[88rem] pb-10">{location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}</div>;
+  return <div className="workspace-page founder-command founder-workspace mx-auto w-full max-w-[88rem] pb-10">{location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}</div>;
 }
 
 function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
@@ -52,14 +52,9 @@ function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string
 
 function SuperAdminDashboard() {
   return <>
-    <ModuleHeader eyebrow="Operations · Dashboard" title="Manage access with clear boundaries." description="This workspace is ready for real operational data. It provides account management without exposing private control configuration or peer Super admin accounts." action={<Link href="/super-admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />Open Users<ArrowUpRight size={16} /></Link>} />
-    <section className="mt-6 grid gap-4 lg:grid-cols-3" aria-label="Operations workspace scope"><ScopeCard icon={UsersRound} title="People directory" description="Search and review students, teachers, marketing and admin accounts." /><ScopeCard icon={UserPlus} title="Account lifecycle" description="Issue, update, pause or remove accounts within the assigned operational scope." /><ScopeCard icon={Shield} title="Role boundaries" description="Super admin records are excluded from this workspace and cannot be issued or managed here." /></section>
-    <section className="founder-panel founder-panel-sand mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="founder-command-eyebrow">Quick action</p><h2 className="mt-2 font-display text-3xl text-[#10253e]">Open the people directory.</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[#53657a]">Use focused account windows, local filters and confirmation before removing an account.</p></div><Link href="/super-admin/users" className="compass-btn-secondary inline-flex items-center gap-2"><UserPlus size={17} />Manage users<ChevronRight size={16} /></Link></section>
+    <ModuleHeader eyebrow="Operations · Dashboard" title="Manage issued accounts." description="This workspace provides scoped account management without exposing private control configuration or peer Super admin accounts." action={<Link href="/super-admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />Open Users<ArrowUpRight size={16} /></Link>} />
+    <section className="founder-panel founder-panel-paper mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="founder-command-eyebrow">Primary task</p><h2 className="mt-2 font-display text-3xl text-[#10253e]">Open the people directory.</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[#53657a]">Search, review, issue, pause or remove accounts within your assigned operational scope.</p></div><Link href="/super-admin/users" className="compass-btn-secondary inline-flex items-center gap-2"><UserPlus size={17} />Manage users<ChevronRight size={16} /></Link></section>
   </>;
-}
-
-function ScopeCard({ icon: Icon, title, description }: { icon: typeof UsersRound; title: string; description: string }) {
-  return <article className="founder-panel founder-panel-paper min-h-56"><span className="grid h-11 w-11 place-items-center rounded-xl bg-[#e7f0eb] text-[#397563]"><Icon size={20} /></span><h2 className="mt-8 font-display text-3xl text-[#10253e]">{title}</h2><p className="mt-3 text-sm leading-6 text-[#53657a]">{description}</p></article>;
 }
 
 function SuperAdminUsersModule() {

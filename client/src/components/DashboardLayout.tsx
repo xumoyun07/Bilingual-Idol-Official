@@ -72,8 +72,8 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
       </SidebarFooter>
     </Sidebar>
     <SidebarInset className="minimal-dashboard-inset">
-      <header className="minimal-dashboard-header"><div className="flex items-center gap-3"><SidebarTrigger className="minimal-mobile-trigger" /><div><p className="minimal-eyebrow">Learning centre workspace</p><h1>{active.label}</h1></div></div><span className="hidden text-xs font-medium text-[#61727c] sm:inline">Signed in</span></header>
-      <main className="minimal-dashboard-main">{children}</main>
+      <header className="minimal-dashboard-header"><div className="flex items-center gap-3"><SidebarTrigger className="minimal-mobile-trigger" /><div><p className="minimal-eyebrow">Workspace</p><h1>{active.label}</h1></div></div><span className="hidden text-xs font-medium text-[#61727c] sm:inline">Account active</span></header>
+      <main className="minimal-dashboard-main workspace-surface">{children}</main>
     </SidebarInset>
   </>;
 }

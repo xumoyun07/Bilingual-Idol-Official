@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowUpRight, BookOpen, LogOut, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { ArrowRight, BookOpen, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "wouter";
 
@@ -9,8 +9,20 @@ const OPERATIONS_ROLES = ["founder", "super_admin"];
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
   const isOperationsUser = Boolean(user && OPERATIONS_ROLES.includes(user.role));
-  useEffect(() => { if (isOperationsUser) window.location.href = user?.role === "super_admin" ? "/super-admin" : "/admin"; }, [isOperationsUser, user?.role]);
-  if (loading || isOperationsUser) return <main className="atlas-page compass-grid grid min-h-screen place-items-center"><p className="atlas-eyebrow">Preparing your dashboard</p></main>;
+
+  useEffect(() => {
+    if (isOperationsUser) window.location.href = user?.role === "super_admin" ? "/super-admin" : "/admin";
+  }, [isOperationsUser, user?.role]);
+
+  if (loading || isOperationsUser) return <main className="minimal-auth-state"><div><p className="minimal-eyebrow">Account</p><h1>Preparing your workspace</h1><p>Please wait while your account access is confirmed.</p></div></main>;
+
   const role = user?.role === "student" ? "Student" : user?.role === "teacher" ? "Teacher" : "Member";
-  return <main className="atlas-page compass-grid min-h-screen"><header className="border-b border-[#ded4c2] bg-[#fbf8f2]/95 backdrop-blur"><div className="compass-shell flex min-h-20 items-center justify-between gap-4 py-4"><Link href="/" className="inline-flex min-h-12 items-center gap-2 text-sm font-extrabold text-[#397563] hover:text-[#10253e]"><ArrowLeft size={16} /> Back to website</Link><Button variant="outline" className="min-h-12 rounded-full border-[#cbbba4] px-5" onClick={() => logout()}><LogOut className="mr-2" size={15} /> Sign out</Button></div></header><section className="compass-shell grid min-h-[calc(100svh-5.5rem)] place-items-center py-10"><div className="grid w-full max-w-5xl gap-5 lg:grid-cols-[1.05fr_.95fr]"><div className="relative overflow-hidden rounded-[1.3rem] bg-[#10253e] p-8 text-white shadow-[0_20px_50px_rgba(16,37,62,.18)] sm:p-11"><div className="absolute -right-12 -top-12 h-48 w-48 rounded-full border border-white/15" /><span className="grid h-14 w-14 place-items-center rounded-full bg-[#ef795b] text-[#10253e]"><UserRound size={25} /></span><p className="atlas-eyebrow mt-8 !text-[#a7c6b8]">Your learning space · {role}</p><h1 className="atlas-section-title !mt-4 !text-white">Welcome back{user?.name ? `, ${user.name}` : ""}.</h1><p className="mt-5 max-w-xl text-base leading-7 text-white/70">Your centre updates, learning materials and relevant information will appear here when they are ready to share.</p><Link href="/programs" className="atlas-button-primary mt-8">Explore programmes <ArrowUpRight size={16} /></Link></div><div className="atlas-dashboard-surface p-7 sm:p-9"><span className="grid h-12 w-12 place-items-center rounded-full bg-[#e7f0eb] text-[#397563]"><Sparkles size={20} /></span><h2 className="compass-display mt-7 text-4xl leading-tight text-[#10253e]">Everything starts with a clear next step.</h2><div className="mt-7 rounded-2xl border border-dashed border-[#cbbba4] bg-[#fbf8f2] p-5"><div className="flex gap-3"><ShieldCheck className="shrink-0 text-[#397563]" size={20} /><div><p className="font-bold text-[#10253e]">No account information is published yet.</p><p className="mt-1 text-sm leading-6 text-[#5b6d80]">Schedules, payments, materials and progress will appear only when the centre enables the relevant account module.</p></div></div></div><div className="mt-7 flex items-center gap-3 text-sm font-bold text-[#397563]"><BookOpen size={18} /> Start by exploring the current programmes.</div></div></div></section></main>;
+  return <main className="member-page">
+    <header className="member-header"><Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home"><span aria-hidden="true">BI</span><div><strong>Bilingual Idol</strong><small>Learning centre</small></div></Link><Button type="button" variant="outline" className="member-signout" onClick={() => logout()}><LogOut size={16} />Sign out</Button></header>
+    <section className="member-content" aria-labelledby="member-dashboard-title">
+      <div className="member-welcome"><span className="member-avatar" aria-hidden="true"><UserRound size={23} /></span><p className="simple-eyebrow">{role} account</p><h1 id="member-dashboard-title">Welcome{user?.name ? `, ${user.name}` : ""}.</h1><p>Your account is ready. Information shared by the centre will appear here when it is available for your role.</p></div>
+      <section className="member-next-step" aria-label="Next step"><div><BookOpen aria-hidden="true" size={21} /><h2>Find a programme</h2><p>Review the current programme information or contact the centre if you need help choosing the right option.</p></div><Link href="/programs" className="simple-button">View programmes<ArrowRight size={16} /></Link></section>
+      <section className="member-status" aria-label="Account information"><ShieldCheck aria-hidden="true" size={19} /><div><strong>No account information is published yet.</strong><p>Schedules, materials, payments and progress will appear only when the centre enables the relevant account area.</p></div></section>
+    </section>
+  </main>;
 }

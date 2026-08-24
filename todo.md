@@ -157,3 +157,7 @@
 - [x] Полностью переписать dashboard workflows для staff, students и teachers в практичном responsive UI без изменения access-control semantics.
 - [ ] Провести moderated usability test с реальными learner/parent, teacher и centre staff representatives по подготовленному protocol; это внешний launch gate и не может быть сфабрикован.
 - [x] Документировать новую frontend architecture, automated QA и moderated usability protocol; сохранить проверенный minimal-UX checkpoint.
+- [x] Провести audit текущего экрана входа и всех role-based dashboard surfaces, не изменяя authentication, RBAC или backend contracts.
+- [x] Переработать UI/UX экрана входа и всех user-facing dashboards в единый minimal practical visual system.
+- [x] Проверить redesigned auth/dashboard flows на desktop, tablet и mobile, включая interactive controls, performance и regression scenarios.
+- [x] Подготовить test report для redesigned auth/dashboard surfaces и сохранить verified checkpoint.

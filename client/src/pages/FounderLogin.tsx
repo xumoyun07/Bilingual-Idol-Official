@@ -2,14 +2,54 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 export default function FounderLogin() {
-  const [, setLocation] = useLocation(); const utils = trpc.useUtils();
-  const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [visible, setVisible] = useState(false);
-  const login = trpc.auth.login.useMutation({ onSuccess: async data => { await utils.auth.me.invalidate(); setLocation(data.redirectTo); } });
-  function submit(event: FormEvent) { event.preventDefault(); login.mutate({ email, password }); }
-  return <main className="compass-page compass-grid grid min-h-screen lg:grid-cols-[.9fr_1.1fr]"><section className="compass-ink hidden p-10 lg:flex lg:flex-col lg:justify-between"><Link href="/" className="inline-flex items-center gap-2 text-sm font-extrabold text-[#a7c6b8] hover:text-white"><ArrowLeft size={16} /> Back to website</Link><div className="max-w-xl"><p className="compass-kicker !text-[#a7c6b8]">Bilingual Idol</p><h1 className="compass-display mt-6 text-7xl leading-[.9]">Your private<br /><em className="font-normal text-[#f3b59f]">space.</em></h1><p className="mt-7 max-w-md text-base leading-8 text-white/70">One secure entrance for members, educators and centre teams. Your account opens the dashboard appropriate to your access level.</p><div className="mt-10 grid max-w-md grid-cols-3 gap-3 text-center text-xs font-extrabold"><span className="rounded-lg bg-white/10 p-3">Access</span><span className="rounded-lg bg-white/10 p-3">Continue</span><span className="rounded-lg bg-white/10 p-3">Progress</span></div></div><p className="text-xs font-semibold tracking-[.08em] text-white/45 uppercase">Secure access · accounts are issued by the centre</p></section><section className="flex items-center justify-center p-6 sm:p-10"><div className="w-full max-w-md"><Link href="/" className="inline-flex items-center gap-2 text-sm font-extrabold text-[#397563] hover:text-[#10253e] lg:hidden"><ArrowLeft size={16} /> Back to website</Link><div className="compass-card mt-10 p-7 sm:p-9"><span className="grid h-12 w-12 place-items-center rounded-xl bg-[#e7f0eb] text-[#397563]"><UserRound size={22} /></span><p className="compass-kicker mt-7">Secure sign in</p><h2 className="compass-display mt-3 text-4xl">Welcome back.</h2><p className="mt-3 text-sm leading-6 text-[#5b6d80]">Use the e-mail and password issued for your account. Public registration is not available.</p><form className="mt-7 grid gap-5" onSubmit={submit}><div className="grid gap-2"><Label htmlFor="sign-in-email">E-mail</Label><div className="relative"><Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={17} /><Input id="sign-in-email" type="email" autoComplete="email" required className="h-12 rounded-lg border-[#d8cdbc] pl-10" value={email} onChange={event => setEmail(event.target.value)} /></div></div><div className="grid gap-2"><Label htmlFor="sign-in-password">Password</Label><div className="relative"><LockKeyhole className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={17} /><Input id="sign-in-password" type={visible ? "text" : "password"} autoComplete="current-password" required minLength={1} className="h-12 rounded-lg border-[#d8cdbc] pl-10 pr-11" value={password} onChange={event => setPassword(event.target.value)} /><button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-[#708098] hover:text-[#10253e]" aria-label={visible ? "Hide password" : "Show password"} onClick={() => setVisible(!visible)}>{visible ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></div>{login.error && <p className="compass-status-error p-3 text-sm" role="alert">Invalid e-mail or password.</p>}<Button type="submit" className="compass-btn-primary mt-1 h-12 w-full" disabled={login.isPending}>{login.isPending ? "Signing in…" : "Sign in"}</Button></form><p className="mt-5 flex items-start gap-2 text-xs leading-5 text-[#708098]"><ShieldCheck className="mt-0.5 shrink-0 text-[#397563]" size={15} />If you do not have access details, please contact the centre.</p></div></div></section></main>;
+  const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
+  const login = trpc.auth.login.useMutation({
+    onSuccess: async data => {
+      await utils.auth.me.invalidate();
+      setLocation(data.redirectTo);
+    },
+  });
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    login.mutate({ email, password });
+  }
+
+  return <main className="auth-page">
+    <header className="auth-header">
+      <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
+        <span aria-hidden="true">BI</span>
+        <div><strong>Bilingual Idol</strong><small>Learning centre</small></div>
+      </Link>
+      <Link href="/" className="auth-back"><ArrowLeft size={16} />Back to website</Link>
+    </header>
+
+    <section className="auth-content" aria-labelledby="sign-in-title">
+      <div className="auth-intro">
+        <p className="simple-eyebrow">Account access</p>
+        <h1 id="sign-in-title">Sign in to your account.</h1>
+        <p>Use the e-mail address and password issued by the centre. You will be taken to the workspace available for your account.</p>
+        <div className="auth-help"><ShieldCheck size={19} aria-hidden="true" /><div><strong>Access is issued by the centre.</strong><span>There is no public registration. Please contact the centre if you need access details.</span></div></div>
+      </div>
+
+      <div className="auth-form-panel">
+        <div><p className="simple-eyebrow">Secure sign in</p><h2>Continue</h2><p>Enter both fields to proceed.</p></div>
+        <form onSubmit={submit} className="auth-form" noValidate={false}>
+          <div className="auth-field"><Label htmlFor="sign-in-email">E-mail</Label><div className="auth-input-wrap"><Mail aria-hidden="true" size={17} /><Input id="sign-in-email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} /></div></div>
+          <div className="auth-field"><Label htmlFor="sign-in-password">Password</Label><div className="auth-input-wrap"><LockKeyhole aria-hidden="true" size={17} /><Input id="sign-in-password" type={visible ? "text" : "password"} autoComplete="current-password" required minLength={1} value={password} onChange={event => setPassword(event.target.value)} /><button type="button" className="auth-password-toggle" aria-label={visible ? "Hide password" : "Show password"} onClick={() => setVisible(current => !current)}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></div>
+          {login.error ? <p className="auth-error" role="alert">Invalid e-mail or password.</p> : null}
+          <Button type="submit" className="auth-submit" disabled={login.isPending}>{login.isPending ? "Signing in…" : "Sign in"}</Button>
+        </form>
+      </div>
+    </section>
+  </main>;
 }

@@ -35,4 +35,33 @@ describe("minimal frontend rewrite", () => {
     expect(dashboard).toContain("minimal-dashboard-header");
     expect(dashboard).toContain("Sign out");
   });
+
+  it("keeps universal sign-in semantics while using the practical auth surface", () => {
+    const login = read("pages/FounderLogin.tsx");
+    const css = read("index.css");
+    expect(login).toContain("trpc.auth.login.useMutation");
+    expect(login).toContain('autoComplete="email"');
+    expect(login).toContain('autoComplete="current-password"');
+    expect(login).toContain('role="alert"');
+    expect(login).toContain("auth-page");
+    expect(css).toContain(".auth-page");
+    expect(css).toContain(".auth-submit");
+  });
+
+  it("uses shared task-first visual foundations across member and protected dashboards", () => {
+    const personal = read("pages/UserDashboard.tsx");
+    const admin = read("pages/Admin.tsx");
+    const superAdmin = read("pages/SuperAdmin.tsx");
+    const audit = read("pages/AuditLogs.tsx");
+    const students = read("pages/StudentsProfile.tsx");
+    const css = read("index.css");
+    expect(personal).toContain("member-page");
+    expect(personal).toContain('redirectPath: "/login"');
+    expect(admin).toContain("workspace-page founder-command");
+    expect(superAdmin).toContain("workspace-page founder-command");
+    expect(audit).toContain("workspace-page founder-command");
+    expect(students).toContain("workspace-page founder-command");
+    expect(css).toContain(".workspace-page");
+    expect(css).toContain("content: none");
+  });
 });
