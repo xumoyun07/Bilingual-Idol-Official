@@ -205,3 +205,5 @@
 - [x] Перенести requested desktop Hero geometry into responsive CSS, verify desktop/mobile composition and save checkpoint.
 - [x] Diagnose Vite HMR WebSocket transport failure without changing application authentication or business behavior.
 - [x] Verify dev-server restart/configuration, representative routes and HMR-related logs; save checkpoint if project files change.
+- [x] Проверить latest Home Hero 500px edit against desktop/mobile breakpoint cascade.
+- [x] Normalize desktop Hero height to 500px, verify mobile 480px behavior and save checkpoint.
