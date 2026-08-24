@@ -196,3 +196,4 @@
 - [x] Нормализовать intended visual spacing into valid responsive styles and verify desktop/mobile presentation; сохранить checkpoint.
 - [x] Проверить latest approved desktop header/Hero geometry against current responsive composition.
 - [x] Сохранить approved desktop geometry and adapt it safely to mobile without fixed-width overflow; выполнить QA и checkpoint.
+- [x] Проверить 21px public-header radius adjustment across approved desktop/mobile geometry; выполнить QA и checkpoint.
