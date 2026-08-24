@@ -201,3 +201,5 @@
 - [x] Перенести requested Home geometry into semantic responsive CSS, verify desktop/mobile layout and save checkpoint.
 - [x] Проверить generated public-action 25px margin edits for duplicate desktop spacing and mobile impact.
 - [x] Нормализовать requested public-action spacing in responsive styles, verify navigation and save checkpoint.
+- [ ] Проверить generated Hero 1320px/450px and −87px content-offset edits for duplicate styles and responsive conflicts.
+- [ ] Перенести requested desktop Hero geometry into responsive CSS, verify desktop/mobile composition and save checkpoint.

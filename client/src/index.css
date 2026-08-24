@@ -509,6 +509,12 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .simple-public-actions { gap: 25px; }
 }
 
+/* Desktop Hero size and content position from visual editor, scoped once to preserve element rhythm. */
+@media (min-width: 1400px) {
+  .simple-home-intro--desktop-450 { width: 1320px; height: 450px; }
+  .simple-home-intro-content--desktop-offset { transform: translateY(-87px); }
+}
+
 /* Dynamic grid visibility correction — declared after visual-theme overrides. */
 .simple-public-shell {
   background-color: #f8faff;

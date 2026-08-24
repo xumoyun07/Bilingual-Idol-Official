@@ -25,6 +25,8 @@ describe("minimal frontend rewrite", () => {
     expect(home).toContain("simple-home-intro--refined");
     expect(home).toContain("simple-home-intro--desktop-geometry");
     expect(home).toContain("simple-home-intro--mobile-480");
+    expect(home).toContain("simple-home-intro--desktop-450");
+    expect(home).toContain("simple-home-intro-content--desktop-offset");
     expect(home).toContain("simple-home-start-panel");
     expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
@@ -76,6 +78,8 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("height: 480px");
     expect(css).toContain("Public action spacing from visual editor");
     expect(css).toContain("gap: 25px");
+    expect(css).toContain("Desktop Hero size and content position from visual editor");
+    expect(css).toContain("transform: translateY(-87px)");
     expect(css).toContain("@keyframes bilc-page-reveal");
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");
