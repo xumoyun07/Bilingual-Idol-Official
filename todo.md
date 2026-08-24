@@ -190,3 +190,5 @@
 - [x] Проверить current preview for visibility of the dynamic grid, entrance effects and smooth scrolling across all visual surface variants.
 - [x] Усилить и унифицировать dynamic grid/motion treatment where required without reducing readability or accessibility.
 - [x] Повторно проверить responsive layout, reduced-motion fallback and interaction regressions; сохранить checkpoint.
+- [x] Проверить user-applied rounded public header and Hero visual edits against grid, viewport and responsive layout rules.
+- [x] Выполнить desktop/mobile visual and regression QA for the verified visual edits; сохранить checkpoint.

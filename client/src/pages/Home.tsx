@@ -13,7 +13,7 @@ export default function Home() {
   const contactMedia = mediaBySlot.get("home_task_contact");
   const accountMedia = mediaBySlot.get("home_task_account");
   return <PublicLayout><div className="simple-public-page">
-    <section className="simple-home-intro simple-home-intro-media">
+    <section className="simple-home-intro simple-home-intro-media simple-home-intro-offset" style={{borderRadius: '20px', marginTop: '20px'}}>
       {heroPoster ? <img className="simple-home-hero-media" src={heroPoster.publicUrl} alt="" aria-hidden="true" fetchPriority="high" decoding="async" /> : null}
       {heroVideo ? <video className="simple-home-hero-media" src={heroVideo.publicUrl} poster={heroPoster?.publicUrl} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" data-hero-video="true" /> : null}
       <div className="simple-home-intro-content"><p className="simple-eyebrow">Language learning in Setapak</p><h1>Find the right next step for learning.</h1><p>Explore language programmes, ask the centre a question, or sign in to the information prepared for your account.</p><div className="simple-actions-row"><Link href="/programs" className="simple-button">View programmes <ArrowRight size={17} /></Link><Link href="/contact" className="simple-button simple-button-quiet">Contact the centre</Link></div></div>
