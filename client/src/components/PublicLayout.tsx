@@ -4,6 +4,7 @@ import { Link, useLocation } from "wouter";
 
 const primaryNavigation = [
   { label: "Programmes", href: "/programs" },
+  { label: "News", href: "/news" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

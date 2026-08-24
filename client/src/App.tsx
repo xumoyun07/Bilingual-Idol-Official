@@ -35,6 +35,7 @@ function Router() {
     <Route path="/admin/audit-logs" component={Admin} />
     <Route path="/admin/students/:studentId" component={Admin} />
     <Route path="/admin/students" component={Admin} />
+    <Route path="/admin/news" component={Admin} />
     <Route path="/admin/media" component={MediaLibrary} />
     <Route path="/admin/users" component={Admin} />
     <Route path="/admin" component={Admin} />

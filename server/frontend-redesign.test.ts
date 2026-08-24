@@ -12,6 +12,7 @@ describe("minimal frontend rewrite", () => {
     expect(layout).toContain('aria-label={open ? "Close navigation" : "Open navigation"}');
     expect(layout).toContain('aria-label="Mobile navigation"');
     expect(layout).toContain("Programmes");
+    expect(layout).toContain('{ label: "News", href: "/news" }');
     expect(layout).toContain("Make an enquiry");
   });
 
@@ -105,5 +106,26 @@ describe("minimal frontend rewrite", () => {
     expect(router).toContain("remove: founderProcedure");
     expect(mediaPage).toContain("DashboardLayout role=\"founder\"");
     expect(app).toContain('path="/admin/media"');
+  });
+
+  it("provides a public six-post News grid with accessible modal details and founder-only publishing UI", () => {
+    const news = read("pages/News.tsx");
+    const manager = read("pages/NewsManager.tsx");
+    const router = read("../../server/routers/news.ts");
+    const database = read("../../server/db.ts");
+    const dashboard = read("components/DashboardLayout.tsx");
+    const css = read("index.css");
+    expect(news).toContain("trpc.news.publicPage.useQuery");
+    expect(news).toContain('aria-haspopup="dialog"');
+    expect(news).toContain("news-pagination");
+    expect(news).toContain('aria-current={index === page ? "page" : undefined}');
+    expect(database).toContain("const pageSize = 6");
+    expect(router).toContain("list: founderProcedure");
+    expect(router).toContain("create: founderProcedure");
+    expect(manager).toContain("trpc.news.create.useMutation");
+    expect(manager).toContain("Publish centre updates.");
+    expect(dashboard).toContain('label: "News", path: "/admin/news"');
+    expect(css).toContain(".news-grid");
+    expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
   });
 });

@@ -26,6 +26,16 @@ try {
   await desktop.getByRole("link", { name: /view programmes/i }).click();
   await desktop.waitForURL("**/programs");
   await check(true, "Programme discovery", "Home task link reaches the programme finder");
+  await desktop.goto(`${baseUrl}/news`, { waitUntil: "networkidle" });
+  await check(await desktop.getByLabel("Primary navigation").getByRole("link", { name: "News", exact: true }).getAttribute("aria-current") === "page", "News navigation", "News is reachable from primary navigation and exposes its active state");
+  const newsCard = desktop.getByRole("button", { name: /Read / }).first();
+  if (await newsCard.count()) {
+    await newsCard.click();
+    await desktop.getByRole("dialog").waitFor();
+    await check(true, "News modal", "Published News card opens an accessible detail dialog");
+    await desktop.keyboard.press("Escape");
+    await check(await desktop.getByRole("dialog").count() === 0, "News modal dismissal", "Escape closes the News detail dialog");
+  }
   await desktop.close();
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await mobile.goto(`${baseUrl}/`, { waitUntil: "networkidle" });

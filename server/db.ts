@@ -375,9 +375,23 @@ export async function upsertPublicMedia(input: Omit<PublicMedia, "id" | "created
 export async function updatePublicMedia(id: number, input: Pick<PublicMedia, "label" | "altText" | "isPublished">) { const database = requireDatabase(await getDb()); await database.update(publicMedia).set(input).where(eq(publicMedia.id, id)); return getManagedPublicMedia(id); }
 export async function deletePublicMedia(id: number) { const database = requireDatabase(await getDb()); await database.delete(publicMedia).where(eq(publicMedia.id, id)); return { success: true } as const; }
 
+export type NewsPostInput = Pick<Announcement, "slug" | "title" | "excerpt" | "body" | "category" | "isPublished" | "publishedAt" | "imageUrl" | "imageStorageKey" | "imageAltText">;
 export async function listPublicAnnouncements() { const db = requireDatabase(await getDb()); return db.select().from(announcements).where(eq(announcements.isPublished, true)).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)); }
+export async function listPublicAnnouncementsPage(input: { page?: number } = {}) {
+  const db = requireDatabase(await getDb());
+  const pageSize = 6;
+  const page = Math.max(input.page ?? 0, 0);
+  const where = eq(announcements.isPublished, true);
+  const [rows, countRows] = await Promise.all([
+    db.select().from(announcements).where(where).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)).limit(pageSize).offset(page * pageSize),
+    db.select({ count: sql<number>`count(*)` }).from(announcements).where(where),
+  ]);
+  const total = Number(countRows[0]?.count ?? 0);
+  return { rows, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+}
 export async function listAnnouncements() { const db = requireDatabase(await getDb()); return db.select().from(announcements).orderBy(desc(announcements.createdAt)); }
-export async function createAnnouncement(input: Pick<Announcement, "slug" | "title" | "excerpt" | "body" | "category" | "isPublished" | "publishedAt">) { const db = requireDatabase(await getDb()); const result = await db.insert(announcements).values(input); return { id: Number(result[0].insertId) }; }
-export async function updateAnnouncement(id: number, input: Pick<Announcement, "slug" | "title" | "excerpt" | "body" | "category" | "isPublished" | "publishedAt">) { const db = requireDatabase(await getDb()); await db.update(announcements).set(input).where(eq(announcements.id, id)); return { success: true }; }
+export async function getAnnouncement(id: number) { const db = requireDatabase(await getDb()); return (await db.select().from(announcements).where(eq(announcements.id, id)).limit(1))[0]; }
+export async function createAnnouncement(input: NewsPostInput) { const db = requireDatabase(await getDb()); const result = await db.insert(announcements).values(input); return getAnnouncement(Number(result[0].insertId)); }
+export async function updateAnnouncement(id: number, input: NewsPostInput) { const db = requireDatabase(await getDb()); await db.update(announcements).set(input).where(eq(announcements.id, id)); return getAnnouncement(id); }
 export async function updateAnnouncementPublishState(id: number, isPublished: boolean) { const db = requireDatabase(await getDb()); await db.update(announcements).set({ isPublished, publishedAt: isPublished ? new Date() : null }).where(eq(announcements.id, id)); return { success: true }; }
 export async function deleteAnnouncement(id: number) { const db = requireDatabase(await getDb()); await db.delete(announcements).where(eq(announcements.id, id)); return { success: true }; }

@@ -9,12 +9,13 @@ export const auditActions = [
   "student_profile.create", "student_profile.update", "student_profile.delete",
   "student_document.upload", "student_document.delete",
   "public_media.upload", "public_media.update", "public_media.delete",
+  "news.create", "news.update", "news.delete", "news.image_upload",
   "user_group.create", "user_group.update", "user_group.delete",
   "user_field.create", "user_field.update", "user_field.delete", "user_field.reorder", "user_field.system_update",
 ] as const;
 export type AuditAction = (typeof auditActions)[number];
 
-export const auditTargetTypes = ["audit_log", "user", "student_profile", "student_document", "public_media", "user_group", "user_field", "user_form"] as const;
+export const auditTargetTypes = ["audit_log", "user", "student_profile", "student_document", "public_media", "news_post", "user_group", "user_field", "user_form"] as const;
 export type AuditTargetType = (typeof auditTargetTypes)[number];
 export type AuditSource = "active" | "archive";
 export type AuditScope = { role: "founder" | "super_admin"; userId: number };

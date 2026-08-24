@@ -179,3 +179,8 @@
 - [x] Воспроизвести и исправить dashboard blocks, где текст или controls касаются внутренней границы без consistent padding and base styling.
 - [x] Проверить corrected dashboard block surfaces на desktop/mobile и сохранить verification checkpoint.
 - [x] Настроить Home Hero ровно на доступную высоту первого viewport под public header без нижнего зазора или overflow; проверить на desktop/tablet/mobile и сохранить checkpoint.
+- [x] Провести audit existing News route, public content contract and publication/media access boundaries.
+- [x] Добавить News в public navigation и реализовать accessible image-led cards с modal details.
+- [x] Реализовать server-backed News pagination: 6 posts per page, 3×2 grid, previous/next and numeric page controls.
+- [x] Проверить News cards, modal, pagination, responsive layout, accessibility and regression behavior.
+- [x] Подготовить News architecture/QA documentation and save a verified checkpoint.

@@ -91,11 +91,16 @@ export const announcements = mysqlTable("announcements", {
   excerpt: text("excerpt").notNull(),
   body: text("body").notNull(),
   category: mysqlEnum("category", ["announcement", "event", "holiday"]).default("announcement").notNull(),
+  imageUrl: varchar("imageUrl", { length: 1024 }),
+  imageStorageKey: varchar("imageStorageKey", { length: 512 }),
+  imageAltText: varchar("imageAltText", { length: 255 }),
   isPublished: boolean("isPublished").default(false).notNull(),
   publishedAt: timestamp("publishedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, table => ({
+  publicPageIndex: index("announcements_public_page_idx").on(table.isPublished, table.publishedAt, table.createdAt),
+}));
 
 export const testimonials = mysqlTable("testimonials", {
   id: int("id").autoincrement().primaryKey(),

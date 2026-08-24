@@ -9,6 +9,7 @@ import { DynamicUserProfileFields, type DynamicField, type DynamicSection } from
 import { UserFieldBuilder } from "@/components/UserFieldBuilder";
 import { trpc } from "@/lib/trpc";
 import AuditLogs from "./AuditLogs";
+import NewsManager from "./NewsManager";
 import { StudentProfileDetail, StudentsProfileList } from "./StudentsProfile";
 import { AlertCircle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleSlash, GraduationCap, Loader2, Megaphone, Pencil, Plus, Search, Settings2, Shield, ShieldCheck, Trash2, UserPlus, UsersRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -42,6 +43,7 @@ export default function Admin() {
 function FounderConsole() {
   const [location] = useLocation();
   if (location === "/admin/audit-logs") return <AuditLogs role="founder" />;
+  if (location === "/admin/news") return <NewsManager />;
   if (location === "/admin/students") return <StudentsProfileList />;
   const studentMatch = location.match(/^\/admin\/students\/(\d+)$/);
   if (studentMatch) return <StudentProfileDetail studentId={Number(studentMatch[1])} />;
