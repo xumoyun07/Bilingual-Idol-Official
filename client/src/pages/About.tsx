@@ -45,7 +45,7 @@ export default function About() {
 
   return (
     <PublicLayout>
-      <div className="simple-route-page about-page">
+      <div className="simple-route-page about-page about-page--compact-spacing">
         <header className="simple-route-header about-hero-header">
           <div className="about-hero-copy">
             <p className="simple-eyebrow">About</p>
@@ -57,7 +57,7 @@ export default function About() {
           </div>
         </header>
 
-        <section className="simple-route-section about-story-section">
+        <section className="simple-route-section about-story-section about-section--compact-spacing">
           <div className="about-story-grid about-story-grid--surface">
             <div className="about-story-copy">
               <p className="simple-eyebrow">A considered start</p>
@@ -71,7 +71,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="simple-route-section about-approach-section">
+        <section className="simple-route-section about-approach-section about-section--compact-spacing">
           <div className="about-approach-intro about-approach-intro--surface">
             <div>
               <p className="simple-eyebrow">Learning approach</p>
@@ -104,7 +104,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="simple-route-section about-team-section">
+        <section className="simple-route-section about-team-section about-section--compact-spacing">
           <div className="simple-section-heading about-team-heading--surface">
             <div><p className="simple-eyebrow">Educators</p><h2>Team information</h2></div>
             <Link href="/contact" className="simple-text-link about-team-contact-link">Contact the centre</Link>

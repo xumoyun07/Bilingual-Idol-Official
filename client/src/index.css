@@ -912,3 +912,10 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .contact-details-section--topless { padding-top: 0; }
   .contact-enquiry-section--wide-gap { margin-top: 5rem; margin-bottom: 5rem; }
 }
+
+/* About compact spacing visual-editor values normalized into semantic hooks. */
+.about-page--compact-spacing { padding-bottom: 50px; }
+.about-section--compact-spacing { padding-top: 50px; padding-bottom: 50px; }
+@media (max-width: 899px) {
+  .about-section--compact-spacing { padding-top: 50px; padding-bottom: 50px; }
+}
