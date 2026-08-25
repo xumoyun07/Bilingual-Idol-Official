@@ -1028,3 +1028,34 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (max-width: 767px) {
   :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before { position: absolute; min-height: 100%; }
 }
+
+/* Full-document static edge sphere field. The overlay follows the shell height, not the viewport. */
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  min-height: 100%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7% 9%, rgb(129 160 239 / .16) 0 4.5rem, transparent 12rem),
+    radial-gradient(circle at 93% 15%, rgb(93 130 225 / .20) 0 7rem, rgb(93 130 225 / .06) 7.2rem, transparent 16rem),
+    radial-gradient(circle at 3% 28%, rgb(93 130 225 / .13) 0 3rem, transparent 10rem),
+    radial-gradient(circle at 97% 39%, rgb(129 160 239 / .15) 0 5rem, transparent 13rem),
+    radial-gradient(circle at 8% 53%, rgb(93 130 225 / .12) 0 6rem, transparent 15rem),
+    radial-gradient(circle at 92% 64%, rgb(129 160 239 / .16) 0 4rem, transparent 12rem),
+    radial-gradient(circle at 4% 79%, rgb(93 130 225 / .14) 0 5.5rem, transparent 14rem),
+    radial-gradient(circle at 96% 91%, rgb(129 160 239 / .17) 0 7rem, rgb(129 160 239 / .04) 7.2rem, transparent 16rem);
+  content: "";
+}
+@media (max-width: 767px) {
+  :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before {
+    background:
+      radial-gradient(circle at 2% 8%, rgb(129 160 239 / .15) 0 3rem, transparent 8rem),
+      radial-gradient(circle at 98% 19%, rgb(93 130 225 / .18) 0 4.5rem, transparent 10rem),
+      radial-gradient(circle at 1% 34%, rgb(93 130 225 / .12) 0 2.5rem, transparent 7rem),
+      radial-gradient(circle at 99% 49%, rgb(129 160 239 / .14) 0 3.5rem, transparent 9rem),
+      radial-gradient(circle at 2% 65%, rgb(93 130 225 / .12) 0 4rem, transparent 10rem),
+      radial-gradient(circle at 98% 81%, rgb(129 160 239 / .15) 0 3rem, transparent 8rem),
+      radial-gradient(circle at 3% 96%, rgb(93 130 225 / .13) 0 3.5rem, transparent 9rem);
+  }
+}
