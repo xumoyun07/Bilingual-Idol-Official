@@ -215,3 +215,5 @@
 - [x] Normalize desktop Hero height to 580px, verify mobile 480px behavior and save checkpoint.
 - [x] Проверить latest PublicLayout/Home edits, sticky-header intent and existing dashboard fixed navigation architecture.
 - [x] Нормализовать sticky public header and Home visual styles without duplicate child-level declarations; verify public/auth/dashboard behavior and save checkpoint.
+- [x] Fix public sticky header stacking so it stays above scrolled content without changing login or dashboard menus.
+- [x] Normalize latest Programme section colors at section/list level, verify responsive scroll layering and save checkpoint.

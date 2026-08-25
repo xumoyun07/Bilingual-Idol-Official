@@ -454,10 +454,10 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Responsive normalization of visual-editor refinements. */
 .simple-public-main { width: 100%; min-width: 0; }
-.simple-public-header--refined { position: sticky; top: 0; border: 1px solid var(--bilc-line); border-radius: 31px; }
+.simple-public-header--refined { position: sticky; top: 0; z-index: 1000; isolation: isolate; border: 1px solid var(--bilc-line); border-radius: 31px; background: rgb(255 255 255 / .97); }
 .simple-home-intro--refined { margin-top: 18px; border-radius: 20px; }
 .simple-home-panel { border-radius: 20px; background: rgb(255 255 255 / .92); padding-right: clamp(1rem, 3vw, 1.25rem); padding-left: clamp(1rem, 3vw, 1.25rem); }
-.simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }.simple-home-programmes-panel { border-radius: 20px; background: var(--bilc-mist); }
+.simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }.simple-home-programmes-panel { border-radius: 20px; background: #fff; }.simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }
 .simple-contact-strip--refined { margin-top: 64px; }
 @media (min-width: 1280px) {
   .simple-public-header--refined { width: min(1330px, calc(100% - 5.625rem)); margin-top: -6px; margin-left: clamp(2rem, 3.125vw, 45px); }
