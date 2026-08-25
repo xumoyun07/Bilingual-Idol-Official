@@ -12,6 +12,7 @@ describe("minimal frontend rewrite", () => {
     expect(layout).toContain('aria-label={open ? "Close navigation" : "Open navigation"}');
     expect(layout).toContain('aria-label="Mobile navigation"');
     expect(layout).toContain("Programmes");
+    expect(layout).toContain('{ label: "Home", href: "/" }');
     expect(layout).toContain('{ label: "News", href: "/news" }');
     expect(layout).toContain("Make an enquiry");
     expect(layout).toContain("simple-public-header--refined");
@@ -29,6 +30,8 @@ describe("minimal frontend rewrite", () => {
     expect(home).toContain("simple-home-intro-content--desktop-offset");
     expect(home).toContain("simple-home-intro-content--desktop-geometry");
     expect(home).toContain("simple-home-start-panel");
+    expect(home).toContain("simple-contact-strip simple-contact-strip--refined simple-contact-strip--geometry");
+    expect(home).not.toContain("simple-contact-strip simple-contact-strip--refined simple-contact-strip--geometry\" style={{backgroundColor");
     expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");

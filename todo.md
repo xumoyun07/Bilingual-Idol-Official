@@ -219,3 +219,5 @@
 - [x] Normalize latest Programme section colors at section/list level, verify responsive scroll layering and save checkpoint.
 - [x] Проверить current public sticky header top/side offsets and stacking geometry at desktop/mobile.
 - [x] Apply responsive public sticky inset, verify scrolled layering and navigation regressions, and save checkpoint.
+- [x] Проверить current public navigation structure and latest Contact strip background edit.
+- [x] Добавить Home в public navigation, normalize Contact strip background, verify responsive active states and save checkpoint.

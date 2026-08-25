@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 const primaryNavigation = [
+  { label: "Home", href: "/" },
   { label: "Programmes", href: "/programs" },
   { label: "News", href: "/news" },
   { label: "About", href: "/about" },
