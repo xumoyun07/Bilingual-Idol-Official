@@ -132,7 +132,7 @@
 - [x] Спроектировать Audit logs data model, RBAC matrix и event taxonomy для Founder/Super admin с учётом минимизации чувствительных данных.
 - [x] Добавить индексированное хранение Audit logs, server-side audit event writer и защищённый paginated/filterable/searchable API только для Founder/Super admin.
 - [x] Реализовать Audit logs dashboard с таблицей, подсказками поиска, фильтрами, pagination и CSV/PDF export без раскрытия секретных значений.
-- [ ] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление.
+- [x] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление. Handler, mounted route, archive table, idempotent rotation, Founder-only restore and tests are implemented; production schedule activation remains deployment-dependent.
 - [x] Добавить unit/integration/browser проверки Audit logs RBAC, search, filters, exports, archival controls и подготовить user/technical documentation.
 - [x] Реализовать Founder-only manual archive/restore и cron-authenticated idempotent handler `/api/scheduled/audit-log-rotation` без создания Heartbeat job до deploy/explicit approval.
 - [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.
