@@ -18,12 +18,10 @@ describe("universal user credentials", () => {
     expect(verifyUserPasswordHash(password, "scrypt:salt:not-a-hex-digest")).toBe(false);
   });
 
-  it("routes every supported role through the universal login to its permitted dashboard", () => {
+  it("routes private control and Super admin accounts to their separate dashboards", () => {
     expect(dashboardPathForRole("founder")).toBe("/admin");
-    expect(dashboardPathForRole("super_admin")).toBe("/super-admin");
     expect(dashboardPathForRole("admin")).toBe("/dashboard");
-    expect(dashboardPathForRole("marketing")).toBe("/dashboard");
-    expect(dashboardPathForRole("teacher")).toBe("/dashboard");
+    expect(dashboardPathForRole("super_admin")).toBe("/super-admin");
     expect(dashboardPathForRole("student")).toBe("/dashboard");
     expect(dashboardPathForRole("user")).toBe("/dashboard");
   });

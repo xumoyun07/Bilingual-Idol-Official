@@ -3,10 +3,9 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 const primaryNavigation = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
   { label: "Programmes", href: "/programs" },
   { label: "News", href: "/news" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -32,7 +31,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const close = () => setOpen(false);
   return <div className="simple-public-shell">
     <a className="simple-skip-link" href="#main-content">Skip to content</a>
-    <header className="simple-public-header simple-public-header--refined">
+    <header className="simple-public-header simple-public-header--refined" style={{borderRadius: '21px'}}>
       <div className="simple-public-bar">
         <Link href="/" className="simple-brand" aria-label="Bilingual Idol Language Centre home" onClick={close}><span aria-hidden="true">BI</span><strong>Bilingual Idol<small>Language Centre</small></strong></Link>
         <nav className="simple-public-nav" aria-label="Primary navigation">{primaryNavigation.map(item => <Link key={item.href} href={item.href} aria-current={location === item.href ? "page" : undefined}>{item.label}</Link>)}</nav>

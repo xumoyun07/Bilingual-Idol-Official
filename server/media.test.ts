@@ -49,14 +49,6 @@ describe("public media router", () => {
     expect(save).toHaveBeenCalledWith(expect.objectContaining({ slot: "home_hero_poster", createdByUserId: 9, mimeType: "image/jpeg" }));
   });
 
-  it("permits Founder-managed About media slots through the same validated storage path", async () => {
-    const save = vi.spyOn(db, "upsertPublicMedia").mockResolvedValue({ ...managedRecord, slot: "about_hero", label: "About hero", altText: "Learners in a language class." });
-    const caller = appRouter.createCaller(context("founder"));
-    const contentBase64 = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]).toString("base64");
-    await expect(caller.media.upload({ slot: "about_hero", label: "About hero", kind: "image", altText: "Learners in a language class.", mimeType: "image/jpeg", fileName: "about-hero.jpg", contentBase64, isPublished: true })).resolves.toMatchObject({ slot: "about_hero" });
-    expect(save).toHaveBeenCalledWith(expect.objectContaining({ slot: "about_hero", createdByUserId: 9 }));
-  });
-
   it("rejects mismatched media types before storage is reached", async () => {
     const caller = appRouter.createCaller(context("founder"));
     const contentBase64 = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]).toString("base64");

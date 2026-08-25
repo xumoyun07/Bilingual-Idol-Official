@@ -34,7 +34,7 @@ export default function FounderLogin() {
     </header>
 
     <section className="auth-content" aria-labelledby="sign-in-title">
-      <div className="auth-intro auth-intro--surface">
+      <div className="auth-intro">
         <p className="simple-eyebrow">Account access</p>
         <h1 id="sign-in-title">Sign in to your account.</h1>
         <p>Use the e-mail address and password issued by the centre. You will be taken to the workspace available for your account.</p>
