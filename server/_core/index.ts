@@ -6,6 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { auditRotationSchedulePath, handleScheduledAuditRotation } from "../scheduledAuditRotation";
+import { handleTeacherClassSessionDetails, handleTeacherClassSessions, teacherClassSessionsPath } from "../teacherPortal";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -36,6 +37,8 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   app.post(auditRotationSchedulePath, handleScheduledAuditRotation);
+  app.get(teacherClassSessionsPath, handleTeacherClassSessions);
+  app.get(`${teacherClassSessionsPath}/:id`, handleTeacherClassSessionDetails);
   // tRPC API
   app.use(
     "/api/trpc",

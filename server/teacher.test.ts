@@ -46,13 +46,20 @@ describe("Teacher T0 router", () => {
 
   it("retains teacherId inside the server-side class ownership query", () => {
     const source = readFileSync(new URL("./teacher.ts", import.meta.url), "utf8");
+    expect(source).toContain("const conditions = [eq(classSessions.teacherId, teacherId)]");
     expect(source).toContain("where(and(eq(classSessions.id, classSessionId), eq(classSessions.teacherId, teacherId)))");
   });
 
   it("lists only the current teacher schedule through the server ownership layer", async () => {
     const list = vi.spyOn(teacher, "listTeacherSchedule").mockResolvedValue(schedule);
     await expect(appRouter.createCaller(context("teacher")).teacher.schedule()).resolves.toEqual(schedule);
-    expect(list).toHaveBeenCalledWith(41);
+    expect(list).toHaveBeenCalledWith(41, { from: undefined, to: undefined });
+  });
+
+  it("passes validated schedule date bounds to the server ownership layer", async () => {
+    const list = vi.spyOn(teacher, "listTeacherSchedule").mockResolvedValue(schedule);
+    await appRouter.createCaller(context("teacher")).teacher.schedule({ from: "2026-09-02", to: "2026-09-04" });
+    expect(list).toHaveBeenCalledWith(41, { from: new Date("2026-09-02T00:00:00.000Z"), to: new Date("2026-09-04T00:00:00.000Z") });
   });
 
   it("returns forbidden when a teacher submits a classSessionId not owned by them", async () => {

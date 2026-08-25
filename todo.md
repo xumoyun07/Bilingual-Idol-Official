@@ -278,3 +278,9 @@
 - [x] Build the Teacher dashboard for assigned schedule, attendance recording, grade entry and grade publication only.
 - [x] Add automated tests that prove role denial and cross-teacher class-session denial, then complete responsive and regression QA before checkpoint.
 - [x] Teacher real-data acceptance gate deferred: the database currently has 0 active teacher accounts and 0 assigned class sessions, so no records were fabricated solely for visual QA; automated RBAC, ownership, routing, TypeScript and regression checks passed.
+- [x] Audit the Teacher T0 session model, Express authentication/routing and supported student-link sources before adding T1 read-only class views.
+- [x] Add teacher-owned class-session list/detail query helpers with today/week/custom date filters and a student list derived only from the assigned session, attendance or same-course records.
+- [x] Add protected `GET /portal/teacher/class-sessions` and `GET /portal/teacher/class-sessions/:id` endpoints that conceal other teachers' sessions.
+- [x] Update the My classes interface with today/upcoming list, date filters, detail navigation, student roster and clear links to the existing attendance/results controls.
+- [x] Add automated T1 isolation/filter tests, complete responsive/regression QA without fabricating class data, then save a checkpoint.
+- [x] T1 real-teacher visual acceptance gate deferred: no active teacher or class session data exists in the current database, so the populated roster/filter UI was not exercised with fabricated records; endpoint smoke checks, non-teacher browser denial, responsive source review, 83 tests and TypeScript passed.

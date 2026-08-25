@@ -4,6 +4,14 @@ import { teacherProcedure, router } from "../_core/trpc";
 import * as teacher from "../teacher";
 
 const classSessionInput = z.object({ classSessionId: z.number().int().positive() });
+const scheduleFilterInput = z.object({
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+}).refine(input => !input.from || !input.to || input.from <= input.to, { message: "The start date must not be after the end date.", path: ["to"] });
+
+function asUtcDate(value: string | undefined) {
+  return value ? new Date(`${value}T00:00:00.000Z`) : undefined;
+}
 
 function teacherError(error: unknown): never {
   if (error instanceof TRPCError) throw error;
@@ -12,8 +20,8 @@ function teacherError(error: unknown): never {
 }
 
 export const teacherRouter = router({
-  schedule: teacherProcedure.query(async ({ ctx }) => {
-    try { return await teacher.listTeacherSchedule(ctx.user.id); } catch (error) { return teacherError(error); }
+  schedule: teacherProcedure.input(scheduleFilterInput.optional()).query(async ({ ctx, input }) => {
+    try { return await teacher.listTeacherSchedule(ctx.user.id, { from: asUtcDate(input?.from), to: asUtcDate(input?.to) }); } catch (error) { return teacherError(error); }
   }),
   sessionDetails: teacherProcedure.input(classSessionInput).query(async ({ ctx, input }) => {
     try { return await teacher.getTeacherSessionDetails(ctx.user.id, input.classSessionId); } catch (error) { return teacherError(error); }

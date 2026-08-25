@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
 import { attendanceRecords, classSessions, grades, users } from "../drizzle/schema";
 import { getDb } from "./db";
 
@@ -13,8 +13,13 @@ export class TeacherSessionAccessError extends Error {
   }
 }
 
-export async function listTeacherSchedule(teacherId: number) {
+export type TeacherScheduleFilter = { from?: Date; to?: Date };
+
+export async function listTeacherSchedule(teacherId: number, filter: TeacherScheduleFilter = {}) {
   const database = requireDatabase(await getDb());
+  const conditions = [eq(classSessions.teacherId, teacherId)];
+  if (filter.from) conditions.push(gte(classSessions.scheduledFor, filter.from));
+  if (filter.to) conditions.push(lte(classSessions.scheduledFor, filter.to));
   return database.select({
     id: classSessions.id,
     title: classSessions.title,
@@ -29,7 +34,7 @@ export async function listTeacherSchedule(teacherId: number) {
     studentEmail: users.email,
   }).from(classSessions)
     .innerJoin(users, eq(users.id, classSessions.studentId))
-    .where(eq(classSessions.teacherId, teacherId))
+    .where(and(...conditions))
     .orderBy(asc(classSessions.scheduledFor), asc(classSessions.startsAt), asc(classSessions.id));
 }
 
@@ -64,7 +69,18 @@ export async function getTeacherSessionDetails(teacherId: number, classSessionId
   const sessionGrades = await database.select().from(grades)
     .where(and(eq(grades.classSessionId, session.id), eq(grades.studentId, session.studentId)))
     .orderBy(desc(grades.createdAt), desc(grades.id));
-  return { session, attendance: attendance ?? null, grades: sessionGrades };
+  const students = await database.select({
+    id: users.id,
+    name: users.name,
+    email: users.email,
+    attendanceStatus: attendanceRecords.status,
+    attendanceMarkedAt: attendanceRecords.markedAt,
+  }).from(classSessions)
+    .innerJoin(users, eq(users.id, classSessions.studentId))
+    .leftJoin(attendanceRecords, and(eq(attendanceRecords.classSessionId, classSessions.id), eq(attendanceRecords.studentId, classSessions.studentId)))
+    .where(and(eq(classSessions.id, session.id), eq(classSessions.teacherId, teacherId)))
+    .orderBy(asc(users.name), asc(users.id));
+  return { session, attendance: attendance ?? null, grades: sessionGrades, students };
 }
 
 export async function saveTeacherAttendance(input: { teacherId: number; classSessionId: number; status: "present" | "absent" | "late" | "excused"; note?: string | null }) {

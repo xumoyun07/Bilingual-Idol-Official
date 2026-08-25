@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { CalendarDays, CheckCircle2, ClipboardCheck, GraduationCap, Loader2, UsersRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 type AttendanceStatus = "present" | "absent" | "late" | "excused";
@@ -20,11 +20,24 @@ function formatSessionDate(value: string | Date) {
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 }
 
+function dateKey(date: Date) { return date.toISOString().slice(0, 10); }
+function dateAfter(date: Date, amount: number) { const next = new Date(date); next.setUTCDate(next.getUTCDate() + amount); return next; }
+
 export default function TeacherDashboard() {
   const { user } = useAuth();
   const isTeacher = user?.role === "teacher";
   const utils = trpc.useUtils();
-  const schedule = trpc.teacher.schedule.useQuery(undefined, { enabled: isTeacher, retry: false });
+  const [range, setRange] = useState<"today" | "week" | "custom">("week");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const scheduleFilter = useMemo(() => {
+    const today = new Date();
+    if (range === "today") { const day = dateKey(today); return { from: day, to: day }; }
+    if (range === "week") return { from: dateKey(today), to: dateKey(dateAfter(today, 6)) };
+    return { from: customFrom || undefined, to: customTo || undefined };
+  }, [range, customFrom, customTo]);
+  const customRangeReady = range !== "custom" || (Boolean(customFrom) && Boolean(customTo) && customFrom <= customTo);
+  const schedule = trpc.teacher.schedule.useQuery(scheduleFilter, { enabled: isTeacher && customRangeReady, retry: false });
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const sessionDetails = trpc.teacher.sessionDetails.useQuery({ classSessionId: selectedSessionId ?? 1 }, { enabled: isTeacher && selectedSessionId !== null, retry: false });
   const [attendanceStatus, setAttendanceStatus] = useState<AttendanceStatus>("present");
@@ -79,7 +92,8 @@ export default function TeacherDashboard() {
       </div>
 
       <div className="teacher-workspace-grid">
-        <Card className="teacher-session-list"><CardHeader><CardTitle><CalendarDays size={19} /> Schedule</CardTitle><CardDescription>Only sessions assigned to you are shown.</CardDescription></CardHeader><CardContent>
+        <Card className="teacher-session-list"><CardHeader><CardTitle><CalendarDays size={19} /> My classes</CardTitle><CardDescription>Only sessions assigned to you are shown.</CardDescription></CardHeader><CardContent>
+          <div className="teacher-schedule-filters" aria-label="Schedule date filter"><Label htmlFor="teacher-schedule-range">Show</Label><select id="teacher-schedule-range" value={range} onChange={event => setRange(event.target.value as "today" | "week" | "custom")}><option value="today">Today</option><option value="week">Next 7 days</option><option value="custom">Custom range</option></select>{range === "custom" ? <div className="teacher-custom-date-grid"><div><Label htmlFor="teacher-from">From</Label><Input id="teacher-from" type="date" value={customFrom} onChange={event => setCustomFrom(event.target.value)} /></div><div><Label htmlFor="teacher-to">To</Label><Input id="teacher-to" type="date" value={customTo} onChange={event => setCustomTo(event.target.value)} /></div></div> : null}{range === "custom" && !customRangeReady ? <p className="teacher-filter-help">Choose a valid start and end date.</p> : null}</div>
           {schedule.isLoading ? <div className="teacher-loading"><Loader2 className="animate-spin" size={18} />Loading assigned sessions…</div> : null}
           {schedule.isError ? <p className="teacher-empty">Your schedule could not be loaded. Please try again.</p> : null}
           {!schedule.isLoading && !schedule.isError && schedule.data?.length === 0 ? <p className="teacher-empty">No class sessions have been assigned to your account yet.</p> : null}
@@ -92,14 +106,15 @@ export default function TeacherDashboard() {
           {!selectedSessionId || sessionDetails.isLoading ? <Card className="teacher-empty-card"><CardContent><Loader2 className="animate-spin" size={20} /><p>Select an assigned session to record attendance and results.</p></CardContent></Card> : null}
           {sessionDetails.isError ? <Card className="teacher-empty-card"><CardContent><p>The selected class is unavailable to your account.</p></CardContent></Card> : null}
           {details ? <>
-            <Card className="teacher-class-summary"><CardContent><div><p className="minimal-eyebrow">Selected session</p><h3>{details.session.title}</h3><p>{details.session.courseName} · {formatSessionDate(details.session.scheduledFor)} · {details.session.startsAt}–{details.session.endsAt}{details.session.room ? ` · ${details.session.room}` : ""}</p></div><Badge variant="secondary"><UsersRound size={14} />{details.session.studentName || "Assigned student"}</Badge></CardContent></Card>
+            <Card className="teacher-class-summary"><CardContent><div><p className="minimal-eyebrow">Selected class</p><h3>{details.session.title}</h3><p>{details.session.courseName} · {formatSessionDate(details.session.scheduledFor)} · {details.session.startsAt}–{details.session.endsAt}{details.session.room ? ` · ${details.session.room}` : ""}</p></div><Badge variant="secondary"><UsersRound size={14} />{details.students.length} student{details.students.length === 1 ? "" : "s"}</Badge></CardContent></Card>
+            <Card className="teacher-roster-card"><CardHeader><CardTitle><UsersRound size={19} /> Students</CardTitle><CardDescription>Students directly assigned to this session. This class view does not manage enrolments.</CardDescription></CardHeader><CardContent>{details.students.length ? <div className="teacher-roster-stack">{details.students.map(student => <div className="teacher-roster-row" key={student.id}><div><strong>{student.name || "Student"}</strong><p>{student.email || "No e-mail available"}</p></div>{student.attendanceStatus ? <Badge variant="secondary">{attendanceLabels[student.attendanceStatus]}</Badge> : <Badge variant="outline">Not marked</Badge>}</div>)}</div> : <p className="teacher-empty">No student is assigned to this session.</p>}<div className="teacher-session-actions"><Button type="button" variant="outline" onClick={() => document.getElementById("teacher-attendance")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Take attendance</Button><Button type="button" onClick={() => document.getElementById("teacher-results")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Record results</Button></div></CardContent></Card>
             <div className="teacher-action-grid">
-              <Card><CardHeader><CardTitle><CheckCircle2 size={19} /> Attendance</CardTitle><CardDescription>Save one attendance status for this student and session.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
+              <Card id="teacher-attendance"><CardHeader><CardTitle><CheckCircle2 size={19} /> Attendance</CardTitle><CardDescription>Save one attendance status for this student and session.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
                 <Label htmlFor="attendance-status">Attendance status</Label><select id="attendance-status" value={attendanceStatus} onChange={event => setAttendanceStatus(event.target.value as AttendanceStatus)}>{(Object.keys(attendanceLabels) as AttendanceStatus[]).map(status => <option key={status} value={status}>{attendanceLabels[status]}</option>)}</select>
                 <Label htmlFor="attendance-note">Note <span>Optional</span></Label><Textarea id="attendance-note" value={attendanceNote} onChange={event => setAttendanceNote(event.target.value)} maxLength={2000} placeholder="Add a concise attendance note" />
                 <Button type="button" onClick={submitAttendance} disabled={saveAttendance.isPending}>{saveAttendance.isPending ? "Saving…" : "Save attendance"}</Button>
               </CardContent></Card>
-              <Card><CardHeader><CardTitle><GraduationCap size={19} /> Result</CardTitle><CardDescription>Save a draft, or publish a result for the assigned student.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
+              <Card id="teacher-results"><CardHeader><CardTitle><GraduationCap size={19} /> Result</CardTitle><CardDescription>Save a draft, or publish a result for the assigned student.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
                 <Label htmlFor="assessment-title">Assessment title</Label><Input id="assessment-title" value={assessmentTitle} onChange={event => setAssessmentTitle(event.target.value)} maxLength={160} />
                 <div className="teacher-score-grid"><div><Label htmlFor="grade-score">Score</Label><Input id="grade-score" type="number" min="0" value={score} onChange={event => setScore(event.target.value)} /></div><div><Label htmlFor="grade-max-score">Out of</Label><Input id="grade-max-score" type="number" min="1" value={maxScore} onChange={event => setMaxScore(event.target.value)} /></div></div>
                 <Label htmlFor="grade-feedback">Feedback <span>Optional</span></Label><Textarea id="grade-feedback" value={feedback} onChange={event => setFeedback(event.target.value)} maxLength={4000} placeholder="Give clear, constructive feedback" />

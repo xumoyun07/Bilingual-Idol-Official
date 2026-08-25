@@ -1095,6 +1095,19 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 .teacher-session-list [data-slot="card-title"], .teacher-action-grid [data-slot="card-title"] { display: flex; align-items: center; gap: .55rem; color: #173fad; }
 .teacher-session-list [data-slot="card-description"], .teacher-action-grid [data-slot="card-description"], .teacher-results-list [data-slot="card-description"] { color: #61728c; line-height: 1.5; }
 .teacher-session-stack, .teacher-results-stack { display: grid; gap: .65rem; }
+.teacher-schedule-filters { display: grid; gap: .45rem; margin-bottom: 1rem; border: 1px solid #d9e2f1; border-radius: .8rem; background: #f8faff; padding: .75rem; }
+.teacher-schedule-filters > label, .teacher-custom-date-grid label { color: #516681; font-size: .72rem; font-weight: 800; }
+.teacher-schedule-filters > select { width: 100%; min-height: 2.6rem; border: 1px solid #cbd8eb; border-radius: .62rem; background: #fff; padding: .45rem .65rem; color: #10253e; font-size: .85rem; }
+.teacher-custom-date-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; margin-top: .2rem; }
+.teacher-custom-date-grid > div { display: grid; gap: .35rem; }
+.teacher-filter-help { margin: .15rem 0 0; color: #a3463c; font-size: .74rem; line-height: 1.45; }
+.teacher-roster-card [data-slot="card-title"] { display: flex; align-items: center; gap: .55rem; color: #173fad; }
+.teacher-roster-stack { display: grid; gap: .55rem; }
+.teacher-roster-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid #d9e2f1; border-radius: .72rem; background: #fff; padding: .75rem .85rem; }
+.teacher-roster-row strong { display: block; color: #10253e; font-size: .87rem; font-weight: 800; }
+.teacher-roster-row p { margin-top: .18rem; color: #61728c; font-size: .76rem; }
+.teacher-session-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+.teacher-session-actions button { min-height: 2.55rem; }
 .teacher-session-button { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: .75rem; border: 1px solid #d9e2f1; border-radius: .8rem; background: #fff; padding: .85rem; color: #10253e; text-align: left; transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), box-shadow 160ms var(--ease-out), transform 160ms var(--ease-out); }
 .teacher-session-button:hover { border-color: #8eace8; background: #f6f9ff; transform: translateY(-1px); }
 .teacher-session-button.is-selected { border-color: #173fad; background: #edf3ff; box-shadow: 0 0 0 3px rgb(23 63 173 / .09); }
@@ -1123,4 +1136,4 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 .teacher-result-row p { margin-top: .25rem; color: #61728c; font-size: .8rem; line-height: 1.45; }
 .teacher-published-badge { border-color: #b8ddca; background: #eef8f2; color: #27614e; }
 @media (max-width: 1023px) { .teacher-workspace-grid { grid-template-columns: 1fr; } .teacher-session-list { max-height: 24rem; overflow: auto; } }
-@media (max-width: 639px) { .teacher-workspace { gap: 1rem; } .teacher-workspace-intro { padding: 1.25rem; } .teacher-workspace-icon { width: 2.6rem; height: 2.6rem; } .teacher-workspace-grid, .teacher-action-grid { gap: 1rem; } .teacher-action-grid { grid-template-columns: 1fr; } .teacher-class-summary [data-slot="card-content"] { align-items: start; flex-direction: column; } .teacher-session-button { grid-template-columns: 1fr; } .teacher-session-time { text-align: left; } .teacher-score-grid, .teacher-grade-actions { grid-template-columns: 1fr; } .teacher-result-row { align-items: start; flex-direction: column; } }
+@media (max-width: 639px) { .teacher-workspace { gap: 1rem; } .teacher-workspace-intro { padding: 1.25rem; } .teacher-workspace-icon { width: 2.6rem; height: 2.6rem; } .teacher-workspace-grid, .teacher-action-grid { gap: 1rem; } .teacher-action-grid { grid-template-columns: 1fr; } .teacher-class-summary [data-slot="card-content"] { align-items: start; flex-direction: column; } .teacher-session-button { grid-template-columns: 1fr; } .teacher-session-time { text-align: left; } .teacher-score-grid, .teacher-grade-actions, .teacher-custom-date-grid { grid-template-columns: 1fr; } .teacher-result-row, .teacher-roster-row { align-items: start; flex-direction: column; } .teacher-session-actions { display: grid; grid-template-columns: 1fr; } }
