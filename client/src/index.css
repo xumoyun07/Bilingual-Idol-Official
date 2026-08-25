@@ -899,3 +899,6 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 .contact-grid--flush { padding: 0; }
 .contact-map--borderless { border-width: 0; }
 .centre-map-shell { border-radius: 1rem; }
+
+/* Specificity fix: old Contact descendant rules must not restore grid padding. */
+.contact-details-section.contact-details-section--flush .simple-contact-grid { padding: 0 !important; }

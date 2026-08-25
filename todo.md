@@ -257,3 +257,4 @@
 - [x] Verify and normalize the latest Contact/CentreMap visual-editor changes: borderless details/map surfaces, 16px map geometry, removal of redundant inline styles and regression safety before checkpoint.
 - [x] Verify and normalize the latest Contact contact-grid padding edit: zero padding without redundant inline style and responsive regression safety before checkpoint.
 - [x] Verify the latest Contact target-selection result: confirm the intended object already has zero padding or normalize it semantically, then run regression before checkpoint.
+- [x] Fix the Contact grid computed padding conflict so the target object is visibly and programmatically 0px on all sides, then run regression before checkpoint.
