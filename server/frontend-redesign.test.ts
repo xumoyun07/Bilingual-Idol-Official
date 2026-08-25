@@ -25,7 +25,7 @@ describe("minimal frontend rewrite", () => {
     expect(home).toContain("simple-home-intro--refined");
     expect(home).toContain("simple-home-intro--desktop-geometry");
     expect(home).toContain("simple-home-intro--mobile-480");
-    expect(home).toContain("simple-home-intro--desktop-500");
+    expect(home).toContain("simple-home-intro--desktop-550");
     expect(home).toContain("simple-home-intro-content--desktop-offset");
     expect(home).toContain("simple-home-intro-content--desktop-geometry");
     expect(home).toContain("simple-home-start-panel");
@@ -76,7 +76,7 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("Approved desktop geometry, translated into an adaptive layout");
     expect(css).toContain("width: 1321px");
     expect(css).toContain("Mobile-only Hero height and desktop Home spacing");
-    expect(css).toContain("height: 500px");
+    expect(css).toContain("height: 550px");
     expect(css).toContain("Public action spacing from visual editor");
     expect(css).toContain("gap: 25px");
     expect(css).toContain("Desktop Hero size and content position from visual editor");
