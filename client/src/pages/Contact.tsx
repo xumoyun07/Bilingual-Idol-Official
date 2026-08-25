@@ -27,8 +27,8 @@ export default function Contact() {
           {contactMedia ? <div className="contact-hero-media"><img src={contactMedia.publicUrl} alt={contactMedia.altText} fetchPriority="high" decoding="async" /></div> : null}
         </header>
 
-        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless">
-          <div className="simple-contact-grid">
+        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless contact-details-section--flush">
+          <div className="simple-contact-grid contact-grid--flush">
             {contacts.map(({ icon: Icon, label, value, href }) => (
               <div className="simple-contact-item" key={label}>
                 <Icon size={19} aria-hidden="true" />
@@ -40,7 +40,7 @@ export default function Contact() {
             ))}
           </div>
           <div className="simple-map-block contact-map-block--light"><MapPin size={18} aria-hidden="true" /><p>E-03-10, StarParc Point, Jalan Genting Kelang, Setapak, Kuala Lumpur.</p></div>
-          <div className="simple-map contact-map--rounded"><CentreMap /></div>
+          <div className="simple-map contact-map--rounded contact-map--borderless"><CentreMap /></div>
         </section>
 
         <section className="simple-route-section simple-section-tint contact-enquiry-section contact-enquiry-section--spaced">

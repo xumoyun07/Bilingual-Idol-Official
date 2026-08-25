@@ -893,3 +893,9 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Contact details final visual-editor value: transparent and borderless section. */
 .contact-details-section--borderless { border-width: 0; }
+
+/* Final Contact/CentreMap visual-editor values: flush details surface and borderless map wrapper. */
+.contact-details-section--flush { padding: 0; }
+.contact-grid--flush { padding: 0; }
+.contact-map--borderless { border-width: 0; }
+.centre-map-shell { border-radius: 1rem; }
