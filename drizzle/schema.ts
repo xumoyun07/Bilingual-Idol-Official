@@ -280,6 +280,64 @@ export const archivedLearningSupportRequests = mysqlTable("learningSupportReques
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+/**
+ * Scheduled lesson instances. These rows are created and assigned by admin
+ * workflows; Teacher T0 may only read rows whose teacherId is their own user id.
+ */
+export const classSessions = mysqlTable("classSessions", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 180 }).notNull(),
+  courseName: varchar("courseName", { length: 180 }).notNull(),
+  teacherId: int("teacherId").notNull(),
+  studentId: int("studentId").notNull(),
+  scheduledFor: date("scheduledFor").notNull(),
+  startsAt: varchar("startsAt", { length: 8 }).notNull(),
+  endsAt: varchar("endsAt", { length: 8 }).notNull(),
+  room: varchar("room", { length: 120 }),
+  status: mysqlEnum("status", ["scheduled", "completed", "cancelled"]).default("scheduled").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  teacherScheduleIndex: index("classSessions_teacher_schedule_idx").on(table.teacherId, table.scheduledFor),
+  studentScheduleIndex: index("classSessions_student_schedule_idx").on(table.studentId, table.scheduledFor),
+}));
+
+/** One attendance state per student for each scheduled lesson instance. */
+export const attendanceRecords = mysqlTable("attendanceRecords", {
+  id: int("id").autoincrement().primaryKey(),
+  classSessionId: int("classSessionId").notNull(),
+  studentId: int("studentId").notNull(),
+  status: mysqlEnum("status", ["present", "absent", "late", "excused"]).default("present").notNull(),
+  note: text("note"),
+  markedByTeacherId: int("markedByTeacherId").notNull(),
+  markedAt: timestamp("markedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  sessionStudentUnique: uniqueIndex("attendanceRecords_session_student_unique").on(table.classSessionId, table.studentId),
+  sessionIndex: index("attendanceRecords_session_idx").on(table.classSessionId),
+  studentIndex: index("attendanceRecords_student_idx").on(table.studentId, table.markedAt),
+}));
+
+/** Teacher-entered assessment result for a student in an assigned lesson instance. */
+export const grades = mysqlTable("grades", {
+  id: int("id").autoincrement().primaryKey(),
+  classSessionId: int("classSessionId").notNull(),
+  studentId: int("studentId").notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  score: int("score").notNull(),
+  maxScore: int("maxScore").notNull(),
+  feedback: text("feedback"),
+  isPublished: boolean("isPublished").default(false).notNull(),
+  publishedAt: timestamp("publishedAt"),
+  gradedByTeacherId: int("gradedByTeacherId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  sessionStudentTitleUnique: uniqueIndex("grades_session_student_title_unique").on(table.classSessionId, table.studentId, table.title),
+  sessionIndex: index("grades_session_idx").on(table.classSessionId),
+  studentPublishedIndex: index("grades_student_published_idx").on(table.studentId, table.isPublished, table.publishedAt),
+}));
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type UserFormSection = typeof userFormSections.$inferSelect;
@@ -295,3 +353,6 @@ export type AuditLogArchive = typeof auditLogArchives.$inferSelect;
 export type StudentProfile = typeof studentProfiles.$inferSelect;
 export type StudentDocument = typeof studentDocuments.$inferSelect;
 export type StudentProfileHistory = typeof studentProfileHistory.$inferSelect;
+export type ClassSession = typeof classSessions.$inferSelect;
+export type AttendanceRecord = typeof attendanceRecords.$inferSelect;
+export type Grade = typeof grades.$inferSelect;

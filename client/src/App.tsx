@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import ProgramDetail from "./pages/ProgramDetail";
 import Programs from "./pages/Programs";
 import SuperAdmin from "./pages/SuperAdmin";
+import TeacherDashboard from "./pages/TeacherDashboard";
 import UserDashboard from "./pages/UserDashboard";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
     <Route path="/contact" component={Contact} />
     <Route path="/enroll" component={Enroll} />
     <Route path="/login" component={FounderLogin} />
+    <Route path="/teacher" component={TeacherDashboard} />
     <Route path="/dashboard" component={UserDashboard} />
     <Route path="/super-admin/audit-logs" component={SuperAdmin} />
     <Route path="/super-admin/users" component={SuperAdmin} />

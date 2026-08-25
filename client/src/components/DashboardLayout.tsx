@@ -1,14 +1,14 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { FileImage, GraduationCap, LayoutDashboard, LogOut, Newspaper, ScrollText, UsersRound } from "lucide-react";
+import { CalendarDays, FileImage, GraduationCap, LayoutDashboard, LogOut, Newspaper, ScrollText, UsersRound } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { Button } from "./ui/button";
 
-type DashboardRole = "founder" | "super_admin";
+type DashboardRole = "founder" | "super_admin" | "teacher";
 
 const menuByRole: Record<DashboardRole, { icon: typeof LayoutDashboard; label: string; path: string }[]> = {
   founder: [
@@ -23,6 +23,9 @@ const menuByRole: Record<DashboardRole, { icon: typeof LayoutDashboard; label: s
     { icon: LayoutDashboard, label: "Overview", path: "/super-admin" },
     { icon: UsersRound, label: "Users", path: "/super-admin/users" },
     { icon: ScrollText, label: "Audit logs", path: "/super-admin/audit-logs" },
+  ],
+  teacher: [
+    { icon: CalendarDays, label: "My classes", path: "/teacher" },
   ],
 };
 

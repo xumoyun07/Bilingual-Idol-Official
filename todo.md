@@ -272,3 +272,9 @@
 - [x] Verify the failed PublicLayout target and make the intended CTA button green through semantic CSS, including contrast, hover, navigation and responsive QA before checkpoint.
 - [x] Restore the original Sign in styling while keeping only Make an enquiry green to match the Call action, then verify both desktop/mobile states before checkpoint.
 - [x] Verify the Home hero margin-top visual edit from 33px to 39px, preserving responsive geometry and initial viewport behavior before checkpoint.
+- [x] Audit existing class session, attendance and grade schema/RBAC patterns for Teacher T0 without adding class creation or teacher assignment capabilities.
+- [x] Add and apply the missing minimal classSessions, attendanceRecords and grades schema migration required for Teacher T0, without creating admin management UI or assignment flows.
+- [x] Implement teacher-scoped schedule, attendance and grade API procedures with database-level teacher ownership checks for every classSessionId input.
+- [x] Build the Teacher dashboard for assigned schedule, attendance recording, grade entry and grade publication only.
+- [x] Add automated tests that prove role denial and cross-teacher class-session denial, then complete responsive and regression QA before checkpoint.
+- [x] Teacher real-data acceptance gate deferred: the database currently has 0 active teacher accounts and 0 assigned class sessions, so no records were fabricated solely for visual QA; automated RBAC, ownership, routing, TypeScript and regression checks passed.

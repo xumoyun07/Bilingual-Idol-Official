@@ -10,12 +10,14 @@ const OPERATIONS_ROLES = ["founder", "super_admin"];
 export default function UserDashboard() {
   const { user, loading, logout } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
   const isOperationsUser = Boolean(user && OPERATIONS_ROLES.includes(user.role));
+  const isTeacher = user?.role === "teacher";
 
   useEffect(() => {
     if (isOperationsUser) window.location.href = user?.role === "super_admin" ? "/super-admin" : "/admin";
-  }, [isOperationsUser, user?.role]);
+    if (isTeacher) window.location.href = "/teacher";
+  }, [isOperationsUser, isTeacher, user?.role]);
 
-  if (loading || isOperationsUser) return <main className="minimal-auth-state"><BackgroundCircleField seed="member-loading" /><div><p className="minimal-eyebrow">Account</p><h1>Preparing your workspace</h1><p>Please wait while your account access is confirmed.</p></div></main>;
+  if (loading || isOperationsUser || isTeacher) return <main className="minimal-auth-state"><BackgroundCircleField seed="member-loading" /><div><p className="minimal-eyebrow">Account</p><h1>Preparing your workspace</h1><p>Please wait while your account access is confirmed.</p></div></main>;
 
   const role = user?.role === "student" ? "Student" : user?.role === "teacher" ? "Teacher" : "Member";
   return <main className="member-page blue-member-page">

@@ -23,7 +23,7 @@ describe("universal user credentials", () => {
     expect(dashboardPathForRole("super_admin")).toBe("/super-admin");
     expect(dashboardPathForRole("admin")).toBe("/dashboard");
     expect(dashboardPathForRole("marketing")).toBe("/dashboard");
-    expect(dashboardPathForRole("teacher")).toBe("/dashboard");
+    expect(dashboardPathForRole("teacher")).toBe("/teacher");
     expect(dashboardPathForRole("student")).toBe("/dashboard");
     expect(dashboardPathForRole("user")).toBe("/dashboard");
   });

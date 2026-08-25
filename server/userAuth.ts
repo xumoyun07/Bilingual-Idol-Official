@@ -17,5 +17,6 @@ export function verifyUserPasswordHash(password: string, value: string | null | 
 export function dashboardPathForRole(role: string) {
   if (role === "founder") return "/admin";
   if (role === "super_admin") return "/super-admin";
+  if (role === "teacher") return "/teacher";
   return "/dashboard";
 }
