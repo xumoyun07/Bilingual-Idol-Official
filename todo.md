@@ -290,3 +290,5 @@
 - [x] Build the attendance screen with student presence toggles and immediate attendance percentage refresh in Student Dashboard.
 - [x] Test RBAC, foreign-session denial, duplicate update behavior, attendance percentage propagation and responsive states before checkpoint.
 - [x] T2 populated-data visual acceptance gate deferred: current database has no active teacher/session records and protected route screenshots were unavailable; no attendance data was fabricated, while 20 test files / 89 tests, TypeScript and endpoint/RBAC checks passed.
+- [ ] Export the complete project to the selected GitHub repository after scanning for secrets, excluding `.env`, local service logs, browser data, node_modules and sandbox-only metadata.
+- [ ] Verify the pushed branch, commit and repository contents, then report the GitHub URL and excluded files.
