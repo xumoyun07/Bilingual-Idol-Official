@@ -545,3 +545,51 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (max-width: 767px) {
   .simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface { background-attachment: scroll; }
 }
+
+/* Programs header visual edit: normalize the requested white card and right-side image into responsive CSS. */
+.simple-route-header--programmes {
+  display: grid;
+  width: min(100%, 56rem);
+  min-height: 25.5625rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 25rem);
+  align-items: stretch;
+  gap: 1.5rem;
+  margin: 2.5625rem 0 2.25rem .3125rem;
+  border: 1px solid var(--bilc-line);
+  border-radius: 1.25rem;
+  background: #fff;
+  padding: 2.5rem;
+  box-shadow: 0 12px 28px rgb(25 55 118 / .06);
+}
+.simple-route-header--programmes::before { display: none; }
+.simple-route-header-copy {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  max-width: 44rem;
+}
+.simple-route-header-copy h1 { max-width: 21rem; font-size: clamp(2.5rem, 4.5vw, 4rem); line-height: .98; letter-spacing: -.05em; }
+.simple-route-header-copy > p:not(.simple-eyebrow) { max-width: 22rem; }
+.simple-route-header-media {
+  display: flex;
+  width: min(100%, 25rem);
+  min-width: 0;
+  min-height: 20rem;
+  align-self: stretch;
+  justify-self: end;
+  overflow: hidden;
+  border: 1px solid var(--bilc-line);
+  border-radius: 1rem;
+  background: var(--bilc-mist);
+}
+.simple-route-header-media img { width: 100%; height: 100%; min-height: 20rem; object-fit: cover; object-position: center; }
+@media (max-width: 899px) {
+  .simple-route-header--programmes { width: 100%; min-height: 0; grid-template-columns: minmax(0, 1fr); margin-left: 0; }
+  .simple-route-header-media { width: 100%; min-height: 15rem; justify-self: stretch; }
+  .simple-route-header-media img { min-height: 15rem; }
+}
+@media (max-width: 639px) {
+  .simple-route-header--programmes { gap: 1.25rem; margin-top: 2.25rem; margin-bottom: 2rem; border-radius: 1rem; padding: 1.25rem; }
+  .simple-route-header-media { min-height: 13rem; border-radius: .8rem; }
+  .simple-route-header-media img { min-height: 13rem; }
+}

@@ -227,3 +227,5 @@
 - [x] Перенести 3D effect с Hero content object на Hero section, сохранить responsive/reduced-motion behavior, выполнить QA и checkpoint.
 - [x] Проверить deterministic visual edit, удаляющий 3D effect с Home Hero section.
 - [x] Сохранить Hero без 3D effect, проверить responsive/regression behavior и создать checkpoint.
+- [x] Проверить generated Programs visual edits for repeated inline styles, invalid JSX and intended right-side media placement.
+- [x] Нормализовать Programs header styles, добавить responsive right-side storage image and verify public route regressions before checkpoint.

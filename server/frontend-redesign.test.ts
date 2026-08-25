@@ -35,6 +35,9 @@ describe("minimal frontend rewrite", () => {
     expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");
+    expect(programmes).toContain("simple-route-header--programmes");
+    expect(programmes).toContain("simple-route-header-media");
+    expect(programmes).not.toContain("style={{");
     expect(contact).toContain("Get in touch with the centre.");
   });
 
@@ -86,6 +89,9 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain(".simple-public-header--refined { position: sticky; top: 1rem; z-index: 1000;");
     expect(css).toContain("top: .75rem; width: calc(100% - 2rem);");
     expect(css).toContain(".simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }");
+    expect(css).toContain(".simple-route-header--programmes");
+    expect(css).toContain("width: min(100%, 25rem)");
+    expect(css).toContain("grid-template-columns: minmax(0, 1fr) minmax(0, 25rem)");
     expect(css).toContain(".simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }");
     expect(css).toContain("padding-top: 155px");
     expect(css).toContain("transform: translateY(-87px)");
