@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronLeft, ChevronRight, Megaphone, Newspaper, PartyPopper } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Megaphone, Newspaper, PartyPopper, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -6,7 +6,7 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
 
 const icons = { announcement: Megaphone, event: CalendarDays, holiday: PartyPopper };
-type NewsPost = { id: number; title: string; excerpt: string; body: string; category: "announcement" | "event" | "holiday"; imageUrl: string | null; imageAltText: string | null; publishedAt: Date | null };
+type NewsPost = { id: number; slug: string; title: string; excerpt: string; body: string; category: "announcement" | "event" | "holiday"; imageUrl: string | null; imageAltText: string | null; publishedAt: Date | null };
 
 function dateLabel(value: Date | null) {
   return value ? new Intl.DateTimeFormat(undefined, { year: "numeric", month: "long", day: "numeric" }).format(new Date(value)) : "Published by the centre";
@@ -15,11 +15,34 @@ function dateLabel(value: Date | null) {
 export default function News() {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<NewsPost | null>(null);
+  const [shareLabel, setShareLabel] = useState("Поделиться");
   const feed = trpc.news.publicPage.useQuery({ page });
   const totalPages = feed.data?.totalPages ?? 0;
 
   useEffect(() => { if (totalPages && page >= totalPages) setPage(totalPages - 1); }, [page, totalPages]);
-  const changePage = (next: number) => { setSelected(null); setPage(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const changePage = (next: number) => { setSelected(null); setShareLabel("Поделиться"); setPage(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openPost = (post: NewsPost) => { setSelected(post); setShareLabel("Поделиться"); };
+  async function sharePost(post: NewsPost) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("post", post.slug);
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setShareLabel("Ссылка скопирована");
+      window.setTimeout(() => setShareLabel("Поделиться"), 2200);
+    } catch {
+      const fallback = document.createElement("textarea");
+      fallback.value = url.toString();
+      fallback.setAttribute("readonly", "");
+      fallback.style.position = "fixed";
+      fallback.style.opacity = "0";
+      document.body.appendChild(fallback);
+      fallback.select();
+      const copied = document.execCommand("copy");
+      fallback.remove();
+      setShareLabel(copied ? "Ссылка скопирована" : "Копирование недоступно");
+      window.setTimeout(() => setShareLabel("Поделиться"), 2200);
+    }
+  }
 
   return (
     <PublicLayout>
@@ -38,7 +61,7 @@ export default function News() {
               {feed.data.rows.map(item => {
                 const Icon = icons[item.category];
                 return <article className="news-card" key={item.id}>
-                  <button type="button" className="news-card-trigger" onClick={() => setSelected(item)} aria-haspopup="dialog" aria-label={`Read ${item.title}`}>
+                  <button type="button" className="news-card-trigger" onClick={() => openPost(item)} aria-haspopup="dialog" aria-label={`Read ${item.title}`}>
                     {item.imageUrl ? <img className="news-card-image" src={item.imageUrl} alt={item.imageAltText || ""} loading="lazy" decoding="async" /> : <span className="news-card-image news-card-image-empty" aria-hidden="true"><Icon size={30} /></span>}
                     <span className="news-card-content"><span className="news-card-meta"><span className="news-category"><Icon size={14} />{item.category}</span><time dateTime={item.publishedAt?.toISOString()}>{dateLabel(item.publishedAt)}</time></span><strong>{item.title}</strong><span className="news-card-excerpt">{item.excerpt}</span><span className="news-read-more">Read update <ChevronRight size={16} /></span></span>
                   </button>
@@ -54,7 +77,7 @@ export default function News() {
       <Dialog open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}>
         <DialogContent className="news-dialog max-h-[calc(100dvh-2rem)] max-w-[calc(100%-1rem)] overflow-y-auto p-0 sm:max-w-2xl">
           <DialogHeader className="news-dialog-header">{selected ? <NewsDialogHeader post={selected} /> : null}</DialogHeader>
-          {selected ? <div className="news-dialog-body">{selected.imageUrl ? <img src={selected.imageUrl} alt={selected.imageAltText || ""} /> : null}<div className="news-dialog-copy">{selected.body.split(/\n{2,}/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div></div> : null}
+          {selected ? <div className="news-dialog-body">{selected.imageUrl ? <img src={selected.imageUrl} alt={selected.imageAltText || ""} /> : null}<div className="news-dialog-copy">{selected.body.split(/\n{2,}/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div><div className="news-dialog-actions"><button type="button" className="news-dialog-share" onClick={() => void sharePost(selected)}><Share2 size={16} /><span aria-live="polite">{shareLabel}</span></button></div></div> : null}
         </DialogContent>
       </Dialog>
     </PublicLayout>

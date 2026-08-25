@@ -690,3 +690,10 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (prefers-reduced-motion: reduce) {
   .news-dialog [data-slot="dialog-close"] { transition: none; }
 }
+
+.news-dialog-actions { display: flex; justify-content: flex-start; border-top: 1px solid var(--bilc-line); padding-top: 1.25rem; }
+.news-dialog-share { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .55rem; border: 1px solid #cbd8eb; border-radius: .7rem; background: #fff; padding: .65rem 1rem; color: var(--bilc-blue); font-size: .86rem; font-weight: 700; transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out); }
+.news-dialog-share:hover { border-color: var(--bilc-blue); background: var(--bilc-mist); transform: translateY(-1px); }
+.news-dialog-share:focus-visible { outline: 3px solid color-mix(in srgb, var(--bilc-blue) 72%, white); outline-offset: 3px; }
+.news-manager-auto-date { border: 1px solid #d7e2f1; border-radius: .7rem; background: #f5f8fc; padding: .75rem .9rem; color: #53657a; font-size: .82rem; line-height: 1.5; }
+@media (prefers-reduced-motion: reduce) { .news-dialog-share { transition: none; } }

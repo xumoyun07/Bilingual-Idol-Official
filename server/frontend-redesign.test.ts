@@ -187,6 +187,9 @@ describe("minimal frontend rewrite", () => {
     const css = read("index.css");
     expect(news).toContain("trpc.news.publicPage.useQuery");
     expect(news).toContain('aria-haspopup="dialog"');
+    expect(news).toContain("Share2");
+    expect(news).toContain("navigator.clipboard.writeText");
+    expect(news).toContain('className="news-dialog-share"');
     expect(news).toContain('className="news-dialog');
     expect(news).toContain('className="news-dialog-header"');
     expect(news).toContain('className="news-dialog-body"');
@@ -197,7 +200,12 @@ describe("minimal frontend rewrite", () => {
     expect(database).toContain("const pageSize = 6");
     expect(router).toContain("list: founderProcedure");
     expect(router).toContain("create: founderProcedure");
-    expect(manager).toContain("trpc.news.create.useMutation");
+    expect(router).toContain(".strict()");
+    expect(router).toContain("publishedAt: input.isPublished ? new Date() : null");
+    expect(router).toContain("news.create");
+    expect(manager).toContain("Publication date is assigned automatically");
+    expect(manager).not.toContain('Field label="Publication date"');
+    expect(manager).not.toContain("publishedAt: draft.publishedAt");
     expect(manager).toContain("Publish centre updates.");
     expect(dashboard).toContain('label: "News", path: "/admin/news"');
     expect(css).toContain(".news-grid");

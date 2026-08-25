@@ -243,3 +243,5 @@
 - [x] Нормализовать News header and route surfaces semantic responsive CSS, проверить cards/modal/pagination and save checkpoint.
 - [x] Проверить текущую разметку и поведение News post modal перед redesign.
 - [x] Переработать News post modal в профессиональном minimalist стиле, проверить interaction/accessibility/responsive behavior и создать checkpoint.
+- [x] Проверить текущие News modal/share route, manager date fields, router validation and timestamp schema.
+- [x] Добавить Share copy-link flow and enforce automatic server publication date without manual assignment; обновить tests, QA и checkpoint.

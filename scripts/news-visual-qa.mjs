@@ -9,7 +9,11 @@ const browser = await chromium.launch({ headless: true, executablePath: "/usr/bi
 const results = [];
 
 for (const viewport of viewports) {
-  const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+  const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height }, permissions: ["clipboard-read", "clipboard-write"] });
+  const page = await context.newPage();
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async text => { window.__newsCopiedText = text; } } });
+  });
   await page.goto(`${baseUrl}/news`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".simple-route-header--news");
   await page.waitForFunction(() => document.querySelector(".news-card-trigger, .simple-empty-state") !== null, { timeout: 10000 });
@@ -53,11 +57,17 @@ for (const viewport of viewports) {
     const dialog = page.locator('[role="dialog"]');
     await dialog.waitFor({ state: "visible" });
     if (!(await dialog.locator('[data-slot="dialog-close"]').count())) throw new Error(`${viewport.name}: News dialog close affordance is missing`);
+    const shareButton = dialog.locator(".news-dialog-share");
+    if (!(await shareButton.count())) throw new Error(`${viewport.name}: News Share button is missing`);
+    await shareButton.click();
+    if ((await shareButton.textContent())?.trim() !== "Ссылка скопирована") throw new Error(`${viewport.name}: News Share feedback did not confirm copy`);
+    const copiedUrl = await page.evaluate(() => window.__newsCopiedText ?? "");
+    if (!copiedUrl.includes(`/news?post=`)) throw new Error(`${viewport.name}: copied URL does not include the News post slug`);
     await page.keyboard.press("Escape");
     await dialog.waitFor({ state: "hidden" });
   }
   results.push({ viewport: viewport.name, status: "passed", overflow, audit, cardModal: Boolean(hasCard) });
-  await page.close();
+  await context.close();
 }
 
 await browser.close();
