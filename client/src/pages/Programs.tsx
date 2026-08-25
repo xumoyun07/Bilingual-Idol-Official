@@ -23,7 +23,7 @@ export default function Programs() {
 
   return (
     <PublicLayout>
-      <div className="simple-route-page">
+      <div className="simple-route-page programs-page">
         <header className="simple-route-header simple-route-header--programmes">
           <div className="simple-route-header-copy simple-route-header-copy--wide">
             <p className="simple-eyebrow">Programmes</p>

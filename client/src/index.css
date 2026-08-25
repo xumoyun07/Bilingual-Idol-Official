@@ -947,3 +947,61 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Founder Login visual-editor normalization: intro surface values expressed semantically. */
 .auth-intro--surface { border: 1px solid var(--blue-line); border-radius: 1rem; background: #fff; padding: 1.25rem; }
+
+/* Static page-specific sphere field: each public route receives a distinct, non-animated composition. */
+.simple-public-shell:has(.home-page) {
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 92% 16%, rgb(93 130 225 / .22) 0 7rem, rgb(93 130 225 / .08) 7.2rem, transparent 15rem),
+    radial-gradient(circle at 7% 76%, rgb(129 160 239 / .14) 0 4.5rem, transparent 12rem),
+    radial-gradient(circle at 78% 88%, rgb(23 63 173 / .10) 0 3rem, transparent 10rem);
+}
+.simple-public-shell:has(.about-page) {
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 15% 20%, rgb(129 160 239 / .17) 0 5.5rem, transparent 14rem),
+    radial-gradient(circle at 88% 42%, rgb(93 130 225 / .20) 0 8rem, rgb(93 130 225 / .06) 8.2rem, transparent 17rem),
+    radial-gradient(circle at 35% 91%, rgb(23 63 173 / .10) 0 3.5rem, transparent 11rem);
+}
+.simple-public-shell:has(.programs-page) {
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 84% 13%, rgb(93 130 225 / .20) 0 6rem, transparent 14rem),
+    radial-gradient(circle at 18% 54%, rgb(129 160 239 / .15) 0 9rem, rgb(129 160 239 / .04) 9.2rem, transparent 18rem),
+    radial-gradient(circle at 72% 92%, rgb(23 63 173 / .10) 0 3rem, transparent 10rem);
+}
+.simple-public-shell:has(.news-page) {
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 9% 12%, rgb(129 160 239 / .16) 0 4rem, transparent 11rem),
+    radial-gradient(circle at 93% 58%, rgb(93 130 225 / .20) 0 7.5rem, rgb(93 130 225 / .05) 7.7rem, transparent 16rem),
+    radial-gradient(circle at 44% 88%, rgb(23 63 173 / .10) 0 4rem, transparent 12rem);
+}
+.simple-public-shell:has(.contact-page) {
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 90% 18%, rgb(93 130 225 / .21) 0 8.5rem, rgb(93 130 225 / .05) 8.7rem, transparent 18rem),
+    radial-gradient(circle at 12% 63%, rgb(129 160 239 / .15) 0 5rem, transparent 13rem),
+    radial-gradient(circle at 61% 94%, rgb(23 63 173 / .10) 0 3rem, transparent 10rem);
+}
+.simple-public-shell:has(.enroll-page) {
+  background-image:
+    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
+    radial-gradient(circle at 80% 24%, rgb(93 130 225 / .21) 0 7rem, transparent 16rem),
+    radial-gradient(circle at 14% 82%, rgb(129 160 239 / .16) 0 8rem, rgb(129 160 239 / .04) 8.2rem, transparent 17rem),
+    radial-gradient(circle at 48% 10%, rgb(23 63 173 / .08) 0 3rem, transparent 10rem);
+}
+@media (max-width: 767px) {
+  .simple-public-shell:has(.home-page),
+  .simple-public-shell:has(.about-page),
+  .simple-public-shell:has(.programs-page),
+  .simple-public-shell:has(.news-page),
+  .simple-public-shell:has(.contact-page),
+  .simple-public-shell:has(.enroll-page) { background-attachment: scroll; }
+}
