@@ -231,3 +231,5 @@
 - [x] Нормализовать Programs header styles, добавить responsive right-side storage image and verify public route regressions before checkpoint.
 - [x] Проверить latest Programs header width and heading-block visual-editor edits for repeated inline styles.
 - [x] Нормализовать Programs header up to 1216px and fee-guide heading surface, verify responsive behavior and save checkpoint.
+- [x] Проверить latest Programs header height visual-editor edit for generated inline `height: 500px`.
+- [x] Нормализовать Programs header height семантическим responsive CSS, проверить layout/regressions и создать checkpoint.
