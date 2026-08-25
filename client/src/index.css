@@ -874,3 +874,15 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .contact-details-section, .contact-enquiry-section { border-radius: .9rem; padding: 1.25rem .75rem; }
   .contact-details-section .simple-contact-grid { padding: .25rem; }
 }
+
+/* Latest Contact visual-editor normalization: final spacing and surface values. */
+.contact-hero-header--compact { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+.contact-details-section--transparent { background: transparent; }
+.contact-map--rounded { border-radius: 1.5625rem; }
+.contact-enquiry-section--spaced { margin-top: 2.5rem; margin-right: 0; margin-bottom: 2.5rem; margin-left: 0; padding-top: 1.25rem; padding-bottom: 1.25rem; }
+.contact-enquiry-copy--spaced { margin-top: 2.5rem; }
+.contact-form-card--tinted { background: #f0f8ff; }
+@media (max-width: 899px) {
+  .contact-hero-header--compact { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+  .contact-enquiry-copy--spaced { margin-top: 2.5rem; }
+}

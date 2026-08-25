@@ -251,3 +251,4 @@
 - [x] Verify and normalize the latest About visual-editor changes: surfaces, captions, approach list geometry, responsive behavior and regression safety before checkpoint.
 - [x] Verify and normalize the latest About visual-editor changes: duplicate JSX styles, spacing, team surface, CTA contrast, responsive behavior and regression safety before checkpoint.
 - [x] Verify and normalize the latest Contact visual-editor changes: duplicate JSX styles, 1216px header/media layout, section surfaces, responsive behavior and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact visual-editor changes: final padding, transparent details surface, map radius, enquiry spacing/background and regression safety before checkpoint.

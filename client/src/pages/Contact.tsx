@@ -18,7 +18,7 @@ export default function Contact() {
   return (
     <PublicLayout>
       <div className="simple-route-page contact-page">
-        <header className="simple-route-header contact-hero-header">
+        <header className="simple-route-header contact-hero-header contact-hero-header--compact">
           <div className="contact-hero-copy">
             <p className="simple-eyebrow">Contact</p>
             <h1>Get in touch with the centre.</h1>
@@ -27,7 +27,7 @@ export default function Contact() {
           {contactMedia ? <div className="contact-hero-media"><img src={contactMedia.publicUrl} alt={contactMedia.altText} fetchPriority="high" decoding="async" /></div> : null}
         </header>
 
-        <section className="simple-route-section contact-details-section">
+        <section className="simple-route-section contact-details-section contact-details-section--transparent">
           <div className="simple-contact-grid">
             {contacts.map(({ icon: Icon, label, value, href }) => (
               <div className="simple-contact-item" key={label}>
@@ -40,17 +40,17 @@ export default function Contact() {
             ))}
           </div>
           <div className="simple-map-block"><MapPin size={18} aria-hidden="true" /><p>E-03-10, StarParc Point, Jalan Genting Kelang, Setapak, Kuala Lumpur.</p></div>
-          <div className="simple-map"><CentreMap /></div>
+          <div className="simple-map contact-map--rounded"><CentreMap /></div>
         </section>
 
-        <section className="simple-route-section simple-section-tint contact-enquiry-section">
+        <section className="simple-route-section simple-section-tint contact-enquiry-section contact-enquiry-section--spaced">
           <div className="simple-form-layout">
-            <div className="contact-enquiry-copy">
+            <div className="contact-enquiry-copy contact-enquiry-copy--spaced">
               <p className="simple-eyebrow">Send an enquiry</p>
               <h2>Tell us what the learner needs.</h2>
               <p className="simple-body-copy">A short description of the learner’s language goal and preferred timing is enough to begin.</p>
             </div>
-            <div className="simple-form-card"><LeadForm type="inquiry" title="Your enquiry" /></div>
+            <div className="simple-form-card contact-form-card--tinted"><LeadForm type="inquiry" title="Your enquiry" /></div>
           </div>
         </section>
       </div>
