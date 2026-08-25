@@ -571,8 +571,11 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 }
 .simple-route-header-copy h1 { max-width: 21rem; font-size: clamp(2.5rem, 4.5vw, 4rem); line-height: .98; letter-spacing: -.05em; }
 .simple-route-header-copy > p:not(.simple-eyebrow) { max-width: 22rem; }
+.simple-route-header-copy--wide h1,
+.simple-route-header-copy--wide > p:not(.simple-eyebrow) { max-width: 28.125rem; }
 .simple-route-header-description { margin-top: 1.25rem; }
 .simple-section-heading--fee-guide { border: 1px solid var(--bilc-line); border-radius: 1rem; background: #fff; padding: 1.25rem 1.125rem; }
+.simple-list-summary--surface { border: 1px solid var(--bilc-line); border-radius: 1rem; background: #fff; padding: 1rem; }
 .simple-route-header-media {
   display: flex;
   width: min(100%, 25rem);
@@ -589,7 +592,10 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (min-width: 900px) { .simple-route-header--programmes { height: 36.25rem; } }
 @media (max-width: 899px) {
   .simple-route-header--programmes { width: 100%; min-height: 0; grid-template-columns: minmax(0, 1fr); margin-left: 0; }
+  .simple-route-header-copy--wide h1,
+  .simple-route-header-copy--wide > p:not(.simple-eyebrow) { max-width: 100%; }
   .simple-section-heading--fee-guide { padding: 1.25rem 1.125rem; }
+  .simple-list-summary--surface { padding: 1rem; }
   .simple-route-header-media { width: 100%; min-height: 15rem; justify-self: stretch; }
   .simple-route-header-media img { min-height: 15rem; }
 }

@@ -96,6 +96,10 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("max-width: none;");
     expect(css).toContain("height: 36.25rem");
     expect(css).toContain(".simple-route-header-description");
+    expect(css).toContain(".simple-route-header-copy--wide h1");
+    expect(css).toContain("max-width: 28.125rem");
+    expect(css).toContain(".simple-list-summary--surface");
+    expect(css).toContain("padding: 1rem");
     expect(css).toContain(".simple-section-heading--fee-guide");
     expect(css).toContain("width: min(100%, 25rem)");
     expect(css).toContain("grid-template-columns: minmax(0, 1fr) minmax(0, 25rem)");

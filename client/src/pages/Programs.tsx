@@ -25,7 +25,7 @@ export default function Programs() {
     <PublicLayout>
       <div className="simple-route-page">
         <header className="simple-route-header simple-route-header--programmes">
-          <div className="simple-route-header-copy">
+          <div className="simple-route-header-copy simple-route-header-copy--wide">
             <p className="simple-eyebrow">Programmes</p>
             <h1>Find a programme that fits the learner.</h1>
             <p className="simple-route-header-description">
@@ -78,7 +78,7 @@ export default function Programs() {
             </div>
           </div>
 
-          <p className="simple-list-summary">
+          <p className="simple-list-summary simple-list-summary--surface">
             <strong>{matches.length}</strong> confirmed programme{matches.length === 1 ? "" : "s"} shown
           </p>
 
