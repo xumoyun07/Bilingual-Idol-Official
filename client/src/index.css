@@ -886,3 +886,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .contact-hero-header--compact { padding-top: 1.25rem; padding-bottom: 1.25rem; }
   .contact-enquiry-copy--spaced { margin-top: 2.5rem; }
 }
+
+/* Contact address block final visual-editor value: white surface without inline JSX styling. */
+.contact-map-block--light { background: #fff !important; }
+.contact-map-block--light p, .contact-map-block--light svg { background: transparent; }

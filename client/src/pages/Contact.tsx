@@ -39,7 +39,7 @@ export default function Contact() {
               </div>
             ))}
           </div>
-          <div className="simple-map-block"><MapPin size={18} aria-hidden="true" /><p>E-03-10, StarParc Point, Jalan Genting Kelang, Setapak, Kuala Lumpur.</p></div>
+          <div className="simple-map-block contact-map-block--light"><MapPin size={18} aria-hidden="true" /><p>E-03-10, StarParc Point, Jalan Genting Kelang, Setapak, Kuala Lumpur.</p></div>
           <div className="simple-map contact-map--rounded"><CentreMap /></div>
         </section>
 
