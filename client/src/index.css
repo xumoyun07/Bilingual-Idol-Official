@@ -604,3 +604,26 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .simple-route-header-media { min-height: 13rem; border-radius: .8rem; }
   .simple-route-header-media img { min-height: 13rem; }
 }
+
+/* News header visual edit: normalize the requested white 1216px surface into responsive CSS. */
+.simple-route-header--news {
+  width: min(100%, 76rem);
+  max-width: none;
+  margin: 2.5rem 0 2.25rem;
+  border: 1px solid var(--bilc-line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 2.5rem 1.25rem;
+  box-shadow: 0 12px 28px rgb(25 55 118 / .06);
+}
+.simple-route-header--news::before { display: none; }
+.simple-route-header--news h1 { max-width: 45rem; }
+.simple-route-header--news > p:not(.simple-eyebrow) { max-width: 42rem; margin-top: 1.25rem; }
+@media (max-width: 899px) {
+  .simple-route-header--news { width: 100%; margin-left: 0; }
+}
+@media (max-width: 639px) {
+  .simple-route-header--news { margin-top: 2.25rem; margin-bottom: 2rem; border-radius: 1rem; padding: 2rem 1.25rem; }
+  .simple-route-header--news h1,
+  .simple-route-header--news > p:not(.simple-eyebrow) { max-width: 100%; }
+}

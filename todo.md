@@ -239,3 +239,5 @@
 - [x] Нормализовать Programs header height semantic responsive CSS, проверить layout/regressions и создать checkpoint.
 - [x] Проверить latest Programs copy-width 450px visual-edit comments and summary-card style edit.
 - [x] Нормализовать Programs copy width and summary surface semantic responsive CSS, проверить layout/regressions и создать checkpoint.
+- [x] Проверить latest News header visual-editor edit for repeated inline styles and intended 1216px width.
+- [x] Нормализовать News header and route surfaces semantic responsive CSS, проверить cards/modal/pagination and save checkpoint.

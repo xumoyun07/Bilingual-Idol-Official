@@ -188,6 +188,8 @@ describe("minimal frontend rewrite", () => {
     expect(news).toContain("trpc.news.publicPage.useQuery");
     expect(news).toContain('aria-haspopup="dialog"');
     expect(news).toContain("news-pagination");
+    expect(news).toContain('className="simple-route-header simple-route-header--news"');
+    expect(news).not.toContain("style={{");
     expect(news).toContain('aria-current={index === page ? "page" : undefined}');
     expect(database).toContain("const pageSize = 6");
     expect(router).toContain("list: founderProcedure");
@@ -196,6 +198,8 @@ describe("minimal frontend rewrite", () => {
     expect(manager).toContain("Publish centre updates.");
     expect(dashboard).toContain('label: "News", path: "/admin/news"');
     expect(css).toContain(".news-grid");
+    expect(css).toContain(".simple-route-header--news");
+    expect(css).toContain("width: min(100%, 76rem)");
     expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
   });
 });
