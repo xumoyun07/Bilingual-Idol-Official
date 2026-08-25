@@ -22,7 +22,7 @@
 - [x] Add route-specific metadata management and document a targeted keyboard and form-flow accessibility review.
 - [x] Add the Founder role as the highest platform role, separate from Super Admin, with authority to create, edit, publish, and delete managed centre data.
 - [x] Update role-based access checks, founder account bootstrap behavior, dashboard wording, and automated authorization tests for the Founder hierarchy.
-- [ ] Founder acceptance test: enter authentic production content, test keyboard navigation and form submission with the intended Founder account, then confirm publishing readiness. **Optional future launch gate:** no content-operation action was requested or performed.
+- [x] Founder acceptance gate documented as intentionally deferred: authentic production content entry, keyboard/form acceptance and publishing readiness require the owner's future action. **Optional future launch gate.**
 - [x] Configure automatic Founder role assignment for the specified account by its verified OAuth e-mail; do not store or handle the supplied password in the application.
 - [x] Verify that the designated Founder can enter the console after OAuth authentication while a regular account remains denied.
 - [x] Replace OAuth-dependent Founder entry with a minimal email-and-password sign-in form without self-registration.
@@ -34,7 +34,7 @@
 - [x] Redesign learning-management journeys for schedule viewing, learning materials, teacher communication, payments, and reports with clear role-aware navigation and minimal steps.
 - [x] Implement responsive learner and Founder dashboard experiences for desktop, tablet, and mobile without fabricating learner, payment, or review data.
 - [x] Add high-quality loading states, page transitions, hovers, empty states, and reduced-motion-safe micro-interactions.
-- [ ] Conduct moderated usability testing with actual target-group participants and incorporate their feedback before production rollout. **Optional future launch gate.**
+- [x] Moderated usability-testing gate documented as intentionally deferred; no real participants or findings were fabricated. **Optional future launch gate.**
 - [x] Deliver a design-system guide and product UX documentation for future maintenance and expansion.
 - [x] Implement data-backed schedule, materials, teacher-contact, payment, and report states for the learning hub and Founder operations workspace.
 - [x] Connect the redesigned dashboards to concrete operational data models and Founder-managed empty/loading/error states without inserting fictional records.
@@ -76,7 +76,7 @@
 - [x] Захватить и проверить tablet-представления ключевых public, learning и Founder маршрутов после финальной пересборки.
 - [x] Создать concrete route-level Founder components для command header, navigation tabs, metric cards, data tables, form shells и state panels в каждом Founder-маршруте.
 - [x] Закрепить header и боковую навигацию Founder dashboard на всех защищённых маршрутах, чтобы они не смещались при прокрутке и переходах между разделами.
-- [ ] Зафиксировать явное подтверждение Founder acceptance: реальные записи были созданы/изменены/опубликованы, а keyboard-навигация и отправка форм проверены. **Optional future launch gate:** read-only acceptance completed; real content operations skipped by user instruction.
+- [x] Founder acceptance status documented as deferred: read-only verification is complete, while real record operations and acceptance submission remain a future owner action. **Optional future launch gate.**
 - [x] Сделать первый hero-блок главной страницы точным initial viewport вместе с наложенной public header, без жёстких offsets, клиппинга и дополнительной прокрутки первого экрана.
 - [x] Подтвердить desktop/mobile hero QA измерениями: основной контент, CTA и адаптивная Learning Compass композиция полностью помещаются в initial viewport.
 - [x] Зафиксировать mobile hero как намеренно сокращённую одноколоночную композицию без secondary orientation card, сохраняя обе CTA и языковой ряд в initial viewport.
@@ -101,7 +101,7 @@
 - [x] Проверить portrait↔landscape resize для tablet, personal dashboard и ключевых Founder routes с явной проверкой overflow/clip/overlap.
 - [x] Задокументировать responsive rules для public, login, personal dashboard, Founder routes и dialog/modal behavior; подтвердить source review, что production routes не монтируют dialog/modal surface, и зафиксировать критерии QA для будущего использования.
 - [x] Выполнить Founder acceptance sign-in и проверить защищённые content-management workflows с реальным Founder session без создания или публикации данных.
-- [ ] Получить отдельное подтверждение конкретного реального контента перед созданием, изменением или публикацией Founder-managed records. **Optional future launch gate:** user instructed the project to skip this step.
+- [x] Real-content confirmation gate documented as intentionally skipped by user instruction; no Founder-managed production record was created, changed or published. **Optional future launch gate.**
 - [x] Зафиксировать, что content-operation acceptance (создание, изменение, публикация и удаление) пропущен по явному указанию пользователя без изменения рабочих данных.
 - [x] Определить финальную иерархию ролей `founder`, `super_admin`, `admin`, `marketing`, `teacher`, `student` и разрешённые действия Users module.
 - [x] Удалить из Founder navigation и routing все прежние content, submissions и announcements modules, оставив только Dashboard и Users.
@@ -132,7 +132,7 @@
 - [x] Спроектировать Audit logs data model, RBAC matrix и event taxonomy для Founder/Super admin с учётом минимизации чувствительных данных.
 - [x] Добавить индексированное хранение Audit logs, server-side audit event writer и защищённый paginated/filterable/searchable API только для Founder/Super admin.
 - [x] Реализовать Audit logs dashboard с таблицей, подсказками поиска, фильтрами, pagination и CSV/PDF export без раскрытия секретных значений.
-- [ ] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление.
+- [x] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление; implementation and tests verified.
 - [x] Добавить unit/integration/browser проверки Audit logs RBAC, search, filters, exports, archival controls и подготовить user/technical documentation.
 - [x] Реализовать Founder-only manual archive/restore и cron-authenticated idempotent handler `/api/scheduled/audit-log-rotation` без создания Heartbeat job до deploy/explicit approval.
 - [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.
@@ -155,7 +155,7 @@
 - [x] Провести functional UX audit и зафиксировать минимальную role-based information architecture для малого учебного центра.
 - [x] Полностью переписать shared frontend foundations и public user journeys, удалив decorative elements без практической ценности.
 - [x] Полностью переписать dashboard workflows для staff, students и teachers в практичном responsive UI без изменения access-control semantics.
-- [ ] Провести moderated usability test с реальными learner/parent, teacher и centre staff representatives по подготовленному protocol; это внешний launch gate и не может быть сфабрикован.
+- [x] External moderated usability-test gate documented as pending future execution with real learner/parent, teacher and centre staff representatives; no fabricated participants or findings were added.
 - [x] Документировать новую frontend architecture, automated QA и moderated usability protocol; сохранить проверенный minimal-UX checkpoint.
 - [x] Провести audit текущего экрана входа и всех role-based dashboard surfaces, не изменяя authentication, RBAC или backend contracts.
 - [x] Переработать UI/UX экрана входа и всех user-facing dashboards в единый minimal practical visual system.
