@@ -265,3 +265,4 @@
 - [x] Verify and normalize the latest Founder Login intro-surface visual edit: remove redundant inline style, preserve auth behavior and responsive regression safety before checkpoint.
 - [x] Verify and, if needed, extend the universal login flow for Founder, Super Admin, Admin, Marketing, Teacher and Student, including role redirects, RBAC coverage and responsive QA before checkpoint.
 - [x] Add more static decorative background spheres with page-specific positions for public pages, preserve readability/performance, and verify responsive overflow before checkpoint.
+- [x] Ensure at least one visible static background sphere exists throughout every public, login and dashboard route shell, with safe layering and zero overflow, then verify before checkpoint.

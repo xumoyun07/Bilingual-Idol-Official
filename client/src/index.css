@@ -1005,3 +1005,26 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .simple-public-shell:has(.contact-page),
   .simple-public-shell:has(.enroll-page) { background-attachment: scroll; }
 }
+
+/* Universal static sphere layer for every application shell, including internal workspaces. */
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page) {
+  position: relative;
+  isolation: isolate;
+}
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 88% 22%, rgb(93 130 225 / .22) 0 6rem, rgb(93 130 225 / .07) 6.2rem, transparent 15rem),
+    radial-gradient(circle at 9% 78%, rgb(129 160 239 / .13) 0 4rem, transparent 12rem);
+  content: "";
+}
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page) > * {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 767px) {
+  :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before { position: absolute; min-height: 100%; }
+}
