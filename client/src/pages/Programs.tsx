@@ -40,7 +40,7 @@ export default function Programs() {
         </header>
 
         <section className="simple-route-section simple-guide-section">
-          <div className="simple-section-heading">
+          <div className="simple-section-heading simple-section-heading--fee-guide">
             <div>
               <p className="simple-eyebrow">2026 fee guide</p>
               <h2>Published course options</h2>

@@ -229,3 +229,5 @@
 - [x] Сохранить Hero без 3D effect, проверить responsive/regression behavior и создать checkpoint.
 - [x] Проверить generated Programs visual edits for repeated inline styles, invalid JSX and intended right-side media placement.
 - [x] Нормализовать Programs header styles, добавить responsive right-side storage image and verify public route regressions before checkpoint.
+- [x] Проверить latest Programs header width and heading-block visual-editor edits for repeated inline styles.
+- [x] Нормализовать Programs header up to 1216px and fee-guide heading surface, verify responsive behavior and save checkpoint.

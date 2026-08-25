@@ -37,6 +37,7 @@ describe("minimal frontend rewrite", () => {
     expect(programmes).toContain("Search by language, level or learner group");
     expect(programmes).toContain("simple-route-header--programmes");
     expect(programmes).toContain("simple-route-header-media");
+    expect(programmes).toContain("simple-section-heading--fee-guide");
     expect(programmes).not.toContain("style={{");
     expect(contact).toContain("Get in touch with the centre.");
   });
@@ -90,6 +91,9 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("top: .75rem; width: calc(100% - 2rem);");
     expect(css).toContain(".simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }");
     expect(css).toContain(".simple-route-header--programmes");
+    expect(css).toContain("width: min(100%, 76rem)");
+    expect(css).toContain("max-width: none;");
+    expect(css).toContain(".simple-section-heading--fee-guide");
     expect(css).toContain("width: min(100%, 25rem)");
     expect(css).toContain("grid-template-columns: minmax(0, 1fr) minmax(0, 25rem)");
     expect(css).toContain(".simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }");
