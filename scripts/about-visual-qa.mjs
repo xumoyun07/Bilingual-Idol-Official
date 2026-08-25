@@ -52,7 +52,7 @@ for (const viewport of viewports) {
   // Generated storage assets may briefly expose reserved placeholders while the background job completes; geometry and storage URLs remain the deterministic contract.
   if (audit.images.filter(image => image.loading === "lazy").length < 4) throw new Error(`${viewport.name}: supporting About images are not lazy-loaded`);
   if (audit.images[0]?.loading !== "eager") throw new Error(`${viewport.name}: About hero image is not eager-loaded`);
-  if (audit.captions !== 3) throw new Error(`${viewport.name}: expected three informative feature-media captions`);
+  if (audit.captions !== 1) throw new Error(`${viewport.name}: expected one retained informative feature-media caption`);
   if (audit.activeNavigation !== "page") throw new Error(`${viewport.name}: About link is not active`);
   if (overflow > 1) throw new Error(`${viewport.name}: horizontal overflow ${overflow}px`);
   if (viewport.name === "desktop" && (audit.hero.width < 1214 || audit.hero.width > 1217)) throw new Error(`${viewport.name}: hero width ${audit.hero.width}px is outside the public 1216px target`);

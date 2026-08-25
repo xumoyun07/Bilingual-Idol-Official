@@ -58,7 +58,7 @@ export default function About() {
         </header>
 
         <section className="simple-route-section about-story-section">
-          <div className="about-story-grid">
+          <div className="about-story-grid about-story-grid--surface">
             <div className="about-story-copy">
               <p className="simple-eyebrow">A considered start</p>
               <h2>What the centre supports</h2>
@@ -67,13 +67,12 @@ export default function About() {
             </div>
             <figure className="about-feature-media">
               <AboutImage media={classroomMedia} />
-              <figcaption>Spaces designed to keep learning practical, calm and focused.</figcaption>
             </figure>
           </div>
         </section>
 
         <section className="simple-route-section about-approach-section">
-          <div className="about-approach-intro">
+          <div className="about-approach-intro about-approach-intro--surface">
             <div>
               <p className="simple-eyebrow">Learning approach</p>
               <h2>How learning is supported</h2>
@@ -81,12 +80,11 @@ export default function About() {
             <p>Clear next steps, active practice and steady confidence-building shape the centre’s public learning approach.</p>
           </div>
           <div className="about-method-layout">
-            <div className="simple-approach-list about-approach-list">
+            <div className="simple-approach-list about-approach-list about-approach-list--surface">
               {approach.map(({ icon: Icon, title, body }) => <article key={title}><Icon size={18} /><div><strong>{title}</strong><p>{body}</p></div></article>)}
             </div>
             <figure className="about-feature-media about-method-media">
               <AboutImage media={methodMedia} />
-              <figcaption>Guided practice turns each session into a useful next step.</figcaption>
             </figure>
           </div>
         </section>

@@ -757,3 +757,36 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .about-contact-copy { padding: 1.5rem; }
   .about-contact-media { min-height: 13rem; }
 }
+
+/* About visual-editor surfaces: normalized from inline edits into responsive semantic rules. */
+.about-story-grid--surface {
+  border: 1px solid var(--bilc-line);
+  border-radius: 1rem;
+  background: #fff;
+  padding-left: 1.25rem;
+}
+.about-approach-intro--surface {
+  margin-bottom: 1.75rem;
+  border: 1px solid var(--bilc-line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1.25rem;
+}
+.about-approach-list--surface {
+  width: min(100%, 39.25rem);
+  height: 25rem;
+  margin-top: -2.375rem;
+  border: 1px solid var(--bilc-line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1.25rem;
+}
+@media (max-width: 899px) {
+  .about-story-grid--surface { padding-left: 1.25rem; }
+  .about-approach-list--surface { width: 100%; height: auto; margin-top: 0; }
+}
+@media (max-width: 639px) {
+  .about-story-grid--surface { padding-left: 1rem; }
+  .about-approach-intro--surface { padding: 1rem; }
+  .about-approach-list--surface { padding: 1rem; }
+}
