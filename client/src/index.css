@@ -902,3 +902,13 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Specificity fix: old Contact descendant rules must not restore grid padding. */
 .contact-details-section.contact-details-section--flush .simple-contact-grid { padding: 0 !important; }
+
+/* Contact spacing visual-editor values normalized into semantic responsive hooks. */
+.contact-hero-header--spaced { margin-bottom: 5rem; }
+.contact-details-section--topless { padding-top: 0; }
+.contact-enquiry-section--wide-gap { margin-top: 5rem; margin-bottom: 5rem; }
+@media (max-width: 899px) {
+  .contact-hero-header--spaced { margin-bottom: 5rem; }
+  .contact-details-section--topless { padding-top: 0; }
+  .contact-enquiry-section--wide-gap { margin-top: 5rem; margin-bottom: 5rem; }
+}

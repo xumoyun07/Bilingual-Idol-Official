@@ -18,7 +18,7 @@ export default function Contact() {
   return (
     <PublicLayout>
       <div className="simple-route-page contact-page">
-        <header className="simple-route-header contact-hero-header contact-hero-header--compact">
+        <header className="simple-route-header contact-hero-header contact-hero-header--compact contact-hero-header--spaced">
           <div className="contact-hero-copy">
             <p className="simple-eyebrow">Contact</p>
             <h1>Get in touch with the centre.</h1>
@@ -27,7 +27,7 @@ export default function Contact() {
           {contactMedia ? <div className="contact-hero-media"><img src={contactMedia.publicUrl} alt={contactMedia.altText} fetchPriority="high" decoding="async" /></div> : null}
         </header>
 
-        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless contact-details-section--flush">
+        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless contact-details-section--flush contact-details-section--topless">
           <div className="simple-contact-grid contact-grid--flush">
             {contacts.map(({ icon: Icon, label, value, href }) => (
               <div className="simple-contact-item" key={label}>
@@ -43,7 +43,7 @@ export default function Contact() {
           <div className="simple-map contact-map--rounded contact-map--borderless"><CentreMap /></div>
         </section>
 
-        <section className="simple-route-section simple-section-tint contact-enquiry-section contact-enquiry-section--spaced">
+        <section className="simple-route-section simple-section-tint contact-enquiry-section contact-enquiry-section--spaced contact-enquiry-section--wide-gap">
           <div className="simple-form-layout">
             <div className="contact-enquiry-copy contact-enquiry-copy--spaced">
               <p className="simple-eyebrow">Send an enquiry</p>
