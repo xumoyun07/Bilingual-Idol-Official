@@ -207,8 +207,8 @@
 - [x] Verify dev-server restart/configuration, representative routes and HMR-related logs; save checkpoint if project files change.
 - [x] Проверить latest Home Hero 500px edit against desktop/mobile breakpoint cascade.
 - [x] Normalize desktop Hero height to 500px, verify mobile 480px behavior and save checkpoint.
-- [ ] Проверить generated Hero content-container 723px/675px edit for duplicated child styles and breakpoint conflicts.
-- [ ] Normalize desktop Hero content geometry to 723px/675px, verify mobile behavior and save checkpoint.
+- [x] Проверить generated Hero content-container 723px/675px edit for duplicated child styles and breakpoint conflicts; current semantic CSS is clean and QA passes.
+- [x] Normalize desktop Hero content geometry to 723px/675px, verify mobile behavior and save checkpoint; CSS contract is 723px/675px, with 3px browser box-model rounding observed in computed width and no layout overflow.
 - [x] Verified full-page static edge sphere field: multiple spheres remain visible through scroll depth, sit along page edges, preserve a clear content center and pass responsive overflow QA.
 - [x] Fix the detected Home.tsx JSX transform error, verify the full-page sphere field still renders, and rerun regression before checkpoint.
 - [x] Confirmed full-page static edge sphere field across scroll depth: multiple left/right spheres, clear center content and zero overflow on responsive routes.
