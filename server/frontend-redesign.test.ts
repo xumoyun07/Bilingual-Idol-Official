@@ -94,7 +94,7 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain(".simple-route-header--programmes");
     expect(css).toContain("width: min(100%, 76rem)");
     expect(css).toContain("max-width: none;");
-    expect(css).toContain("height: 34.375rem");
+    expect(css).toContain("height: 36.25rem");
     expect(css).toContain(".simple-route-header-description");
     expect(css).toContain(".simple-section-heading--fee-guide");
     expect(css).toContain("width: min(100%, 25rem)");

@@ -235,3 +235,5 @@
 - [x] Нормализовать Programs header height семантическим responsive CSS, проверить layout/regressions и создать checkpoint.
 - [x] Проверить latest Programs header height 550px and description margin visual-editor edits for generated inline styles.
 - [x] Нормализовать Programs header height and description spacing semantic responsive CSS, проверить layout/regressions и создать checkpoint.
+- [x] Проверить latest Programs header height 580px visual-editor edit for generated inline style.
+- [x] Нормализовать Programs header height semantic responsive CSS, проверить layout/regressions и создать checkpoint.

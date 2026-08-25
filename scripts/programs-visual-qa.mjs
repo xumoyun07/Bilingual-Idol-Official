@@ -45,7 +45,7 @@ for (const viewport of viewports) {
   if (audit.media.width <= 0 || audit.image.width <= 0) throw new Error(`${viewport.name}: Programs image is not visible`);
   if (audit.imageWidth > 401) throw new Error(`${viewport.name}: image width ${audit.imageWidth}px exceeds 400px cap`);
   if (viewport.name === "desktop" && Math.abs((audit.header?.width ?? 0) - 1216) > 1) throw new Error(`${viewport.name}: header width ${audit.header?.width}px does not match 1216px target`);
-  if (viewport.name === "desktop" && Math.abs((audit.header?.height ?? 0) - 550) > 1) throw new Error(`${viewport.name}: header height ${audit.header?.height}px does not match 500px target`);
+  if (viewport.name === "desktop" && Math.abs((audit.header?.height ?? 0) - 580) > 1) throw new Error(`${viewport.name}: header height ${audit.header?.height}px does not match 580px target`);
   if (audit.imageObjectFit !== "cover") throw new Error(`${viewport.name}: image object-fit is not cover`);
   if (audit.descriptionMarginTop !== "20px") throw new Error(`${viewport.name}: description top margin ${audit.descriptionMarginTop}px does not match 20px target`);
   if (viewport.name === "desktop" && audit.copy.right > audit.media.left + 1) throw new Error(`${viewport.name}: copy overlaps right-side image`);
