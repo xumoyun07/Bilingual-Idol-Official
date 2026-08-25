@@ -65,7 +65,7 @@ export default function About() {
               <p className="simple-body-copy">The centre describes a learning environment with interactive classrooms, digital learning resources, placement guidance and personalised language routes.</p>
               <Link href="/programs" className="simple-text-link">Explore programmes</Link>
             </div>
-            <figure className="about-feature-media">
+            <figure className="about-feature-media about-story-media--spaced">
               <AboutImage media={classroomMedia} />
             </figure>
           </div>
@@ -77,7 +77,7 @@ export default function About() {
               <p className="simple-eyebrow">Learning approach</p>
               <h2>How learning is supported</h2>
             </div>
-            <p>Clear next steps, active practice and steady confidence-building shape the centre’s public learning approach.</p>
+            <p className="about-approach-intro-copy">Clear next steps, active practice and steady confidence-building shape the centre’s public learning approach.</p>
           </div>
           <div className="about-method-layout">
             <div className="simple-approach-list about-approach-list about-approach-list--surface">
@@ -105,19 +105,19 @@ export default function About() {
         </section>
 
         <section className="simple-route-section about-team-section">
-          <div className="simple-section-heading">
+          <div className="simple-section-heading about-team-heading--surface">
             <div><p className="simple-eyebrow">Educators</p><h2>Team information</h2></div>
-            <Link href="/contact" className="simple-text-link">Contact the centre</Link>
+            <Link href="/contact" className="simple-text-link about-team-contact-link">Contact the centre</Link>
           </div>
           {team.data?.length ? <div className="simple-team-list">{team.data.map(member => <article key={member.id}><UsersRound size={18} /><div><strong>{member.name}</strong><span>{member.role}</span><p>{member.bio}</p><small>Languages: {member.languages}</small></div></article>)}</div> : <div className="simple-empty-state"><p>Educator profiles are shown only when the centre has confirmed the information.</p></div>}
         </section>
 
-        <section className="about-contact-panel">
-          <div className="about-contact-copy">
-            <p className="simple-eyebrow">Start a conversation</p>
-            <h2>Choose a clear next step for learning.</h2>
-            <p>Ask about programmes, placement guidance or the most suitable route for the learner.</p>
-            <Link href="/contact" className="simple-primary-link">Contact the centre</Link>
+        <section className="about-contact-panel about-contact-panel--light">
+          <div className="about-contact-copy about-contact-copy--light">
+            <p className="simple-eyebrow about-contact-eyebrow--light">Start a conversation</p>
+            <h2 className="about-contact-title--light">Choose a clear next step for learning.</h2>
+            <p className="about-contact-body--light">Ask about programmes, placement guidance or the most suitable route for the learner.</p>
+            <Link href="/contact" className="simple-primary-link about-contact-link--light">Contact the centre</Link>
           </div>
           <div className="about-contact-media"><AboutImage media={ctaMedia} /></div>
         </section>

@@ -790,3 +790,32 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .about-approach-intro--surface { padding: 1rem; }
   .about-approach-list--surface { padding: 1rem; }
 }
+
+/* Latest About visual-editor normalization: final values kept, duplicate inline declarations removed. */
+.about-story-media--spaced { margin: 30px; padding: 0; }
+.about-approach-intro-copy { margin-bottom: 10px; }
+.about-approach-list--surface { margin-top: 0; }
+.about-team-heading--surface {
+  border: 1px solid var(--bilc-line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1.25rem;
+}
+.about-team-contact-link { margin-bottom: 25px; }
+.about-contact-panel--light { background: #fff; }
+.about-contact-copy--light { background: #fff; color: var(--bilc-ink); }
+.about-contact-eyebrow--light { color: #515e76; }
+.about-contact-title--light { color: #000; }
+.about-contact-body--light { color: #000; }
+.about-contact-link--light { border-color: #545e74; color: #000; }
+@media (max-width: 899px) {
+  .about-story-media--spaced { margin: 0; }
+  .about-team-contact-link { margin-bottom: 0; }
+}
+
+/* Light CTA contrast override: outrank the original blue CTA descendant selectors. */
+.about-contact-panel--light .about-contact-copy--light { background: #fff; color: var(--bilc-ink); }
+.about-contact-panel--light .about-contact-copy--light .about-contact-eyebrow--light { color: #515e76; }
+.about-contact-panel--light .about-contact-copy--light h2.about-contact-title--light { color: #000; }
+.about-contact-panel--light .about-contact-copy--light > p.about-contact-body--light { color: #000; }
+.about-contact-panel--light .about-contact-copy--light a.about-contact-link--light { border-color: #545e74; color: #000; }

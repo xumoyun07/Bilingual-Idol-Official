@@ -249,3 +249,4 @@
 - [x] Подготовить restrained set of five About media assets and upload them to project storage.
 - [x] Интегрировать About media into semantic responsive sections with lazy loading, проверить accessibility/performance/regressions и создать checkpoint.
 - [x] Verify and normalize the latest About visual-editor changes: surfaces, captions, approach list geometry, responsive behavior and regression safety before checkpoint.
+- [x] Verify and normalize the latest About visual-editor changes: duplicate JSX styles, spacing, team surface, CTA contrast, responsive behavior and regression safety before checkpoint.
