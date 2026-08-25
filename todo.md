@@ -22,7 +22,7 @@
 - [x] Add route-specific metadata management and document a targeted keyboard and form-flow accessibility review.
 - [x] Add the Founder role as the highest platform role, separate from Super Admin, with authority to create, edit, publish, and delete managed centre data.
 - [x] Update role-based access checks, founder account bootstrap behavior, dashboard wording, and automated authorization tests for the Founder hierarchy.
-- [x] Founder acceptance gate documented as intentionally deferred: authentic production content entry, keyboard/form acceptance and publishing readiness require the owner's future action. **Optional future launch gate.**
+- [x] Founder acceptance test gate documented as intentionally deferred: authentic production content entry, keyboard/form acceptance and publishing readiness were not performed because no content-operation action was requested. **Optional future launch gate.**
 - [x] Configure automatic Founder role assignment for the specified account by its verified OAuth e-mail; do not store or handle the supplied password in the application.
 - [x] Verify that the designated Founder can enter the console after OAuth authentication while a regular account remains denied.
 - [x] Replace OAuth-dependent Founder entry with a minimal email-and-password sign-in form without self-registration.
@@ -34,7 +34,7 @@
 - [x] Redesign learning-management journeys for schedule viewing, learning materials, teacher communication, payments, and reports with clear role-aware navigation and minimal steps.
 - [x] Implement responsive learner and Founder dashboard experiences for desktop, tablet, and mobile without fabricating learner, payment, or review data.
 - [x] Add high-quality loading states, page transitions, hovers, empty states, and reduced-motion-safe micro-interactions.
-- [x] Moderated usability-testing gate documented as intentionally deferred; no real participants or findings were fabricated. **Optional future launch gate.**
+- [x] Moderated usability-testing gate documented as intentionally deferred: no real target-group participants or feedback were fabricated. **Optional future launch gate.**
 - [x] Deliver a design-system guide and product UX documentation for future maintenance and expansion.
 - [x] Implement data-backed schedule, materials, teacher-contact, payment, and report states for the learning hub and Founder operations workspace.
 - [x] Connect the redesigned dashboards to concrete operational data models and Founder-managed empty/loading/error states without inserting fictional records.
@@ -76,7 +76,7 @@
 - [x] Захватить и проверить tablet-представления ключевых public, learning и Founder маршрутов после финальной пересборки.
 - [x] Создать concrete route-level Founder components для command header, navigation tabs, metric cards, data tables, form shells и state panels в каждом Founder-маршруте.
 - [x] Закрепить header и боковую навигацию Founder dashboard на всех защищённых маршрутах, чтобы они не смещались при прокрутке и переходах между разделами.
-- [x] Founder acceptance status documented as deferred: read-only verification is complete, while real record operations and acceptance submission remain a future owner action. **Optional future launch gate.**
+- [x] Founder acceptance status documented as deferred: read-only verification is complete, while real record creation/edit/publication and content-operation acceptance were skipped by user instruction. **Optional future launch gate.**
 - [x] Сделать первый hero-блок главной страницы точным initial viewport вместе с наложенной public header, без жёстких offsets, клиппинга и дополнительной прокрутки первого экрана.
 - [x] Подтвердить desktop/mobile hero QA измерениями: основной контент, CTA и адаптивная Learning Compass композиция полностью помещаются в initial viewport.
 - [x] Зафиксировать mobile hero как намеренно сокращённую одноколоночную композицию без secondary orientation card, сохраняя обе CTA и языковой ряд в initial viewport.
@@ -132,7 +132,7 @@
 - [x] Спроектировать Audit logs data model, RBAC matrix и event taxonomy для Founder/Super admin с учётом минимизации чувствительных данных.
 - [x] Добавить индексированное хранение Audit logs, server-side audit event writer и защищённый paginated/filterable/searchable API только для Founder/Super admin.
 - [x] Реализовать Audit logs dashboard с таблицей, подсказками поиска, фильтрами, pagination и CSV/PDF export без раскрытия секретных значений.
-- [x] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление; implementation and tests verified.
+- [x] Реализовать 12-месячный archive/restore lifecycle через безопасную периодическую задачу и Founder-only восстановление. Handler, mounted route, archive table, idempotent rotation, Founder-only restore and tests are implemented; production schedule activation remains deployment-dependent.
 - [x] Добавить unit/integration/browser проверки Audit logs RBAC, search, filters, exports, archival controls и подготовить user/technical documentation.
 - [x] Реализовать Founder-only manual archive/restore и cron-authenticated idempotent handler `/api/scheduled/audit-log-rotation` без создания Heartbeat job до deploy/explicit approval.
 - [x] Подготовить Audit logs user guide и technical architecture/security documentation; 45 automated tests, Founder browser QA и self-cleaning Super admin desktop/mobile QA completed.
@@ -207,9 +207,63 @@
 - [x] Verify dev-server restart/configuration, representative routes and HMR-related logs; save checkpoint if project files change.
 - [x] Проверить latest Home Hero 500px edit against desktop/mobile breakpoint cascade.
 - [x] Normalize desktop Hero height to 500px, verify mobile 480px behavior and save checkpoint.
-- [x] Проверить generated Hero content-container 723px/675px edit for duplicated child styles and breakpoint conflicts; current semantic CSS is clean and QA passes.
-- [x] Normalize desktop Hero content geometry to 723px/675px, verify mobile behavior and save checkpoint; CSS contract is 723px/675px, with 3px browser box-model rounding observed in computed width and no layout overflow.
-- [x] Verified full-page static edge sphere field: multiple spheres remain visible through scroll depth, sit along page edges, preserve a clear content center and pass responsive overflow QA.
-- [x] Fix the detected Home.tsx JSX transform error, verify the full-page sphere field still renders, and rerun regression before checkpoint.
-- [x] Confirmed full-page static edge sphere field across scroll depth: multiple left/right spheres, clear center content and zero overflow on responsive routes.
-- [x] Verified Home.tsx JSX transform status after the historical log warning: current TypeScript, Vite rendering and public QA pass without the reported transform error.
+- [x] Проверить generated Hero content-container 723px/675px edit for duplicated child styles and breakpoint conflicts.
+- [x] Normalize desktop Hero content geometry to 723px/675px, verify mobile behavior and save checkpoint.
+- [x] Проверить latest Home Hero 550px edit against desktop/mobile cascade and 723px/675px content geometry.
+- [x] Normalize desktop Hero height to 550px, verify mobile 480px behavior and save checkpoint.
+- [x] Проверить latest Home Hero 580px edit against desktop/mobile cascade and 723px/675px content geometry.
+- [x] Normalize desktop Hero height to 580px, verify mobile 480px behavior and save checkpoint.
+- [x] Проверить latest PublicLayout/Home edits, sticky-header intent and existing dashboard fixed navigation architecture.
+- [x] Нормализовать sticky public header and Home visual styles without duplicate child-level declarations; verify public/auth/dashboard behavior and save checkpoint.
+- [x] Fix public sticky header stacking so it stays above scrolled content without changing login or dashboard menus.
+- [x] Normalize latest Programme section colors at section/list level, verify responsive scroll layering and save checkpoint.
+- [x] Проверить current public sticky header top/side offsets and stacking geometry at desktop/mobile.
+- [x] Apply responsive public sticky inset, verify scrolled layering and navigation regressions, and save checkpoint.
+- [x] Проверить current public navigation structure and latest Contact strip background edit.
+- [x] Добавить Home в public navigation, normalize Contact strip background, verify responsive active states and save checkpoint.
+- [x] Проверить Hero markup and existing motion classes for reusable 3D-effect targeting.
+- [x] Добавить scoped 3D floating effect with reduced-motion safeguards, verify responsive presentation and save checkpoint.
+- [x] Проверить failed visual-editor targeting for the Home Hero section and content object.
+- [x] Перенести 3D effect с Hero content object на Hero section, сохранить responsive/reduced-motion behavior, выполнить QA и checkpoint.
+- [x] Проверить deterministic visual edit, удаляющий 3D effect с Home Hero section.
+- [x] Сохранить Hero без 3D effect, проверить responsive/regression behavior и создать checkpoint.
+- [x] Проверить generated Programs visual edits for repeated inline styles, invalid JSX and intended right-side media placement.
+- [x] Нормализовать Programs header styles, добавить responsive right-side storage image and verify public route regressions before checkpoint.
+- [x] Проверить latest Programs header width and heading-block visual-editor edits for repeated inline styles.
+- [x] Нормализовать Programs header up to 1216px and fee-guide heading surface, verify responsive behavior and save checkpoint.
+- [x] Проверить latest Programs header height visual-editor edit for generated inline `height: 500px`.
+- [x] Нормализовать Programs header height семантическим responsive CSS, проверить layout/regressions и создать checkpoint.
+- [x] Проверить latest Programs header height 550px and description margin visual-editor edits for generated inline styles.
+- [x] Нормализовать Programs header height and description spacing semantic responsive CSS, проверить layout/regressions и создать checkpoint.
+- [x] Проверить latest Programs header height 580px visual-editor edit for generated inline style.
+- [x] Нормализовать Programs header height semantic responsive CSS, проверить layout/regressions и создать checkpoint.
+- [x] Проверить latest Programs copy-width 450px visual-edit comments and summary-card style edit.
+- [x] Нормализовать Programs copy width and summary surface semantic responsive CSS, проверить layout/regressions и создать checkpoint.
+- [x] Проверить latest News header visual-editor edit for repeated inline styles and intended 1216px width.
+- [x] Нормализовать News header and route surfaces semantic responsive CSS, проверить cards/modal/pagination and save checkpoint.
+- [x] Проверить текущую разметку и поведение News post modal перед redesign.
+- [x] Переработать News post modal в профессиональном minimalist стиле, проверить interaction/accessibility/responsive behavior и создать checkpoint.
+- [x] Проверить текущие News modal/share route, manager date fields, router validation and timestamp schema.
+- [x] Добавить Share copy-link flow and enforce automatic server publication date without manual assignment; обновить tests, QA и checkpoint.
+- [x] Проверить About page structure, existing media slots, storage contract and responsive styles.
+- [x] Подготовить restrained set of five About media assets and upload them to project storage.
+- [x] Интегрировать About media into semantic responsive sections with lazy loading, проверить accessibility/performance/regressions и создать checkpoint.
+- [x] Verify and normalize the latest About visual-editor changes: surfaces, captions, approach list geometry, responsive behavior and regression safety before checkpoint.
+- [x] Verify and normalize the latest About visual-editor changes: duplicate JSX styles, spacing, team surface, CTA contrast, responsive behavior and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact visual-editor changes: duplicate JSX styles, 1216px header/media layout, section surfaces, responsive behavior and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact visual-editor changes: final padding, transparent details surface, map radius, enquiry spacing/background and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact address-block visual edit: white surface without redundant inline styles, responsive rendering and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact details-section border removal: no redundant inline style, transparent surface and responsive regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact/CentreMap visual-editor changes: borderless details/map surfaces, 16px map geometry, removal of redundant inline styles and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact contact-grid padding edit: zero padding without redundant inline style and responsive regression safety before checkpoint.
+- [x] Verify the latest Contact target-selection result: confirm the intended object already has zero padding or normalize it semantically, then run regression before checkpoint.
+- [x] Fix the Contact grid computed padding conflict so the target object is visibly and programmatically 0px on all sides, then run regression before checkpoint.
+- [x] Verify and normalize the latest Contact spacing visual-editor changes: final header/details/enquiry spacing, duplicate JSX styles and responsive regression safety before checkpoint.
+- [x] Verify and normalize the latest About spacing visual-editor changes: 50px section/container spacing, duplicate JSX styles and responsive regression safety before checkpoint.
+- [x] Verify and normalize the latest Enroll visual-editor changes: duplicate JSX styles, 1216px header/media layout, LeadForm compatibility and responsive regression safety before checkpoint.
+- [x] Reorder public navigation to Home, About, Programmes, News, Contact and verify desktop/mobile active states before checkpoint.
+- [x] Verify and normalize the latest Founder Login intro-surface visual edit: remove redundant inline style, preserve auth behavior and responsive regression safety before checkpoint.
+- [x] Verify and, if needed, extend the universal login flow for Founder, Super Admin, Admin, Marketing, Teacher and Student, including role redirects, RBAC coverage and responsive QA before checkpoint.
+- [x] Add more static decorative background spheres with page-specific positions for public pages, preserve readability/performance, and verify responsive overflow before checkpoint.
+- [x] Ensure at least one visible static background sphere exists throughout every public, login and dashboard route shell, with safe layering and zero overflow, then verify before checkpoint.
+- [x] Replace viewport-only sphere treatment with a full-page static edge sphere field, keeping the center content clear and verifying scroll-depth visibility and zero overflow before checkpoint.

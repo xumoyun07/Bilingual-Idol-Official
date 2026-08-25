@@ -12,6 +12,7 @@ describe("minimal frontend rewrite", () => {
     expect(layout).toContain('aria-label={open ? "Close navigation" : "Open navigation"}');
     expect(layout).toContain('aria-label="Mobile navigation"');
     expect(layout).toContain("Programmes");
+    expect(layout).toContain('{ label: "Home", href: "/" }');
     expect(layout).toContain('{ label: "News", href: "/news" }');
     expect(layout).toContain("Make an enquiry");
     expect(layout).toContain("simple-public-header--refined");
@@ -25,13 +26,20 @@ describe("minimal frontend rewrite", () => {
     expect(home).toContain("simple-home-intro--refined");
     expect(home).toContain("simple-home-intro--desktop-geometry");
     expect(home).toContain("simple-home-intro--mobile-480");
-    expect(home).toContain("simple-home-intro--desktop-500");
+    expect(home).toContain("simple-home-intro--desktop-580");
     expect(home).toContain("simple-home-intro-content--desktop-offset");
     expect(home).toContain("simple-home-intro-content--desktop-geometry");
     expect(home).toContain("simple-home-start-panel");
+    expect(home).toContain("simple-contact-strip simple-contact-strip--refined simple-contact-strip--geometry");
+    expect(home).not.toContain("simple-contact-strip simple-contact-strip--refined simple-contact-strip--geometry\" style={{backgroundColor");
     expect(home).toContain("simple-home-panel");
     expect(home).not.toContain("manus-storage");
     expect(programmes).toContain("Search by language, level or learner group");
+    expect(programmes).toContain("simple-route-header--programmes");
+    expect(programmes).toContain("simple-route-header-media");
+    expect(programmes).toContain("simple-section-heading--fee-guide");
+    expect(programmes).toContain("simple-route-header-description");
+    expect(programmes).not.toContain("style={{");
     expect(contact).toContain("Get in touch with the centre.");
   });
 
@@ -76,10 +84,27 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("Approved desktop geometry, translated into an adaptive layout");
     expect(css).toContain("width: 1321px");
     expect(css).toContain("Mobile-only Hero height and desktop Home spacing");
-    expect(css).toContain("height: 500px");
+    expect(css).toContain("height: 580px");
     expect(css).toContain("Public action spacing from visual editor");
     expect(css).toContain("gap: 25px");
     expect(css).toContain("Desktop Hero size and content position from visual editor");
+    expect(css).toContain(".simple-public-header--refined { position: sticky; top: 1rem; z-index: 1000;");
+    expect(css).toContain("top: .75rem; width: calc(100% - 2rem);");
+    expect(css).toContain(".simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }");
+    expect(css).toContain(".simple-route-header--programmes");
+    expect(css).toContain("width: min(100%, 76rem)");
+    expect(css).toContain("max-width: none;");
+    expect(css).toContain("height: 36.25rem");
+    expect(css).toContain(".simple-route-header-description");
+    expect(css).toContain(".simple-route-header-copy--wide h1");
+    expect(css).toContain("max-width: 28.125rem");
+    expect(css).toContain(".simple-list-summary--surface");
+    expect(css).toContain("padding: 1rem");
+    expect(css).toContain(".simple-section-heading--fee-guide");
+    expect(css).toContain("width: min(100%, 25rem)");
+    expect(css).toContain("grid-template-columns: minmax(0, 1fr) minmax(0, 25rem)");
+    expect(css).toContain(".simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }");
+    expect(css).toContain("padding-top: 155px");
     expect(css).toContain("transform: translateY(-87px)");
     expect(css).toContain("width: 723px");
     expect(css).toContain("height: 675px");
@@ -87,6 +112,15 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("@keyframes bilc-item-reveal");
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");
     expect(css).toContain("animation: none !important");
+  });
+
+  it("keeps the Hero free of the removed 3D floating effect", () => {
+    const home = read("pages/Home.tsx");
+    const css = read("index.css");
+    expect(home).not.toContain("simple-home-intro--floating");
+    expect(home).not.toContain("simple-home-intro-content--floating");
+    expect(css).not.toContain(".simple-home-intro--floating {");
+    expect(css).not.toContain("@keyframes bilc-hero-float");
   });
 
   it("keeps universal sign-in semantics while using the practical auth surface", () => {
@@ -144,6 +178,33 @@ describe("minimal frontend rewrite", () => {
     expect(app).toContain('path="/admin/media"');
   });
 
+  it("adds a restrained storage-backed About media rhythm without hardcoded local assets", () => {
+    const about = read("pages/About.tsx");
+    const router = read("../../server/routers/media.ts");
+    const css = read("index.css");
+    expect(about).toContain("trpc.media.publicList.useQuery");
+    expect(about).toContain("resolveAboutMedia");
+    expect(about).toContain('about_hero');
+    expect(about).toContain('about_method');
+    expect(about).toContain('about_classroom');
+    expect(about).toContain('about_community');
+    expect(about).toContain('about_cta');
+    expect(about).toContain('loading="eager"');
+    expect(about).toContain('loading = "lazy"');
+    expect(about).toContain("about-hero-media");
+    expect(about).toContain("about-contact-panel");
+    expect(about).not.toContain("style={{");
+    expect(router).toContain('"about_hero"');
+    expect(router).toContain('"about_method"');
+    expect(router).toContain('"about_classroom"');
+    expect(router).toContain('"about_community"');
+    expect(router).toContain('"about_cta"');
+    expect(router).toContain("upload: founderProcedure");
+    expect(css).toContain(".about-hero-header");
+    expect(css).toContain(".about-contact-panel");
+    expect(css).toContain("@media (max-width: 899px)");
+  });
+
   it("provides a public six-post News grid with accessible modal details and founder-only publishing UI", () => {
     const news = read("pages/News.tsx");
     const manager = read("pages/NewsManager.tsx");
@@ -153,15 +214,32 @@ describe("minimal frontend rewrite", () => {
     const css = read("index.css");
     expect(news).toContain("trpc.news.publicPage.useQuery");
     expect(news).toContain('aria-haspopup="dialog"');
+    expect(news).toContain("Share2");
+    expect(news).toContain("navigator.clipboard.writeText");
+    expect(news).toContain('className="news-dialog-share"');
+    expect(news).toContain('className="news-dialog');
+    expect(news).toContain('className="news-dialog-header"');
+    expect(news).toContain('className="news-dialog-body"');
     expect(news).toContain("news-pagination");
+    expect(news).toContain('className="simple-route-header simple-route-header--news"');
+    expect(news).not.toContain("style={{");
     expect(news).toContain('aria-current={index === page ? "page" : undefined}');
     expect(database).toContain("const pageSize = 6");
     expect(router).toContain("list: founderProcedure");
     expect(router).toContain("create: founderProcedure");
-    expect(manager).toContain("trpc.news.create.useMutation");
+    expect(router).toContain(".strict()");
+    expect(router).toContain("publishedAt: input.isPublished ? new Date() : null");
+    expect(router).toContain("news.create");
+    expect(manager).toContain("Publication date is assigned automatically");
+    expect(manager).not.toContain('Field label="Publication date"');
+    expect(manager).not.toContain("publishedAt: draft.publishedAt");
     expect(manager).toContain("Publish centre updates.");
     expect(dashboard).toContain('label: "News", path: "/admin/news"');
     expect(css).toContain(".news-grid");
+    expect(css).toContain(".news-dialog [data-slot=\"dialog-close\"]");
+    expect(css).toContain("overscroll-behavior: contain");
+    expect(css).toContain(".simple-route-header--news");
+    expect(css).toContain("width: min(100%, 76rem)");
     expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
   });
 });

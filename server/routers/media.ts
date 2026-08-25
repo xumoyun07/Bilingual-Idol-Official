@@ -5,7 +5,7 @@ import { founderProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 import * as audit from "../audit";
 
-const mediaSlot = z.enum(["home_hero_video", "home_hero_poster", "home_task_programmes", "home_task_contact", "home_task_account", "programmes_listing", "programme_detail"]);
+const mediaSlot = z.enum(["home_hero_video", "home_hero_poster", "home_task_programmes", "home_task_contact", "home_task_account", "programmes_listing", "programme_detail", "about_hero", "about_method", "about_classroom", "about_community", "about_cta"]);
 const mediaKind = z.enum(["image", "video"]);
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 12 * 1024 * 1024;

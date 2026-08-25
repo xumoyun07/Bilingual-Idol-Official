@@ -37,7 +37,14 @@ describe("News router", () => {
     const create = vi.spyOn(db, "createAnnouncement").mockResolvedValue(record);
     const caller = appRouter.createCaller(context("founder"));
     await expect(caller.news.create({ slug: "centre-update", title: "Verified update", excerpt: "A confirmed centre update.", body: "Full confirmed centre update content.", category: "announcement", isPublished: true, clearImage: false })).resolves.toEqual(record);
-    expect(create).toHaveBeenCalledWith(expect.objectContaining({ slug: "centre-update", imageUrl: null, isPublished: true }));
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ slug: "centre-update", imageUrl: null, isPublished: true, publishedAt: expect.any(Date) }));
+  });
+
+  it("rejects manual publication dates and generates the timestamp only on the server", async () => {
+    const create = vi.spyOn(db, "createAnnouncement").mockResolvedValue(record);
+    const caller = appRouter.createCaller(context("founder"));
+    await expect(caller.news.create({ slug: "centre-update", title: "Verified update", excerpt: "A confirmed centre update.", body: "Full confirmed centre update content.", category: "announcement", isPublished: true, publishedAt: new Date("2000-01-01T00:00:00.000Z"), clearImage: false } as never)).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    expect(create).not.toHaveBeenCalled();
   });
 
   it("rejects malformed News image data before publishing", async () => {
