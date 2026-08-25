@@ -187,6 +187,9 @@ describe("minimal frontend rewrite", () => {
     const css = read("index.css");
     expect(news).toContain("trpc.news.publicPage.useQuery");
     expect(news).toContain('aria-haspopup="dialog"');
+    expect(news).toContain('className="news-dialog');
+    expect(news).toContain('className="news-dialog-header"');
+    expect(news).toContain('className="news-dialog-body"');
     expect(news).toContain("news-pagination");
     expect(news).toContain('className="simple-route-header simple-route-header--news"');
     expect(news).not.toContain("style={{");
@@ -198,6 +201,8 @@ describe("minimal frontend rewrite", () => {
     expect(manager).toContain("Publish centre updates.");
     expect(dashboard).toContain('label: "News", path: "/admin/news"');
     expect(css).toContain(".news-grid");
+    expect(css).toContain(".news-dialog [data-slot=\"dialog-close\"]");
+    expect(css).toContain("overscroll-behavior: contain");
     expect(css).toContain(".simple-route-header--news");
     expect(css).toContain("width: min(100%, 76rem)");
     expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");

@@ -12,6 +12,7 @@ for (const viewport of viewports) {
   const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
   await page.goto(`${baseUrl}/news`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".simple-route-header--news");
+  await page.waitForFunction(() => document.querySelector(".news-card-trigger, .simple-empty-state") !== null, { timeout: 10000 });
   const audit = await page.evaluate(() => {
     const route = document.querySelector(".simple-route-page");
     const header = document.querySelector(".simple-route-header--news");
@@ -46,12 +47,16 @@ for (const viewport of viewports) {
   if (audit.active !== "page") throw new Error(`${viewport.name}: News link is not active`);
 
   const firstCard = page.locator(".news-card-trigger").first();
-  if (await firstCard.count()) {
+  const hasCard = await firstCard.count();
+  if (hasCard) {
     await firstCard.click();
-    await page.locator('[role="dialog"]').waitFor({ state: "visible" });
+    const dialog = page.locator('[role="dialog"]');
+    await dialog.waitFor({ state: "visible" });
+    if (!(await dialog.locator('[data-slot="dialog-close"]').count())) throw new Error(`${viewport.name}: News dialog close affordance is missing`);
     await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
   }
-  results.push({ viewport: viewport.name, status: "passed", overflow, audit, optionalCardModal: Boolean(await firstCard.count()) });
+  results.push({ viewport: viewport.name, status: "passed", overflow, audit, cardModal: Boolean(hasCard) });
   await page.close();
 }
 
