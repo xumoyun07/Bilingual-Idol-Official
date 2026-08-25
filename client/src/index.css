@@ -547,7 +547,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 }
 
 /* Reusable 3D floating surface for explicitly marked visual objects. */
-.simple-home-intro-content--floating {
+.simple-home-intro--floating {
   position: relative;
   z-index: 2;
   isolation: isolate;
@@ -561,7 +561,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   animation: bilc-hero-float 5.5s var(--ease-in-out) infinite;
   will-change: transform;
 }
-.simple-home-intro-content--floating::before {
+.simple-home-intro--floating::before {
   position: absolute;
   z-index: -1;
   inset: .7rem;
@@ -570,14 +570,14 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   content: "";
   pointer-events: none;
 }
-.simple-home-intro-content--floating > * { position: relative; z-index: 1; }
+.simple-home-intro--floating > .simple-home-intro-content { position: relative; z-index: 2; }
 @keyframes bilc-hero-float {
   0%, 100% { transform: translate3d(0, -.35rem, 0) rotateX(0deg); }
   50% { transform: translate3d(0, -.7rem, 0) rotateX(.35deg); }
 }
 @media (max-width: 639px) {
-  .simple-home-intro-content--floating { border-radius: 1rem; transform: translate3d(0, -.15rem, 0); }
+  .simple-home-intro--floating { border-radius: 1rem; transform: translate3d(0, -.15rem, 0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .simple-home-intro-content--floating { animation: none !important; transform: translate3d(0, -.25rem, 0) !important; }
+  .simple-home-intro--floating { animation: none !important; transform: translate3d(0, -.25rem, 0) !important; }
 }

@@ -223,3 +223,5 @@
 - [x] Добавить Home в public navigation, normalize Contact strip background, verify responsive active states and save checkpoint.
 - [x] Проверить Hero markup and existing motion classes for reusable 3D-effect targeting.
 - [x] Добавить scoped 3D floating effect with reduced-motion safeguards, verify responsive presentation and save checkpoint.
+- [x] Проверить failed visual-editor targeting for the Home Hero section and content object.
+- [x] Перенести 3D effect с Hero content object на Hero section, сохранить responsive/reduced-motion behavior, выполнить QA и checkpoint.

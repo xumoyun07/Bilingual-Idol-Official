@@ -11,9 +11,9 @@ const results = [];
 for (const viewport of viewports) {
   const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
   await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector(".simple-home-intro-content--floating");
+  await page.waitForSelector(".simple-home-intro--floating");
   const audit = await page.evaluate(() => {
-    const floating = document.querySelector(".simple-home-intro-content--floating");
+    const floating = document.querySelector(".simple-home-intro--floating");
     const header = document.querySelector(".simple-public-header");
     const homeLink = document.querySelector('[aria-label="Primary navigation"] a[href="/"]');
     const rect = element => element ? element.getBoundingClientRect() : null;
