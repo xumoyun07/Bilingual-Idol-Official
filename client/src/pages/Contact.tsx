@@ -27,7 +27,7 @@ export default function Contact() {
           {contactMedia ? <div className="contact-hero-media"><img src={contactMedia.publicUrl} alt={contactMedia.altText} fetchPriority="high" decoding="async" /></div> : null}
         </header>
 
-        <section className="simple-route-section contact-details-section contact-details-section--transparent">
+        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless">
           <div className="simple-contact-grid">
             {contacts.map(({ icon: Icon, label, value, href }) => (
               <div className="simple-contact-item" key={label}>

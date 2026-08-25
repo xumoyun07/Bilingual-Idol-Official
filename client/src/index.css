@@ -890,3 +890,6 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 /* Contact address block final visual-editor value: white surface without inline JSX styling. */
 .contact-map-block--light { background: #fff !important; }
 .contact-map-block--light p, .contact-map-block--light svg { background: transparent; }
+
+/* Contact details final visual-editor value: transparent and borderless section. */
+.contact-details-section--borderless { border-width: 0; }
