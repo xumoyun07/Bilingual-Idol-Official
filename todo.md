@@ -225,3 +225,5 @@
 - [x] Добавить scoped 3D floating effect with reduced-motion safeguards, verify responsive presentation and save checkpoint.
 - [x] Проверить failed visual-editor targeting for the Home Hero section and content object.
 - [x] Перенести 3D effect с Hero content object на Hero section, сохранить responsive/reduced-motion behavior, выполнить QA и checkpoint.
+- [x] Проверить deterministic visual edit, удаляющий 3D effect с Home Hero section.
+- [x] Сохранить Hero без 3D effect, проверить responsive/regression behavior и создать checkpoint.

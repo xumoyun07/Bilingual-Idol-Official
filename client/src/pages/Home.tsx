@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <PublicLayout>
       <div className="simple-public-page">
-        <section className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580 simple-home-intro--floating">
+        <section className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580">
           {heroPoster ? <img className="simple-home-hero-media" src={heroPoster.publicUrl} alt="" aria-hidden="true" fetchPriority="high" decoding="async" /> : null}
           {heroVideo ? <video className="simple-home-hero-media" src={heroVideo.publicUrl} poster={heroPoster?.publicUrl} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" data-hero-video="true" /> : null}
           <div className="simple-home-intro-content simple-home-intro-content--desktop-offset simple-home-intro-content--desktop-geometry">

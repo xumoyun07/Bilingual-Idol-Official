@@ -11,29 +11,30 @@ const results = [];
 for (const viewport of viewports) {
   const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
   await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector(".simple-home-intro--floating");
+  await page.waitForSelector(".simple-home-intro");
   const audit = await page.evaluate(() => {
-    const floating = document.querySelector(".simple-home-intro--floating");
+    const hero = document.querySelector(".simple-home-intro");
     const header = document.querySelector(".simple-public-header");
     const homeLink = document.querySelector('[aria-label="Primary navigation"] a[href="/"]');
     const rect = element => element ? element.getBoundingClientRect() : null;
-    const floatingStyle = floating ? getComputedStyle(floating) : null;
+    const heroStyle = hero ? getComputedStyle(hero) : null;
     const headerStyle = header ? getComputedStyle(header) : null;
     return {
       viewportWidth: window.innerWidth,
       documentWidth: document.documentElement.scrollWidth,
       bodyWidth: document.body.scrollWidth,
-      floating: rect(floating),
-      floatingTransform: floatingStyle?.transform ?? null,
-      floatingAnimation: floatingStyle?.animationName ?? null,
-      floatingPerspective: floatingStyle?.perspective ?? null,
+      hero: rect(hero),
+      floatingClassCount: document.querySelectorAll(".simple-home-intro--floating, .simple-home-intro-content--floating").length,
+      heroTransform: heroStyle?.transform ?? null,
+      heroAnimation: heroStyle?.animationName ?? null,
       headerPosition: headerStyle?.position ?? null,
       headerZIndex: headerStyle?.zIndex ?? null,
       homeActive: homeLink?.getAttribute("aria-current") ?? null,
     };
   });
   const overflow = Math.max(audit.documentWidth, audit.bodyWidth) - audit.viewportWidth;
-  if (!audit.floating || audit.floating.width <= 0 || audit.floating.height <= 0) throw new Error(`${viewport.name}: Hero floating object is not visible`);
+  if (!audit.hero || audit.hero.width <= 0 || audit.hero.height <= 0) throw new Error(`${viewport.name}: Hero is not visible`);
+  if (audit.floatingClassCount !== 0) throw new Error(`${viewport.name}: removed 3D class is still present`);
   if (overflow > 1) throw new Error(`${viewport.name}: horizontal overflow ${overflow}px`);
   if (audit.headerPosition !== "sticky" || audit.headerZIndex !== "1000") throw new Error(`${viewport.name}: sticky header layer is incorrect`);
   if (audit.homeActive !== "page") throw new Error(`${viewport.name}: Home link is not active on /`);
