@@ -944,3 +944,6 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .enroll-hero-media img { min-height: 13rem; }
   .enroll-page .simple-enroll-layout { padding-top: 2rem; }
 }
+
+/* Founder Login visual-editor normalization: intro surface values expressed semantically. */
+.auth-intro--surface { border: 1px solid var(--blue-line); border-radius: 1rem; background: #fff; padding: 1.25rem; }

@@ -262,3 +262,4 @@
 - [x] Verify and normalize the latest About spacing visual-editor changes: 50px section/container spacing, duplicate JSX styles and responsive regression safety before checkpoint.
 - [x] Verify and normalize the latest Enroll visual-editor changes: duplicate JSX styles, 1216px header/media layout, LeadForm compatibility and responsive regression safety before checkpoint.
 - [x] Reorder public navigation to Home, About, Programmes, News, Contact and verify desktop/mobile active states before checkpoint.
+- [x] Verify and normalize the latest Founder Login intro-surface visual edit: remove redundant inline style, preserve auth behavior and responsive regression safety before checkpoint.
