@@ -471,7 +471,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 /* Approved desktop geometry, translated into an adaptive layout rather than inline fixed dimensions. */
 @media (min-width: 1280px) {
   .simple-public-header--refined { width: 1328px; margin-top: 0; margin-left: 46px; border-radius: 20px; }
-  .simple-home-intro--desktop-geometry { width: 1321px; height: calc(100svh - 4.5rem - 33px); margin-top: 33px; margin-left: -51px; border-radius: 20px; }
+  .simple-home-intro--desktop-geometry { width: 1321px; height: calc(100svh - 4.5rem - 39px); margin-top: 39px; margin-left: -51px; border-radius: 20px; }
 }
 @media (min-width: 768px) and (max-width: 1279px) {
   .simple-public-header--refined { width: calc(100% - 2.5rem); margin: .75rem 1.25rem 0; border-radius: 20px; }
