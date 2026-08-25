@@ -308,6 +308,7 @@ export const attendanceRecords = mysqlTable("attendanceRecords", {
   classSessionId: int("classSessionId").notNull(),
   studentId: int("studentId").notNull(),
   status: mysqlEnum("status", ["present", "absent", "late", "excused"]).default("present").notNull(),
+  method: mysqlEnum("method", ["manual", "qr"]).default("manual").notNull(),
   note: text("note"),
   markedByTeacherId: int("markedByTeacherId").notNull(),
   markedAt: timestamp("markedAt").defaultNow().notNull(),

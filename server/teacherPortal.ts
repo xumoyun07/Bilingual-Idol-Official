@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
 import { sdk } from "./_core/sdk";
-import { TeacherSessionAccessError, getTeacherSessionDetails, listTeacherSchedule, type TeacherScheduleFilter } from "./teacher";
+import { TeacherSessionAccessError, getTeacherAttendance, getTeacherSessionDetails, listTeacherSchedule, saveTeacherAttendance, type TeacherScheduleFilter } from "./teacher";
 
 export const teacherClassSessionsPath = "/portal/teacher/class-sessions";
+export const teacherAttendancePath = `${teacherClassSessionsPath}/:id/attendance`;
 
 type DateRangePreset = "today" | "week" | "custom";
 
@@ -65,6 +66,41 @@ export async function handleTeacherClassSessions(req: Request, res: Response) {
     return res.json({ sessions, filter: { preset, from: filter.from?.toISOString().slice(0, 10), to: filter.to?.toISOString().slice(0, 10) } });
   } catch (error) {
     return res.status(400).json({ error: error instanceof Error ? error.message : "Invalid class session request." });
+  }
+}
+
+export async function handleTeacherAttendance(req: Request, res: Response) {
+  const user = await authenticateTeacher(req, res);
+  if (!user) return;
+  const classSessionId = Number(req.params.id);
+  if (!Number.isSafeInteger(classSessionId) || classSessionId < 1) return res.status(400).json({ error: "Invalid class session id." });
+  try {
+    return res.json(await getTeacherAttendance(user.id, classSessionId));
+  } catch (error) {
+    if (error instanceof TeacherSessionAccessError) return res.status(404).json({ error: "Class session not found." });
+    console.error("[teacher-portal] Could not load attendance", error);
+    return res.status(500).json({ error: "Attendance could not be loaded." });
+  }
+}
+
+export async function handleTeacherAttendanceUpdate(req: Request, res: Response) {
+  const user = await authenticateTeacher(req, res);
+  if (!user) return;
+  const classSessionId = Number(req.params.id);
+  const studentId = Number(req.body?.studentId);
+  const status = req.body?.status;
+  const method = req.body?.method ?? "manual";
+  const note = req.body?.note;
+  if (!Number.isSafeInteger(classSessionId) || classSessionId < 1 || !Number.isSafeInteger(studentId) || studentId < 1) return res.status(400).json({ error: "Valid class session and student IDs are required." });
+  if (!["present", "absent", "late", "excused"].includes(status)) return res.status(400).json({ error: "Invalid attendance status." });
+  if (!["manual", "qr"].includes(method)) return res.status(400).json({ error: "Invalid attendance method." });
+  if (note !== undefined && note !== null && typeof note !== "string") return res.status(400).json({ error: "Attendance note must be text." });
+  try {
+    return res.json(await saveTeacherAttendance({ teacherId: user.id, classSessionId, studentId, status, method, note }));
+  } catch (error) {
+    if (error instanceof TeacherSessionAccessError) return res.status(403).json({ error: "This student or class is not assigned to your account." });
+    console.error("[teacher-portal] Could not save attendance", error);
+    return res.status(500).json({ error: "Attendance could not be saved." });
   }
 }
 

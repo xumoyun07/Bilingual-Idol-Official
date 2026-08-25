@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect } from "react";
@@ -11,6 +12,7 @@ export default function UserDashboard() {
   const { user, loading, logout } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
   const isOperationsUser = Boolean(user && OPERATIONS_ROLES.includes(user.role));
   const isTeacher = user?.role === "teacher";
+  const attendanceSummary = trpc.studentAttendance.summary.useQuery(undefined, { enabled: user?.role === "student", retry: false });
 
   useEffect(() => {
     if (isOperationsUser) window.location.href = user?.role === "super_admin" ? "/super-admin" : "/admin";
@@ -26,7 +28,7 @@ export default function UserDashboard() {
     <section className="member-content" aria-labelledby="member-dashboard-title">
       <div className="member-welcome"><span className="member-avatar" aria-hidden="true"><UserRound size={23} /></span><p className="simple-eyebrow">{role} account</p><h1 id="member-dashboard-title">Welcome{user?.name ? `, ${user.name}` : ""}.</h1><p>Your account is ready. Information shared by the centre will appear here when it is available for your role.</p></div>
       <section className="member-next-step" aria-label="Next step"><div><BookOpen aria-hidden="true" size={21} /><h2>Find a programme</h2><p>Review the current programme information or contact the centre if you need help choosing the right option.</p></div><Link href="/programs" className="simple-button">View programmes<ArrowRight size={16} /></Link></section>
-      <section className="member-status" aria-label="Account information"><ShieldCheck aria-hidden="true" size={19} /><div><strong>No account information is published yet.</strong><p>Schedules, materials, payments and progress will appear only when the centre enables the relevant account area.</p></div></section>
+      <section className="member-status" aria-label="Attendance information"><ShieldCheck aria-hidden="true" size={19} /><div>{attendanceSummary.isLoading ? <><strong>Attendance: loading</strong><p>Your latest attendance summary is being prepared.</p></> : attendanceSummary.data?.totalSessions ? <><strong>Attendance: {attendanceSummary.data.percentage}%</strong><p>{attendanceSummary.data.attendedSessions} of {attendanceSummary.data.totalSessions} completed sessions attended. Present and late marks count as attended.</p></> : <><strong>Attendance is not available yet.</strong><p>Your attendance percentage will appear after the centre records completed sessions for your account.</p></>}</div></section>
     </section>
   </main>;
 }

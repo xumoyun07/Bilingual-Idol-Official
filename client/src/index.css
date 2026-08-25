@@ -1137,3 +1137,11 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 .teacher-published-badge { border-color: #b8ddca; background: #eef8f2; color: #27614e; }
 @media (max-width: 1023px) { .teacher-workspace-grid { grid-template-columns: 1fr; } .teacher-session-list { max-height: 24rem; overflow: auto; } }
 @media (max-width: 639px) { .teacher-workspace { gap: 1rem; } .teacher-workspace-intro { padding: 1.25rem; } .teacher-workspace-icon { width: 2.6rem; height: 2.6rem; } .teacher-workspace-grid, .teacher-action-grid { gap: 1rem; } .teacher-action-grid { grid-template-columns: 1fr; } .teacher-class-summary [data-slot="card-content"] { align-items: start; flex-direction: column; } .teacher-session-button { grid-template-columns: 1fr; } .teacher-session-time { text-align: left; } .teacher-score-grid, .teacher-grade-actions, .teacher-custom-date-grid { grid-template-columns: 1fr; } .teacher-result-row, .teacher-roster-row { align-items: start; flex-direction: column; } .teacher-session-actions { display: grid; grid-template-columns: 1fr; } }
+
+.teacher-attendance-roster { display: grid; gap: .65rem; }
+.teacher-attendance-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid #d9e2f1; border-radius: .72rem; background: #fff; padding: .75rem .85rem; }
+.teacher-attendance-row strong { display: block; color: #10253e; font-size: .87rem; font-weight: 800; }
+.teacher-attendance-row p { margin-top: .18rem; color: #61728c; font-size: .76rem; }
+.teacher-attendance-toggle { display: flex; flex-wrap: wrap; gap: .45rem; }
+.teacher-attendance-toggle button { min-width: 5.2rem; min-height: 2.5rem; }
+@media (max-width: 639px) { .teacher-attendance-row { align-items: stretch; flex-direction: column; } .teacher-attendance-toggle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .teacher-attendance-toggle button { width: 100%; } }

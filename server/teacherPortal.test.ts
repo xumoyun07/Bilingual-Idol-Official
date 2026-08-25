@@ -57,3 +57,33 @@ describe("Teacher T1 portal endpoints", () => {
     expect(res.json).toHaveBeenCalledWith({ error: "Class session not found." });
   });
 });
+
+
+describe("Teacher T2 attendance endpoints", () => {
+  it("returns current attendance only through the teacher-owned session query", async () => {
+    vi.spyOn(sdk, "authenticateRequest").mockResolvedValue(teacherUser);
+    const attendance = vi.spyOn(teacher, "getTeacherAttendance").mockResolvedValue({ session, students: [{ id: 81, name: "Ari Student", email: "ari@example.test", status: "present", method: "manual", note: null, markedAt: new Date("2026-09-01T10:00:00.000Z") }] } as never);
+    const res = response();
+    await (await import("./teacherPortal")).handleTeacherAttendance({ params: { id: "12" }, originalUrl: "/portal/teacher/class-sessions/12/attendance" } as never, res as never);
+    expect(attendance).toHaveBeenCalledWith(41, 12);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ session, students: expect.any(Array) }));
+  });
+
+  it("returns 403 and never writes when the student is not assigned to the owned session", async () => {
+    vi.spyOn(sdk, "authenticateRequest").mockResolvedValue(teacherUser);
+    const save = vi.spyOn(teacher, "saveTeacherAttendance").mockRejectedValue(new teacher.TeacherSessionAccessError());
+    const res = response();
+    await (await import("./teacherPortal")).handleTeacherAttendanceUpdate({ params: { id: "12" }, body: { studentId: 999, status: "present", method: "manual" }, originalUrl: "/portal/teacher/class-sessions/12/attendance" } as never, res as never);
+    expect(save).toHaveBeenCalledWith({ teacherId: 41, classSessionId: 12, studentId: 999, status: "present", method: "manual", note: undefined });
+    expect(res.status).toHaveBeenCalledWith(403);
+  });
+
+  it("updates an existing attendance mark through the explicit upsert path", async () => {
+    vi.spyOn(sdk, "authenticateRequest").mockResolvedValue(teacherUser);
+    const save = vi.spyOn(teacher, "saveTeacherAttendance").mockResolvedValue({ session, attendance: null, grades: [], students: [] } as never);
+    const res = response();
+    await (await import("./teacherPortal")).handleTeacherAttendanceUpdate({ params: { id: "12" }, body: { studentId: 81, status: "late", method: "manual", note: "Arrived late" }, originalUrl: "/portal/teacher/class-sessions/12/attendance" } as never, res as never);
+    expect(save).toHaveBeenCalledWith({ teacherId: 41, classSessionId: 12, studentId: 81, status: "late", method: "manual", note: "Arrived late" });
+    expect(res.json).toHaveBeenCalled();
+  });
+});

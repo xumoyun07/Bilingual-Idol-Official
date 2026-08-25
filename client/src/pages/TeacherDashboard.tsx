@@ -40,6 +40,7 @@ export default function TeacherDashboard() {
   const schedule = trpc.teacher.schedule.useQuery(scheduleFilter, { enabled: isTeacher && customRangeReady, retry: false });
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const sessionDetails = trpc.teacher.sessionDetails.useQuery({ classSessionId: selectedSessionId ?? 1 }, { enabled: isTeacher && selectedSessionId !== null, retry: false });
+  const attendance = trpc.teacher.attendance.useQuery({ classSessionId: selectedSessionId ?? 1 }, { enabled: isTeacher && selectedSessionId !== null, retry: false });
   const [attendanceStatus, setAttendanceStatus] = useState<AttendanceStatus>("present");
   const [attendanceNote, setAttendanceNote] = useState("");
   const [assessmentTitle, setAssessmentTitle] = useState("Lesson result");
@@ -62,7 +63,7 @@ export default function TeacherDashboard() {
   }, [sessionDetails.data?.attendance, selectedSessionId]);
 
   const refresh = async () => {
-    await Promise.all([utils.teacher.schedule.invalidate(), utils.teacher.sessionDetails.invalidate()]);
+    await Promise.all([utils.teacher.schedule.invalidate(), utils.teacher.sessionDetails.invalidate(), utils.teacher.attendance.invalidate()]);
   };
   const saveAttendance = trpc.teacher.saveAttendance.useMutation({ onSuccess: async () => { await refresh(); toast.success("Attendance saved."); }, onError: error => toast.error(error.message) });
   const upsertGrade = trpc.teacher.upsertGrade.useMutation({ onSuccess: async (_result, variables) => { await refresh(); toast.success(variables.isPublished ? "Result published." : "Result saved as a draft."); }, onError: error => toast.error(error.message) });
@@ -71,7 +72,7 @@ export default function TeacherDashboard() {
   const details = sessionDetails.data;
   const submitAttendance = () => {
     if (!selectedSessionId) return;
-    saveAttendance.mutate({ classSessionId: selectedSessionId, status: attendanceStatus, note: attendanceNote || null });
+    saveAttendance.mutate({ classSessionId: selectedSessionId, studentId: details?.session.studentId ?? 0, status: attendanceStatus, method: "manual", note: attendanceNote || null });
   };
   const submitGrade = (isPublished: boolean) => {
     if (!selectedSessionId) return;
@@ -109,7 +110,8 @@ export default function TeacherDashboard() {
             <Card className="teacher-class-summary"><CardContent><div><p className="minimal-eyebrow">Selected class</p><h3>{details.session.title}</h3><p>{details.session.courseName} · {formatSessionDate(details.session.scheduledFor)} · {details.session.startsAt}–{details.session.endsAt}{details.session.room ? ` · ${details.session.room}` : ""}</p></div><Badge variant="secondary"><UsersRound size={14} />{details.students.length} student{details.students.length === 1 ? "" : "s"}</Badge></CardContent></Card>
             <Card className="teacher-roster-card"><CardHeader><CardTitle><UsersRound size={19} /> Students</CardTitle><CardDescription>Students directly assigned to this session. This class view does not manage enrolments.</CardDescription></CardHeader><CardContent>{details.students.length ? <div className="teacher-roster-stack">{details.students.map(student => <div className="teacher-roster-row" key={student.id}><div><strong>{student.name || "Student"}</strong><p>{student.email || "No e-mail available"}</p></div>{student.attendanceStatus ? <Badge variant="secondary">{attendanceLabels[student.attendanceStatus]}</Badge> : <Badge variant="outline">Not marked</Badge>}</div>)}</div> : <p className="teacher-empty">No student is assigned to this session.</p>}<div className="teacher-session-actions"><Button type="button" variant="outline" onClick={() => document.getElementById("teacher-attendance")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Take attendance</Button><Button type="button" onClick={() => document.getElementById("teacher-results")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Record results</Button></div></CardContent></Card>
             <div className="teacher-action-grid">
-              <Card id="teacher-attendance"><CardHeader><CardTitle><CheckCircle2 size={19} /> Attendance</CardTitle><CardDescription>Save one attendance status for this student and session.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
+              <Card id="teacher-attendance"><CardHeader><CardTitle><CheckCircle2 size={19} /> Attendance</CardTitle><CardDescription>Save one attendance status for each student in this session. Re-saving updates the existing mark.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
+                <div className="teacher-attendance-roster" aria-label="Attendance students">{(attendance.data?.students ?? details.students).map(student => <div className="teacher-attendance-row" key={student.id}><div><strong>{student.name || "Student"}</strong><p>{student.email || "No e-mail available"}</p></div><div className="teacher-attendance-toggle" role="group" aria-label={`Attendance for ${student.name || "student"}`}><Button type="button" size="sm" variant={("status" in student ? student.status : student.attendanceStatus) === "present" ? "default" : "outline"} onClick={() => setAttendanceStatus("present")}>Present</Button><Button type="button" size="sm" variant={("status" in student ? student.status : student.attendanceStatus) === "absent" ? "destructive" : "outline"} onClick={() => setAttendanceStatus("absent")}>Absent</Button></div></div>)}</div>
                 <Label htmlFor="attendance-status">Attendance status</Label><select id="attendance-status" value={attendanceStatus} onChange={event => setAttendanceStatus(event.target.value as AttendanceStatus)}>{(Object.keys(attendanceLabels) as AttendanceStatus[]).map(status => <option key={status} value={status}>{attendanceLabels[status]}</option>)}</select>
                 <Label htmlFor="attendance-note">Note <span>Optional</span></Label><Textarea id="attendance-note" value={attendanceNote} onChange={event => setAttendanceNote(event.target.value)} maxLength={2000} placeholder="Add a concise attendance note" />
                 <Button type="button" onClick={submitAttendance} disabled={saveAttendance.isPending}>{saveAttendance.isPending ? "Saving…" : "Save attendance"}</Button>

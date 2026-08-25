@@ -1,0 +1,1 @@
+ALTER TABLE `attendanceRecords` ADD `method` enum('manual','qr') DEFAULT 'manual' NOT NULL;

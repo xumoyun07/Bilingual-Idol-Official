@@ -26,7 +26,10 @@ export const teacherRouter = router({
   sessionDetails: teacherProcedure.input(classSessionInput).query(async ({ ctx, input }) => {
     try { return await teacher.getTeacherSessionDetails(ctx.user.id, input.classSessionId); } catch (error) { return teacherError(error); }
   }),
-  saveAttendance: teacherProcedure.input(classSessionInput.extend({ status: z.enum(["present", "absent", "late", "excused"]), note: z.string().trim().max(2000).optional().nullable() })).mutation(async ({ ctx, input }) => {
+  attendance: teacherProcedure.input(classSessionInput).query(async ({ ctx, input }) => {
+    try { return await teacher.getTeacherAttendance(ctx.user.id, input.classSessionId); } catch (error) { return teacherError(error); }
+  }),
+  saveAttendance: teacherProcedure.input(classSessionInput.extend({ studentId: z.number().int().positive(), status: z.enum(["present", "absent", "late", "excused"]), method: z.enum(["manual", "qr"]).default("manual"), note: z.string().trim().max(2000).optional().nullable() })).mutation(async ({ ctx, input }) => {
     try { return await teacher.saveTeacherAttendance({ teacherId: ctx.user.id, ...input }); } catch (error) { return teacherError(error); }
   }),
   upsertGrade: teacherProcedure.input(classSessionInput.extend({ title: z.string().trim().min(1).max(160), score: z.number().int().min(0).max(100000), maxScore: z.number().int().min(1).max(100000), feedback: z.string().trim().max(4000).optional().nullable(), isPublished: z.boolean() }).refine(input => input.score <= input.maxScore, { message: "Score cannot exceed the maximum score.", path: ["score"] })).mutation(async ({ ctx, input }) => {

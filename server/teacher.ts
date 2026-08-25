@@ -83,17 +83,37 @@ export async function getTeacherSessionDetails(teacherId: number, classSessionId
   return { session, attendance: attendance ?? null, grades: sessionGrades, students };
 }
 
-export async function saveTeacherAttendance(input: { teacherId: number; classSessionId: number; status: "present" | "absent" | "late" | "excused"; note?: string | null }) {
+export async function getTeacherAttendance(teacherId: number, classSessionId: number) {
+  const { database, session } = await getOwnedSession(teacherId, classSessionId);
+  const students = await database.select({
+    id: users.id,
+    name: users.name,
+    email: users.email,
+    status: attendanceRecords.status,
+    method: attendanceRecords.method,
+    note: attendanceRecords.note,
+    markedAt: attendanceRecords.markedAt,
+  }).from(classSessions)
+    .innerJoin(users, eq(users.id, classSessions.studentId))
+    .leftJoin(attendanceRecords, and(eq(attendanceRecords.classSessionId, classSessions.id), eq(attendanceRecords.studentId, classSessions.studentId)))
+    .where(and(eq(classSessions.id, session.id), eq(classSessions.teacherId, teacherId)))
+    .orderBy(asc(users.name), asc(users.id));
+  return { session, students };
+}
+
+export async function saveTeacherAttendance(input: { teacherId: number; classSessionId: number; studentId: number; status: "present" | "absent" | "late" | "excused"; method: "manual" | "qr"; note?: string | null }) {
   const { database, session } = await getOwnedSession(input.teacherId, input.classSessionId);
+  if (input.studentId !== session.studentId) throw new TeacherSessionAccessError();
   const note = input.note?.trim() || null;
   await database.insert(attendanceRecords).values({
     classSessionId: session.id,
-    studentId: session.studentId,
+    studentId: input.studentId,
     status: input.status,
+    method: input.method,
     note,
     markedByTeacherId: input.teacherId,
     markedAt: new Date(),
-  }).onDuplicateKeyUpdate({ set: { status: input.status, note, markedByTeacherId: input.teacherId, markedAt: new Date() } });
+  }).onDuplicateKeyUpdate({ set: { status: input.status, method: input.method, note, markedByTeacherId: input.teacherId, markedAt: new Date() } });
   return getTeacherSessionDetails(input.teacherId, session.id);
 }
 

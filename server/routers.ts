@@ -17,6 +17,7 @@ import { usersRouter } from "./routers/users";
 import { mediaRouter } from "./routers/media";
 import { newsRouter } from "./routers/news";
 import { teacherRouter } from "./routers/teacher";
+import { studentAttendanceRouter } from "./routers/studentAttendance";
 import { dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 
 export const appRouter = router({
@@ -52,6 +53,7 @@ export const appRouter = router({
   media: mediaRouter,
   news: newsRouter,
   teacher: teacherRouter,
+  studentAttendance: studentAttendanceRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -284,3 +284,9 @@
 - [x] Update the My classes interface with today/upcoming list, date filters, detail navigation, student roster and clear links to the existing attendance/results controls.
 - [x] Add automated T1 isolation/filter tests, complete responsive/regression QA without fabricating class data, then save a checkpoint.
 - [x] T1 real-teacher visual acceptance gate deferred: no active teacher or class session data exists in the current database, so the populated roster/filter UI was not exercised with fabricated records; endpoint smoke checks, non-teacher browser denial, responsive source review, 83 tests and TypeScript passed.
+- [x] Audit T0/T1 attendance records and Student Dashboard attendance percentage contracts before implementing T2.
+- [x] Add teacher-owned attendance list and upsert query helpers with explicit `manual`/`qr` method semantics and duplicate updates.
+- [x] Add protected `GET/POST /portal/teacher/class-sessions/:id/attendance` and matching teacher-only tRPC procedures with ownership enforcement.
+- [x] Build the attendance screen with student presence toggles and immediate attendance percentage refresh in Student Dashboard.
+- [x] Test RBAC, foreign-session denial, duplicate update behavior, attendance percentage propagation and responsive states before checkpoint.
+- [x] T2 populated-data visual acceptance gate deferred: current database has no active teacher/session records and protected route screenshots were unavailable; no attendance data was fabricated, while 20 test files / 89 tests, TypeScript and endpoint/RBAC checks passed.

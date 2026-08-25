@@ -39,6 +39,7 @@ describe("public accessibility structure", () => {
     expect(login).toContain('role="alert"');
     expect(login).toContain("login.isPending");
     expect(dashboard).toContain('redirectPath: "/login"');
-    expect(dashboard).toContain("No account information is published yet.");
+    expect(dashboard).toContain("Attendance is not available yet.");
+    expect(dashboard).toContain("attendanceSummary");
   });
 });

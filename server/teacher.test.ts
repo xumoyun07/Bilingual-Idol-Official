@@ -69,7 +69,7 @@ describe("Teacher T0 router", () => {
     vi.spyOn(teacher, "publishTeacherGrade").mockRejectedValue(new teacher.TeacherSessionAccessError());
     const caller = appRouter.createCaller(context("teacher"));
     await expect(caller.teacher.sessionDetails({ classSessionId: 999 })).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(caller.teacher.saveAttendance({ classSessionId: 999, status: "present", note: null })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(caller.teacher.saveAttendance({ classSessionId: 999, studentId: 81, status: "present", method: "manual", note: null })).rejects.toMatchObject({ code: "FORBIDDEN" });
     await expect(caller.teacher.upsertGrade({ classSessionId: 999, title: "Lesson result", score: 9, maxScore: 10, feedback: null, isPublished: false })).rejects.toMatchObject({ code: "FORBIDDEN" });
     await expect(caller.teacher.publishGrade({ classSessionId: 999, gradeId: 4 })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
@@ -79,7 +79,7 @@ describe("Teacher T0 router", () => {
     const grade = vi.spyOn(teacher, "upsertTeacherGrade").mockResolvedValue(details);
     const publish = vi.spyOn(teacher, "publishTeacherGrade").mockResolvedValue(details);
     const caller = appRouter.createCaller(context("teacher"));
-    await caller.teacher.saveAttendance({ classSessionId: 12, status: "late", note: "Arrived after the warm-up." });
+    await caller.teacher.saveAttendance({ classSessionId: 12, studentId: 81, status: "late", method: "manual", note: "Arrived after the warm-up." });
     await caller.teacher.upsertGrade({ classSessionId: 12, title: "Speaking", score: 8, maxScore: 10, feedback: "Good clarity.", isPublished: false });
     await caller.teacher.publishGrade({ classSessionId: 12, gradeId: 2 });
     expect(attendance).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 41, classSessionId: 12, status: "late" }));
