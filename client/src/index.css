@@ -454,10 +454,10 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Responsive normalization of visual-editor refinements. */
 .simple-public-main { width: 100%; min-width: 0; }
-.simple-public-header--refined { border-radius: 31px; }
+.simple-public-header--refined { position: sticky; top: 0; border: 1px solid var(--bilc-line); border-radius: 31px; }
 .simple-home-intro--refined { margin-top: 18px; border-radius: 20px; }
 .simple-home-panel { border-radius: 20px; background: rgb(255 255 255 / .92); padding-right: clamp(1rem, 3vw, 1.25rem); padding-left: clamp(1rem, 3vw, 1.25rem); }
-.simple-home-programmes-panel { border-radius: 20px; }
+.simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }.simple-home-programmes-panel { border-radius: 20px; background: var(--bilc-mist); }
 .simple-contact-strip--refined { margin-top: 64px; }
 @media (min-width: 1280px) {
   .simple-public-header--refined { width: min(1330px, calc(100% - 5.625rem)); margin-top: -6px; margin-left: clamp(2rem, 3.125vw, 45px); }
@@ -513,7 +513,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (min-width: 1400px) {
   .simple-home-intro--desktop-580 { width: 1320px; height: 580px; }
   .simple-home-intro-content--desktop-offset { transform: translateY(-87px); }
-  .simple-home-intro-content--desktop-geometry { width: 723px; height: 675px; max-width: none; }
+  .simple-home-intro-content--desktop-geometry { width: 723px; height: 675px; max-width: none; padding-top: 155px; }
 }
 @media (max-width: 1399px) {
   .simple-home-intro-content--desktop-geometry { width: auto; height: auto; max-width: 45rem; }

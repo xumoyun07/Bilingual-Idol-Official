@@ -80,6 +80,9 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("Public action spacing from visual editor");
     expect(css).toContain("gap: 25px");
     expect(css).toContain("Desktop Hero size and content position from visual editor");
+    expect(css).toContain(".simple-public-header--refined { position: sticky");
+    expect(css).toContain(".simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }");
+    expect(css).toContain("padding-top: 155px");
     expect(css).toContain("transform: translateY(-87px)");
     expect(css).toContain("width: 723px");
     expect(css).toContain("height: 675px");
