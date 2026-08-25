@@ -217,3 +217,5 @@
 - [x] Нормализовать sticky public header and Home visual styles without duplicate child-level declarations; verify public/auth/dashboard behavior and save checkpoint.
 - [x] Fix public sticky header stacking so it stays above scrolled content without changing login or dashboard menus.
 - [x] Normalize latest Programme section colors at section/list level, verify responsive scroll layering and save checkpoint.
+- [x] Проверить current public sticky header top/side offsets and stacking geometry at desktop/mobile.
+- [x] Apply responsive public sticky inset, verify scrolled layering and navigation regressions, and save checkpoint.

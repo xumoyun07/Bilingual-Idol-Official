@@ -454,7 +454,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Responsive normalization of visual-editor refinements. */
 .simple-public-main { width: 100%; min-width: 0; }
-.simple-public-header--refined { position: sticky; top: 0; z-index: 1000; isolation: isolate; border: 1px solid var(--bilc-line); border-radius: 31px; background: rgb(255 255 255 / .97); }
+.simple-public-header--refined { position: sticky; top: 1rem; z-index: 1000; isolation: isolate; border: 1px solid var(--bilc-line); border-radius: 31px; background: rgb(255 255 255 / .97); box-shadow: 0 10px 30px rgb(16 37 62 / .08); }
 .simple-home-intro--refined { margin-top: 18px; border-radius: 20px; }
 .simple-home-panel { border-radius: 20px; background: rgb(255 255 255 / .92); padding-right: clamp(1rem, 3vw, 1.25rem); padding-left: clamp(1rem, 3vw, 1.25rem); }
 .simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }.simple-home-programmes-panel { border-radius: 20px; background: #fff; }.simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }
@@ -478,7 +478,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   .simple-home-intro--desktop-geometry { width: 100%; height: calc(100svh - 4.5rem - 24px); margin: 24px 0 0; border-radius: 20px; }
 }
 @media (max-width: 767px) {
-  .simple-public-header--refined { width: calc(100% - 2rem); margin: .75rem 1rem 0; border-radius: 20px; }
+  .simple-public-header--refined { top: .75rem; width: calc(100% - 2rem); margin: .75rem 1rem 0; border-radius: 20px; }
   .simple-home-intro--desktop-geometry { width: 100%; height: calc(100svh - 4.5rem - 18px); margin: 18px 0 0; border-radius: 20px; }
 }
 
