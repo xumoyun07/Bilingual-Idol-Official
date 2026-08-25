@@ -245,3 +245,6 @@
 - [x] Переработать News post modal в профессиональном minimalist стиле, проверить interaction/accessibility/responsive behavior и создать checkpoint.
 - [x] Проверить текущие News modal/share route, manager date fields, router validation and timestamp schema.
 - [x] Добавить Share copy-link flow and enforce automatic server publication date without manual assignment; обновить tests, QA и checkpoint.
+- [x] Проверить About page structure, existing media slots, storage contract and responsive styles.
+- [x] Подготовить restrained set of five About media assets and upload them to project storage.
+- [x] Интегрировать About media into semantic responsive sections with lazy loading, проверить accessibility/performance/regressions и создать checkpoint.

@@ -178,6 +178,33 @@ describe("minimal frontend rewrite", () => {
     expect(app).toContain('path="/admin/media"');
   });
 
+  it("adds a restrained storage-backed About media rhythm without hardcoded local assets", () => {
+    const about = read("pages/About.tsx");
+    const router = read("../../server/routers/media.ts");
+    const css = read("index.css");
+    expect(about).toContain("trpc.media.publicList.useQuery");
+    expect(about).toContain("resolveAboutMedia");
+    expect(about).toContain('about_hero');
+    expect(about).toContain('about_method');
+    expect(about).toContain('about_classroom');
+    expect(about).toContain('about_community');
+    expect(about).toContain('about_cta');
+    expect(about).toContain('loading="eager"');
+    expect(about).toContain('loading = "lazy"');
+    expect(about).toContain("about-hero-media");
+    expect(about).toContain("about-contact-panel");
+    expect(about).not.toContain("style={{");
+    expect(router).toContain('"about_hero"');
+    expect(router).toContain('"about_method"');
+    expect(router).toContain('"about_classroom"');
+    expect(router).toContain('"about_community"');
+    expect(router).toContain('"about_cta"');
+    expect(router).toContain("upload: founderProcedure");
+    expect(css).toContain(".about-hero-header");
+    expect(css).toContain(".about-contact-panel");
+    expect(css).toContain("@media (max-width: 899px)");
+  });
+
   it("provides a public six-post News grid with accessible modal details and founder-only publishing UI", () => {
     const news = read("pages/News.tsx");
     const manager = read("pages/NewsManager.tsx");

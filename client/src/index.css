@@ -697,3 +697,63 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 .news-dialog-share:focus-visible { outline: 3px solid color-mix(in srgb, var(--bilc-blue) 72%, white); outline-offset: 3px; }
 .news-manager-auto-date { border: 1px solid #d7e2f1; border-radius: .7rem; background: #f5f8fc; padding: .75rem .9rem; color: #53657a; font-size: .82rem; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) { .news-dialog-share { transition: none; } }
+
+
+/* About media system: five restrained storage-backed visuals with responsive, content-first layouts. */
+.about-page { padding-bottom: 2.5rem; }
+.about-hero-header { display: grid; width: min(100%, 76rem); max-width: none; min-height: 30rem; grid-template-columns: minmax(0, 1fr) minmax(18rem, 30rem); align-items: stretch; gap: 2rem; margin: 2.5rem 0 2.25rem; border: 1px solid var(--bilc-line); border-radius: 1.25rem; background: #fff; padding: 2.5rem; box-shadow: 0 12px 28px rgb(25 55 118 / .06); }
+.about-hero-header::before { display: none; }
+.about-hero-copy { display: grid; align-content: center; max-width: 31rem; }
+.about-hero-copy h1 { max-width: 30rem; color: var(--bilc-ink); font-size: clamp(2.7rem, 5vw, 4.55rem); line-height: .98; letter-spacing: -.06em; }
+.about-hero-copy > p:not(.simple-eyebrow) { max-width: 29rem; margin-top: 1.25rem; color: #566983; font-size: 1rem; line-height: 1.7; }
+.about-hero-media, .about-contact-media { min-width: 0; overflow: hidden; border: 1px solid var(--bilc-line); border-radius: 1rem; background: var(--bilc-mist); }
+.about-hero-media { min-height: 25rem; }
+.about-hero-media img, .about-contact-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.about-story-section, .about-approach-section, .about-community-section, .about-team-section { padding-top: 3.5rem; }
+.about-story-grid, .about-method-layout, .about-community-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); align-items: center; gap: clamp(2rem, 6vw, 5rem); }
+.about-story-copy, .about-community-copy { max-width: 34rem; }
+.about-story-copy h2, .about-community-copy h2, .about-approach-intro h2, .about-team-section h2, .about-contact-panel h2 { color: var(--bilc-ink); letter-spacing: -.045em; }
+.about-story-copy h2, .about-community-copy h2 { margin-top: .55rem; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.02; }
+.about-story-copy .simple-text-link, .about-community-copy .simple-text-link { display: inline-flex; margin-top: 1.4rem; font-weight: 750; }
+.about-feature-media { min-width: 0; margin: 0; overflow: hidden; border: 1px solid var(--bilc-line); border-radius: 1rem; background: #fff; box-shadow: 0 14px 30px rgb(25 55 118 / .07); }
+.about-feature-media img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.about-feature-media figcaption { padding: .85rem 1rem 1rem; color: #627391; font-size: .78rem; line-height: 1.5; }
+.about-approach-intro { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 1.75rem; }
+.about-approach-intro h2 { margin-top: .55rem; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.02; }
+.about-approach-intro > p { max-width: 27rem; color: #566983; font-size: .92rem; line-height: 1.65; }
+.about-approach-list { border-top: 1px solid var(--bilc-line); }
+.about-approach-list article { min-height: 5rem; padding-block: 1.1rem; }
+.about-approach-list article > svg { flex: 0 0 auto; color: var(--bilc-blue); }
+.about-method-media { align-self: stretch; }
+.about-community-grid { grid-template-columns: minmax(0, .95fr) minmax(0, 1fr); }
+.about-community-section { border: 1px solid var(--bilc-line); border-radius: 1rem; background: color-mix(in srgb, var(--bilc-mist) 72%, white); }
+.about-community-media img { aspect-ratio: 3 / 2; }
+.about-team-section .simple-section-heading { align-items: end; }
+.about-contact-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 27rem); align-items: stretch; gap: 0; width: min(100%, 76rem); min-height: 20rem; margin-top: 3.5rem; overflow: hidden; border: 1px solid var(--bilc-line); border-radius: 1.25rem; background: var(--bilc-blue); box-shadow: 0 16px 34px rgb(25 55 118 / .1); }
+.about-contact-copy { display: grid; align-content: center; max-width: 34rem; padding: clamp(2rem, 5vw, 3.5rem); color: #fff; }
+.about-contact-copy .simple-eyebrow { color: #dbe6ff; }
+.about-contact-copy h2 { margin-top: .55rem; color: #fff; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.02; }
+.about-contact-copy > p:not(.simple-eyebrow) { max-width: 28rem; margin-top: 1rem; color: rgb(255 255 255 / .78); line-height: 1.65; }
+.simple-primary-link { display: inline-flex; width: fit-content; align-items: center; justify-content: center; min-height: 2.85rem; margin-top: 1.4rem; border: 1px solid #fff; border-radius: .7rem; background: #fff; padding: .7rem 1rem; color: var(--bilc-blue); font-size: .86rem; font-weight: 800; }
+.simple-primary-link:hover { background: #dbe6ff; color: var(--bilc-ink); transform: translateY(-1px); }
+.about-contact-media { min-height: 20rem; border: 0; border-radius: 0; }
+@media (max-width: 899px) {
+  .about-hero-header, .about-contact-panel { grid-template-columns: minmax(0, 1fr); }
+  .about-hero-header { min-height: 0; }
+  .about-hero-media { min-height: 18rem; }
+  .about-story-grid, .about-method-layout, .about-community-grid { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .about-community-grid { padding: 0; }
+  .about-community-copy { order: -1; }
+  .about-approach-intro { align-items: start; flex-direction: column; }
+  .about-contact-media { min-height: 15rem; }
+}
+@media (max-width: 639px) {
+  .about-hero-header { gap: 1.25rem; margin-top: 2.25rem; margin-bottom: 2rem; border-radius: 1rem; padding: 1.25rem; }
+  .about-hero-copy h1 { font-size: clamp(2.45rem, 12vw, 3.4rem); }
+  .about-hero-media { min-height: 14rem; border-radius: .8rem; }
+  .about-story-section, .about-approach-section, .about-community-section, .about-team-section { padding-top: 2.5rem; }
+  .about-community-section { border-radius: .9rem; }
+  .about-contact-panel { min-height: 0; margin-top: 2.5rem; border-radius: 1rem; }
+  .about-contact-copy { padding: 1.5rem; }
+  .about-contact-media { min-height: 13rem; }
+}
