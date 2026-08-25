@@ -1059,3 +1059,27 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
       radial-gradient(circle at 3% 96%, rgb(93 130 225 / .13) 0 3.5rem, transparent 9rem);
   }
 }
+
+/* Dynamic decorative circle field: two edge circles per viewport-square of document height. */
+.dynamic-circle-field { position: absolute; inset: 0; z-index: 0; min-height: 100%; overflow: hidden; pointer-events: none; }
+.dynamic-circle { position: absolute; top: var(--circle-top); width: var(--circle-size); height: var(--circle-size); border: 1px solid rgb(23 63 173 / .16); border-radius: 50%; opacity: .72; transform: translateY(-50%); }
+.dynamic-circle--left { left: calc(var(--circle-offset) * -1); }
+.dynamic-circle--right { right: calc(var(--circle-offset) * -1); }
+.dynamic-circle--blue { background: radial-gradient(circle at 34% 28%, rgb(129 160 239 / .2), rgb(23 63 173 / .08) 58%, transparent 72%); box-shadow: 0 0 0 1rem rgb(23 63 173 / .025), 0 0 0 2.5rem rgb(23 63 173 / .018); }
+.dynamic-circle--mist { background: radial-gradient(circle at 38% 32%, rgb(214 226 255 / .72), rgb(129 160 239 / .12) 62%, transparent 74%); box-shadow: 0 0 0 1rem rgb(129 160 239 / .025), 0 0 0 2.5rem rgb(129 160 239 / .016); }
+.dynamic-circle-field + *, .dynamic-circle-field ~ * { position: relative; z-index: 1; }
+@media (max-width: 767px) {
+  .dynamic-circle { opacity: .56; }
+  .dynamic-circle--left { left: -3.5rem; }
+  .dynamic-circle--right { right: -3.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dynamic-circle { transition: none; }
+}
+
+/* Circle field replaces all previous sphere pseudo-elements and route radial-gradient decorations. */
+.simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface {
+  background-image: linear-gradient(rgb(23 63 173 / .065) 1px, transparent 1px), linear-gradient(90deg, rgb(23 63 173 / .065) 1px, transparent 1px) !important;
+  background-size: 32px 32px !important;
+}
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface)::before { display: none !important; }

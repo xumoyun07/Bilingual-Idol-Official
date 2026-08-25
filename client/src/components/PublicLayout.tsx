@@ -1,4 +1,5 @@
 import { Menu, Phone, X } from "lucide-react";
+import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 
@@ -31,6 +32,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const close = () => setOpen(false);
   return <div className="simple-public-shell">
+    <BackgroundCircleField />
     <a className="simple-skip-link" href="#main-content">Skip to content</a>
     <header className="simple-public-header simple-public-header--refined">
       <div className="simple-public-bar">

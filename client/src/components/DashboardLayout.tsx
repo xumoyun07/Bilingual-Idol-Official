@@ -5,6 +5,7 @@ import { FileImage, GraduationCap, LayoutDashboard, LogOut, Newspaper, ScrollTex
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
+import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { Button } from "./ui/button";
 
 type DashboardRole = "founder" | "super_admin";
@@ -72,8 +73,8 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
         <div className="flex min-w-0 items-center gap-3 group-data-[collapsible=icon]:justify-center"><Avatar className="h-9 w-9 border border-[#d9e2f1]"><AvatarFallback className="bg-[#e8eeff] text-xs font-bold text-[#173fad]">{user?.name?.slice(0, 1).toUpperCase() || "U"}</AvatarFallback></Avatar><div className="min-w-0 group-data-[collapsible=icon]:hidden"><p className="truncate text-sm font-semibold text-[#10253e]">{user?.name || "Account"}</p><p className="truncate text-xs text-[#566983]">{user?.email || ""}</p></div></div>
         <button className="minimal-signout group-data-[collapsible=icon]:justify-center" onClick={logout}><LogOut size={16} /><span className="group-data-[collapsible=icon]:hidden">Sign out</span></button>
       </SidebarFooter>
-    </Sidebar>
-    <SidebarInset className="minimal-dashboard-inset">
+    </Sidebar><SidebarInset className="minimal-dashboard-inset">
+      <BackgroundCircleField seed={`dashboard-${role}-${location}`} />
       <header className="minimal-dashboard-header"><div className="flex items-center gap-3"><SidebarTrigger className="minimal-mobile-trigger" /><div><p className="minimal-eyebrow">Workspace</p><h1>{active.label}</h1></div></div><span className="hidden text-xs font-medium text-[#61727c] sm:inline">Account active</span></header>
       <main className="minimal-dashboard-main workspace-surface">{children}</main>
     </SidebarInset>

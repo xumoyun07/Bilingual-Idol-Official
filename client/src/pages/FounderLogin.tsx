@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
@@ -25,6 +26,7 @@ export default function FounderLogin() {
   }
 
   return <main className="auth-page blue-auth-page">
+    <BackgroundCircleField seed="auth-login" />
     <header className="auth-header">
       <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
         <span aria-hidden="true">BI</span>
