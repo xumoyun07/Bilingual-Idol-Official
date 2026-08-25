@@ -255,3 +255,4 @@
 - [x] Verify and normalize the latest Contact address-block visual edit: white surface without redundant inline styles, responsive rendering and regression safety before checkpoint.
 - [x] Verify and normalize the latest Contact details-section border removal: no redundant inline style, transparent surface and responsive regression safety before checkpoint.
 - [x] Verify and normalize the latest Contact/CentreMap visual-editor changes: borderless details/map surfaces, 16px map geometry, removal of redundant inline styles and regression safety before checkpoint.
+- [x] Verify and normalize the latest Contact contact-grid padding edit: zero padding without redundant inline style and responsive regression safety before checkpoint.
