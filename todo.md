@@ -270,3 +270,4 @@
 - [x] Replace the static sphere system with dynamic 100–300px circles, calculated as two edge circles per viewport-square of page height, and verify all routes before checkpoint.
 - [x] Replaced the sphere background system with dynamic 100–300px circles: two edge circles per viewport-square of page height, deterministic per route seed, center-safe layering and responsive overflow QA completed.
 - [x] Verify the failed PublicLayout target and make the intended CTA button green through semantic CSS, including contrast, hover, navigation and responsive QA before checkpoint.
+- [x] Restore the original Sign in styling while keeping only Make an enquiry green to match the Call action, then verify both desktop/mobile states before checkpoint.
