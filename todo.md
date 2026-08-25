@@ -260,3 +260,4 @@
 - [x] Fix the Contact grid computed padding conflict so the target object is visibly and programmatically 0px on all sides, then run regression before checkpoint.
 - [x] Verify and normalize the latest Contact spacing visual-editor changes: final header/details/enquiry spacing, duplicate JSX styles and responsive regression safety before checkpoint.
 - [x] Verify and normalize the latest About spacing visual-editor changes: 50px section/container spacing, duplicate JSX styles and responsive regression safety before checkpoint.
+- [x] Verify and normalize the latest Enroll visual-editor changes: duplicate JSX styles, 1216px header/media layout, LeadForm compatibility and responsive regression safety before checkpoint.

@@ -919,3 +919,28 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (max-width: 899px) {
   .about-section--compact-spacing { padding-top: 50px; padding-bottom: 50px; }
 }
+
+/* Enroll visual-editor normalization: 1216px responsive header with existing storage-backed photo. */
+.enroll-page { width: min(100% - 2rem, 76rem); max-width: none; padding-bottom: 2.5rem; }
+.enroll-hero-header { display: grid; width: 100%; max-width: none; min-height: 28rem; grid-template-columns: minmax(0, 1fr) minmax(18rem, 30rem); align-items: stretch; gap: 2rem; margin: 2.5rem 0 2.25rem; border: 1px solid var(--bilc-line); border-radius: 1rem; background: #fff; padding: 2.5rem 1.25rem; box-shadow: 0 12px 28px rgb(25 55 118 / .06); }
+.enroll-hero-header::before { display: none; }
+.enroll-hero-copy { display: grid; align-content: center; max-width: 34rem; }
+.enroll-eyebrow { margin-top: 2rem; }
+.enroll-hero-copy h1 { max-width: 34rem; }
+.enroll-hero-copy > p:last-child { max-width: 32rem; }
+.enroll-hero-media { min-width: 0; overflow: hidden; border: 1px solid var(--bilc-line); border-radius: 1.5625rem; background: var(--bilc-mist); }
+.enroll-hero-media img { display: block; width: 100%; height: 100%; min-height: 20rem; object-fit: cover; object-position: center; }
+.enroll-page .simple-enroll-layout { width: 100%; max-width: none; }
+.enroll-next-steps { min-width: 0; }
+@media (min-width: 900px) { .enroll-hero-header { height: 31.25rem; } }
+@media (max-width: 899px) {
+  .enroll-hero-header { grid-template-columns: minmax(0, 1fr); min-height: 0; margin-top: 2.5rem; }
+  .enroll-hero-media img { min-height: 15rem; }
+}
+@media (max-width: 639px) {
+  .enroll-hero-header { gap: 1.25rem; margin-top: 2.25rem; margin-bottom: 2rem; border-radius: 1rem; padding: 2rem 1rem 1rem; }
+  .enroll-hero-copy h1 { font-size: clamp(2.45rem, 12vw, 3.4rem); }
+  .enroll-hero-media { border-radius: .8rem; }
+  .enroll-hero-media img { min-height: 13rem; }
+  .enroll-page .simple-enroll-layout { padding-top: 2rem; }
+}
