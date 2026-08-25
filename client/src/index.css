@@ -511,7 +511,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 
 /* Desktop Hero size and content position from visual editor, scoped once to preserve element rhythm. */
 @media (min-width: 1400px) {
-  .simple-home-intro--desktop-550 { width: 1320px; height: 550px; }
+  .simple-home-intro--desktop-580 { width: 1320px; height: 580px; }
   .simple-home-intro-content--desktop-offset { transform: translateY(-87px); }
   .simple-home-intro-content--desktop-geometry { width: 723px; height: 675px; max-width: none; }
 }

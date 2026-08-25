@@ -211,3 +211,5 @@
 - [x] Normalize desktop Hero content geometry to 723px/675px, verify mobile behavior and save checkpoint.
 - [x] Проверить latest Home Hero 550px edit against desktop/mobile cascade and 723px/675px content geometry.
 - [x] Normalize desktop Hero height to 550px, verify mobile 480px behavior and save checkpoint.
+- [x] Проверить latest Home Hero 580px edit against desktop/mobile cascade and 723px/675px content geometry.
+- [x] Normalize desktop Hero height to 580px, verify mobile 480px behavior and save checkpoint.
