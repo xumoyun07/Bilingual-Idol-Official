@@ -19,7 +19,7 @@ export default function Home() {
         <section className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580">
           {heroPoster ? <img className="simple-home-hero-media" src={heroPoster.publicUrl} alt="" aria-hidden="true" fetchPriority="high" decoding="async" /> : null}
           {heroVideo ? <video className="simple-home-hero-media" src={heroVideo.publicUrl} poster={heroPoster?.publicUrl} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" data-hero-video="true" /> : null}
-          <div className="simple-home-intro-content simple-home-intro-content--desktop-offset simple-home-intro-content--desktop-geometry">
+          <div className="simple-home-intro-content simple-home-intro-content--desktop-offset simple-home-intro-content--desktop-geometry simple-home-intro-content--floating">
             <p className="simple-eyebrow">Language learning in Setapak</p>
             <h1>Find the right next step for learning.</h1>
             <p>Explore language programmes, ask the centre a question, or sign in to the information prepared for your account.</p>

@@ -97,6 +97,19 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("animation: none !important");
   });
 
+  it("scopes the requested 3D floating effect to explicitly marked Hero objects", () => {
+    const home = read("pages/Home.tsx");
+    const css = read("index.css");
+    expect(home).toContain("simple-home-intro-content--floating");
+    expect(css).toContain("Reusable 3D floating surface");
+    expect(css).toContain("perspective: 1200px");
+    expect(css).toContain("transform-style: preserve-3d");
+    expect(css).toContain("animation: bilc-hero-float");
+    expect(css).toContain("@keyframes bilc-hero-float");
+    expect(css).toContain(".simple-home-intro-content--floating::before");
+    expect(css).toContain(".simple-home-intro-content--floating { animation: none !important;");
+  });
+
   it("keeps universal sign-in semantics while using the practical auth surface", () => {
     const login = read("pages/FounderLogin.tsx");
     const css = read("index.css");

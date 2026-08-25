@@ -545,3 +545,39 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 @media (max-width: 767px) {
   .simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface { background-attachment: scroll; }
 }
+
+/* Reusable 3D floating surface for explicitly marked visual objects. */
+.simple-home-intro-content--floating {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  border: 1px solid rgb(255 255 255 / .2);
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, rgb(10 35 92 / .56), rgb(23 63 173 / .24));
+  box-shadow: 0 24px 48px rgb(5 20 58 / .3), inset 0 1px 0 rgb(255 255 255 / .14);
+  perspective: 1200px;
+  transform: translate3d(0, -.35rem, 0) rotateX(0deg);
+  transform-style: preserve-3d;
+  animation: bilc-hero-float 5.5s var(--ease-in-out) infinite;
+  will-change: transform;
+}
+.simple-home-intro-content--floating::before {
+  position: absolute;
+  z-index: -1;
+  inset: .7rem;
+  border: 1px solid rgb(255 255 255 / .11);
+  border-radius: .95rem;
+  content: "";
+  pointer-events: none;
+}
+.simple-home-intro-content--floating > * { position: relative; z-index: 1; }
+@keyframes bilc-hero-float {
+  0%, 100% { transform: translate3d(0, -.35rem, 0) rotateX(0deg); }
+  50% { transform: translate3d(0, -.7rem, 0) rotateX(.35deg); }
+}
+@media (max-width: 639px) {
+  .simple-home-intro-content--floating { border-radius: 1rem; transform: translate3d(0, -.15rem, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .simple-home-intro-content--floating { animation: none !important; transform: translate3d(0, -.25rem, 0) !important; }
+}
