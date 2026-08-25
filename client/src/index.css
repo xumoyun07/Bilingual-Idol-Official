@@ -571,6 +571,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 }
 .simple-route-header-copy h1 { max-width: 21rem; font-size: clamp(2.5rem, 4.5vw, 4rem); line-height: .98; letter-spacing: -.05em; }
 .simple-route-header-copy > p:not(.simple-eyebrow) { max-width: 22rem; }
+.simple-route-header-description { margin-top: 1.25rem; }
 .simple-section-heading--fee-guide { border: 1px solid var(--bilc-line); border-radius: 1rem; background: #fff; padding: 1.25rem 1.125rem; }
 .simple-route-header-media {
   display: flex;
@@ -585,7 +586,7 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   background: var(--bilc-mist);
 }
 .simple-route-header-media img { width: 100%; height: 100%; min-height: 20rem; object-fit: cover; object-position: center; }
-@media (min-width: 900px) { .simple-route-header--programmes { height: 31.25rem; } }
+@media (min-width: 900px) { .simple-route-header--programmes { height: 34.375rem; } }
 @media (max-width: 899px) {
   .simple-route-header--programmes { width: 100%; min-height: 0; grid-template-columns: minmax(0, 1fr); margin-left: 0; }
   .simple-section-heading--fee-guide { padding: 1.25rem 1.125rem; }

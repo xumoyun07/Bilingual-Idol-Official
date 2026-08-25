@@ -28,7 +28,7 @@ export default function Programs() {
           <div className="simple-route-header-copy">
             <p className="simple-eyebrow">Programmes</p>
             <h1>Find a programme that fits the learner.</h1>
-            <p>
+            <p className="simple-route-header-description">
               Explore the published 2026 course guide, then contact the centre to confirm suitability, availability and the current fee.
             </p>
           </div>
