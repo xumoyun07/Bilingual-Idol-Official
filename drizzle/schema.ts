@@ -347,6 +347,7 @@ export type UserProfileValue = typeof userProfileValues.$inferSelect;
 export type Program = typeof programs.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;
+export type Testimonial = typeof testimonials.$inferSelect;
 export type TeamProfile = typeof teamProfiles.$inferSelect;
 export type PublicMedia = typeof publicMedia.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;

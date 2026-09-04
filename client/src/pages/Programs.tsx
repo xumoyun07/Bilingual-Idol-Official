@@ -4,13 +4,15 @@ import { Link } from "wouter";
 import { PublicLayout } from "@/components/PublicLayout";
 import { OFFICIAL_PROGRAMME_GUIDE, PROGRAM_CATEGORIES } from "@/lib/siteData";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Programs() {
   const [category, setCategory] = useState<(typeof PROGRAM_CATEGORIES)[number]>("All");
   const [query, setQuery] = useState("");
+  const { t, isRTL, language } = useLanguage();
   const programmes = trpc.content.publicPrograms.useQuery();
   const media = trpc.media.publicList.useQuery();
-  const listingMedia = (media.data ?? []).find(item => item.slot === "programmes_listing");
+  const listingMedia = (media.data ?? []).find(item => item.slot === "programmes_listing") ?? { publicUrl: "/media/prog_general_english.webp", altText: "Students taking part in an engaging language session at Bilingual Idol" };
   const matches = useMemo(
     () =>
       (programmes.data ?? []).filter(
@@ -23,13 +25,13 @@ export default function Programs() {
 
   return (
     <PublicLayout>
-      <div className="simple-route-page programs-page">
+      <div className={`simple-route-page programs-page ${isRTL ? "is-rtl" : ""}`}>
         <header className="simple-route-header simple-route-header--programmes">
           <div className="simple-route-header-copy simple-route-header-copy--wide">
-            <p className="simple-eyebrow">Programmes</p>
-            <h1>Find a programme that fits the learner.</h1>
+            <p className="simple-eyebrow">{t("programs.eyebrow")}</p>
+            <h1>{t("programs.heroTitle")}</h1>
             <p className="simple-route-header-description">
-              Explore the published 2026 course guide, then contact the centre to confirm suitability, availability and the current fee.
+              {t("programs.heroSubtitle")}
             </p>
           </div>
           {listingMedia ? (
@@ -42,10 +44,10 @@ export default function Programs() {
         <section className="simple-route-section simple-guide-section">
           <div className="simple-section-heading simple-section-heading--fee-guide">
             <div>
-              <p className="simple-eyebrow">2026 fee guide</p>
-              <h2>Published course options</h2>
+              <p className="simple-eyebrow">{t("programs.feeGuideEyebrow")}</p>
+              <h2>{t("programs.feeGuideTitle")}</h2>
             </div>
-            <p>Fees are guidance from the 2026 list. Confirm the current total, visa requirements and intake with the centre before enrolment.</p>
+            <p>{t("programs.feeGuideSubtitle")}</p>
           </div>
           <div className="simple-programme-guide">
             {OFFICIAL_PROGRAMME_GUIDE.map(item => (
@@ -63,23 +65,23 @@ export default function Programs() {
           <div className="simple-filter-bar">
             <label>
               <Search size={17} />
-              <span className="sr-only">Search programmes</span>
-              <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by language, level or learner group" />
+              <span className="sr-only">{t("programs.searchPlaceholder")}</span>
+              <input value={query} onChange={event => setQuery(event.target.value)} placeholder={t("programs.searchPlaceholder")} />
             </label>
             <div className="simple-filter-options" aria-label="Programme category filters">
               <span>
-                <Filter size={15} /> Filter
+                <Filter size={15} /> {t("programs.filterAll")}
               </span>
               {PROGRAM_CATEGORIES.map(item => (
                 <button key={item} onClick={() => setCategory(item)} aria-pressed={category === item}>
-                  {item}
+                  {item === "All" ? t("programs.filterAll") : item}
                 </button>
               ))}
             </div>
           </div>
 
           <p className="simple-list-summary simple-list-summary--surface">
-            <strong>{matches.length}</strong> confirmed programme{matches.length === 1 ? "" : "s"} shown
+            <strong>{matches.length}</strong> {t("programs.showingCount", { count: matches.length })}
           </p>
 
           {programmes.isLoading ? (
@@ -98,15 +100,15 @@ export default function Programs() {
                       {programme.language} · {programme.level} · {programme.ageGroup}
                     </span>
                   </div>
-                  <span>View details</span>
+                  <span>{t("programs.viewDetails")}</span>
                 </Link>
               ))}
             </div>
           ) : (
             <div className="simple-empty-state">
-              <p>Looking for another option? The centre can advise on the most suitable course and current availability.</p>
+              <p>{t("programs.emptyText")}</p>
               <Link href="/contact" className="simple-text-link">
-                Ask the centre for guidance
+                {t("programs.emptyCta")}
               </Link>
             </div>
           )}

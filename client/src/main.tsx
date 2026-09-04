@@ -61,11 +61,30 @@ const trpcClient = trpc.createClient({
         }
         return {};
       },
-      fetch(input, init) {
-        return globalThis.fetch(input, {
+      async fetch(input, init) {
+        const res = await globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
         });
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+          return new Response(
+            JSON.stringify([
+              {
+                error: {
+                  message: `Endpoint returned HTML (${res.status} ${res.statusText}).`,
+                  code: -32603,
+                  data: { code: "INTERNAL_SERVER_ERROR", httpStatus: res.status },
+                },
+              },
+            ]),
+            {
+              status: res.status >= 400 ? res.status : 500,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        return res;
       },
     }),
   ],

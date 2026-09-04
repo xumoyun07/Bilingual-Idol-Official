@@ -47,8 +47,19 @@ async function startServer() {
     createExpressMiddleware({
       router: appRouter,
       createContext,
+      onError({ error, path }) {
+        if (error.code === "INTERNAL_SERVER_ERROR") {
+          console.error(`[tRPC Error on ${path}]:`, error);
+        }
+      },
     })
   );
+
+  // Return JSON 404 for any unhandled API or portal routes rather than HTML SPA fallback
+  app.all(["/api", "/api/*", "/portal/*", "/storage/*"], (_req, res) => {
+    res.status(404).json({ error: "Endpoint not found" });
+  });
+
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
@@ -63,8 +74,8 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on http://0.0.0.0:${port}/`);
   });
 }
 

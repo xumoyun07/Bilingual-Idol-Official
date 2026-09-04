@@ -1,0 +1,6 @@
+{
+  "name": "Bilingual Idol Language Centre",
+  "description": "Comprehensive platform for Bilingual Idol Language Centre featuring language programs, student profiles, teacher portals, news, media library, and administrative dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

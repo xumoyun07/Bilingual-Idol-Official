@@ -172,6 +172,84 @@ import {
 import { useState } from "react";
 import { toast as sonnerToast } from "sonner";
 import { AIChatBox, type Message } from "@/components/AIChatBox";
+import { ResponsiveDataTransform, type ResponsiveDataItem } from "@/components/ResponsiveDataTransform";
+
+const SAMPLE_RESPONSIVE_DATA: ResponsiveDataItem[] = [
+  {
+    id: "stu-101",
+    title: "Amira binti Mansor",
+    subtitle: "Kuala Lumpur, Malaysia · Registered Aug 2026",
+    roleOrCategory: "IELTS Masterclass (Band 8.0 Prep)",
+    status: "active",
+    statusLabel: "Enrolled",
+    progressPercentage: 85,
+    progressLabel: "85% course completion (Band 7.5 Diagnostic)",
+    metaTags: ["Evening Track", "Pavilion Embassy", "Speaking Drill"],
+    contactInfo: {
+      email: "amira.mansor@bilingualidol.edu.my",
+      phone: "+60 12-345 6789",
+    },
+  },
+  {
+    id: "stu-102",
+    title: "Alexander Chen",
+    subtitle: "Shanghai, China · EMGS Visa Approved",
+    roleOrCategory: "Intensive Academic English (IEP)",
+    status: "active",
+    statusLabel: "In Progress",
+    progressPercentage: 62,
+    progressLabel: "62% module milestones verified",
+    metaTags: ["International", "Student Visa", "CEFR B2+"],
+    contactInfo: {
+      email: "alexander.chen@int.bilingualidol.edu.my",
+      phone: "+60 19-876 5432",
+    },
+  },
+  {
+    id: "stu-103",
+    title: "Fatima Al-Zahra",
+    subtitle: "Dubai, UAE · EMGS Submission Stage",
+    roleOrCategory: "Executive Business English & Public Speaking",
+    status: "pending",
+    statusLabel: "Visa Review",
+    progressPercentage: 25,
+    progressLabel: "Orientation docs pending",
+    metaTags: ["VIP Corporate", "Hybrid Track"],
+    contactInfo: {
+      email: "fatima.zahra@global.com",
+      phone: "+971 50 123 4567",
+    },
+  },
+  {
+    id: "stu-104",
+    title: "Dmitry Morozov",
+    subtitle: "Almaty, Kazakhstan · Enrolled June 2026",
+    roleOrCategory: "General English Standard Track",
+    status: "completed",
+    statusLabel: "Certified",
+    progressPercentage: 100,
+    progressLabel: "Graduated with CEFR C1 Honours",
+    metaTags: ["Alumni", "High Distinction", "Summer Intake"],
+    contactInfo: {
+      email: "dmitry.m@bilingualidol.edu.my",
+    },
+  },
+  {
+    id: "stu-105",
+    title: "Nurul Izzah binti Rashid",
+    subtitle: "Petaling Jaya, Malaysia · Diagnostic Completed",
+    roleOrCategory: "Junior Cambridge English Explorers",
+    status: "active",
+    statusLabel: "Active",
+    progressPercentage: 45,
+    progressLabel: "Unit 4 Phonics & Storytelling",
+    metaTags: ["Weekend Camp", "Young Learners"],
+    contactInfo: {
+      email: "guardian.rashid@gmail.com",
+      phone: "+60 17-555 1234",
+    },
+  },
+];
 
 export default function ComponentsShowcase() {
   const { theme, toggleTheme } = useTheme();
@@ -1389,6 +1467,36 @@ export default function ComponentsShowcase() {
                 </div>
               </CardContent>
             </Card>
+          </section>
+
+          {/* Responsive Data Transform Section */}
+          <section className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold">Responsive Layout Pattern (Data Transform)</h3>
+              <p className="text-sm text-muted-foreground">
+                Transforms data presentation automatically based on viewport size:
+                <strong> Desktop (≥1024px)</strong> multi-column table rows, 
+                <strong> Tablet (768px–1023px)</strong> 2-column card grid, and 
+                <strong> Mobile (&lt;768px)</strong> vertical thumb-friendly stacked cards.
+              </p>
+            </div>
+
+            <ResponsiveDataTransform
+              items={SAMPLE_RESPONSIVE_DATA}
+              title="Student & Enrolment Records (Live Responsive Transformer)"
+              subtitle="Resize the browser window or use the controls to preview breakpoint adaptations without layout shifts."
+              onItemClick={(item) => {
+                sonnerToast.info(`Selected ${item.title}`, {
+                  description: `Track: ${item.roleOrCategory} · Status: ${item.status}`,
+                });
+              }}
+              onEdit={(item) => {
+                sonnerToast.success(`Edit action triggered for ${item.title}`);
+              }}
+              onDelete={(item) => {
+                sonnerToast.warning(`Remove action triggered for ${item.title}`);
+              }}
+            />
           </section>
 
           {/* AI ChatBox Section */}

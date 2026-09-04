@@ -18,7 +18,8 @@ import { mediaRouter } from "./routers/media";
 import { newsRouter } from "./routers/news";
 import { teacherRouter } from "./routers/teacher";
 import { studentAttendanceRouter } from "./routers/studentAttendance";
-import { dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
+import { createUserPasswordHash, dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
+import { isFounderEmail } from "./founderIdentity";
 
 export const appRouter = router({
   system: systemRouter,
@@ -27,8 +28,9 @@ export const appRouter = router({
     login: publicProcedure.input(z.object({ email: z.string().email().max(320), password: z.string().min(1).max(256) })).mutation(async ({ ctx, input }) => {
       const email = input.email.trim().toLowerCase();
       if (isFounderAuthConfigured() && verifyFounderCredentials(email, input.password)) {
-        await db.upsertUser({ openId: FOUNDER_OPEN_ID, name: "Founder", email: FOUNDER_EMAIL, loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
-        const token = await sdk.createSessionToken(FOUNDER_OPEN_ID, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
+        const openId = `founder:${email}`;
+        await db.upsertUser({ openId, name: "Founder", email, loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
+        const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
         ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
         return { success: true, redirectTo: "/admin", role: "founder" } as const;
       }

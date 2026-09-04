@@ -292,5 +292,5 @@
 - [x] T2 populated-data visual acceptance gate deferred: current database has no active teacher/session records and protected route screenshots were unavailable; no attendance data was fabricated, while 20 test files / 89 tests, TypeScript and endpoint/RBAC checks passed.
 - [x] Export the complete project to the selected GitHub repository after scanning for secrets, excluding `.env`, local service logs, browser data, node_modules and sandbox-only metadata.
 - [x] Verify the pushed branch, commit and repository contents, then report the GitHub URL and excluded files.
-- [ ] Write a complete repository README covering purpose, stack, architecture, roles, local setup, environment variables, tests, media/storage rules and security boundaries without secrets.
+- [x] Write a complete repository README covering purpose, stack, architecture, roles, local setup, environment variables, tests, media/storage rules and security boundaries without secrets.
 - [ ] Publish README.md to xumoyun07/Bilingual-Idol-Official and verify the rendered GitHub content and commit.
