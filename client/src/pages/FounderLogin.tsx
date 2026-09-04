@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, KeyRound } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { Link, useLocation } from "wouter";
 
@@ -27,12 +27,6 @@ export default function FounderLogin() {
   function submit(event: FormEvent) {
     event.preventDefault();
     login.mutate({ email: email.trim().toLowerCase(), password });
-  }
-
-  function fillFounderCredentials(targetEmail: string) {
-    setEmail(targetEmail);
-    setPassword("Founder2026!");
-    login.mutate({ email: targetEmail, password: "Founder2026!" });
   }
 
   return (
@@ -65,36 +59,6 @@ export default function FounderLogin() {
             <div>
               <strong>{t("login.helpTitle")}</strong>
               <span>{t("login.helpText")}</span>
-            </div>
-          </div>
-
-          <div className="mt-6 border-t border-[#e2e8f0] pt-6 dark:border-[#1e293b]">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#64748b]">
-              Быстрый доступ к роли Founder
-            </p>
-            <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                onClick={() => fillFounderCredentials("nurlanguageschool@gmail.com")}
-                className="flex items-center justify-between rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-left text-xs font-medium text-[#1e293b] shadow-sm hover:border-[#3b82f6] hover:bg-[#f8fafc] transition-colors dark:border-[#334155] dark:bg-[#0f172a] dark:text-[#f1f5f9]"
-              >
-                <span className="flex items-center gap-2">
-                  <KeyRound size={14} className="text-[#2563eb]" />
-                  <span>nurlanguageschool@gmail.com</span>
-                </span>
-                <span className="text-[11px] text-[#64748b]">Войти в 1 клик</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillFounderCredentials("lektor0780@gmail.com")}
-                className="flex items-center justify-between rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-left text-xs font-medium text-[#1e293b] shadow-sm hover:border-[#3b82f6] hover:bg-[#f8fafc] transition-colors dark:border-[#334155] dark:bg-[#0f172a] dark:text-[#f1f5f9]"
-              >
-                <span className="flex items-center gap-2">
-                  <KeyRound size={14} className="text-[#2563eb]" />
-                  <span>lektor0780@gmail.com</span>
-                </span>
-                <span className="text-[11px] text-[#64748b]">Войти в 1 клик</span>
-              </button>
             </div>
           </div>
         </div>
