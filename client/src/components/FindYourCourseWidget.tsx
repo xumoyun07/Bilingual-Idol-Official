@@ -303,7 +303,7 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
 
   return (
     <section className={`bilc-finder-section ${isRTL ? "is-rtl" : ""}`} id="find-your-course">
-      <div className="bilc-finder-header">
+      <div className="bilc-finder-header" style={{ marginLeft: 0 }}>
         <div className="bilc-finder-tag">
           <Compass size={16} />
           <span>

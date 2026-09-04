@@ -277,7 +277,7 @@ export function OfficialPriceList2026() {
 
   return (
     <section className={`simple-section bilc-pricing-section ${isRTL ? "is-rtl" : ""}`} id="course-pricing">
-      <div className="bilc-pricing-header">
+      <div className="bilc-pricing-header" style={{ marginLeft: 0 }}>
         <div className="bilc-pricing-tag">
           <GraduationCap size={16} />
           <span>
