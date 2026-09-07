@@ -83,6 +83,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       document.head.appendChild(ogDesc);
     }
     ogDesc.setAttribute("content", selected.description);
+
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement("meta");
+      metaKeywords.setAttribute("name", "keywords");
+      document.head.appendChild(metaKeywords);
+    }
+    const arabicKeywords = "معهد تعليم لغات كوالالمبور, دورات لغة إنجليزية ماليزيا, معهد بايلينجوال آيدول, دراسة آيلتس في كوالالمبور, بافيليون إمباسي, مخيمات صيفية لتعليم الإنجليزية, تأشيرة طالب إنجليزية ماليزيا, رسوم معهد اللغات ماليزيا 2026";
+    const defaultKeywords = "Bilingual Idol, English Language Centre Kuala Lumpur, Pavilion Embassy, IELTS Preparation Malaysia, General English Course, Summer Camp KL";
+    metaKeywords.setAttribute("content", language === "ar" ? arabicKeywords : defaultKeywords);
   }, [location, language]);
 
   useEffect(() => {
@@ -111,7 +121,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="simple-brand" aria-label={t("footer.centreName")} onClick={close}>
             <span aria-hidden="true">BI</span>
             <strong>
-              Bilingual Idol<small>{t("footer.brandSubtitle")}</small>
+              <bdi dir="ltr">Bilingual Idol</bdi><small>{t("footer.brandSubtitle")}</small>
             </strong>
           </Link>
           <nav className="simple-public-nav" aria-label={language === "ar" ? "التنقل الرئيسي" : language === "ms" ? "Navigasi utama" : "Primary navigation"}>

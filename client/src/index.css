@@ -43,8 +43,26 @@
   --input: oklch(0.866 0.021 80);
   --ring: oklch(0.66 0.13 36);
   --radius: 1.15rem;
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Fluid & Natural Motion Design Tokens */
+  --ease-natural: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Unified Duration Scales (150ms - 300ms for micro/medium, up to 500ms for large) */
+  --duration-micro: 150ms;
+  --duration-fast: 200ms;
+  --duration-normal: 250ms;
+  --duration-medium: 300ms;
+  --duration-large: 450ms;
+
+  /* Typography Design Tokens with Per-Locale Support */
+  --locale-font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --locale-display-font: "DM Serif Display", Georgia, serif;
+  --locale-font-size-base: 1rem;
+  --locale-line-height-base: 1.6;
 }
 
 *, ::before, ::after {
@@ -170,20 +188,93 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .rise-in { animation: rise-in 650ms var(--ease-out) both; }
 .rise-in-delay { animation: rise-in 650ms 120ms var(--ease-out) both; }
 .rise-in-delay-2 { animation: rise-in 650ms 220ms var(--ease-out) both; }
-.route-enter { animation: route-enter 240ms var(--ease-out) both; transform: none !important; }
-.interactive-card { transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), border-color 180ms var(--ease-out); }
-.interactive-card:hover { transform: translate3d(0, -4px, 0); box-shadow: 0 18px 36px rgba(16, 37, 62, .10); }
+.route-enter {
+  animation: route-enter 280ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: opacity, transform;
+}
+.interactive-card {
+  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.interactive-card:hover {
+  transform: translate3d(0, -4px, 0);
+  box-shadow: 0 18px 36px rgba(16, 37, 62, .10);
+}
 .skeleton-shimmer { overflow: hidden; position: relative; background: #eee6d9; }
 .skeleton-shimmer::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent); animation: shimmer 1.4s var(--ease-in-out) infinite; }
 
+/* Unified Smooth Transitions for Interactive Elements */
+button:not(:disabled),
+.simple-button,
+.compass-btn,
+.bilc-wa-trigger-btn,
+[role="button"]:not([aria-disabled="true"]) {
+  transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:not(:disabled):active,
+.simple-button:active,
+.compass-btn:active {
+  transform: scale(0.985);
+  transition-duration: 100ms;
+}
+
+a:not([class*="no-transition"]) {
+  transition: color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  transition: border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @keyframes float { from { transform: translate3d(0, 0, 0) rotate(-2deg); } to { transform: translate3d(0, -12px, 0) rotate(2deg); } }
 @keyframes rise-in { from { opacity: 0; transform: translate3d(0, 16px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-@keyframes route-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 @keyframes shimmer { to { transform: translateX(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+  html {
+    scroll-behavior: auto !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+  .route-enter,
+  .rise-in,
+  .rise-in-delay,
+  .rise-in-delay-2,
+  .hero-orbit,
+  .interactive-card {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }
 
 @media (min-width: 768px) { .site-container { width: min(100% - 4rem, 76rem); } }
@@ -546,6 +637,20 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   border-radius: 0 0 16px 16px;
   padding: 0.75rem 1.25rem 1.25rem;
   background: #ffffff;
+  animation: mobileNavSlideDown 240ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
+  transform-origin: top;
+}
+
+@keyframes mobileNavSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .simple-mobile-nav > a:not(.simple-button) {
   min-height: 3rem;
@@ -3871,7 +3976,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(23, 63, 173, 0.16);
   overflow: hidden;
-  animation: bilcPopupSlide 200ms ease;
+  animation: bilcPopupSlide 240ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   z-index: 999;
 }
 
@@ -3891,7 +3996,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
     -webkit-backdrop-filter: blur(4px) !important;
     z-index: 998 !important;
     pointer-events: auto !important;
-    animation: bilcBackdropFade 220ms ease forwards;
+    animation: bilcBackdropFade 220ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
@@ -3914,7 +4019,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
     flex-direction: column !important;
     z-index: 9999 !important;
     pointer-events: auto !important;
-    animation: bilcMobileSheetSlide 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    animation: bilcMobileSheetSlide 280ms cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
     overflow: hidden !important;
   }
 
@@ -4073,7 +4178,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 @keyframes bilcMobileSheetSlide {
   from {
     transform: translateY(100%);
-    opacity: 0.5;
+    opacity: 0;
   }
   to {
     transform: translateY(0);
@@ -4092,7 +4197,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 @keyframes bilcPopupSlide {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.97);
+    transform: translateY(6px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -5217,11 +5322,13 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 
 /* 2. Static Centered Modal Behavior Across All Devices */
 .bilc-modal-overlay {
-  animation: bilcModalFadeIn 180ms ease-out forwards;
+  animation: bilcModalFadeIn 240ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: opacity;
 }
 
 .bilc-modal-card {
-  animation: bilcModalScaleIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: bilcModalScaleIn 280ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes bilcModalFadeIn {
@@ -5235,12 +5342,12 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 
 @keyframes bilcModalScaleIn {
   from {
-    opacity: 0.9;
-    transform: scale(0.96);
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -6740,7 +6847,279 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-co
     margin-left: 105px !important;
     margin-right: 105px !important;
   }
+
+  /* Desktop-only Arabic container width customization (1216px) */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) {
+    width: 1216px !important;
+  }
+
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > div:nth-of-type(1),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > div:nth-of-type(1) {
+    width: 1216px !important;
+  }
+
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(3),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(3),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(3),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(3) {
+    width: 1216px !important;
+  }
+
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#course-pricing:nth-of-type(4),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#course-pricing:nth-of-type(4),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#course-pricing:nth-of-type(4),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#course-pricing:nth-of-type(4) {
+    width: 1216px !important;
+  }
+
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(6),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(6),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(6),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(6) {
+    width: 1216px !important;
+  }
+
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-testimonials:nth-of-type(7),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-testimonials:nth-of-type(7),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-testimonials:nth-of-type(7),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-testimonials:nth-of-type(7) {
+    width: 1216px !important;
+  }
+
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(8),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(8),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(8),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(8) {
+    width: 1216px !important;
+  }
 }
+
+/* Mobile-only Arabic header brand link padding */
+@media (max-width: 768px) {
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1),
+  html[lang="ar"] header.simple-public-header a.simple-brand,
+  html[dir="rtl"] header.simple-public-header a.simple-brand,
+  html.rtl header.simple-public-header a.simple-brand {
+    padding-left: 160px !important;
+  }
+}
+
+/* ==========================================================================
+   ARABIC (RTL) TYPOGRAPHY, LINE-HEIGHT & PER-LOCALE TOKENS
+   ========================================================================== */
+
+html[dir="rtl"],
+html.rtl,
+html[lang="ar"],
+body.rtl,
+body[dir="rtl"] {
+  --locale-font-family: "Cairo", "IBM Plex Sans Arabic", "Noto Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --locale-display-font: "Cairo", "IBM Plex Sans Arabic", sans-serif;
+  --locale-font-size-base: 0.9375rem; /* ~15px: slightly reduced base size for Arabic optical harmony */
+  --locale-line-height-base: 1.82; /* +14% line-height to eliminate diacritic / ascender / descender collisions */
+
+  font-family: var(--locale-font-family) !important;
+  font-size: var(--locale-font-size-base);
+  line-height: var(--locale-line-height-base) !important;
+  text-align: start;
+}
+
+/* Ensure Headings, Navigation & Display text adopt Cairo / IBM Plex Sans Arabic in Arabic */
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] h4,
+html[dir="rtl"] h5,
+html[dir="rtl"] h6,
+html[dir="rtl"] .font-display,
+html[dir="rtl"] .simple-eyebrow,
+html.rtl h1,
+html.rtl h2,
+html.rtl h3,
+html.rtl h4,
+html.rtl h5,
+html.rtl h6,
+html.rtl .font-display,
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] h4,
+html[lang="ar"] h5,
+html[lang="ar"] h6 {
+  font-family: var(--locale-display-font) !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important; /* Arabic script connects letters; avoid Latin tracking */
+}
+
+/* STRICT ARABIC RULE: Ban font-style: italic in Arabic typography (replaces with weight accent) */
+html[dir="rtl"] em,
+html[dir="rtl"] i,
+html[dir="rtl"] cite,
+html[dir="rtl"] .italic,
+html[dir="rtl"] [style*="italic"],
+html.rtl em,
+html.rtl i,
+html.rtl cite,
+html.rtl .italic,
+html.rtl [style*="italic"],
+html[lang="ar"] em,
+html[lang="ar"] i,
+html[lang="ar"] cite,
+html[lang="ar"] .italic,
+body.rtl em,
+body.rtl i,
+body.rtl cite,
+body.rtl .italic {
+  font-style: normal !important;
+  font-weight: 700 !important;
+}
+
+/* BIDIRECTIONAL ISOLATION: Phone numbers, Latin brands, currency & numeric ranges */
+.bidi-ltr,
+bdi,
+[dir="ltr"] {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  text-align: start;
+}
+
+/* Preserve inline-block alignment inside headings or paragraphs for bidi tokens */
+bdi.inline-block,
+span.bidi-ltr {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+/* Input Fields & Textareas: default to start alignment in RTL */
+html[dir="rtl"] input:not([type="tel"]):not([type="email"]):not([dir="ltr"]),
+html[dir="rtl"] textarea:not([dir="ltr"]),
+html[dir="rtl"] select:not([dir="ltr"]) {
+  text-align: start;
+}
+
+/* Tel and Email inputs must always maintain LTR directionality for international conventions */
+html[dir="rtl"] input[type="tel"],
+html[dir="rtl"] input[type="email"],
+html.rtl input[type="tel"],
+html.rtl input[type="email"] {
+  direction: ltr !important;
+  text-align: start !important;
+  unicode-bidi: isolate;
+}
+
+/* ==========================================================================
+   UNIFIED FLUID MOTION SYSTEM & SMOOTH TRANSITIONS
+   Strictly adheres to:
+   - Natural cubic-bezier(0.4, 0, 0.2, 1) curves
+   - 150-300ms for micro & medium UI elements
+   - Up to 450-500ms for major components/drawers/pages
+   - Zero jarring state snaps
+   - Full prefers-reduced-motion accessibility compliance
+   ========================================================================== */
+
+/* Radix & UI Floating Modals, Sheets, Dialogs & Overlays */
+[data-slot="dialog-overlay"],
+[data-slot="alert-dialog-overlay"],
+[data-slot="sheet-overlay"] {
+  animation-duration: 240ms !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: opacity;
+}
+
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"] {
+  animation-duration: 280ms !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform, opacity;
+}
+
+[data-slot="sheet-content"] {
+  animation-duration: 320ms !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform, opacity;
+}
+
+[data-slot="dropdown-menu-content"],
+[data-slot="select-content"],
+[data-slot="popover-content"],
+[data-slot="hover-card-content"],
+[data-slot="context-menu-content"] {
+  animation-duration: 200ms !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform, opacity;
+}
+
+[data-slot="tooltip-content"] {
+  animation-duration: 160ms !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform, opacity;
+}
+
+[data-slot="accordion-content"] {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: height, opacity;
+}
+
+[data-slot="switch-thumb"] {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 200ms !important;
+}
+
+/* Comprehensive prefers-reduced-motion Accessibility Enforcement */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .route-enter,
+  .rise-in,
+  .rise-in-delay,
+  .rise-in-delay-2,
+  .hero-orbit,
+  .interactive-card,
+  .news-card,
+  .simple-task-card,
+  .simple-mobile-nav,
+  .bilc-modal-overlay,
+  .bilc-modal-card,
+  .bilc-wa-popup,
+  .bilc-wa-backdrop,
+  .bilc-wa-glow-halo,
+  [data-slot="dialog-content"],
+  [data-slot="dialog-overlay"],
+  [data-slot="alert-dialog-content"],
+  [data-slot="alert-dialog-overlay"],
+  [data-slot="sheet-content"],
+  [data-slot="sheet-overlay"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="popover-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="select-content"],
+  [data-slot="accordion-content"] {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
 
 
 

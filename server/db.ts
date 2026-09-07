@@ -52,6 +52,71 @@ const inMemoryStore = {
       updatedAt: new Date("2026-01-01"),
       lastSignedIn: new Date("2026-01-01"),
     },
+    {
+      id: 3,
+      openId: "teacher:marcus@bilingualidol.com",
+      name: "Marcus Chen",
+      email: "teacher@bilingualidol.com",
+      passwordHash: createUserPasswordHash("Teacher2026!"),
+      role: "teacher" as const,
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 4,
+      openId: "student:sophia@bilingualidol.com",
+      name: "Sophia Wong",
+      email: "student@bilingualidol.com",
+      passwordHash: createUserPasswordHash("Student2026!"),
+      role: "student" as const,
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 5,
+      openId: "student:ahmad@example.com",
+      name: "Ahmad Daniel",
+      email: "ahmad.daniel@example.com",
+      passwordHash: createUserPasswordHash("Student2026!"),
+      role: "student" as const,
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 6,
+      openId: "admin:admin@bilingualidol.com",
+      name: "Operations Admin",
+      email: "admin@bilingualidol.com",
+      passwordHash: createUserPasswordHash("Admin2026!"),
+      role: "admin" as const,
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 7,
+      openId: "superadmin:superadmin@bilingualidol.com",
+      name: "Super Admin",
+      email: "superadmin@bilingualidol.com",
+      passwordHash: createUserPasswordHash("SuperAdmin2026!"),
+      role: "super_admin" as const,
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
   ] as User[],
   submissions: [] as Submission[],
   programs: [
@@ -97,6 +162,9 @@ const inMemoryStore = {
     { id: 12, slot: "about_cta", label: "About CTA", kind: "image" as const, altText: "A welcoming consultation corner prepared for a conversation about learning.", mimeType: "image/webp", fileSize: 301962, storageKey: "about_cta", publicUrl: "/media/about_cta.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
   ] as PublicMedia[],
   siteSettings: {} as Record<string, string>,
+  userFormSections: [] as any[],
+  userFormFields: [] as any[],
+  userProfileValues: [] as { userId: number; fieldId: number; value: string }[],
   nextId: 100,
 };
 
@@ -331,7 +399,9 @@ export async function getUserFormSchema(includeInactive = false) {
   const database = await getDb();
   if (!database) {
     const systemFields = await getUserSystemFields();
-    return { sections: [], fields: [], systemFields: includeInactive ? systemFields : systemFields.filter(field => field.isActive) };
+    const sections = includeInactive ? inMemoryStore.userFormSections : inMemoryStore.userFormSections.filter(s => s.isActive);
+    const fields = includeInactive ? inMemoryStore.userFormFields : inMemoryStore.userFormFields.filter(f => f.isActive);
+    return { sections, fields: fields.map(toRuntimeField), systemFields: includeInactive ? systemFields : systemFields.filter(field => field.isActive) };
   }
   const [sections, fields, systemFields] = await Promise.all([
     database.select().from(userFormSections).where(includeInactive ? undefined : eq(userFormSections.isActive, true)).orderBy(asc(userFormSections.sortOrder), asc(userFormSections.id)),
@@ -347,19 +417,37 @@ function safeFieldKey(label: string) {
 }
 
 export async function createUserFormSection(input: { title: string; icon?: string; sortOrder: number; isActive: boolean }) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    const section = { id: ++inMemoryStore.nextId, title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive, createdAt: new Date(), updatedAt: new Date() };
+    inMemoryStore.userFormSections.push(section);
+    return section;
+  }
   const result = await database.insert(userFormSections).values({ title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive });
   return (await database.select().from(userFormSections).where(eq(userFormSections.id, Number(result[0].insertId))).limit(1))[0];
 }
 
 export async function updateUserFormSection(id: number, input: { title: string; icon?: string; sortOrder: number; isActive: boolean }) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    const idx = inMemoryStore.userFormSections.findIndex(s => s.id === id);
+    if (idx !== -1) {
+      inMemoryStore.userFormSections[idx] = { ...inMemoryStore.userFormSections[idx], title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive, updatedAt: new Date() };
+      return inMemoryStore.userFormSections[idx];
+    }
+    throw new Error("Section not found.");
+  }
   await database.update(userFormSections).set({ title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive }).where(eq(userFormSections.id, id));
   return (await database.select().from(userFormSections).where(eq(userFormSections.id, id)).limit(1))[0];
 }
 
 export async function deleteUserFormSection(id: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    inMemoryStore.userFormFields.forEach(f => { if (f.sectionId === id) f.sectionId = null; });
+    inMemoryStore.userFormSections = inMemoryStore.userFormSections.filter(s => s.id !== id);
+    return { success: true } as const;
+  }
   await database.transaction(async tx => {
     await tx.update(userFormFields).set({ sectionId: null }).where(eq(userFormFields.sectionId, id));
     await tx.delete(userFormSections).where(eq(userFormSections.id, id));
@@ -370,16 +458,29 @@ export async function deleteUserFormSection(id: number) {
 type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean };
 
 export async function createUserFormField(input: FormFieldInput) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const options = normaliseOptions(input.fieldType, input.options);
+  if (!database) {
+    const field = { id: ++inMemoryStore.nextId, key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, createdAt: new Date(), updatedAt: new Date() };
+    inMemoryStore.userFormFields.push(field);
+    return toRuntimeField(field as any);
+  }
   const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive });
   const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, Number(result[0].insertId))).limit(1))[0];
   return toRuntimeField(field);
 }
 
 export async function updateUserFormField(id: number, input: FormFieldInput) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const options = normaliseOptions(input.fieldType, input.options);
+  if (!database) {
+    const idx = inMemoryStore.userFormFields.findIndex(f => f.id === id);
+    if (idx !== -1) {
+      inMemoryStore.userFormFields[idx] = { ...inMemoryStore.userFormFields[idx], label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, updatedAt: new Date() };
+      return toRuntimeField(inMemoryStore.userFormFields[idx] as any);
+    }
+    throw new Error("Field not found.");
+  }
   await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive }).where(eq(userFormFields.id, id));
   const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, id)).limit(1))[0];
   if (!field) throw new Error("Field not found.");
@@ -387,7 +488,12 @@ export async function updateUserFormField(id: number, input: FormFieldInput) {
 }
 
 export async function deleteUserFormField(id: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(p => p.fieldId !== id);
+    inMemoryStore.userFormFields = inMemoryStore.userFormFields.filter(f => f.id !== id);
+    return { success: true } as const;
+  }
   await database.transaction(async tx => {
     await tx.delete(userProfileValues).where(eq(userProfileValues.fieldId, id));
     await tx.delete(userFormFields).where(eq(userFormFields.id, id));
@@ -396,7 +502,14 @@ export async function deleteUserFormField(id: number) {
 }
 
 export async function reorderUserFormFields(fieldIds: number[]) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    for (let index = 0; index < fieldIds.length; index += 1) {
+      const field = inMemoryStore.userFormFields.find(f => f.id === fieldIds[index]);
+      if (field) field.sortOrder = index;
+    }
+    return getUserFormSchema(true);
+  }
   const existing = await database.select({ id: userFormFields.id }).from(userFormFields);
   const existingIds = existing.map(field => field.id).sort((a, b) => a - b);
   const submittedIds = [...fieldIds].sort((a, b) => a - b);
@@ -413,7 +526,7 @@ async function validatedProfileRows(values: UserProfileValuesInput) {
 }
 
 export async function createManagedUser(input: { name?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const systemFields = await getUserSystemFields();
   const supplied: Record<UserSystemFieldId, unknown> = { name: input.name, email: input.email, role: input.role, password: input.password, isActive: input.isActive };
   for (const field of systemFields) if (field.isActive && field.isRequired && (supplied[field.id] === undefined || supplied[field.id] === "")) throw new Error(`${field.label} is required by the current create form.`);
@@ -423,22 +536,48 @@ export async function createManagedUser(input: { name?: string; email?: string; 
   const credentialsIssued = Boolean(input.email && input.password);
   const password = input.password ?? randomUUID().replace(/-/g, "") + randomUUID().replace(/-/g, "");
   const profileRows = await validatedProfileRows(input.profileValues ?? {});
-  const result = await database.transaction(async tx => {
-    const created = await tx.insert(users).values({
-      openId: `issued:${randomUUID()}`,
-      name: input.name?.trim() || "Unnamed account",
-      email,
-      passwordHash: createUserPasswordHash(password),
-      isActive: input.isActive ?? credentialsIssued,
-      loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
-      role: input.role ?? "student",
-      lastSignedIn: new Date(),
+  
+  if (database) {
+    const result = await database.transaction(async tx => {
+      const created = await tx.insert(users).values({
+        openId: `issued:${randomUUID()}`,
+        name: input.name?.trim() || "Unnamed account",
+        email,
+        passwordHash: createUserPasswordHash(password),
+        isActive: input.isActive ?? credentialsIssued,
+        loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
+        role: input.role ?? "student",
+        lastSignedIn: new Date(),
+      });
+      const userId = Number(created[0].insertId);
+      if (profileRows.length) await tx.insert(userProfileValues).values(profileRows.map(row => ({ userId, fieldId: row.fieldId, value: row.value })));
+      return created;
     });
-    const userId = Number(created[0].insertId);
-    if (profileRows.length) await tx.insert(userProfileValues).values(profileRows.map(row => ({ userId, fieldId: row.fieldId, value: row.value })));
+    const created = await getManagedUser(Number(result[0].insertId));
+    if (!created) throw new Error("The account could not be created.");
     return created;
-  });
-  const created = await getManagedUser(Number(result[0].insertId));
+  }
+
+  const now = new Date();
+  const userId = ++inMemoryStore.nextId;
+  const newUser: User = {
+    id: userId,
+    openId: `issued:${randomUUID()}`,
+    name: input.name?.trim() || "Unnamed account",
+    email,
+    passwordHash: createUserPasswordHash(password),
+    isActive: input.isActive ?? credentialsIssued,
+    loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
+    role: input.role ?? "student",
+    createdAt: now,
+    updatedAt: now,
+    lastSignedIn: now,
+  };
+  inMemoryStore.users.push(newUser);
+  for (const row of profileRows) {
+    inMemoryStore.userProfileValues.push({ userId, fieldId: row.fieldId, value: row.value });
+  }
+  const created = await getManagedUser(userId);
   if (!created) throw new Error("The account could not be created.");
   return created;
 }
@@ -449,7 +588,7 @@ export async function createSuperAdminManagedUser(input: { name?: string; email?
 }
 
 export async function updateManagedUser(id: number, input: { name: string; email: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const existing = await getManagedUser(id);
   if (!existing) throw new Error("Account not found.");
   if (existing.role === "founder") throw new Error("Founder accounts cannot be changed in Users.");
@@ -458,7 +597,22 @@ export async function updateManagedUser(id: number, input: { name: string; email
   if (matchingEmail && matchingEmail.id !== id) throw new Error("An account with this e-mail already exists.");
   const values: Partial<InsertUser> = { name: input.name.trim(), email, role: input.role, isActive: input.isActive };
   if (input.password) values.passwordHash = createUserPasswordHash(input.password);
-  await database.update(users).set(values).where(eq(users.id, id));
+  
+  if (database) {
+    await database.update(users).set(values).where(eq(users.id, id));
+    const updated = await getManagedUser(id);
+    if (!updated) throw new Error("The account could not be updated.");
+    return updated;
+  }
+
+  const userIndex = inMemoryStore.users.findIndex(u => u.id === id);
+  if (userIndex !== -1) {
+    inMemoryStore.users[userIndex] = {
+      ...inMemoryStore.users[userIndex],
+      ...values,
+      updatedAt: new Date(),
+    };
+  }
   const updated = await getManagedUser(id);
   if (!updated) throw new Error("The account could not be updated.");
   return updated;
@@ -471,14 +625,21 @@ export async function updateSuperAdminManagedUser(id: number, input: { name: str
 }
 
 export async function deleteManagedUser(id: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const existing = await getManagedUser(id);
   if (!existing) throw new Error("Account not found.");
   if (existing.role === "founder") throw new Error("Founder accounts cannot be deleted in Users.");
-  await database.transaction(async tx => {
-    await tx.delete(userProfileValues).where(eq(userProfileValues.userId, id));
-    await tx.delete(users).where(eq(users.id, id));
-  });
+  
+  if (database) {
+    await database.transaction(async tx => {
+      await tx.delete(userProfileValues).where(eq(userProfileValues.userId, id));
+      await tx.delete(users).where(eq(users.id, id));
+    });
+    return { success: true } as const;
+  }
+
+  inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(p => p.userId !== id);
+  inMemoryStore.users = inMemoryStore.users.filter(u => u.id !== id);
   return { success: true } as const;
 }
 

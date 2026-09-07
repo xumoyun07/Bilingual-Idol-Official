@@ -1,5 +1,13 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { Language, TranslationDictionary, translations } from "@/lib/translations";
+import {
+  getLocaleForLanguage,
+  translateAmPm,
+  formatTimeSlot,
+  format24hTo12h,
+  formatLocalizedDateTime,
+  formatLocalizedDate,
+} from "@/lib/timeLocalization";
 
 interface LanguageContextType {
   language: Language;
@@ -8,6 +16,12 @@ interface LanguageContextType {
   isRTL: boolean;
   dict: TranslationDictionary;
   t: (keyPath: string, params?: Record<string, string | number>, fallback?: string) => string;
+  locale: string;
+  translateAmPm: (text: string) => string;
+  formatTimeSlot: (slot: string) => string;
+  formatTime: (value: Date | string | number | null | undefined, options?: Intl.DateTimeFormatOptions) => string;
+  format24hTime: (timeStr: string) => string;
+  formatDate: (value: Date | string | number | null | undefined, options?: Intl.DateTimeFormatOptions) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -141,6 +155,35 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return result;
   };
 
+  const locale = getLocaleForLanguage(language);
+
+  const translateAmPmFn = useCallback(
+    (text: string) => translateAmPm(text, language),
+    [language]
+  );
+
+  const formatTimeSlotFn = useCallback(
+    (slot: string) => formatTimeSlot(slot, language),
+    [language]
+  );
+
+  const formatTimeFn = useCallback(
+    (value: Date | string | number | null | undefined, options?: Intl.DateTimeFormatOptions) =>
+      formatLocalizedDateTime(value, language, options),
+    [language]
+  );
+
+  const format24hTimeFn = useCallback(
+    (timeStr: string) => format24hTo12h(timeStr, language),
+    [language]
+  );
+
+  const formatDateFn = useCallback(
+    (value: Date | string | number | null | undefined, options?: Intl.DateTimeFormatOptions) =>
+      formatLocalizedDate(value, language, options),
+    [language]
+  );
+
   const value = useMemo(
     () => ({
       language,
@@ -149,8 +192,25 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       isRTL,
       dict,
       t,
+      locale,
+      translateAmPm: translateAmPmFn,
+      formatTimeSlot: formatTimeSlotFn,
+      formatTime: formatTimeFn,
+      format24hTime: format24hTimeFn,
+      formatDate: formatDateFn,
     }),
-    [language, dir, isRTL, dict],
+    [
+      language,
+      dir,
+      isRTL,
+      dict,
+      locale,
+      translateAmPmFn,
+      formatTimeSlotFn,
+      formatTimeFn,
+      format24hTimeFn,
+      formatDateFn,
+    ],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

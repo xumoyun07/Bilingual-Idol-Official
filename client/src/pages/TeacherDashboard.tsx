@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getLocaleForLanguage } from "@/lib/timeLocalization";
+import { Language } from "@/lib/translations";
 import { CalendarDays, CheckCircle2, ClipboardCheck, GraduationCap, Loader2, UsersRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -15,9 +18,10 @@ type AttendanceStatus = "present" | "absent" | "late" | "excused";
 
 const attendanceLabels: Record<AttendanceStatus, string> = { present: "Present", absent: "Absent", late: "Late", excused: "Excused" };
 
-function formatSessionDate(value: string | Date) {
+function formatSessionDate(value: string | Date, language: Language = "en") {
   const date = typeof value === "string" ? new Date(`${value}T12:00:00`) : value;
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  const locale = getLocaleForLanguage(language);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 }
 
 function dateKey(date: Date) { return date.toISOString().slice(0, 10); }
@@ -25,6 +29,7 @@ function dateAfter(date: Date, amount: number) { const next = new Date(date); ne
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
+  const { language, format24hTime } = useLanguage();
   const isTeacher = user?.role === "teacher";
   const utils = trpc.useUtils();
   const [range, setRange] = useState<"today" | "week" | "custom">("week");
@@ -99,7 +104,7 @@ export default function TeacherDashboard() {
           {schedule.isError ? <p className="teacher-empty">Your schedule could not be loaded. Please try again.</p> : null}
           {!schedule.isLoading && !schedule.isError && schedule.data?.length === 0 ? <p className="teacher-empty">No class sessions have been assigned to your account yet.</p> : null}
           <div className="teacher-session-stack">{schedule.data?.map(session => <button key={session.id} type="button" className={session.id === selectedSessionId ? "teacher-session-button is-selected" : "teacher-session-button"} onClick={() => setSelectedSessionId(session.id)}>
-            <span><strong>{session.title}</strong><small>{session.courseName} · {session.studentName || "Student"}</small></span><span className="teacher-session-time">{formatSessionDate(session.scheduledFor)}<br />{session.startsAt}–{session.endsAt}</span>
+            <span><strong>{session.title}</strong><small>{session.courseName} · {session.studentName || "Student"}</small></span><span className="teacher-session-time">{formatSessionDate(session.scheduledFor, language)}<br />{format24hTime(session.startsAt)}–{format24hTime(session.endsAt)}</span>
           </button>)}</div>
         </CardContent></Card>
 
@@ -107,8 +112,8 @@ export default function TeacherDashboard() {
           {!selectedSessionId || sessionDetails.isLoading ? <Card className="teacher-empty-card"><CardContent><Loader2 className="animate-spin" size={20} /><p>Select an assigned session to record attendance and results.</p></CardContent></Card> : null}
           {sessionDetails.isError ? <Card className="teacher-empty-card"><CardContent><p>The selected class is unavailable to your account.</p></CardContent></Card> : null}
           {details ? <>
-            <Card className="teacher-class-summary"><CardContent><div><p className="minimal-eyebrow">Selected class</p><h3>{details.session.title}</h3><p>{details.session.courseName} · {formatSessionDate(details.session.scheduledFor)} · {details.session.startsAt}–{details.session.endsAt}{details.session.room ? ` · ${details.session.room}` : ""}</p></div><Badge variant="secondary"><UsersRound size={14} />{details.students.length} student{details.students.length === 1 ? "" : "s"}</Badge></CardContent></Card>
-            <Card className="teacher-roster-card"><CardHeader><CardTitle><UsersRound size={19} /> Students</CardTitle><CardDescription>Students directly assigned to this session. This class view does not manage enrolments.</CardDescription></CardHeader><CardContent>{details.students.length ? <div className="teacher-roster-stack">{details.students.map(student => <div className="teacher-roster-row" key={student.id}><div><strong>{student.name || "Student"}</strong><p>{student.email || "No e-mail available"}</p></div>{student.attendanceStatus ? <Badge variant="secondary">{attendanceLabels[student.attendanceStatus]}</Badge> : <Badge variant="outline">Not marked</Badge>}</div>)}</div> : <p className="teacher-empty">No student is assigned to this session.</p>}<div className="teacher-session-actions"><Button type="button" variant="outline" onClick={() => document.getElementById("teacher-attendance")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Take attendance</Button><Button type="button" onClick={() => document.getElementById("teacher-results")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Record results</Button></div></CardContent></Card>
+            <Card className="teacher-class-summary"><CardContent><div><p className="minimal-eyebrow">Selected class</p><h3>{details.session.title}</h3><p>{details.session.courseName} · {formatSessionDate(details.session.scheduledFor, language)} · {format24hTime(details.session.startsAt)}–{format24hTime(details.session.endsAt)}{details.session.room ? ` · ${details.session.room}` : ""}</p></div><Badge variant="secondary"><UsersRound size={14} />{details.students.length} student{details.students.length === 1 ? "" : "s"}</Badge></CardContent></Card>
+            <Card className="teacher-roster-card"><CardHeader><CardTitle><UsersRound size={19} /> Students</CardTitle><CardDescription>Students directly assigned to this session. This class view does not manage enrolments.</CardDescription></CardHeader><CardContent>{details.students.length ? <div className="teacher-roster-stack">{details.students.map(student => <div className="teacher-roster-row" key={student.id}><div><strong>{student.name || "Student"}</strong><p>{student.email || "No e-mail available"}</p></div>{student.attendanceStatus ? <Badge variant="secondary">{attendanceLabels[student.attendanceStatus as AttendanceStatus] ?? student.attendanceStatus}</Badge> : <Badge variant="outline">Not marked</Badge>}</div>)}</div> : <p className="teacher-empty">No student is assigned to this session.</p>}<div className="teacher-session-actions"><Button type="button" variant="outline" onClick={() => document.getElementById("teacher-attendance")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Take attendance</Button><Button type="button" onClick={() => document.getElementById("teacher-results")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Record results</Button></div></CardContent></Card>
             <div className="teacher-action-grid">
               <Card id="teacher-attendance"><CardHeader><CardTitle><CheckCircle2 size={19} /> Attendance</CardTitle><CardDescription>Save one attendance status for each student in this session. Re-saving updates the existing mark.</CardDescription></CardHeader><CardContent className="teacher-form-stack">
                 <div className="teacher-attendance-roster" aria-label="Attendance students">{(attendance.data?.students ?? details.students).map(student => <div className="teacher-attendance-row" key={student.id}><div><strong>{student.name || "Student"}</strong><p>{student.email || "No e-mail available"}</p></div><div className="teacher-attendance-toggle" role="group" aria-label={`Attendance for ${student.name || "student"}`}><Button type="button" size="sm" variant={("status" in student ? student.status : student.attendanceStatus) === "present" ? "default" : "outline"} onClick={() => setAttendanceStatus("present")}>Present</Button><Button type="button" size="sm" variant={("status" in student ? student.status : student.attendanceStatus) === "absent" ? "destructive" : "outline"} onClick={() => setAttendanceStatus("absent")}>Absent</Button></div></div>)}</div>

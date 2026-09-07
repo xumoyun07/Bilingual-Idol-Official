@@ -206,11 +206,13 @@ export function SmartWhatsAppWidget() {
 
           <div className="bilc-wa-popup-footer">
             <span>
-              {language === "ms"
-                ? "WhatsApp Terus: +60 3-6731 0449"
-                : language === "ar"
-                ? "واتساب المباشر: +60 3-6731 0449"
-                : "Direct WhatsApp: +60 3-6731 0449"}
+              {language === "ms" ? (
+                <>WhatsApp Terus: <bdi dir="ltr">+60 3-6731 0449</bdi></>
+              ) : language === "ar" ? (
+                <>واتساب المباشر: <bdi dir="ltr">+60 3-6731 0449</bdi></>
+              ) : (
+                <>Direct WhatsApp: <bdi dir="ltr">+60 3-6731 0449</bdi></>
+              )}
             </span>
           </div>
         </div>

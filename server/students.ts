@@ -72,8 +72,85 @@ async function writeHistory(database: any, studentId: number, actorUserId: numbe
 
 function studentBaseWhere(studentId: number) { return and(eq(users.id, studentId), eq(users.role, "student")); }
 
+const inMemoryStudentsList: Array<any> = [
+  {
+    userId: 4,
+    name: "Sophia Wong",
+    email: "student@bilingualidol.com",
+    isActive: true,
+    createdAt: new Date("2026-01-15T00:00:00.000Z"),
+    updatedAt: new Date("2026-01-15T00:00:00.000Z"),
+    guardianName: "David Wong",
+    guardianPhone: "+60 12-345 6789",
+    contactEmail: "david.wong@example.com",
+    dateOfBirth: new Date("2008-05-12T00:00:00.000Z"),
+    address: "Mont Kiara, Kuala Lumpur",
+    notes: "Active participant in oral discussions. Progressing towards IELTS track.",
+    attendedSessions: 18,
+    totalSessions: 20,
+    currentLevel: "Intermediate B2",
+    courseName: "General English",
+    courseCode: "GE-2026",
+    courseStartDate: new Date("2026-01-10T00:00:00.000Z"),
+    courseEndDate: new Date("2026-06-30T00:00:00.000Z"),
+    documents: [] as any[],
+    history: [
+      { id: 1, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date("2026-01-15T00:00:00.000Z"), actorName: "Founder" },
+    ],
+  },
+  {
+    userId: 5,
+    name: "Ahmad Daniel",
+    email: "ahmad.daniel@example.com",
+    isActive: true,
+    createdAt: new Date("2026-02-01T00:00:00.000Z"),
+    updatedAt: new Date("2026-02-01T00:00:00.000Z"),
+    guardianName: "Fatimah Zahra",
+    guardianPhone: "+60 17-889 4321",
+    contactEmail: "fatimah.zahra@example.com",
+    dateOfBirth: new Date("2005-09-20T00:00:00.000Z"),
+    address: "Ampang, Kuala Lumpur",
+    notes: "Targeting Band 7.5+ for international postgraduate admission.",
+    attendedSessions: 12,
+    totalSessions: 12,
+    currentLevel: "Advanced C1",
+    courseName: "IELTS Preparation",
+    courseCode: "IELTS-2026",
+    courseStartDate: new Date("2026-02-01T00:00:00.000Z"),
+    courseEndDate: new Date("2026-04-30T00:00:00.000Z"),
+    documents: [] as any[],
+    history: [
+      { id: 2, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date("2026-02-01T00:00:00.000Z"), actorName: "Founder" },
+    ],
+  },
+];
+
 export async function listStudentProfiles(filters: StudentListFilters = {}) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    let filtered = inMemoryStudentsList;
+    if (filters.query) {
+      const q = filters.query.toLowerCase();
+      filtered = filtered.filter(s => s.name.toLowerCase().includes(q) || (s.email && s.email.toLowerCase().includes(q)) || (s.courseName && s.courseName.toLowerCase().includes(q)));
+    }
+    if (filters.level) filtered = filtered.filter(s => s.currentLevel === filters.level);
+    if (filters.course) filtered = filtered.filter(s => s.courseName === filters.course);
+    if (filters.isActive !== undefined) filtered = filtered.filter(s => s.isActive === filters.isActive);
+    const pageSize = Math.min(Math.max(filters.pageSize ?? 10, 1), 50);
+    const page = Math.max(filters.page ?? 0, 0);
+    const rows = filtered.slice(page * pageSize, (page + 1) * pageSize).map(s => ({
+      id: s.userId,
+      name: s.name,
+      email: s.email,
+      isActive: s.isActive,
+      createdAt: s.createdAt,
+      currentLevel: s.currentLevel,
+      courseName: s.courseName,
+      attendedSessions: s.attendedSessions,
+      totalSessions: s.totalSessions,
+    }));
+    return { rows, total: filtered.length, page, pageSize };
+  }
   const conditions = [eq(users.role, "student")];
   const query = filters.query?.trim();
   if (query) {
@@ -95,7 +172,10 @@ export async function listStudentProfiles(filters: StudentListFilters = {}) {
 }
 
 export async function getStudentProfile(studentId: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
+  if (!database) {
+    return inMemoryStudentsList.find(s => s.userId === studentId);
+  }
   const profile = (await database.select({ userId: users.id, name: users.name, email: users.email, isActive: users.isActive, createdAt: users.createdAt, updatedAt: users.updatedAt, guardianName: studentProfiles.guardianName, guardianPhone: studentProfiles.guardianPhone, contactEmail: studentProfiles.contactEmail, dateOfBirth: studentProfiles.dateOfBirth, address: studentProfiles.address, notes: studentProfiles.notes, attendedSessions: studentProfiles.attendedSessions, totalSessions: studentProfiles.totalSessions, currentLevel: studentProfiles.currentLevel, courseName: studentProfiles.courseName, courseCode: studentProfiles.courseCode, courseStartDate: studentProfiles.courseStartDate, courseEndDate: studentProfiles.courseEndDate }).from(users).leftJoin(studentProfiles, eq(studentProfiles.userId, users.id)).where(studentBaseWhere(studentId)).limit(1))[0];
   if (!profile) return undefined;
   const [documents, history] = await Promise.all([
@@ -107,10 +187,25 @@ export async function getStudentProfile(studentId: number) {
 }
 
 export async function createStudentProfile(input: StudentProfileInput, actorUserId: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const email = normaliseOptional(input.email)?.toLowerCase() ?? null;
-  if (email && (await database.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1))[0]) throw new Error("A user with this e-mail already exists.");
   const values = profileValues(input);
+  if (!database) {
+    const newStudent = {
+      userId: inMemoryStudentsList.length + 10,
+      name: input.name.trim(),
+      email,
+      isActive: input.isActive,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...values,
+      documents: [],
+      history: [{ id: 1, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date(), actorName: "Founder" }],
+    };
+    inMemoryStudentsList.push(newStudent);
+    return newStudent;
+  }
+  if (email && (await database.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1))[0]) throw new Error("A user with this e-mail already exists.");
   let studentId = 0;
   await database.transaction(async tx => {
     const inserted = await tx.insert(users).values({ openId: `student-profile:${randomUUID()}`, name: input.name.trim(), email, isActive: input.isActive, loginMethod: "student-profile", role: "student", lastSignedIn: new Date() });
@@ -122,15 +217,30 @@ export async function createStudentProfile(input: StudentProfileInput, actorUser
 }
 
 export async function updateStudentProfile(studentId: number, input: StudentProfileInput, actorUserId: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const existing = await getStudentProfile(studentId);
   if (!existing) throw new Error("Student profile not found.");
   const email = normaliseOptional(input.email)?.toLowerCase() ?? null;
+  const values = profileValues(input);
+  if (!database) {
+    const idx = inMemoryStudentsList.findIndex(s => s.userId === studentId);
+    if (idx !== -1) {
+      inMemoryStudentsList[idx] = {
+        ...inMemoryStudentsList[idx],
+        name: input.name.trim(),
+        email,
+        isActive: input.isActive,
+        ...values,
+        updatedAt: new Date(),
+      };
+      return inMemoryStudentsList[idx];
+    }
+    throw new Error("Student profile not found.");
+  }
   if (email) {
     const duplicate = (await database.select({ id: users.id }).from(users).where(and(eq(users.email, email), sql`${users.id} <> ${studentId}`)).limit(1))[0];
     if (duplicate) throw new Error("A user with this e-mail already exists.");
   }
-  const values = profileValues(input);
   const before = { ...existing };
   const after = { name: input.name.trim(), email, isActive: input.isActive, ...values };
   await database.transaction(async tx => {
@@ -142,9 +252,14 @@ export async function updateStudentProfile(studentId: number, input: StudentProf
 }
 
 export async function deleteStudentProfile(studentId: number, actorUserId: number) {
-  const database = requireDatabase(await getDb());
+  const database = await getDb();
   const existing = await getStudentProfile(studentId);
   if (!existing) throw new Error("Student profile not found.");
+  if (!database) {
+    const idx = inMemoryStudentsList.findIndex(s => s.userId === studentId);
+    if (idx !== -1) inMemoryStudentsList.splice(idx, 1);
+    return { success: true } as const;
+  }
   await database.transaction(async tx => {
     await tx.delete(studentDocuments).where(eq(studentDocuments.studentId, studentId));
     await tx.delete(studentProfileHistory).where(eq(studentProfileHistory.studentId, studentId));

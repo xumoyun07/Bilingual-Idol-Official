@@ -191,11 +191,11 @@ export function LeadForm({ type = "enrollment", title }: { type?: "enrollment" |
               {...form.register("preferredSchedule")}
             >
               <option value="">{t("enroll.schedulePlaceholder")}</option>
-              <option value="Weekday mornings">{language === "ms" ? "Pagi hari bekerja (09:00 - 12:00)" : language === "ar" ? "صباح أيام العمل (09:00 - 12:00)" : "Weekday mornings (09:00 - 12:00)"}</option>
-              <option value="Weekday afternoons">{language === "ms" ? "Petang hari bekerja (13:30 - 16:30)" : language === "ar" ? "بعد الظهر أيام العمل (13:30 - 16:30)" : "Weekday afternoons (13:30 - 16:30)"}</option>
-              <option value="Weekday evenings">{language === "ms" ? "Malam hari bekerja (18:00 - 21:00)" : language === "ar" ? "مساء أيام العمل (18:00 - 21:00)" : "Weekday evenings (18:00 - 21:00)"}</option>
-              <option value="Weekends">{language === "ms" ? "Hujung minggu intensif" : language === "ar" ? "عطلة نهاية الأسبوع مكثف" : "Weekends intensive"}</option>
-              <option value="Please advise">{language === "ms" ? "Fleksibel / Sila beri cadangan" : language === "ar" ? "مرن / يرجى تقديم المشورة" : "Flexible / Please advise"}</option>
+              <option value="Weekday mornings">{t("enroll.weekdayMorning")}</option>
+              <option value="Weekday afternoons">{t("enroll.weekdayAfternoon")}</option>
+              <option value="Weekday evenings">{t("enroll.weekdayEvening")}</option>
+              <option value="Weekends">{t("enroll.weekendIntensive")}</option>
+              <option value="Please advise">{t("enroll.flexiblePrivate")}</option>
             </select>
           </label>
         </div>

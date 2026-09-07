@@ -383,8 +383,8 @@ export function OfficialPriceList2026() {
                             )}
                           </td>
                           <td>{clsText}</td>
-                          <td>{visaText}</td>
-                          <td className="bilc-price-cell">{course.tuitionFee}</td>
+                          <td><bdi dir="ltr">{visaText}</bdi></td>
+                          <td className="bilc-price-cell"><bdi dir="ltr">{course.tuitionFee}</bdi></td>
                           <td>
                             <Link href={`/enroll?course=General+English+${encodeURIComponent(course.rawDuration)}`} className="bilc-enroll-inline-btn">
                               {language === "ms" ? "Daftar" : language === "ar" ? "استفسار" : "Enquire"}
@@ -424,7 +424,7 @@ export function OfficialPriceList2026() {
                         <span className="bilc-mobile-card-sub">{clsText}</span>
                       </div>
                       <div className="bilc-mobile-card-price">
-                        <strong>{course.tuitionFee}</strong>
+                        <strong><bdi dir="ltr">{course.tuitionFee}</bdi></strong>
                         <span>{language === "ms" ? "Yuran Pengajian" : language === "ar" ? "الرسوم الدراسية" : "Tuition Fee"}</span>
                       </div>
                     </div>
@@ -435,7 +435,7 @@ export function OfficialPriceList2026() {
                           {language === "ms" ? "Pas Pelajar EMGS:" : language === "ar" ? "فيزا الطالب EMGS:" : "EMGS Student Visa:"}
                         </span>
                         <span className="bilc-spec-val">
-                          {visaText === "—" ? (language === "ms" ? "Lawatan Singkat / Pelancong" : language === "ar" ? "فيزا سياحية / زيارة قصيرة" : "Tourist / Short Visit") : visaText}
+                          {visaText === "—" ? (language === "ms" ? "Lawatan Singkat / Pelancong" : language === "ar" ? "فيزا سياحية / زيارة قصيرة" : "Tourist / Short Visit") : <bdi dir="ltr">{visaText}</bdi>}
                         </span>
                       </div>
                       <div className="bilc-spec-row">
@@ -464,13 +464,13 @@ export function OfficialPriceList2026() {
               <div className="bilc-note-item">
                 <FileText size={16} />
                 <span>
-                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> RM 500 {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
+                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> <bdi dir="ltr">RM 500</bdi> {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
                 </span>
               </div>
               <div className="bilc-note-item">
                 <UserCheck size={16} />
                 <span>
-                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> RM 300 {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
+                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> <bdi dir="ltr">RM 300</bdi> {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
                 </span>
               </div>
             </div>
@@ -495,7 +495,7 @@ export function OfficialPriceList2026() {
                       </div>
                     </div>
                     <div className="bilc-course-price">
-                      <span className="bilc-price-val">{course.tuitionFee}</span>
+                      <span className="bilc-price-val"><bdi dir="ltr">{course.tuitionFee}</bdi></span>
                       <span className="bilc-price-sub">{language === "ms" ? "Yuran Pengajian" : language === "ar" ? "الرسوم الدراسية" : "Tuition Fee"}</span>
                     </div>
                     <div className="bilc-course-inclusions">
@@ -538,7 +538,7 @@ export function OfficialPriceList2026() {
                     </div>
                     <p className="bilc-camp-highlight">{hlText}</p>
                     <div className="bilc-course-price">
-                      <span className="bilc-price-val">{course.tuitionFee}</span>
+                      <span className="bilc-price-val"><bdi dir="ltr">{course.tuitionFee}</bdi></span>
                       <span className="bilc-price-sub">{language === "ms" ? "Pakej Serba Lengkap" : language === "ar" ? "باقة شاملة متكاملة" : "All-inclusive Package"}</span>
                     </div>
                     <div className="bilc-course-inclusions">
@@ -578,7 +578,7 @@ export function OfficialPriceList2026() {
                     </div>
                   </div>
                   <div className="bilc-course-price">
-                    <span className="bilc-price-val">{course.tuitionFee}</span>
+                    <span className="bilc-price-val"><bdi dir="ltr">{course.tuitionFee}</bdi></span>
                     <span className="bilc-price-sub">{language === "ms" ? "Bimbingan Peribadi" : language === "ar" ? "تدريب فردي مخصص" : "Personalized Coaching"}</span>
                   </div>
                   <div className="bilc-course-inclusions">
@@ -620,7 +620,7 @@ export function OfficialPriceList2026() {
                   </div>
                   <p className="bilc-camp-highlight">{descText}</p>
                   <div className="bilc-course-price">
-                    <span className="bilc-price-val">{feeText}</span>
+                    <span className="bilc-price-val"><bdi dir="ltr">{feeText}</bdi></span>
                     <span className="bilc-price-sub">{language === "ms" ? "Yuran Eksekutif" : language === "ar" ? "الرسوم التنفيذية" : "Executive Tuition"}</span>
                   </div>
                   <div className="bilc-course-inclusions">

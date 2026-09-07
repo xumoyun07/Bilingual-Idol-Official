@@ -6,7 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Contact() {
-  const { t, isRTL, language } = useLanguage();
+  const { t, isRTL, language, translateAmPm } = useLanguage();
   const settings = trpc.content.siteSettings.useQuery();
   const media = trpc.media.publicList.useQuery();
   const contactMedia = media.data?.find(item => item.slot === "home_task_contact") ?? media.data?.find(item => item.slot === "about_cta");
@@ -15,7 +15,7 @@ export default function Contact() {
     { icon: Phone, label: t("common.call"), value: "+6 03 6731 0449", href: "tel:+60367310449" },
     { icon: MessageCircle, label: t("common.whatsapp"), value: language === "ms" ? "Hantar mesej WhatsApp" : language === "ar" ? "تواصل عبر واتساب" : "Message the centre", href: "https://wa.me/60367310449" },
     { icon: Mail, label: t("common.email"), value: "info@bilingualidol.edu.my", href: "mailto:info@bilingualidol.edu.my" },
-    { icon: Clock3, label: t("contact.openingHours"), value: settings.data?.operatingHours ?? (language === "ms" ? "Hubungi pusat untuk waktu operasi terkini." : language === "ar" ? "تواصل مع المركز لمعرفة ساعات العمل الحالية." : "Contact the centre for current opening hours.") },
+    { icon: Clock3, label: t("common.openingHours"), value: settings.data?.operatingHours ? translateAmPm(settings.data.operatingHours) : t("contact.openingHours") },
   ];
 
   return (
@@ -43,7 +43,7 @@ export default function Contact() {
                   <strong>{label}</strong>
                   {href ? (
                     <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noreferrer" : undefined}>
-                      {value}
+                      {href.startsWith("tel:") || href.startsWith("mailto:") ? <bdi dir="ltr">{value}</bdi> : value}
                     </a>
                   ) : (
                     <span>{value}</span>

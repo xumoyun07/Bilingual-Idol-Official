@@ -74,7 +74,7 @@ const BOOKING_SERVICES: ServiceOption[] = [
 const TIME_SLOTS = ["10:00 AM – 11:00 AM", "11:30 AM – 12:30 PM", "02:00 PM – 03:00 PM", "03:30 PM – 04:30 PM", "05:00 PM – 06:00 PM"];
 
 export function BookingSystemModal({ isOpen, onClose, initialService }: BookingProps) {
-  const { t, isRTL, language } = useLanguage();
+  const { t, isRTL, language, formatTimeSlot } = useLanguage();
   const [selectedService, setSelectedService] = useState<string>(initialService || "placement_test");
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
@@ -202,7 +202,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
                 >
                   {TIME_SLOTS.map(slot => (
                     <option key={slot} value={slot}>
-                      {slot}
+                      {formatTimeSlot(slot)}
                     </option>
                   ))}
                 </select>
@@ -301,10 +301,10 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
 
             <div className="bilc-booking-recap-box">
               <div className="flex items-center gap-2 text-sm text-slate-700">
-                <Calendar size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Tarikh:" : language === "ar" ? "التاريخ:" : "Date:"}</strong> {selectedDate} ({selectedTime})
+                <Calendar size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Tarikh:" : language === "ar" ? "التاريخ:" : "Date:"}</strong> <bdi dir="ltr">{selectedDate}</bdi> (<bdi dir="ltr">{formatTimeSlot(selectedTime)}</bdi>)
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-700 mt-2">
-                <MapPin size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Lokasi:" : language === "ar" ? "الموقع:" : "Location:"}</strong> B-25-07, Pavilion Embassy, Menara G-Vestor, Kuala Lumpur
+                <MapPin size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Lokasi:" : language === "ar" ? "الموقع:" : "Location:"}</strong> <bdi dir="ltr">B-25-07, Pavilion Embassy, Menara G-Vestor, Kuala Lumpur</bdi>
               </div>
             </div>
 
@@ -312,10 +312,10 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
               <a
                 href={`https://wa.me/60367310449?text=${encodeURIComponent(
                   language === "ms"
-                    ? `Salam Bilingual Idol, saya telah menempah temujanji untuk "${serviceTitle}" pada ${selectedDate} pukul ${selectedTime}. Nama saya ${name} (${phone}).`
+                    ? `Salam Bilingual Idol, saya telah menempah temujanji untuk "${serviceTitle}" pada ${selectedDate} pukul ${formatTimeSlot(selectedTime)}. Nama saya ${name} (${phone}).`
                     : language === "ar"
-                    ? `مرحباً بايلينجوال آيدول، قمت بحجز موعد لـ "${serviceTitle}" بتاريخ ${selectedDate} في تمام الساعة ${selectedTime}. اسمي ${name} (${phone}).`
-                    : `Hello Bilingual Idol, I booked an appointment for "${serviceTitle}" on ${selectedDate} at ${selectedTime}. My name is ${name} (${phone}).`
+                    ? `مرحباً بايلينجوال آيدول، قمت بحجز موعد لـ "${serviceTitle}" بتاريخ ${selectedDate} في تمام الساعة ${formatTimeSlot(selectedTime)}. اسمي ${name} (${phone}).`
+                    : `Hello Bilingual Idol, I booked an appointment for "${serviceTitle}" on ${selectedDate} at ${formatTimeSlot(selectedTime)}. My name is ${name} (${phone}).`
                 )}`}
                 target="_blank"
                 rel="noreferrer"
