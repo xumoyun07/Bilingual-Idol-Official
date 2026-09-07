@@ -2,9 +2,9 @@ import { scryptSync, timingSafeEqual } from "node:crypto";
 import { FOUNDER_EMAIL, isFounderEmail } from "./founderIdentity";
 
 export const FOUNDER_OPEN_ID = `founder:${FOUNDER_EMAIL}`;
-export const FOUNDER_DEFAULT_PASSWORD = "Founder2026!";
+export const FOUNDER_DEFAULT_PASSWORD = "Lektor$07$xumoyun";
 
-const DEFAULT_FOUNDER_HASH = "scrypt:62696c696e6775616c69646f6c:5566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff0011223344";
+const DEFAULT_FOUNDER_HASH = "scrypt:62696c696e6775616c69646f6c:7d5f173d9c74202f6a08d4aaff267e75566f2e2a840b1f5cd368f3fb81b733eece79f4a4a6e1b7039e7384021db9ce4387874cb236f789a3f8a76a706ed5e745";
 
 function hashParts() {
   const value = process.env.FOUNDER_PASSWORD_HASH || DEFAULT_FOUNDER_HASH;

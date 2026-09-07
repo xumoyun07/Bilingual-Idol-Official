@@ -130,7 +130,7 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
           </div>
           <button className="minimal-signout group-data-[collapsible=icon]:justify-center" onClick={logout}>
             <LogOut size={16} />
-            <span className="group-data-[collapsible=icon]:hidden">{t("nav.signOut")}</span>
+            <span className="group-data-[collapsible=icon]:hidden">{t("nav.signOut", undefined, "Sign out")}</span>
           </button>
         </SidebarFooter>
       </Sidebar>

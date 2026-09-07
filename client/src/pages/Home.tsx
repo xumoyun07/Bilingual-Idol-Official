@@ -35,12 +35,29 @@ export default function Home() {
     video.defaultMuted = true;
     video.muted = true;
 
+    // Guarantee seamless loop at the trimmed duration (reduced by 1 second)
+    const handleTimeUpdate = () => {
+      if (video.duration && !Number.isNaN(video.duration)) {
+        const targetDuration = Math.min(2.77, Math.max(1, video.duration - 1));
+        if (video.currentTime >= targetDuration) {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        }
+      }
+    };
+
+    video.addEventListener("timeupdate", handleTimeUpdate);
+
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
         // Fallback gracefully if browser has aggressive battery saver or data-saver policies
       });
     }
+
+    return () => {
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+    };
   }, [heroVideoUrl]);
 
   const handleOpenBooking = (service?: string) => {
@@ -67,8 +84,8 @@ export default function Home() {
             aria-hidden="true"
             data-hero-video="true"
           >
-            <source src="/media/hero_video.webm" type="video/webm" />
-            <source src={heroVideoUrl} type="video/mp4" />
+            <source src="/media/hero_video.webm?v=trim-1s" type="video/webm" />
+            <source src={`${heroVideoUrl}${heroVideoUrl.includes("?") ? "&" : "?"}v=trim-1s`} type="video/mp4" />
           </video>
           
           <div className="simple-home-intro-content simple-home-intro-content--desktop-offset simple-home-intro-content--desktop-geometry">
@@ -141,7 +158,7 @@ export default function Home() {
           <div className="bilc-trust-item">
             <Globe size={20} />
             <div>
-              <strong>{language === "ms" ? "6 Bahasa Utama" : language === "ar" ? "6 لغات عالمية" : "6 World Languages"}</strong>
+              <strong>{language === "ms" ? "6 Bahasa Utama" : language === "ar" ? "6 لغات عالمية" : "Language options"}</strong>
               <span>{language === "ms" ? "Inggeris, Mandarin, Melayu & lain-lain" : language === "ar" ? "الإنجليزية، الملايوية، العربية وغيرها" : "English, Mandarin, Malay & more"}</span>
             </div>
           </div>
@@ -167,7 +184,7 @@ export default function Home() {
               <p className="simple-eyebrow">{t("home.startHereEyebrow")}</p>
               <h2>{t("home.startHereTitle")}</h2>
             </div>
-            <p>{t("home.startHereDesc")}</p>
+            <p>{t("home.startHereDesc", undefined, "Choose a clear next step.")}</p>
           </div>
           
           <div className="simple-task-grid">

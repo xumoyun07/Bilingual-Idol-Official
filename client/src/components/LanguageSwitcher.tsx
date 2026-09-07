@@ -102,7 +102,7 @@ export function LanguageSwitcher({
 
       {isOpen && (
         <div
-          className={`absolute mt-1.5 w-48 rounded-xl bg-white border border-[#d9e2f1] shadow-xl py-1.5 z-100 animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
+          className={`absolute mt-1.5 w-48 rounded-xl bg-white border border-[#d9e2f1] shadow-2xl py-1.5 z-[100] pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
             isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
           }`}
           role="listbox"

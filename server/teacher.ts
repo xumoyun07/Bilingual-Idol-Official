@@ -2,11 +2,6 @@ import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
 import { attendanceRecords, classSessions, grades, users } from "../drizzle/schema";
 import { getDb } from "./db";
 
-function requireDatabase(db: Awaited<ReturnType<typeof getDb>>) {
-  if (!db) throw new Error("Database is currently unavailable. Please try again shortly.");
-  return db;
-}
-
 export class TeacherSessionAccessError extends Error {
   constructor() {
     super("The selected class is not assigned to this teacher.");

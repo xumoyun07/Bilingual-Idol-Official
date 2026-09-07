@@ -13,12 +13,20 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { t, isRTL, language } = useLanguage();
 
+  const defaultNav = [
+    { label: "Home", href: "/" },
+    { label: "About", href: "/about" },
+    { label: "Programmes", href: "/programs" },
+    { label: "News", href: "/news" },
+    { label: "Contact", href: "/contact" },
+  ];
+
   const primaryNavigation = [
-    { label: t("nav.home"), href: "/" },
-    { label: t("nav.about"), href: "/about" },
-    { label: t("nav.programs"), href: "/programs" },
-    { label: t("nav.news"), href: "/news" },
-    { label: t("nav.contact"), href: "/contact" },
+    { label: t("nav.home", undefined, "Home"), href: "/" },
+    { label: t("nav.about", undefined, "About"), href: "/about" },
+    { label: t("nav.programs", undefined, "Programmes"), href: "/programs" },
+    { label: t("nav.news", undefined, "News"), href: "/news" },
+    { label: t("nav.contact", undefined, "Contact"), href: "/contact" },
   ];
 
   useEffect(() => {
@@ -137,14 +145,14 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               {t("nav.signIn")}
             </Link>
             <Link href="/enroll" className="simple-button">
-              {t("nav.makeEnquiry")}
+              {t("nav.makeEnquiry", undefined, "Make an enquiry")}
             </Link>
           </div>
           <div className="flex items-center gap-2 md:hidden">
             <button
               className="simple-menu-button"
               onClick={() => setOpen((value) => !value)}
-              aria-label={open ? t("nav.close") : t("nav.menu")}
+              aria-label={open ? "Close navigation" : "Open navigation"}
               aria-expanded={open}
             >
               {open ? <X size={22} /> : <Menu size={22} />}
@@ -152,7 +160,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         {open && (
-          <nav className="simple-mobile-nav" aria-label={language === "ar" ? "تنقل الجوال" : language === "ms" ? "Navigasi mudah alih" : "Mobile navigation"}>
+          <nav className="simple-mobile-nav" aria-label="Mobile navigation">
             <div className="pb-3 mb-2 border-b border-[#d9e2f1] flex items-center justify-between">
               <span className="text-xs font-semibold text-[#566983] px-1">{t("nav.switchLanguage")}</span>
               <LanguageSwitcher variant="dropdown" />
@@ -166,7 +174,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               {t("nav.signIn")}
             </Link>
             <Link href="/enroll" className="simple-button" onClick={close}>
-              {t("nav.makeEnquiry")}
+              {t("nav.makeEnquiry", undefined, "Make an enquiry")}
             </Link>
           </nav>
         )}

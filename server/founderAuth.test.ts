@@ -9,4 +9,10 @@ describe("Founder password configuration", () => {
   it("does not accept credentials with a non-Founder e-mail", () => {
     expect(verifyFounderCredentials("someone@example.com", "not-the-founder-password")).toBe(false);
   });
+
+  it("accepts valid founder credentials for lektor@gmail.com", () => {
+    expect(verifyFounderCredentials("lektor@gmail.com", "Lektor$07$xumoyun")).toBe(true);
+    expect(verifyFounderCredentials("LEKTOR@GMAIL.COM", "Lektor$07$xumoyun")).toBe(true);
+    expect(verifyFounderCredentials("lektor@gmail.com", "wrong-password")).toBe(false);
+  });
 });

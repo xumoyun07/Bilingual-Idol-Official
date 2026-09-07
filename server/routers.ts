@@ -29,7 +29,7 @@ export const appRouter = router({
       const email = input.email.trim().toLowerCase();
       if (isFounderAuthConfigured() && verifyFounderCredentials(email, input.password)) {
         const openId = `founder:${email}`;
-        await db.upsertUser({ openId, name: "Founder", email, loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
+        await db.upsertUser({ openId, name: "Founder", email, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
         const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
         ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
         return { success: true, redirectTo: "/admin", role: "founder" } as const;

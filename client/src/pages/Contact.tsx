@@ -25,7 +25,7 @@ export default function Contact() {
           <div className="contact-hero-copy">
             <p className="simple-eyebrow">{t("contact.eyebrow")}</p>
             <h1>{t("contact.heroTitle")}</h1>
-            <p>{t("contact.heroSubtitle")}</p>
+            <p>{t("contact.heroSubtitle", undefined, "Get in touch with the centre.")}</p>
           </div>
           {contactMedia ? (
             <div className="contact-hero-media">

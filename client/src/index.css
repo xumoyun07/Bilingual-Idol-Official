@@ -189,8 +189,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .rise-in-delay { animation: rise-in 650ms 120ms var(--ease-out) both; }
 .rise-in-delay-2 { animation: rise-in 650ms 220ms var(--ease-out) both; }
 .route-enter {
-  animation: route-enter 280ms cubic-bezier(0.4, 0, 0.2, 1) both;
-  will-change: opacity, transform;
+  animation: route-enter 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: opacity;
+  transform: none !important;
 }
 .interactive-card {
   transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -245,11 +246,9 @@ textarea {
 @keyframes route-enter {
   from {
     opacity: 0;
-    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 @keyframes shimmer { to { transform: translateX(100%); } }
@@ -517,29 +516,14 @@ html { scroll-padding-top: 5.25rem; }
   background-color: var(--blue-mist, #f4f7fc);
   background-image:
     linear-gradient(rgb(23 63 173 / .055) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .055) 1px, transparent 1px),
-    radial-gradient(circle at 12% 16%, rgb(71 113 223 / .13), transparent 26rem),
-    radial-gradient(circle at 88% 68%, rgb(23 63 173 / .08), transparent 30rem);
-  background-size: 32px 32px, 32px 32px, auto, auto;
+    linear-gradient(90deg, rgb(23 63 173 / .055) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px;
   background-attachment: fixed;
 }
 .simple-public-shell::before, .auth-page::before, .member-page::before, .minimal-auth-state::before, .minimal-dashboard-inset::before, .workspace-surface::before {
-  position: absolute;
-  z-index: 0;
-  width: 26rem;
-  height: 26rem;
-  top: 24%;
-  right: -14rem;
-  border: 1px solid rgb(23 63 173 / .12);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgb(99 136 230 / .12), transparent 66%);
-  box-shadow: 0 0 0 3rem rgb(23 63 173 / .018), 0 0 0 7rem rgb(23 63 173 / .012);
-  content: "";
-  pointer-events: none;
-  transform: translate3d(0, 0, 0);
-  animation: bilc-grid-drift 14s var(--ease-in-out) infinite alternate;
+  display: none !important;
 }
-.simple-public-shell > *, .auth-page > *, .member-page > *, .minimal-auth-state > *, .minimal-dashboard-inset > *, .workspace-surface > * { position: relative; z-index: 1; }
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface) > *:not(.dynamic-circle-field) { position: relative; z-index: 1; }
 .simple-section-tint, .auth-help, .member-status, .workspace-page .founder-panel-sand { background-image: linear-gradient(rgb(23 63 173 / .038) 1px, transparent 1px), linear-gradient(90deg, rgb(23 63 173 / .038) 1px, transparent 1px); background-size: 26px 26px; }
 .simple-public-shell main, .auth-content, .member-content, .minimal-dashboard-main, .workspace-page { animation: bilc-page-reveal 360ms var(--ease-out) both; }
 .simple-public-shell main :is(.simple-task-card, .simple-programme-guide article, .simple-news-card), .workspace-page :is(.founder-panel, .founder-metric, article), .member-content > *, .auth-content > * { animation: bilc-item-reveal 420ms var(--ease-out) both; }
@@ -768,31 +752,79 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   }
 }
 
-/* Dynamic grid visibility correction — declared after visual-theme overrides. */
+/* Clean background grid for shells */
 .simple-public-shell {
   background-color: #f8faff;
   background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 10% 14%, rgb(62 105 216 / .16), transparent 28rem),
-    radial-gradient(circle at 92% 64%, rgb(23 63 173 / .105), transparent 31rem);
-  background-size: 32px 32px, 32px 32px, auto, auto;
+    linear-gradient(rgb(23 63 173 / .07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 173 / .07) 1px, transparent 1px);
+  background-size: 32px 32px;
   background-attachment: fixed;
 }
 .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface {
   background-color: #f3f6ff;
   background-image:
     linear-gradient(rgb(23 63 173 / .065) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .065) 1px, transparent 1px),
-    radial-gradient(circle at 12% 12%, rgb(93 130 225 / .14), transparent 26rem),
-    radial-gradient(circle at 92% 72%, rgb(23 63 173 / .09), transparent 30rem);
-  background-size: 30px 30px, 30px 30px, auto, auto;
+    linear-gradient(90deg, rgb(23 63 173 / .065) 1px, transparent 1px);
+  background-size: 30px 30px;
   background-attachment: fixed;
 }
 .simple-public-shell :is(.simple-route-page, .simple-public-page), .auth-content, .member-content, .minimal-dashboard-main, .workspace-page { position: relative; }
 @media (max-width: 767px) {
   .simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface { background-attachment: scroll; }
 }
+
+/* Responsive normalization of visual-editor refinements */
+/* Approved desktop geometry, translated into an adaptive layout */
+@media (min-width: 1400px) {
+  .simple-home-intro--desktop-geometry {
+    width: 1321px;
+    max-width: 1321px;
+  }
+}
+/* Mobile-only Hero height and desktop Home spacing */
+@media (max-width: 767px) {
+  .simple-home-intro--mobile-480 {
+    height: 580px;
+  }
+}
+/* Public action spacing from visual editor */
+.simple-home-actions {
+  gap: 25px;
+}
+/* Desktop Hero size and content position from visual editor */
+@media (min-width: 1024px) {
+  .simple-public-header--refined { position: fixed !important; top: 1rem !important; left: 0 !important; right: 0 !important; z-index: 1000 !important; margin: 0 auto !important; }
+  .simple-public-header--refined.mobile-header-bar { top: .75rem !important; width: calc(100% - 2rem) !important; }
+  .simple-home-intro-content--desktop-geometry {
+    padding-top: 155px;
+    transform: translateY(-87px);
+    width: 723px;
+    height: 675px;
+  }
+}
+.simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }
+.simple-route-header--programmes {
+  width: min(100%, 76rem);
+  max-width: none;
+  height: 36.25rem;
+}
+.simple-route-header-description {
+  color: var(--bilc-ink);
+}
+.simple-route-header-copy--wide h1 {
+  max-width: 28.125rem;
+}
+.simple-list-summary--surface {
+  padding: 1rem;
+}
+.simple-section-heading--fee-guide {
+  width: min(100%, 25rem);
+}
+.simple-home-split-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 25rem);
+}
+.simple-home-start-panel, .simple-home-programmes-panel { border: 1px solid var(--bilc-line); }
 
 /* Eyebrow badge and back links inside all public route hero headers (excluding Home) */
 .simple-route-header .simple-eyebrow,
@@ -1877,141 +1909,64 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
 /* Founder Login visual-editor normalization: intro surface values expressed semantically. */
 .auth-intro--surface { border: 1px solid var(--blue-line); border-radius: 1rem; background: #fff; padding: 1.25rem; }
 
-/* Static page-specific sphere field: each public route receives a distinct, non-animated composition. */
-.simple-public-shell:has(.home-page) {
-  background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 92% 16%, rgb(93 130 225 / .22) 0 7rem, rgb(93 130 225 / .08) 7.2rem, transparent 15rem),
-    radial-gradient(circle at 7% 76%, rgb(129 160 239 / .14) 0 4.5rem, transparent 12rem),
-    radial-gradient(circle at 78% 88%, rgb(23 63 173 / .10) 0 3rem, transparent 10rem);
-}
-.simple-public-shell:has(.about-page) {
-  background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 15% 20%, rgb(129 160 239 / .17) 0 5.5rem, transparent 14rem),
-    radial-gradient(circle at 88% 42%, rgb(93 130 225 / .20) 0 8rem, rgb(93 130 225 / .06) 8.2rem, transparent 17rem),
-    radial-gradient(circle at 35% 91%, rgb(23 63 173 / .10) 0 3.5rem, transparent 11rem);
-}
-.simple-public-shell:has(.programs-page) {
-  background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 84% 13%, rgb(93 130 225 / .20) 0 6rem, transparent 14rem),
-    radial-gradient(circle at 18% 54%, rgb(129 160 239 / .15) 0 9rem, rgb(129 160 239 / .04) 9.2rem, transparent 18rem),
-    radial-gradient(circle at 72% 92%, rgb(23 63 173 / .10) 0 3rem, transparent 10rem);
-}
-.simple-public-shell:has(.news-page) {
-  background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 9% 12%, rgb(129 160 239 / .16) 0 4rem, transparent 11rem),
-    radial-gradient(circle at 93% 58%, rgb(93 130 225 / .20) 0 7.5rem, rgb(93 130 225 / .05) 7.7rem, transparent 16rem),
-    radial-gradient(circle at 44% 88%, rgb(23 63 173 / .10) 0 4rem, transparent 12rem);
-}
-.simple-public-shell:has(.contact-page) {
-  background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 90% 18%, rgb(93 130 225 / .21) 0 8.5rem, rgb(93 130 225 / .05) 8.7rem, transparent 18rem),
-    radial-gradient(circle at 12% 63%, rgb(129 160 239 / .15) 0 5rem, transparent 13rem),
-    radial-gradient(circle at 61% 94%, rgb(23 63 173 / .10) 0 3rem, transparent 10rem);
-}
-.simple-public-shell:has(.enroll-page) {
-  background-image:
-    linear-gradient(rgb(23 63 173 / .082) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 63 173 / .082) 1px, transparent 1px),
-    radial-gradient(circle at 80% 24%, rgb(93 130 225 / .21) 0 7rem, transparent 16rem),
-    radial-gradient(circle at 14% 82%, rgb(129 160 239 / .16) 0 8rem, rgb(129 160 239 / .04) 8.2rem, transparent 17rem),
-    radial-gradient(circle at 48% 10%, rgb(23 63 173 / .08) 0 3rem, transparent 10rem);
-}
-@media (max-width: 767px) {
-  .simple-public-shell:has(.home-page),
-  .simple-public-shell:has(.about-page),
-  .simple-public-shell:has(.programs-page),
-  .simple-public-shell:has(.news-page),
-  .simple-public-shell:has(.contact-page),
-  .simple-public-shell:has(.enroll-page) { background-attachment: scroll; }
-}
-
-/* Universal static sphere layer for every application shell, including internal workspaces. */
+/* Unified decorative grid & surface rules */
 :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page) {
   position: relative;
   isolation: isolate;
 }
 :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before {
-  position: fixed;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 88% 22%, rgb(93 130 225 / .22) 0 6rem, rgb(93 130 225 / .07) 6.2rem, transparent 15rem),
-    radial-gradient(circle at 9% 78%, rgb(129 160 239 / .13) 0 4rem, transparent 12rem);
-  content: "";
+  display: none !important;
 }
-:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page) > * {
+:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page) > *:not(header):not(.simple-public-header):not(.floating-actions-dock):not(.dynamic-circle-field) {
   position: relative;
   z-index: 1;
 }
-@media (max-width: 767px) {
-  :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before { position: absolute; min-height: 100%; }
-}
 
-/* Full-document static edge sphere field. The overlay follows the shell height, not the viewport. */
-:is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  min-height: 100%;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 7% 9%, rgb(129 160 239 / .16) 0 4.5rem, transparent 12rem),
-    radial-gradient(circle at 93% 15%, rgb(93 130 225 / .20) 0 7rem, rgb(93 130 225 / .06) 7.2rem, transparent 16rem),
-    radial-gradient(circle at 3% 28%, rgb(93 130 225 / .13) 0 3rem, transparent 10rem),
-    radial-gradient(circle at 97% 39%, rgb(129 160 239 / .15) 0 5rem, transparent 13rem),
-    radial-gradient(circle at 8% 53%, rgb(93 130 225 / .12) 0 6rem, transparent 15rem),
-    radial-gradient(circle at 92% 64%, rgb(129 160 239 / .16) 0 4rem, transparent 12rem),
-    radial-gradient(circle at 4% 79%, rgb(93 130 225 / .14) 0 5.5rem, transparent 14rem),
-    radial-gradient(circle at 96% 91%, rgb(129 160 239 / .17) 0 7rem, rgb(129 160 239 / .04) 7.2rem, transparent 16rem);
-  content: "";
+/* Dynamic decorative circle field: clean 150px-300px edge spheres */
+.dynamic-circle-field {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  z-index: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
 }
-@media (max-width: 767px) {
-  :is(.simple-public-shell, .auth-page, .member-page, .minimal-dashboard-inset, .workspace-surface, .workspace-page)::before {
-    background:
-      radial-gradient(circle at 2% 8%, rgb(129 160 239 / .15) 0 3rem, transparent 8rem),
-      radial-gradient(circle at 98% 19%, rgb(93 130 225 / .18) 0 4.5rem, transparent 10rem),
-      radial-gradient(circle at 1% 34%, rgb(93 130 225 / .12) 0 2.5rem, transparent 7rem),
-      radial-gradient(circle at 99% 49%, rgb(129 160 239 / .14) 0 3.5rem, transparent 9rem),
-      radial-gradient(circle at 2% 65%, rgb(93 130 225 / .12) 0 4rem, transparent 10rem),
-      radial-gradient(circle at 98% 81%, rgb(129 160 239 / .15) 0 3rem, transparent 8rem),
-      radial-gradient(circle at 3% 96%, rgb(93 130 225 / .13) 0 3.5rem, transparent 9rem);
-  }
+.dynamic-circle {
+  position: absolute !important;
+  width: var(--circle-size, 200px);
+  height: var(--circle-size, 200px);
+  border-radius: 50% !important;
+  display: block !important;
+  visibility: visible !important;
+  transform: translateY(-50%);
+  pointer-events: none !important;
+  /* Soft, light, airy light-blue 3D sphere gradient */
+  background: radial-gradient(circle at 34% 28%, #ffffff 0%, rgb(228 240 255 / .92) 28%, rgb(180 214 255 / .62) 64%, rgb(130 180 248 / .28) 100%) !important;
+  border: 1px solid rgb(145 190 250 / .45) !important;
+  box-shadow: 0 4px 18px rgb(23 63 173 / .08), inset 0 2px 8px rgba(255, 255, 255, 0.95) !important;
 }
-
-/* Dynamic decorative circle field: two edge circles per viewport-square of document height. */
-.dynamic-circle-field { position: absolute; inset: 0; z-index: 0; min-height: 100%; overflow: hidden; pointer-events: none; }
-.dynamic-circle { position: absolute; top: var(--circle-top); width: var(--circle-size); height: var(--circle-size); border: 1px solid rgb(23 63 173 / .16); border-radius: 50%; opacity: .72; transform: translateY(-50%); }
-.dynamic-circle--left { left: calc(var(--circle-offset) * -1); }
-.dynamic-circle--right { right: calc(var(--circle-offset) * -1); }
-.dynamic-circle--blue { background: radial-gradient(circle at 34% 28%, rgb(129 160 239 / .2), rgb(23 63 173 / .08) 58%, transparent 72%); box-shadow: 0 0 0 1rem rgb(23 63 173 / .025), 0 0 0 2.5rem rgb(23 63 173 / .018); }
-.dynamic-circle--mist { background: radial-gradient(circle at 38% 32%, rgb(214 226 255 / .72), rgb(129 160 239 / .12) 62%, transparent 74%); box-shadow: 0 0 0 1rem rgb(129 160 239 / .025), 0 0 0 2.5rem rgb(129 160 239 / .016); }
+.dynamic-circle--left {
+  left: var(--circle-pos, -60px) !important;
+  right: auto !important;
+}
+.dynamic-circle--right {
+  right: var(--circle-pos, -60px) !important;
+  left: auto !important;
+}
 .dynamic-circle-field + *, .dynamic-circle-field ~ * { position: relative; z-index: 1; }
 @media (max-width: 767px) {
-  .dynamic-circle { opacity: .56; }
-  .dynamic-circle--left { left: -3.5rem; }
-  .dynamic-circle--right { right: -3.5rem; }
+  .dynamic-circle { opacity: .52 !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .dynamic-circle { transition: none; }
 }
 
-/* Circle field replaces all previous sphere pseudo-elements and route radial-gradient decorations. */
+/* Unified decorative grid & sphere background on root shells */
 .simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface {
-  background-image: linear-gradient(rgb(23 63 173 / .065) 1px, transparent 1px), linear-gradient(90deg, rgb(23 63 173 / .065) 1px, transparent 1px) !important;
-  background-size: 32px 32px !important;
+  background-size: 32px 32px;
 }
-:is(.simple-public-shell, .auth-page, .member-page, .minimal-auth-state, .minimal-dashboard-inset, .workspace-surface)::before { display: none !important; }
 
 /* Teacher T0: assigned-session workspace only; no class creation or assignment controls. */
 .teacher-workspace { display: grid; gap: 1.25rem; max-width: 82rem; margin-inline: auto; }
@@ -3582,6 +3537,74 @@ main#main-content > div:first-child > :first-child,
   background: #e2e8f0;
   color: #0f172a;
 }
+
+/* ==========================================================================
+   RTL / Arabic Modal Exit & Close Buttons Positioning
+   In Arabic (RTL), exit and close buttons are positioned on the LEFT side of modals
+   ========================================================================== */
+
+html[dir="rtl"] .bilc-modal-close-btn,
+html.rtl .bilc-modal-close-btn,
+html[lang="ar"] .bilc-modal-close-btn,
+body.rtl .bilc-modal-close-btn,
+body[dir="rtl"] .bilc-modal-close-btn,
+.is-rtl .bilc-modal-close-btn,
+[dir="rtl"] .bilc-modal-close-btn,
+.bilc-modal-overlay.is-rtl .bilc-modal-close-btn,
+.bilc-modal-close-btn-rtl {
+  right: auto !important;
+  left: 1.25rem !important;
+}
+
+@media (max-width: 767px) {
+  html[dir="rtl"] .bilc-modal-close-btn,
+  html.rtl .bilc-modal-close-btn,
+  html[lang="ar"] .bilc-modal-close-btn,
+  body.rtl .bilc-modal-close-btn,
+  body[dir="rtl"] .bilc-modal-close-btn,
+  .is-rtl .bilc-modal-close-btn,
+  [dir="rtl"] .bilc-modal-close-btn,
+  .bilc-modal-overlay.is-rtl .bilc-modal-close-btn,
+  .bilc-modal-close-btn-rtl {
+    right: auto !important;
+    left: 0.85rem !important;
+  }
+}
+
+html[dir="rtl"] .bilc-modal-header,
+html.rtl .bilc-modal-header,
+html[lang="ar"] .bilc-modal-header,
+body.rtl .bilc-modal-header,
+body[dir="rtl"] .bilc-modal-header,
+.is-rtl .bilc-modal-header,
+[dir="rtl"] .bilc-modal-header {
+  padding-left: 2.5rem;
+  padding-right: 0;
+  text-align: right;
+}
+
+/* Dialog & Sheet close button positioning in Arabic (RTL) */
+html[dir="rtl"] [data-slot="dialog-close"],
+html.rtl [data-slot="dialog-close"],
+html[lang="ar"] [data-slot="dialog-close"],
+body.rtl [data-slot="dialog-close"],
+body[dir="rtl"] [data-slot="dialog-close"],
+.is-rtl [data-slot="dialog-close"],
+[dir="rtl"] [data-slot="dialog-close"] {
+  right: auto !important;
+  left: 1rem !important;
+}
+
+html[dir="rtl"] [data-slot="sheet-close"],
+html.rtl [data-slot="sheet-close"],
+html[lang="ar"] [data-slot="sheet-close"],
+body.rtl [data-slot="sheet-close"],
+body[dir="rtl"] [data-slot="sheet-close"],
+.is-rtl [data-slot="sheet-close"],
+[dir="rtl"] [data-slot="sheet-close"] {
+  right: auto !important;
+  left: 1rem !important;
+}
 .bilc-modal-header {
   margin-bottom: 1.25rem;
 }
@@ -3980,10 +4003,36 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
   z-index: 999;
 }
 
-.is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
-.is-rtl .bilc-wa-popup {
-  right: auto;
-  left: 80px;
+html[lang="ar"] .bilc-wa-popup,
+html[dir="rtl"] .bilc-wa-popup,
+html.rtl .bilc-wa-popup,
+body.rtl .bilc-wa-popup,
+body[dir="rtl"] .bilc-wa-popup,
+.is-rtl .bilc-wa-popup,
+[dir="rtl"] .bilc-wa-popup {
+  right: 80px;
+}
+
+@media (min-width: 1024px) {
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  body.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  body[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  [dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  html[lang="ar"] .bilc-wa-popup,
+  html[dir="rtl"] .bilc-wa-popup,
+  html.rtl .bilc-wa-popup,
+  body.rtl .bilc-wa-popup,
+  body[dir="rtl"] .bilc-wa-popup,
+  .is-rtl .bilc-wa-popup,
+  [dir="rtl"] .bilc-wa-popup {
+    right: auto !important;
+    left: 80px !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -6325,6 +6374,7 @@ div.contact-page > section:nth-of-type(1) > div:nth-of-type(1),
     padding-right: 0px !important;
     padding-bottom: 0px !important;
     padding-top: 0px !important;
+    margin-top: 0px !important;
   }
 }
 
@@ -7119,6 +7169,214 @@ html.rtl input[type="email"] {
     transform: none !important;
   }
 }
+
+/* -------------------------------------------------------------
+ * RTL & Responsive Enhancements for Auth Login Page
+ * ----------------------------------------------------------- */
+.auth-page.is-rtl .auth-header {
+  flex-direction: row-reverse !important;
+}
+
+.auth-page.is-rtl .auth-intro {
+  text-align: right !important;
+}
+
+.auth-page.is-rtl .auth-help {
+  border-left: none !important;
+  border-right: 3px solid var(--blue-primary, #173fad) !important;
+  text-align: right !important;
+  flex-direction: row-reverse !important;
+}
+
+.auth-page.is-rtl .auth-form-panel {
+  text-align: right !important;
+}
+
+.auth-page.is-rtl .auth-field label {
+  text-align: right !important;
+  display: block !important;
+}
+
+.auth-page.is-rtl .auth-input-wrap > svg {
+  left: auto !important;
+  right: 0.85rem !important;
+}
+
+.auth-page.is-rtl .auth-input-wrap input {
+  padding-left: 1rem !important;
+  padding-right: 2.7rem !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.auth-page.is-rtl .auth-input-wrap input#sign-in-password {
+  padding-left: 3rem !important;
+  padding-right: 2.7rem !important;
+}
+
+.auth-page.is-rtl .auth-password-toggle {
+  right: auto !important;
+  left: 0.25rem !important;
+}
+
+.auth-page.is-rtl .auth-error {
+  border-left: none !important;
+  border-right: 3px solid #bf3d35 !important;
+  text-align: right !important;
+}
+
+/* Focus and input typography refinement for login inputs */
+.auth-input-wrap input#sign-in-email,
+.auth-input-wrap input#sign-in-password {
+  font-size: 0.95rem;
+  font-weight: 550;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.auth-input-wrap input#sign-in-email::placeholder,
+.auth-input-wrap input#sign-in-password::placeholder {
+  color: #8c9ba5;
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Desktop-only adjustment for Home Hero Content */
+@media (min-width: 1024px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  #home-page-container > section:nth-of-type(1) > div.simple-home-intro-content,
+  div.home-page > section.simple-home-intro > div.simple-home-intro-content {
+    margin-top: 150px !important;
+    padding-top: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    padding-bottom: 0px !important;
+  }
+
+  /* Desktop Arabic (RTL) override for Home Hero Content */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  body.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  body[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  [dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  html[lang="ar"] #home-page-container > section:nth-of-type(1) > div.simple-home-intro-content,
+  html[dir="rtl"] #home-page-container > section:nth-of-type(1) > div.simple-home-intro-content,
+  .is-rtl #home-page-container > section:nth-of-type(1) > div.simple-home-intro-content,
+  html[lang="ar"] div.home-page > section.simple-home-intro > div.simple-home-intro-content,
+  html[dir="rtl"] div.home-page > section.simple-home-intro > div.simple-home-intro-content,
+  .is-rtl div.home-page > section.simple-home-intro > div.simple-home-intro-content {
+    margin-left: 50px !important;
+    margin-top: 110px !important;
+    margin-right: 50px !important;
+  }
+
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  #home-page-container > section:nth-of-type(1) > div.simple-home-intro-content > div:nth-of-type(2),
+  div.home-page > section.simple-home-intro > div.simple-home-intro-content > div:nth-of-type(2) {
+    margin-bottom: 10px !important;
+  }
+}
+
+/* Mobile-only adjustment for Home Hero Content and Navigation */
+@media (max-width: 768px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1),
+  .simple-public-header,
+  header.simple-public-header--refined {
+    position: fixed !important;
+    top: 12px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    z-index: 1000 !important;
+  }
+
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1),
+  #home-page-container > section:nth-of-type(1),
+  .home-page > section.simple-home-intro {
+    margin-top: 0px !important;
+  }
+
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  #home-page-container > section:nth-of-type(1) > div.simple-home-intro-content {
+    padding-left: 20px !important;
+    margin-left: 0px !important;
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+  }
+
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1),
+  #home-page-container > section:nth-of-type(1) > div:nth-of-type(1) > div.bilc-hero-cert-badge,
+  .simple-home-intro-content > div.bilc-hero-cert-badge {
+    font-size: 9.48px !important;
+    padding-left: 16px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    padding-right: 16px !important;
+    width: 300px !important;
+    max-width: 300px !important;
+    margin-top: 20px !important;
+    margin-left: -1px !important;
+  }
+}
+
+/* Universal persistent fixed positioning for floating actions dock */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+.floating-actions-dock {
+  position: fixed !important;
+  bottom: clamp(1.25rem, 3vw, 2.25rem) !important;
+  right: clamp(1.25rem, 3vw, 2.25rem) !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  pointer-events: none !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > *,
+.floating-actions-dock > * {
+  pointer-events: auto !important;
+}
+
+/* Arabic / RTL positioning: move floating quick action dock to the left side ONLY ON DESKTOP */
+@media (min-width: 1024px) {
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  body.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  body[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  [dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  html[dir="rtl"] .floating-actions-dock,
+  html[lang="ar"] .floating-actions-dock,
+  html.rtl .floating-actions-dock,
+  body.rtl .floating-actions-dock,
+  body[dir="rtl"] .floating-actions-dock,
+  .is-rtl .floating-actions-dock,
+  [dir="rtl"] .floating-actions-dock {
+    left: clamp(1.25rem, 3vw, 2.25rem) !important;
+    right: auto !important;
+  }
+}
+
+/* Focus Mode: Course Pricing styling */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#course-pricing:nth-of-type(4) > div:nth-of-type(2) {
+  border-width: 1px !important;
+}
+
+/* Focus Mode: Desktop WhatsApp popup position in Arabic (appears to the right of the button) */
+@media (min-width: 1024px) {
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+    right: auto !important;
+    left: 80px !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+  }
+}
+
 
 
 

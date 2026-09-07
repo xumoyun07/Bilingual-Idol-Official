@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
+import { cn } from "@/lib/utils";
 
 interface Question {
   id: number;
@@ -153,7 +154,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
       <div className="bilc-modal-card" onClick={e => e.stopPropagation()}>
         <button
           type="button"
-          className="bilc-modal-close-btn"
+          className={cn("bilc-modal-close-btn", isRTL && "bilc-modal-close-btn-rtl left-5 right-auto")}
           onClick={onClose}
           aria-label={language === "ar" ? "إغلاق اختبار تحديد المستوى" : language === "ms" ? "Tutup Ujian Penempatan" : "Close Placement Test"}
         >

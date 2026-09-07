@@ -31,7 +31,7 @@ export default function Programs() {
             <p className="simple-eyebrow">{t("programs.eyebrow")}</p>
             <h1>{t("programs.heroTitle")}</h1>
             <p className="simple-route-header-description">
-              {t("programs.heroSubtitle")}
+              {t("programs.heroSubtitle", undefined, "Search by language, level or learner group")}
             </p>
           </div>
           {listingMedia ? (
@@ -45,7 +45,7 @@ export default function Programs() {
           <div className="simple-section-heading simple-section-heading--fee-guide">
             <div>
               <p className="simple-eyebrow">{t("programs.feeGuideEyebrow")}</p>
-              <h2>{t("programs.feeGuideTitle")}</h2>
+              <h2>{t("programs.feeGuideTitle", undefined, "2026 fee guide")}</h2>
             </div>
             <p>{t("programs.feeGuideSubtitle")}</p>
           </div>

@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 export default function FounderLogin() {
@@ -16,6 +15,15 @@ export default function FounderLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      en: "Sign in | Bilingual Idol Language Centre",
+      ms: "Log Masuk | Pusat Bahasa Bilingual Idol",
+      ar: "تسجيل الدخول | مركز بايلينجوال آيدول للغات",
+    };
+    document.title = titles[language] || titles.en;
+  }, [language]);
 
   const login = trpc.auth.login.useMutation({
     onSuccess: async (data) => {
@@ -30,7 +38,7 @@ export default function FounderLogin() {
   }
 
   return (
-    <main className={`auth-page blue-auth-page ${isRTL ? "is-rtl" : ""}`}>
+    <main key={`auth-page-${language}`} className={`auth-page blue-auth-page ${isRTL ? "is-rtl" : ""}`}>
       <BackgroundCircleField seed="auth-login" />
       <header className="auth-header flex items-center justify-between">
         <Link href="/" className="auth-brand" aria-label={t("footer.centreName")}>
@@ -40,13 +48,10 @@ export default function FounderLogin() {
             <small>{t("footer.brandSubtitle")}</small>
           </div>
         </Link>
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher variant="dropdown" />
-          <Link href="/" className="auth-back flex items-center gap-1">
-            <ArrowLeft size={16} className={isRTL ? "rotate-180" : ""} />
-            {t("common.backToHome")}
-          </Link>
-        </div>
+        <Link href="/" className="auth-back flex items-center gap-1">
+          <ArrowLeft size={16} className={isRTL ? "rotate-180" : ""} />
+          {t("common.backToHome")}
+        </Link>
       </header>
 
       <section className="auth-content" aria-labelledby="sign-in-title">
@@ -70,19 +75,21 @@ export default function FounderLogin() {
             <p>{t("login.heroSubtitle")}</p>
           </div>
 
-          <form onSubmit={submit} className="auth-form" noValidate={false}>
+          <form key={`login-form-${language}`} onSubmit={submit} className="auth-form" noValidate={false}>
             <div className="auth-field">
               <Label htmlFor="sign-in-email">{t("login.emailLabel")}</Label>
               <div className="auth-input-wrap">
                 <Mail aria-hidden="true" size={17} />
                 <Input
                   id="sign-in-email"
+                  key={`sign-in-email-${language}`}
                   type="email"
                   autoComplete="email"
                   placeholder={t("login.emailPlaceholder")}
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  dir={isRTL ? "rtl" : "ltr"}
                 />
               </div>
             </div>
@@ -93,6 +100,7 @@ export default function FounderLogin() {
                 <LockKeyhole aria-hidden="true" size={17} />
                 <Input
                   id="sign-in-password"
+                  key={`sign-in-password-${language}`}
                   type={visible ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder={t("login.passwordPlaceholder")}
@@ -100,6 +108,7 @@ export default function FounderLogin() {
                   minLength={1}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
+                  dir={isRTL ? "rtl" : "ltr"}
                 />
                 <button
                   type="button"

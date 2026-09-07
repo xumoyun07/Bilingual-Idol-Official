@@ -16,35 +16,15 @@ export async function getDb() {
   return _db;
 }
 
-function requireDatabase(db: Awaited<ReturnType<typeof getDb>>): NonNullable<Awaited<ReturnType<typeof getDb>>> {
-  if (!db) {
-    throw new Error("Database is currently offline. Please configure DATABASE_URL.");
-  }
-  return db;
-}
-
 // In-Memory Data Store Fallbacks (active when DATABASE_URL is unconfigured or offline)
 const inMemoryStore = {
   users: [
     {
       id: 1,
-      openId: "founder:nurlanguageschool@gmail.com",
+      openId: "founder:lektor@gmail.com",
       name: "Founder",
-      email: "nurlanguageschool@gmail.com",
-      passwordHash: createUserPasswordHash("Founder2026!"),
-      role: "founder" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 2,
-      openId: "founder:lektor0780@gmail.com",
-      name: "Founder",
-      email: "lektor0780@gmail.com",
-      passwordHash: createUserPasswordHash("Founder2026!"),
+      email: "lektor@gmail.com",
+      passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
       role: "founder" as const,
       isActive: true,
       loginMethod: "email_password",
@@ -174,7 +154,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   if (db) {
     const values: InsertUser = { openId: user.openId, lastSignedIn: user.lastSignedIn ?? new Date() };
     const updateSet: Record<string, unknown> = { lastSignedIn: values.lastSignedIn };
-    for (const field of ["name", "email", "loginMethod"] as const) if (user[field] !== undefined) { values[field] = user[field] ?? null; updateSet[field] = user[field] ?? null; }
+    for (const field of ["name", "email", "loginMethod", "passwordHash"] as const) if (user[field] !== undefined) { values[field] = user[field] ?? null; updateSet[field] = user[field] ?? null; }
     if (shouldGrantFounderRole({ email: user.email, openId: user.openId, ownerOpenId: ENV.ownerOpenId })) { values.role = "founder"; updateSet.role = "founder"; } else if (user.role !== undefined) { values.role = user.role; updateSet.role = user.role; }
     await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
     return;

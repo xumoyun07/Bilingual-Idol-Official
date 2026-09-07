@@ -2,11 +2,6 @@ import { and, eq, lte, ne, sql } from "drizzle-orm";
 import { attendanceRecords, classSessions } from "../drizzle/schema";
 import { getDb } from "./db";
 
-function requireDatabase(database: Awaited<ReturnType<typeof getDb>>) {
-  if (!database) throw new Error("Attendance information is currently unavailable. Please try again shortly.");
-  return database;
-}
-
 export async function getStudentAttendanceSummary(studentId: number) {
   const database = await getDb();
   if (!database) {

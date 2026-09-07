@@ -44,6 +44,15 @@ function setCookie(name: string, value: string, days = 365) {
 function detectInitialLanguage(): Language {
   if (typeof window === "undefined") return "en";
   try {
+    // 0. Check URL query parameter (?lang=en | ?lang=ms | ?lang=ar)
+    if (window.location && window.location.search) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryLang = urlParams.get("lang");
+      if (queryLang === "en" || queryLang === "ms" || queryLang === "ar") {
+        return queryLang as Language;
+      }
+    }
+
     // 1. Check localStorage
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "en" || saved === "ms" || saved === "ar") {
@@ -78,10 +87,37 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY, lang);
       setCookie(COOKIE_NAME, lang);
+      if (typeof window !== "undefined" && window.location) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", lang);
+        window.history.replaceState(null, "", url.toString());
+      }
+      window.dispatchEvent(new CustomEvent("bilc_languagechange", { detail: lang }));
     } catch (e) {
       console.warn("Could not save language to storage", e);
     }
   };
+
+  // Synchronize across tabs or custom languagechange events
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY && (e.newValue === "en" || e.newValue === "ms" || e.newValue === "ar")) {
+        setLanguageState(e.newValue as Language);
+      }
+    };
+    const handleCustomChange = (e: Event) => {
+      const customEvent = e as CustomEvent<Language>;
+      if (customEvent.detail && (customEvent.detail === "en" || customEvent.detail === "ms" || customEvent.detail === "ar")) {
+        setLanguageState(customEvent.detail);
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("bilc_languagechange", handleCustomChange);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("bilc_languagechange", handleCustomChange);
+    };
+  }, []);
 
   const isRTL = language === "ar";
   const dir: "ltr" | "rtl" = isRTL ? "rtl" : "ltr";

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
+import { cn } from "@/lib/utils";
 
 interface BookingProps {
   isOpen: boolean;
@@ -113,7 +114,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
       <div className="bilc-modal-card" onClick={e => e.stopPropagation()}>
         <button
           type="button"
-          className="bilc-modal-close-btn"
+          className={cn("bilc-modal-close-btn", isRTL && "bilc-modal-close-btn-rtl left-5 right-auto")}
           onClick={onClose}
           aria-label={language === "ar" ? "إغلاق نافذة الحجز" : language === "ms" ? "Tutup Tempahan" : "Close Booking Modal"}
         >
@@ -273,12 +274,25 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
             </div>
 
             <div className="bilc-modal-footer bilc-sticky-modal-footer mt-4 gap-3 sm:gap-4">
-              <button type="button" className="bilc-nav-btn min-h-[44px] px-5" onClick={onClose}>
-                {language === "ms" ? "Batal" : language === "ar" ? "إلغاء" : "Cancel"}
-              </button>
-              <button type="submit" className="simple-button min-h-[44px] flex-1 justify-center gap-2">
-                {language === "ms" ? "Sahkan Tempahan" : language === "ar" ? "تأكيد الحجز" : "Confirm Booking"} <Send size={16} />
-              </button>
+              {isRTL ? (
+                <>
+                  <button type="submit" className="simple-button min-h-[44px] flex-1 justify-center gap-2">
+                    {language === "ar" ? "تأكيد الحجز" : "Confirm Booking"} <Send size={16} className="rotate-180" />
+                  </button>
+                  <button type="button" className="bilc-nav-btn min-h-[44px] px-5" onClick={onClose}>
+                    {language === "ar" ? "إلغاء" : "Cancel"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="bilc-nav-btn min-h-[44px] px-5" onClick={onClose}>
+                    {language === "ms" ? "Batal" : "Cancel"}
+                  </button>
+                  <button type="submit" className="simple-button min-h-[44px] flex-1 justify-center gap-2">
+                    {language === "ms" ? "Sahkan Tempahan" : "Confirm Booking"} <Send size={16} />
+                  </button>
+                </>
+              )}
             </div>
           </form>
         ) : (
