@@ -47,7 +47,7 @@ export default function About() {
 
   return (
     <PublicLayout>
-      <div className={`simple-route-page about-page about-page--compact-spacing ${isRTL ? "is-rtl" : ""}`}>
+      <div id="about-page-container" className={`simple-route-page about-page about-page--compact-spacing ${isRTL ? "is-rtl" : ""}`}>
         <header className="simple-route-header about-hero-header">
           <div className="about-hero-copy">
             <p className="simple-eyebrow">{t("about.eyebrow")}</p>

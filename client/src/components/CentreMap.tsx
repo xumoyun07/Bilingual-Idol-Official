@@ -11,7 +11,13 @@ export function CentreMap() {
       <div className="relative h-[330px] overflow-hidden bg-[#e7f0eb]">
         <iframe
           className="h-full w-full border-0"
-          title="Map showing Bilingual Idol Language Centre at Pavilion Embassy, Kuala Lumpur"
+          title={
+            language === "ar"
+              ? "خريطة توضح موقع مركز بايلينجوال آيدول للغات في بافيليون إمباسي، كوالالمبور"
+              : language === "ms"
+              ? "Peta menunjukkan Pusat Bahasa Bilingual Idol di Pavilion Embassy, Kuala Lumpur"
+              : "Map showing Bilingual Idol Language Centre at Pavilion Embassy, Kuala Lumpur"
+          }
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}

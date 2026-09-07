@@ -293,7 +293,12 @@ export function OfficialPriceList2026() {
       </div>
 
       {/* Category Navigation */}
-      <div className="bilc-pricing-tabs" role="tablist" aria-label="Course categories">
+      <div
+        className="bilc-pricing-tabs"
+        role="tablist"
+        aria-label={language === "ar" ? "فئات الدورات الدراسية" : language === "ms" ? "Kategori kursus" : "Course categories"}
+        style={{ marginLeft: 0 }}
+      >
         <button
           role="tab"
           aria-selected={activeTab === "general"}

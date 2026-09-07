@@ -12,7 +12,7 @@ import { Link, useLocation } from "wouter";
 export default function FounderLogin() {
   const [, setLocation] = useLocation();
   const utils = trpc.useUtils();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
@@ -33,11 +33,11 @@ export default function FounderLogin() {
     <main className={`auth-page blue-auth-page ${isRTL ? "is-rtl" : ""}`}>
       <BackgroundCircleField seed="auth-login" />
       <header className="auth-header flex items-center justify-between">
-        <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
+        <Link href="/" className="auth-brand" aria-label={t("footer.centreName")}>
           <span aria-hidden="true">BI</span>
           <div>
             <strong>Bilingual Idol</strong>
-            <small>Learning centre</small>
+            <small>{t("footer.brandSubtitle")}</small>
           </div>
         </Link>
         <div className="flex items-center gap-3">
@@ -114,7 +114,11 @@ export default function FounderLogin() {
 
             {login.error ? (
               <p className="auth-error" role="alert">
-                Invalid e-mail or password.
+                {language === "ms"
+                  ? "Emel atau kata laluan tidak sah."
+                  : language === "ar"
+                  ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+                  : "Invalid e-mail or password."}
               </p>
             ) : null}
 

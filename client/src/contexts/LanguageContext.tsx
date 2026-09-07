@@ -122,7 +122,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (typeof current !== "string") {
-      return fallback ?? keyPath;
+      if (fallback) return fallback;
+      // Fallback cleanly to human-readable text instead of raw dotted key
+      const lastPart = parts[parts.length - 1] || keyPath;
+      const formatted = lastPart
+        .replace(/([A-Z])/g, " $1")
+        .replace(/[._-]/g, " ")
+        .trim();
+      return formatted ? (formatted.charAt(0).toUpperCase() + formatted.slice(1)) : keyPath;
     }
 
     let result = current;

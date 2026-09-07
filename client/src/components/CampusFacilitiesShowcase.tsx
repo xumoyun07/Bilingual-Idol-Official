@@ -288,7 +288,7 @@ export function CampusFacilitiesShowcase() {
                 type="button"
                 className={`bilc-carousel-dot ${selectedIndex === i ? "is-active" : ""}`}
                 onClick={() => setSelectedIndex(i)}
-                aria-label={`Go to facility ${i + 1}`}
+                aria-label={language === "ar" ? `الانتقال إلى المرفق ${i + 1}` : language === "ms" ? `Pergi ke kemudahan ${i + 1}` : `Go to facility ${i + 1}`}
               />
             ))}
           </div>

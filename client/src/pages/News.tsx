@@ -10,7 +10,13 @@ const icons = { announcement: Megaphone, event: CalendarDays, holiday: PartyPopp
 type NewsPost = { id: number; slug: string; title: string; excerpt: string; body: string; category: "announcement" | "event" | "holiday"; imageUrl: string | null; imageAltText: string | null; publishedAt: Date | null };
 
 function dateLabel(value: Date | null, locale: string) {
-  return value ? new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : locale === "ms" ? "ms-MY" : "en-GB", { year: "numeric", month: "long", day: "numeric" }).format(new Date(value)) : "Published by the centre";
+  return value
+    ? new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : locale === "ms" ? "ms-MY" : "en-GB", { year: "numeric", month: "long", day: "numeric" }).format(new Date(value))
+    : locale === "ms"
+    ? "Diterbitkan oleh pihak pusat"
+    : locale === "ar"
+    ? "نُشر بواسطة المركز"
+    : "Published by the centre";
 }
 
 export default function News() {
@@ -74,15 +80,15 @@ export default function News() {
             <p>{t("news.heroSubtitle")}</p>
           </div>
           {listingMedia ? (
-            <div className="simple-route-header-media" aria-label="News header image">
+            <div className="simple-route-header-media" aria-label={language === "ar" ? "صورة الأخبار الرئيسية" : language === "ms" ? "Gambar tajuk berita" : "News header image"}>
               <img src={listingMedia.publicUrl} alt={listingMedia.altText} loading="lazy" decoding="async" />
             </div>
           ) : null}
         </header>
 
-        <section className="simple-route-section news-feed" aria-label="Centre news">
+        <section className="simple-route-section news-feed" aria-label={language === "ar" ? "أخبار المركز" : language === "ms" ? "Berita pusat" : "Centre news"}>
           {feed.isLoading ? (
-            <div className="news-grid" aria-label="Loading news">
+            <div className="news-grid" aria-label={language === "ar" ? "جارٍ تحميل الأخبار" : language === "ms" ? "Memuatkan berita" : "Loading news"}>
               {Array.from({ length: 6 }, (_, index) => (
                 <div className="news-card news-card-loading" key={index} />
               ))}
@@ -91,7 +97,13 @@ export default function News() {
           {feed.error ? (
             <div className="simple-empty-state">
               <Newspaper size={20} />
-              <p>Updates are temporarily unavailable. Please contact the centre directly if you need help.</p>
+              <p>
+                {language === "ms"
+                  ? "Kemas kini tidak tersedia buat sementara waktu. Sila hubungi pihak pusat secara langsung jika anda memerlukan bantuan."
+                  : language === "ar"
+                  ? "التحديثات غير متاحة مؤقتاً. يرجى التواصل مع إدارة المركز مباشرة إذا كنت بحاجة إلى مساعدة."
+                  : "Updates are temporarily unavailable. Please contact the centre directly if you need help."}
+              </p>
             </div>
           ) : null}
           {!feed.isLoading && !feed.error && feed.data?.rows.length ? (
@@ -129,19 +141,40 @@ export default function News() {
                 })}
               </div>
               {totalPages > 1 ? (
-                <nav className="news-pagination" aria-label="News pages">
-                  <Button type="button" variant="outline" onClick={() => changePage(page - 1)} disabled={page === 0} className="news-pagination-arrow" aria-label="Previous news page">
+                <nav className="news-pagination" aria-label={language === "ar" ? "صفحات الأخبار" : language === "ms" ? "Halaman berita" : "News pages"}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => changePage(page - 1)}
+                    disabled={page === 0}
+                    className="news-pagination-arrow"
+                    aria-label={language === "ar" ? "الصفحة السابقة" : language === "ms" ? "Halaman sebelumnya" : "Previous news page"}
+                  >
                     <ChevronLeft size={17} className={isRTL ? "rotate-180" : ""} />
                     <span>{t("news.previous")}</span>
                   </Button>
                   <div className="news-page-numbers">
                     {Array.from({ length: totalPages }, (_, index) => (
-                      <button type="button" key={index} onClick={() => changePage(index)} className={index === page ? "news-page-number is-current" : "news-page-number"} aria-current={index === page ? "page" : undefined} aria-label={`News page ${index + 1}`}>
+                      <button
+                        type="button"
+                        key={index}
+                        onClick={() => changePage(index)}
+                        className={index === page ? "news-page-number is-current" : "news-page-number"}
+                        aria-current={index === page ? "page" : undefined}
+                        aria-label={language === "ar" ? `صفحة الأخبار ${index + 1}` : language === "ms" ? `Halaman berita ${index + 1}` : `News page ${index + 1}`}
+                      >
                         {index + 1}
                       </button>
                     ))}
                   </div>
-                  <Button type="button" variant="outline" onClick={() => changePage(page + 1)} disabled={page === totalPages - 1} className="news-pagination-arrow" aria-label="Next news page">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => changePage(page + 1)}
+                    disabled={page === totalPages - 1}
+                    className="news-pagination-arrow"
+                    aria-label={language === "ar" ? "الصفحة التالية" : language === "ms" ? "Halaman seterusnya" : "Next news page"}
+                  >
                     <span>{t("news.next")}</span>
                     <ChevronRight size={17} className={isRTL ? "rotate-180" : ""} />
                   </Button>

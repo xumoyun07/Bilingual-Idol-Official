@@ -50,7 +50,7 @@ export default function Home() {
 
   return (
     <PublicLayout>
-      <div className={`simple-public-page home-page ${isRTL ? "is-rtl" : ""}`}>
+      <div id="home-page-container" className={`simple-public-page home-page ${isRTL ? "is-rtl" : ""}`}>
         {/* Luxury Hero Section with Seamless Loop Video */}
         <section className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580">
           <video
@@ -128,7 +128,7 @@ export default function Home() {
             <GraduationCap size={20} />
             <div>
               <strong>{language === "ms" ? "Kelulusan KPT" : language === "ar" ? "اعتماد رسمي" : "MOHE Approved"}</strong>
-              <span>License WZ10104</span>
+              <span>{language === "ms" ? "Lesen WZ10104" : language === "ar" ? "ترخيص WZ10104" : "License WZ10104"}</span>
             </div>
           </div>
           <div className="bilc-trust-item">

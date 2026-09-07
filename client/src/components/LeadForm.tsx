@@ -158,11 +158,21 @@ export function LeadForm({ type = "enrollment", title }: { type?: "enrollment" |
               {...form.register("programInterest")}
             >
               <option value="">{t("enroll.programPlaceholder")}</option>
-              <option value="General English (1-12 Months)">General English (1-12 Months)</option>
-              <option value="IELTS Preparation Track">IELTS Preparation Track</option>
-              <option value="Summer Camp Intensive">Summer Camp Intensive</option>
-              <option value="1-on-1 Private Lessons">1-on-1 Private Lessons</option>
-              <option value="Executive Business English">Executive Business English</option>
+              <option value="General English (1-12 Months)">
+                {language === "ms" ? "Bahasa Inggeris Umum (1-12 Bulan)" : language === "ar" ? "اللغة الإنجليزية العامة (1-12 شهراً)" : "General English (1-12 Months)"}
+              </option>
+              <option value="IELTS Preparation Track">
+                {language === "ms" ? "Laluan Persediaan IELTS" : language === "ar" ? "مسار التحضير لاختبار الآيلتس" : "IELTS Preparation Track"}
+              </option>
+              <option value="Summer Camp Intensive">
+                {language === "ms" ? "Kem Musim Panas Intensif" : language === "ar" ? "المخيم الصيفي المكثف" : "Summer Camp Intensive"}
+              </option>
+              <option value="1-on-1 Private Lessons">
+                {language === "ms" ? "Pelajaran Peribadi 1-sama-1" : language === "ar" ? "دروس خاصة فردية 1-على-1" : "1-on-1 Private Lessons"}
+              </option>
+              <option value="Executive Business English">
+                {language === "ms" ? "Bahasa Inggeris Perniagaan Eksekutif" : language === "ar" ? "الإنجليزية للأعمال التنفيذية" : "Executive Business English"}
+              </option>
               {programs.data?.map((program) => (
                 <option key={program.id} value={program.title}>
                   {program.title}

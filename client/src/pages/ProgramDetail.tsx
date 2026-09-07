@@ -63,7 +63,7 @@ export default function ProgramDetail() {
 
   return (
     <PublicLayout>
-      <div className={`simple-route-page program-detail-page ${isRTL ? "is-rtl" : ""}`}>
+      <div id="program-detail-page-container" className={`simple-route-page program-detail-page ${isRTL ? "is-rtl" : ""}`}>
         <header className="simple-route-header simple-route-header--programmes simple-route-header--program-detail">
           <div className="simple-route-header-copy">
             <Link href="/programs" className="simple-text-link">
@@ -73,7 +73,7 @@ export default function ProgramDetail() {
             <h1>{programme.title}</h1>
             <p className="simple-route-header-description">{programme.description}</p>
           </div>
-          <div className="simple-route-header-media" aria-label={`${programme.title} photo`}>
+          <div className="simple-route-header-media" aria-label={language === "ar" ? `صورة ${programme.title}` : language === "ms" ? `Gambar ${programme.title}` : `${programme.title} photo`}>
             <img src={bannerImageSrc} alt={bannerImageAlt} loading="lazy" decoding="async" />
           </div>
         </header>

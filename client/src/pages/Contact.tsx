@@ -20,7 +20,7 @@ export default function Contact() {
 
   return (
     <PublicLayout>
-      <div className={`simple-route-page contact-page ${isRTL ? "is-rtl" : ""}`}>
+      <div id="contact-page-container" className={`simple-route-page contact-page ${isRTL ? "is-rtl" : ""}`}>
         <header className="simple-route-header contact-hero-header contact-hero-header--compact contact-hero-header--spaced">
           <div className="contact-hero-copy">
             <p className="simple-eyebrow">{t("contact.eyebrow")}</p>
@@ -34,8 +34,8 @@ export default function Contact() {
           ) : null}
         </header>
 
-        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless contact-details-section--flush contact-details-section--topless">
-          <div className="simple-contact-grid contact-grid--flush">
+        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless">
+          <div className="simple-contact-grid">
             {contacts.map(({ icon: Icon, label, value, href }) => (
               <div className="simple-contact-item" key={label}>
                 <Icon size={19} aria-hidden="true" />

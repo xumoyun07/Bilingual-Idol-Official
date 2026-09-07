@@ -139,7 +139,8 @@ export function SmartWhatsAppWidget() {
   return (
     <div className={`bilc-wa-floating-dock ${isRTL ? "is-rtl" : ""}`}>
       {isOpen && (
-        <div className="bilc-wa-popup" role="dialog" aria-label="Smart WhatsApp Chat Selection">
+        <>
+          <div className="bilc-wa-popup" role="dialog" aria-label={language === "ar" ? "قائمة محادثة واتساب" : language === "ms" ? "Pilihan sembang WhatsApp" : "Smart WhatsApp Chat Selection"}>
           <div className="bilc-wa-popup-header">
             <div className="flex items-center gap-2">
               <div className="bilc-wa-avatar">
@@ -204,9 +205,21 @@ export function SmartWhatsAppWidget() {
           </div>
 
           <div className="bilc-wa-popup-footer">
-            <span>Direct WhatsApp: +60 3-6731 0449</span>
+            <span>
+              {language === "ms"
+                ? "WhatsApp Terus: +60 3-6731 0449"
+                : language === "ar"
+                ? "واتساب المباشر: +60 3-6731 0449"
+                : "Direct WhatsApp: +60 3-6731 0449"}
+            </span>
           </div>
         </div>
+        <div
+          className="bilc-wa-backdrop"
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
+        />
+        </>
       )}
 
       <button

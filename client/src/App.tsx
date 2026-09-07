@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import About from "./pages/About";
@@ -22,8 +23,10 @@ import UserDashboard from "./pages/UserDashboard";
 function Router() {
   const [location] = useLocation();
   return (
-    <div key={location} className="route-enter">
-      <Switch>
+    <>
+      <ScrollToTop />
+      <div key={location} className="route-enter">
+        <Switch>
         <Route path="/" component={Home} />
         <Route path="/programs" component={Programs} />
         <Route path="/programs/:slug" component={ProgramDetail} />
@@ -48,7 +51,8 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
     </div>
-  );
+  </>
+);
 }
 
 function App() {

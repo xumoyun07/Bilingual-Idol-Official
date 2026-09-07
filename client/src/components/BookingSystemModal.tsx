@@ -272,11 +272,11 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
               />
             </div>
 
-            <div className="bilc-modal-footer bilc-sticky-modal-footer mt-4">
-              <button type="button" className="bilc-nav-btn min-h-[44px]" onClick={onClose}>
+            <div className="bilc-modal-footer bilc-sticky-modal-footer mt-4 gap-3 sm:gap-4">
+              <button type="button" className="bilc-nav-btn min-h-[44px] px-5" onClick={onClose}>
                 {language === "ms" ? "Batal" : language === "ar" ? "إلغاء" : "Cancel"}
               </button>
-              <button type="submit" className="simple-button min-h-[44px] flex-1 justify-center">
+              <button type="submit" className="simple-button min-h-[44px] flex-1 justify-center gap-2">
                 {language === "ms" ? "Sahkan Tempahan" : language === "ar" ? "تأكيد الحجز" : "Confirm Booking"} <Send size={16} />
               </button>
             </div>
@@ -310,7 +310,13 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
 
             <div className="bilc-result-cta-grid mt-4">
               <a
-                href={`https://wa.me/60367310449?text=${encodeURIComponent(`Hello Bilingual Idol, I booked an appointment for "${serviceTitle}" on ${selectedDate} at ${selectedTime}. My name is ${name} (${phone}).`)}`}
+                href={`https://wa.me/60367310449?text=${encodeURIComponent(
+                  language === "ms"
+                    ? `Salam Bilingual Idol, saya telah menempah temujanji untuk "${serviceTitle}" pada ${selectedDate} pukul ${selectedTime}. Nama saya ${name} (${phone}).`
+                    : language === "ar"
+                    ? `مرحباً بايلينجوال آيدول، قمت بحجز موعد لـ "${serviceTitle}" بتاريخ ${selectedDate} في تمام الساعة ${selectedTime}. اسمي ${name} (${phone}).`
+                    : `Hello Bilingual Idol, I booked an appointment for "${serviceTitle}" on ${selectedDate} at ${selectedTime}. My name is ${name} (${phone}).`
+                )}`}
                 target="_blank"
                 rel="noreferrer"
                 className="simple-button bilc-wa-btn"

@@ -46,7 +46,11 @@ export function LanguageSwitcher({
 
   if (variant === "inline") {
     return (
-      <div className={`flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#eef3ff] border border-[#d9e2f1] ${className}`} role="group" aria-label="Language selection">
+      <div
+        className={`flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#eef3ff] border border-[#d9e2f1] ${className}`}
+        role="group"
+        aria-label={language === "ar" ? "اختيار اللغة" : language === "ms" ? "Pilihan bahasa" : "Language selection"}
+      >
         {languages.map((item) => {
           const isSelected = item.code === language;
           return (
@@ -78,7 +82,13 @@ export function LanguageSwitcher({
         className="inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3 py-1.5 text-xs font-bold text-[#354c6d] bg-white hover:bg-[#eef3ff] hover:text-[#173fad] border border-[#d9e2f1] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-label={`Current language: ${currentLang.nativeName}. Click to change language`}
+        aria-label={
+          language === "ar"
+            ? `اللغة الحالية: ${currentLang.nativeName}. انقر لتغيير اللغة`
+            : language === "ms"
+            ? `Bahasa semasa: ${currentLang.nativeName}. Klik untuk menukar bahasa`
+            : `Current language: ${currentLang.nativeName}. Click to change language`
+        }
       >
         <Globe size={15} className="text-[#173fad]" aria-hidden="true" />
         <span className="text-sm leading-none" aria-hidden="true">{currentLang.flag}</span>
@@ -96,7 +106,7 @@ export function LanguageSwitcher({
             isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
           }`}
           role="listbox"
-          aria-label="Select language"
+          aria-label={language === "ar" ? "اختر اللغة" : language === "ms" ? "Pilih bahasa" : "Select language"}
         >
           {languages.map((item) => {
             const isSelected = item.code === language;

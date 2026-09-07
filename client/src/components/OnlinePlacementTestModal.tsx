@@ -151,7 +151,12 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
   return createPortal(
     <div className={`bilc-modal-overlay ${isRTL ? "is-rtl" : ""}`} role="dialog" aria-modal="true" onClick={onClose}>
       <div className="bilc-modal-card" onClick={e => e.stopPropagation()}>
-        <button type="button" className="bilc-modal-close-btn" onClick={onClose} aria-label="Close Placement Test">
+        <button
+          type="button"
+          className="bilc-modal-close-btn"
+          onClick={onClose}
+          aria-label={language === "ar" ? "إغلاق اختبار تحديد المستوى" : language === "ms" ? "Tutup Ujian Penempatan" : "Close Placement Test"}
+        >
           <X size={20} />
         </button>
 
@@ -274,7 +279,13 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
 
             <div className="bilc-result-cta-grid">
               <a
-                href={`https://wa.me/60367310449?text=${encodeURIComponent(`Hello Bilingual Idol! I completed your free Online Placement Test. My score is ${score}/${totalQ} (${evalResult.level}). I'd like to book my official evaluation.`)}`}
+                href={`https://wa.me/60367310449?text=${encodeURIComponent(
+                  language === "ms"
+                    ? `Salam Bilingual Idol! Saya telah melengkapkan Ujian Penempatan dalam talian. Skor saya ialah ${score}/${totalQ} (${evalResult.level}). Saya ingin menempah sesi penilaian rasmi.`
+                    : language === "ar"
+                    ? `مرحباً بايلينجوال آيدول! أكملت اختبار تحديد المستوى المجاني عبر الإنترنت. نتيجتي هي ${score}/${totalQ} (${evalResult.level}). أود حجز تقييم رسمي.`
+                    : `Hello Bilingual Idol! I completed your free Online Placement Test. My score is ${score}/${totalQ} (${evalResult.level}). I'd like to book my official evaluation.`
+                )}`}
                 target="_blank"
                 rel="noreferrer"
                 className="simple-button bilc-wa-btn"

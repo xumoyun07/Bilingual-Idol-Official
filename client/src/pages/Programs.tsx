@@ -25,7 +25,7 @@ export default function Programs() {
 
   return (
     <PublicLayout>
-      <div className={`simple-route-page programs-page ${isRTL ? "is-rtl" : ""}`}>
+      <div id="programs-page-container" className={`simple-route-page programs-page ${isRTL ? "is-rtl" : ""}`}>
         <header className="simple-route-header simple-route-header--programmes">
           <div className="simple-route-header-copy simple-route-header-copy--wide">
             <p className="simple-eyebrow">{t("programs.eyebrow")}</p>
@@ -35,7 +35,7 @@ export default function Programs() {
             </p>
           </div>
           {listingMedia ? (
-            <div className="simple-route-header-media" aria-label="Programme classroom image">
+            <div className="simple-route-header-media" aria-label={language === "ar" ? "صورة الفصول والبرامج الدراسية" : language === "ms" ? "Gambar kelas program" : "Programme classroom image"}>
               <img src={listingMedia.publicUrl} alt={listingMedia.altText} loading="lazy" decoding="async" />
             </div>
           ) : null}
@@ -50,7 +50,38 @@ export default function Programs() {
             <p>{t("programs.feeGuideSubtitle")}</p>
           </div>
           <div className="simple-programme-guide">
-            {OFFICIAL_PROGRAMME_GUIDE.map(item => (
+            {[
+              {
+                title: language === "ar" ? "اللغة الإنجليزية العامة" : language === "ms" ? "Bahasa Inggeris Umum" : "General English",
+                detail: language === "ar" ? "1، 3، 6، 9 أو 12 شهراً · 5 أيام/الأسبوع" : language === "ms" ? "1, 3, 6, 9 atau 12 bulan · 5 hari/seminggu" : "1, 3, 6, 9 or 12 months · 5 days/week",
+                fee: language === "ar" ? "الرسوم من 2,950 ر.م" : language === "ms" ? "Yuran dari RM 2,950" : "Tuition from RM 2,950",
+                note: language === "ar" ? "رسوم التسجيل وتحديد المستوى مدرجة في دليل 2026." : language === "ms" ? "Yuran pendaftaran dan penempatan disenaraikan secara berasingan dalam panduan 2026." : "Registration and placement fees are listed separately in the 2026 guide.",
+              },
+              {
+                title: language === "ar" ? "التحضير لاختبار آيلتس (IELTS)" : language === "ms" ? "Persediaan IELTS" : "IELTS Preparation",
+                detail: language === "ar" ? "سريع 4 أسابيع · مكثف 8 أسابيع · بريميوم 12 أسبوعاً" : language === "ms" ? "Ekspres 4 minggu · Intensif 8 minggu · Premium 12 minggu" : "Express 4 weeks · Intensive 8 weeks · Premium 12 weeks",
+                fee: language === "ar" ? "3,500 – 9,900 ر.م" : language === "ms" ? "RM 3,500–RM 9,900" : "RM 3,500–RM 9,900",
+                note: language === "ar" ? "يشمل اختبار تحديد المستوى وتقييم التقدم والمواد الدراسية وشهادة الإتمام." : language === "ms" ? "Termasuk ujian penempatan, penilaian kemajuan, bahan pembelajaran dan sijil tamat." : "Includes placement test, progress assessment, learning materials and certificate of completion.",
+              },
+              {
+                title: language === "ar" ? "المخيم الصيفي الدولي" : language === "ms" ? "Kem Musim Panas" : "Summer Camp",
+                detail: language === "ar" ? "إنجليزي للصغار أسبوعان · مخيم دولي وقيادي 4 أسابيع" : language === "ms" ? "Bahasa Inggeris Junior 2 minggu · Kem antarabangsa & kepimpinan 4 minggu" : "Junior English 2 weeks · International and Leadership camps 4 weeks",
+                fee: language === "ar" ? "4,400 – 7,600 ر.م" : language === "ms" ? "RM 4,400–RM 7,600" : "RM 4,400–RM 7,600",
+                note: language === "ar" ? "الباقات تشمل دروس اللغة والأنشطة والرحلات والكتب والشهادات." : language === "ms" ? "Pakej merangkumi kelas bahasa Inggeris, aktiviti/lawatan, bahan pembelajaran dan sijil." : "Packages list English classes, activities/trips, learning materials and certificates.",
+              },
+              {
+                title: language === "ar" ? "دروس إنجليزية خاصة (فردية)" : language === "ms" ? "Pelajaran Bahasa Inggeris Peribadi" : "Private English Lessons",
+                detail: language === "ar" ? "الفضي 10 ساعات · الذهبي 20 ساعة · البلاتيني 40 ساعة" : language === "ms" ? "Perak 10 jam · Emas 20 jam · Platinum 40 jam" : "Silver 10 hours · Gold 20 hours · Platinum 40 hours",
+                fee: language === "ar" ? "1,800 – 5,800 ر.م" : language === "ms" ? "RM 1,800–RM 5,800" : "RM 1,800–RM 5,800",
+                note: language === "ar" ? "باقات دروس فردية مخصصة بالكامل وفق احتياجاتك." : language === "ms" ? "Pakej pelajaran yang diperibadikan mengikut keperluan anda." : "Personalised lesson packages.",
+              },
+              {
+                title: language === "ar" ? "الإنجليزية التنفيذية للأعمال" : language === "ms" ? "Bahasa Inggeris Eksekutif" : "Executive English",
+                detail: language === "ar" ? "إنجليزية أعمال شهر · تواصل تنفيذي شهران · ماستر كلاس مخصص للشركات" : language === "ms" ? "Bahasa Inggeris Perniagaan 1 bulan · Komunikasi Eksekutif 2 bulan · Kelas Master Korporat" : "Business English 1 month · Executive Communication 2 months · Corporate Masterclass customised",
+                fee: language === "ar" ? "3,800 – 6,600 ر.م" : language === "ms" ? "RM 3,800–RM 6,600" : "RM 3,800–RM 6,600",
+                note: language === "ar" ? "يتم تقديم عروض الأسعار للشركات والمؤسسات عند الطلب." : language === "ms" ? "Kelas Master Bahasa Inggeris Korporat disebut harga atas permintaan." : "Corporate English Masterclass is quoted on request.",
+              },
+            ].map(item => (
               <article key={item.title}>
                 <h3>{item.title}</h3>
                 <p>{item.detail}</p>
@@ -68,15 +99,27 @@ export default function Programs() {
               <span className="sr-only">{t("programs.searchPlaceholder")}</span>
               <input value={query} onChange={event => setQuery(event.target.value)} placeholder={t("programs.searchPlaceholder")} />
             </label>
-            <div className="simple-filter-options" aria-label="Programme category filters">
+            <div className="simple-filter-options" aria-label={language === "ar" ? "تصفية فئات البرامج" : language === "ms" ? "Penapis kategori program" : "Programme category filters"}>
               <span>
                 <Filter size={15} /> {t("programs.filterAll")}
               </span>
-              {PROGRAM_CATEGORIES.map(item => (
-                <button key={item} onClick={() => setCategory(item)} aria-pressed={category === item}>
-                  {item === "All" ? t("programs.filterAll") : item}
-                </button>
-              ))}
+              {PROGRAM_CATEGORIES.map(item => {
+                const label =
+                  item === "All"
+                    ? t("programs.filterAll")
+                    : item === "Kids"
+                    ? (language === "ar" ? "الأطفال" : language === "ms" ? "Kanak-kanak" : "Kids")
+                    : item === "English"
+                    ? (language === "ar" ? "اللغة الإنجليزية" : language === "ms" ? "Bahasa Inggeris" : "English")
+                    : item === "World Languages"
+                    ? (language === "ar" ? "لغات عالمية" : language === "ms" ? "Bahasa Antarabangsa" : "World Languages")
+                    : (language === "ar" ? "مهني وتطويري" : language === "ms" ? "Profesional" : "Professional");
+                return (
+                  <button key={item} onClick={() => setCategory(item)} aria-pressed={category === item}>
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

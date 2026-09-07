@@ -114,7 +114,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               Bilingual Idol<small>{t("footer.brandSubtitle")}</small>
             </strong>
           </Link>
-          <nav className="simple-public-nav" aria-label="Primary navigation">
+          <nav className="simple-public-nav" aria-label={language === "ar" ? "التنقل الرئيسي" : language === "ms" ? "Navigasi utama" : "Primary navigation"}>
             {primaryNavigation.map((item) => (
               <Link key={item.href} href={item.href} aria-current={location === item.href ? "page" : undefined}>
                 {item.label}
@@ -142,7 +142,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         {open && (
-          <nav className="simple-mobile-nav" aria-label="Mobile navigation">
+          <nav className="simple-mobile-nav" aria-label={language === "ar" ? "تنقل الجوال" : language === "ms" ? "Navigasi mudah alih" : "Mobile navigation"}>
             <div className="pb-3 mb-2 border-b border-[#d9e2f1] flex items-center justify-between">
               <span className="text-xs font-semibold text-[#566983] px-1">{t("nav.switchLanguage")}</span>
               <LanguageSwitcher variant="dropdown" />
@@ -171,7 +171,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <strong>{t("footer.centreName")}</strong>
           <span>{t("footer.location")}</span>
         </div>
-        <nav aria-label="Footer navigation">
+        <nav aria-label={language === "ar" ? "تنقل التذييل" : language === "ms" ? "Navigasi bahagian bawah" : "Footer navigation"}>
           <Link href="/news">{t("nav.news")}</Link>
           <Link href="/contact">{t("nav.contact")}</Link>
           <a href="mailto:info@bilingualidol.edu.my">{t("common.email")}</a>
@@ -179,7 +179,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </footer>
 
       {/* Floating Actions Dock */}
-      <div className="floating-actions-dock" aria-label="Quick actions">
+      <div className="floating-actions-dock" aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}>
         <a
           href="tel:+60367310449"
           className="floating-call-button"
@@ -197,8 +197,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           type="button"
           className={`floating-scroll-top-button ${showScrollTop ? "is-visible" : ""}`}
           onClick={scrollToTop}
-          aria-label="Scroll to top of page"
-          title="Scroll to top"
+          aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
+          title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
           aria-hidden={!showScrollTop}
           tabIndex={showScrollTop ? 0 : -1}
         >

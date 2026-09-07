@@ -135,10 +135,17 @@ export interface TranslationDictionary {
     guideEyebrow: string;
     guideTitle: string;
     guideSubtitle: string;
+    feeGuideEyebrow: string;
+    feeGuideTitle: string;
+    feeGuideSubtitle: string;
     searchPlaceholder: string;
     filterLabel: string;
+    filterAll: string;
     countShown: string;
+    showingCount: string;
     noMatches: string;
+    emptyText: string;
+    emptyCta: string;
     viewDetails: string;
     catAll: string;
     catKids: string;
@@ -168,11 +175,14 @@ export interface TranslationDictionary {
     whatsappValue: string;
     email: string;
     hours: string;
+    openingHours: string;
     address: string;
+    addressText: string;
     formEyebrow: string;
     formTitle: string;
     formSubtitle: string;
     formCardTitle: string;
+    submitButton: string;
   };
   enroll: {
     backLink: string;
@@ -184,7 +194,29 @@ export interface TranslationDictionary {
     step2: string;
     step3: string;
     formEyebrow: string;
+    formTitle: string;
+    formSubtitle: string;
+    studentNameLabel: string;
+    studentNamePlaceholder: string;
+    studentAgeLabel: string;
+    studentAgePlaceholder: string;
+    programLabel: string;
+    programPlaceholder: string;
+    scheduleLabel: string;
+    schedulePlaceholder: string;
+    parentNameLabel: string;
+    parentNamePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    messageLabel: string;
+    messagePlaceholder: string;
+    submitButton: string;
     requiredNote: string;
+    successTitle: string;
+    successSubtitle: string;
+    submitAnother: string;
   };
   news: {
     eyebrow: string;
@@ -193,6 +225,11 @@ export interface TranslationDictionary {
     searchPlaceholder: string;
     allCategories: string;
     readMore: string;
+    readUpdate: string;
+    previous: string;
+    next: string;
+    noUpdates: string;
+    noUpdatesText: string;
   };
   login: {
     eyebrow: string;
@@ -427,10 +464,17 @@ export const translations: Record<Language, TranslationDictionary> = {
       guideEyebrow: "2026 fee guide",
       guideTitle: "Published course options",
       guideSubtitle: "Fees are guidance from the 2026 list. Confirm the current total, visa requirements and intake with the centre before enrolment.",
+      feeGuideEyebrow: "Course Structure & Fees",
+      feeGuideTitle: "Published 2026 Programme Guide",
+      feeGuideSubtitle: "Explore certified language programmes designed for international students, kids, teens, and professionals.",
       searchPlaceholder: "Search by language, level or learner group",
       filterLabel: "Filter",
+      filterAll: "All Categories",
       countShown: "{count} confirmed programme(s) shown",
+      showingCount: "programme(s) available",
       noMatches: "No programmes match the current search. Try changing the category or search keywords.",
+      emptyText: "No programmes found matching your search criteria.",
+      emptyCta: "Contact us for customised course options",
       viewDetails: "View programme details",
       catAll: "All",
       catKids: "Kids",
@@ -460,11 +504,14 @@ export const translations: Record<Language, TranslationDictionary> = {
       whatsappValue: "Message the centre",
       email: "Email",
       hours: "Opening hours",
+      openingHours: "Monday – Sunday: 9:00 AM – 9:00 PM",
       address: "B-25-07, Pavilion Embassy, Menara G-Vestor, 200, Jln Ampang, 50450 Kuala Lumpur.",
+      addressText: "B-25-07, Pavilion Embassy, Menara G-Vestor, 200, Jln Ampang, 50450 Kuala Lumpur, Malaysia.",
       formEyebrow: "Send an enquiry",
       formTitle: "Tell us what the learner needs.",
       formSubtitle: "A short description of the learner’s language goal and preferred timing is enough to begin.",
       formCardTitle: "Your enquiry",
+      submitButton: "Send enquiry",
     },
     enroll: {
       backLink: "Back to home",
@@ -476,7 +523,29 @@ export const translations: Record<Language, TranslationDictionary> = {
       step2: "The centre can recommend a relevant next step or ask a follow-up question.",
       step3: "Your information is handled by authorised centre staff.",
       formEyebrow: "Learner details",
+      formTitle: "Tell us what the learner needs.",
+      formSubtitle: "A short description of the learner’s language goal and preferred timing is enough to begin.",
+      studentNameLabel: "Student Name *",
+      studentNamePlaceholder: "e.g. Sara Lee",
+      studentAgeLabel: "Student Age *",
+      studentAgePlaceholder: "e.g. 16",
+      programLabel: "Programme of Interest *",
+      programPlaceholder: "Select a programme...",
+      scheduleLabel: "Preferred Schedule *",
+      schedulePlaceholder: "Select preferred timing...",
+      parentNameLabel: "Parent / Guardian Name *",
+      parentNamePlaceholder: "e.g. David Lee",
+      emailLabel: "Email Address *",
+      emailPlaceholder: "e.g. guardian@example.com",
+      phoneLabel: "Phone / WhatsApp Number *",
+      phonePlaceholder: "e.g. +60 12-345 6789",
+      messageLabel: "Additional Notes or Questions",
+      messagePlaceholder: "Share any language goals, current level, or special requirements...",
+      submitButton: "Submit learning enquiry",
       requiredNote: "Fields marked with an asterisk are required.",
+      successTitle: "Enquiry Submitted Successfully",
+      successSubtitle: "Thank you. Our academic counsellor will review the learner's requirements and contact you within 24 hours.",
+      submitAnother: "Submit another enquiry",
     },
     news: {
       eyebrow: "Updates & Notices",
@@ -485,6 +554,11 @@ export const translations: Record<Language, TranslationDictionary> = {
       searchPlaceholder: "Search news articles...",
       allCategories: "All categories",
       readMore: "Read article",
+      readUpdate: "Read full update",
+      previous: "Previous",
+      next: "Next",
+      noUpdates: "No announcements published yet.",
+      noUpdatesText: "Check back soon for academic calendar notices, workshops, and school events.",
     },
     login: {
       eyebrow: "Portal Access",
@@ -717,10 +791,17 @@ export const translations: Record<Language, TranslationDictionary> = {
       guideEyebrow: "Panduan yuran 2026",
       guideTitle: "Pilihan kursus yang diterbitkan",
       guideSubtitle: "Yuran adalah panduan dari senarai 2026. Sahkan jumlah yuran, keperluan visa dan tarikh pengambilan dengan pusat sebelum pendaftaran.",
+      feeGuideEyebrow: "Struktur Kursus & Yuran",
+      feeGuideTitle: "Panduan Program 2026 Diterbitkan",
+      feeGuideSubtitle: "Terokai program bahasa bertauliah yang direka khas untuk pelajar antarabangsa, kanak-kanak, remaja dan profesional.",
       searchPlaceholder: "Cari mengikut bahasa, tahap atau kumpulan pelajar",
       filterLabel: "Tapis",
+      filterAll: "Semua Kategori",
       countShown: "{count} program disahkan dipaparkan",
+      showingCount: "program tersedia",
       noMatches: "Tiada program yang sepadan dengan carian semasa. Cuba tukar kategori atau kata kunci carian.",
+      emptyText: "Tiada program ditemui yang sepadan dengan kriteria carian anda.",
+      emptyCta: "Hubungi kami untuk pilihan kursus tersuai",
       viewDetails: "Lihat butiran program",
       catAll: "Semua",
       catKids: "Kanak-kanak",
@@ -750,11 +831,14 @@ export const translations: Record<Language, TranslationDictionary> = {
       whatsappValue: "Mesej pusat kami",
       email: "E-mel",
       hours: "Waktu operasi",
+      openingHours: "Isnin – Ahad: 9:00 PG – 9:00 MLM",
       address: "B-25-07, Pavilion Embassy, Menara G-Vestor, 200, Jln Ampang, 50450 Kuala Lumpur.",
+      addressText: "B-25-07, Pavilion Embassy, Menara G-Vestor, 200, Jln Ampang, 50450 Kuala Lumpur, Malaysia.",
       formEyebrow: "Hantar pertanyaan",
       formTitle: "Beritahu kami keperluan pembelajaran anda.",
       formSubtitle: "Penerangan ringkas mengenai matlamat bahasa dan waktu pilihan sudah mencukupi untuk memulakan langkah.",
       formCardTitle: "Pertanyaan anda",
+      submitButton: "Hantar pertanyaan",
     },
     enroll: {
       backLink: "Kembali ke laman utama",
@@ -766,7 +850,29 @@ export const translations: Record<Language, TranslationDictionary> = {
       step2: "Pusat akan mengesyorkan langkah seterusnya yang relevan atau mengajukan soalan susulan.",
       step3: "Maklumat anda hanya dikendalikan oleh kakitangan pusat yang diberi kuasa.",
       formEyebrow: "Maklumat pelajar",
+      formTitle: "Beritahu kami keperluan pembelajaran anda.",
+      formSubtitle: "Penerangan ringkas mengenai matlamat bahasa dan waktu pilihan sudah mencukupi untuk memulakan langkah.",
+      studentNameLabel: "Nama Pelajar *",
+      studentNamePlaceholder: "cth. Sara Lee",
+      studentAgeLabel: "Umur Pelajar *",
+      studentAgePlaceholder: "cth. 16",
+      programLabel: "Program Pilihan *",
+      programPlaceholder: "Pilih program...",
+      scheduleLabel: "Jadual Pilihan *",
+      schedulePlaceholder: "Pilih waktu pilihan...",
+      parentNameLabel: "Nama Ibu Bapa / Penjaga *",
+      parentNamePlaceholder: "cth. David Lee",
+      emailLabel: "Alamat E-mel *",
+      emailPlaceholder: "cth. penjaga@example.com",
+      phoneLabel: "Nombor Telefon / WhatsApp *",
+      phonePlaceholder: "cth. +60 12-345 6789",
+      messageLabel: "Nota Tambahan atau Soalan",
+      messagePlaceholder: "Kongsi sebarang matlamat bahasa, tahap semasa atau keperluan khas...",
+      submitButton: "Hantar pertanyaan pembelajaran",
       requiredNote: "Medan bertanda bintang (*) adalah wajib.",
+      successTitle: "Pertanyaan Berjaya Dihantar",
+      successSubtitle: "Terima kasih. Kaunselor akademik kami akan menyemak keperluan pelajar dan menghubungi anda dalam masa 24 jam.",
+      submitAnother: "Hantar pertanyaan lain",
     },
     news: {
       eyebrow: "Kemas Kini & Makluman",
@@ -775,6 +881,11 @@ export const translations: Record<Language, TranslationDictionary> = {
       searchPlaceholder: "Cari artikel berita...",
       allCategories: "Semua kategori",
       readMore: "Baca artikel",
+      readUpdate: "Baca makluman penuh",
+      previous: "Sebelumnya",
+      next: "Seterusnya",
+      noUpdates: "Tiada pengumuman diterbitkan lagi.",
+      noUpdatesText: "Semak semula nanti untuk makluman takwim akademik, bengkel dan acara sekolah.",
     },
     login: {
       eyebrow: "Akses Portal",
@@ -1007,10 +1118,17 @@ export const translations: Record<Language, TranslationDictionary> = {
       guideEyebrow: "دليل رسوم 2026",
       guideTitle: "خيارات الدورات المتاحة",
       guideSubtitle: "الرسوم استرشادية وفق قائمة 2026. يرجى تأكيد المبلغ الإجمالي وشروط التأشيرة مع المركز قبل التسجيل.",
+      feeGuideEyebrow: "هيكل الدورات والرسوم",
+      feeGuideTitle: "دليل البرامج والرسوم لعام 2026",
+      feeGuideSubtitle: "استكشف البرامج اللغوية المعتمدة المصممة للطلاب الدوليين والأطفال واليافعين والمهنيين.",
       searchPlaceholder: "ابحث باللغة أو المستوى أو الفئة المستهدفة...",
       filterLabel: "تصفية",
+      filterAll: "جميع الفئات",
       countShown: "تم عرض {count} برنامج معتمد",
+      showingCount: "برامج متاحة",
       noMatches: "لا توجد برامج مطابقة لبحثك الحالي. جرب تغيير الفئة أو كلمات البحث.",
+      emptyText: "لم يتم العثور على برامج تطابق معايير البحث.",
+      emptyCta: "تواصل معنا للحصول على خيارات دراسية مخصصة",
       viewDetails: "عرض تفاصيل البرنامج",
       catAll: "الكل",
       catKids: "للأطفال واليافعين",
@@ -1040,11 +1158,14 @@ export const translations: Record<Language, TranslationDictionary> = {
       whatsappValue: "مراسلة المركز عبر واتساب",
       email: "البريد الإلكتروني",
       hours: "أوقات العمل",
+      openingHours: "من الاثنين إلى الأحد: 9:00 صباحاً – 9:00 مساءً",
       address: "B-25-07، بافيليون إمباسي، برج جي-فيستور، 200، شارع أمبانغ، 50450 كوالالمبور.",
+      addressText: "B-25-07، بافيليون إمباسي، برج جي-فيستور، 200، شارع أمبانغ، 50450 كوالالمبور، ماليزيا.",
       formEyebrow: "إرسال استفسار",
       formTitle: "أخبرنا بما يحتاجه الطالب.",
       formSubtitle: "وصف موجز لهدف الطالب ومواعيده المفضلة كافٍ لبدء المساعدة والتوجيه.",
       formCardTitle: "نموذج استفسارك",
+      submitButton: "إرسال الاستفسار",
     },
     enroll: {
       backLink: "العودة للرئيسية",
@@ -1056,7 +1177,29 @@ export const translations: Record<Language, TranslationDictionary> = {
       step2: "يقترح المركز الخطوة التالية المناسبة أو يطرح أسئلة إضافية للمساعدة.",
       step3: "تتم معالجة بياناتك بكل خصوصية من قبل موظفي المركز المعتمدين.",
       formEyebrow: "بيانات الطالب",
+      formTitle: "أخبرنا بما يحتاجه الطالب.",
+      formSubtitle: "وصف موجز لهدف الطالب ومواعيده المفضلة كافٍ لبدء المساعدة والتوجيه.",
+      studentNameLabel: "اسم الطالب *",
+      studentNamePlaceholder: "مثال: سارة أحمد",
+      studentAgeLabel: "عمر الطالب *",
+      studentAgePlaceholder: "مثال: 16",
+      programLabel: "البرنامج المطلوب *",
+      programPlaceholder: "اختر البرنامج...",
+      scheduleLabel: "الوقت المفضل *",
+      schedulePlaceholder: "اختر الوقت المفضل...",
+      parentNameLabel: "اسم ولي الأمر / المسؤول *",
+      parentNamePlaceholder: "مثال: أحمد محمد",
+      emailLabel: "البريد الإلكتروني *",
+      emailPlaceholder: "مثال: guardian@example.com",
+      phoneLabel: "رقم الهاتف / واتساب *",
+      phonePlaceholder: "مثال: +60 12-345 6789",
+      messageLabel: "ملاحظات أو أسئلة إضافية",
+      messagePlaceholder: "شارك أي أهداف لغوية أو المستوى الحالي أو متطلبات خاصة...",
+      submitButton: "إرسال طلب الاستفسار",
       requiredNote: "الحقول المشار إليها بعلامة (*) مطلوبة.",
+      successTitle: "تم إرسال استفسارك بنجاح",
+      successSubtitle: "شكراً لك. سيقوم المستشار الأكاديمي بمراجعة تفاصيل الطالب والتواصل معك خلال 24 ساعة.",
+      submitAnother: "إرسال استفسار آخر",
     },
     news: {
       eyebrow: "تحديثات وإعلانات",
@@ -1065,6 +1208,11 @@ export const translations: Record<Language, TranslationDictionary> = {
       searchPlaceholder: "البحث في الأخبار والمقالات...",
       allCategories: "جميع الفئات",
       readMore: "قراءة المقال",
+      readUpdate: "قراءة التحديث كاملاً",
+      previous: "السابق",
+      next: "التالي",
+      noUpdates: "لا توجد إعلانات منشورة بعد.",
+      noUpdatesText: "يرجى المتابعة لاحقاً لمعرفة التحديثات حول التقويم الأكاديمي وورش العمل والفعاليات.",
     },
     login: {
       eyebrow: "بوابة الدخول",

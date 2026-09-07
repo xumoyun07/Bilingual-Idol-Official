@@ -261,7 +261,11 @@ export function StudentJourneyRoadmap() {
       </div>
 
       {/* Steps Navigation */}
-      <div className="bilc-journey-stepper" role="tablist" aria-label="Student journey steps">
+      <div
+        className="bilc-journey-stepper"
+        role="tablist"
+        aria-label={language === "ar" ? "خطوات رحلة الطالب" : language === "ms" ? "Langkah perjalanan pelajar" : "Student journey steps"}
+      >
         {JOURNEY_STEPS.map((s, idx) => {
           const itemTitle = s.titles[language] || s.titles.en;
           const itemSub = s.subtitles[language] || s.subtitles.en;
