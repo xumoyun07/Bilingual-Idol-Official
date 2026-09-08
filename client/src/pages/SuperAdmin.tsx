@@ -32,8 +32,12 @@ const categoryItems = [
 export default function SuperAdmin() {
   const { user, loading } = useAuth();
   useEffect(() => {
-    if (!loading && !user) window.location.replace("/login");
-    else if (!loading && user?.role !== "super_admin") window.location.replace(user?.role === "founder" ? "/admin" : "/dashboard");
+    if (loading) return;
+    if (!user) {
+      window.location.replace("/login");
+    } else if (user.role !== "super_admin") {
+      window.location.replace(user.role === "founder" ? "/admin" : "/dashboard");
+    }
   }, [loading, user]);
   if (loading) return <div className="grid min-h-screen place-items-center bg-[#fbf8f2]"><Loader2 className="animate-spin text-[#397563]" /></div>;
   if (!user || user.role !== "super_admin") return null;

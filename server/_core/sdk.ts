@@ -173,8 +173,8 @@ class SDKServer {
     return this.signSession(
       {
         openId,
-        appId: ENV.appId,
-        name: options.name || "",
+        appId: ENV.appId || "bilingual-idol-platform",
+        name: options.name || "User",
       },
       options
     );
@@ -191,8 +191,8 @@ class SDKServer {
 
     return new SignJWT({
       openId: payload.openId,
-      appId: payload.appId,
-      name: payload.name,
+      appId: payload.appId || ENV.appId || "bilingual-idol-platform",
+      name: payload.name || "User",
     })
       .setProtectedHeader({ alg: "HS256", typ: "JWT" })
       .setExpirationTime(expirationSeconds)
@@ -203,7 +203,6 @@ class SDKServer {
     cookieValue: string | undefined | null
   ): Promise<{ openId: string; appId: string; name: string } | null> {
     if (!cookieValue) {
-      console.warn("[Auth] Missing session cookie");
       return null;
     }
 
@@ -214,19 +213,18 @@ class SDKServer {
       });
       const { openId, appId, name } = payload as Record<string, unknown>;
 
-      if (
-        !isNonEmptyString(openId) ||
-        !isNonEmptyString(appId) ||
-        !isNonEmptyString(name)
-      ) {
-        console.warn("[Auth] Session payload missing required fields");
+      if (!isNonEmptyString(openId)) {
+        console.warn("[Auth] Session payload missing required openId");
         return null;
       }
 
+      const verifiedAppId = isNonEmptyString(appId) ? appId : (ENV.appId || "bilingual-idol-platform");
+      const verifiedName = isNonEmptyString(name) ? name : "User";
+
       return {
         openId,
-        appId,
-        name,
+        appId: verifiedAppId,
+        name: verifiedName,
       };
     } catch (error) {
       console.warn("[Auth] Session verification failed", String(error));
@@ -262,18 +260,21 @@ class SDKServer {
     // 1. Prefer the session cookie (regular OAuth login).
     const cookies = this.parseCookies(req.headers.cookie);
     let sessionToken = cookies.get(COOKIE_NAME);
+    let session = sessionToken ? await this.verifySession(sessionToken) : null;
 
     // 2. Fallback to the Authorization header (Preview auto-login via
     //    sessionStorage), used when the browser blocks iframe cookies such as
     //    Safari ITP, private browsing, or iOS/Android WebView.
-    if (!sessionToken) {
+    if (!session) {
       const authHeader = req.headers.authorization;
       if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
-        sessionToken = authHeader.slice(7);
+        const headerToken = authHeader.slice(7).trim();
+        session = await this.verifySession(headerToken);
+        if (session) {
+          sessionToken = headerToken;
+        }
       }
     }
-
-    const session = await this.verifySession(sessionToken);
 
     if (!session) {
       throw ForbiddenError("Invalid session cookie");
@@ -291,6 +292,20 @@ class SDKServer {
     const sessionUserId = session.openId;
     const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
+
+    // If founder session user not in DB yet, auto-provision as founder
+    if (!user && sessionUserId.startsWith("founder:")) {
+      const founderEmail = sessionUserId.slice("founder:".length);
+      await db.upsertUser({
+        openId: sessionUserId,
+        name: "Founder",
+        email: founderEmail || "lektor@gmail.com",
+        loginMethod: "email_password",
+        role: "founder",
+        lastSignedIn: signedInAt,
+      });
+      user = await db.getUserByOpenId(sessionUserId);
+    }
 
     // If user not in DB, sync from OAuth server automatically
     if (!user) {

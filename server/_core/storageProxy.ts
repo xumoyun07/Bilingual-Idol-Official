@@ -1,5 +1,7 @@
 import type { Express } from "express";
+import fs from "fs";
 import { ENV } from "./env";
+import { getLocalStoragePath, LOCAL_STORAGE_DIR } from "../storage";
 
 export function registerStorageProxy(app: Express) {
   app.get("/manus-storage/*", async (req, res) => {
@@ -9,40 +11,40 @@ export function registerStorageProxy(app: Express) {
       return;
     }
 
-    if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
-      res.status(500).send("Storage proxy not configured");
+    // 1. Check if the file exists in local storage
+    const localPath = getLocalStoragePath(key);
+    if (localPath.startsWith(LOCAL_STORAGE_DIR) && fs.existsSync(localPath)) {
+      res.set("Cache-Control", "public, max-age=86400");
+      res.sendFile(localPath);
       return;
     }
 
-    try {
-      const forgeUrl = new URL(
-        "v1/storage/presign/get",
-        ENV.forgeApiUrl.replace(/\/+$/, "") + "/",
-      );
-      forgeUrl.searchParams.set("path", key);
+    // 2. If Forge is configured, try Forge presigned S3 redirect
+    if (ENV.forgeApiUrl && ENV.forgeApiKey) {
+      try {
+        const forgeUrl = new URL(
+          "v1/storage/presign/get",
+          ENV.forgeApiUrl.replace(/\/+$/, "") + "/",
+        );
+        forgeUrl.searchParams.set("path", key);
 
-      const forgeResp = await fetch(forgeUrl, {
-        headers: { Authorization: `Bearer ${ENV.forgeApiKey}` },
-      });
+        const forgeResp = await fetch(forgeUrl, {
+          headers: { Authorization: `Bearer ${ENV.forgeApiKey}` },
+        });
 
-      if (!forgeResp.ok) {
-        const body = await forgeResp.text().catch(() => "");
-        console.error(`[StorageProxy] forge error: ${forgeResp.status} ${body}`);
-        res.status(502).send("Storage backend error");
-        return;
+        if (forgeResp.ok) {
+          const { url } = (await forgeResp.json()) as { url: string };
+          if (url) {
+            res.set("Cache-Control", "no-store");
+            res.redirect(307, url);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("[StorageProxy] forge error:", err);
       }
-
-      const { url } = (await forgeResp.json()) as { url: string };
-      if (!url) {
-        res.status(502).send("Empty signed URL from backend");
-        return;
-      }
-
-      res.set("Cache-Control", "no-store");
-      res.redirect(307, url);
-    } catch (err) {
-      console.error("[StorageProxy] failed:", err);
-      res.status(502).send("Storage proxy error");
     }
+
+    res.status(404).send("File not found");
   });
 }

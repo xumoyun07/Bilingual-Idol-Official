@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import superjson from "superjson";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
@@ -56,7 +57,16 @@ async function startServer() {
   );
 
   // Return JSON 404 for any unhandled API or portal routes rather than HTML SPA fallback
-  app.all(["/api", "/api/*", "/portal/*", "/storage/*"], (_req, res) => {
+  app.all(["/api", "/api/*", "/portal/*", "/storage/*"], (req, res) => {
+    if (req.originalUrl.startsWith("/api/trpc")) {
+      return res.status(404).json({
+        error: superjson.serialize({
+          message: "API endpoint not found (404)",
+          code: -32604,
+          data: { code: "NOT_FOUND", httpStatus: 404 },
+        }),
+      });
+    }
     res.status(404).json({ error: "Endpoint not found" });
   });
 

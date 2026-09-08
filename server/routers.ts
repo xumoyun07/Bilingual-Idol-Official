@@ -27,19 +27,28 @@ export const appRouter = router({
     me: publicProcedure.query(opts => opts.ctx.user),
     login: publicProcedure.input(z.object({ email: z.string().email().max(320), password: z.string().min(1).max(256) })).mutation(async ({ ctx, input }) => {
       const email = input.email.trim().toLowerCase();
-      if (isFounderAuthConfigured() && verifyFounderCredentials(email, input.password)) {
-        const openId = `founder:${email}`;
-        await db.upsertUser({ openId, name: "Founder", email, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
-        const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
-        ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
-        return { success: true, redirectTo: "/admin", role: "founder" } as const;
+      if (isFounderEmail(email)) {
+        if (verifyFounderCredentials(email, input.password)) {
+          const openId = `founder:${email}`;
+          await db.upsertUser({ openId, name: "Founder", email, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
+          const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
+          ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
+          return { success: true, redirectTo: "/admin", role: "founder", token } as const;
+        }
+        const existing = await db.getUserByEmail(email);
+        if (existing?.isActive && verifyUserPasswordHash(input.password, existing.passwordHash)) {
+          await db.recordUserSignIn(existing.openId);
+          const token = await sdk.createSessionToken(existing.openId, { expiresInMs: ONE_YEAR_MS, name: existing.name ?? "Founder" });
+          ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
+          return { success: true, redirectTo: "/admin", role: "founder", token } as const;
+        }
       }
       const user = await db.getUserByEmail(email);
       if (!user?.isActive || !verifyUserPasswordHash(input.password, user.passwordHash)) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid e-mail or password." });
       await db.recordUserSignIn(user.openId);
       const token = await sdk.createSessionToken(user.openId, { expiresInMs: ONE_YEAR_MS, name: user.name ?? email });
       ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
-      return { success: true, redirectTo: dashboardPathForRole(user.role), role: user.role } as const;
+      return { success: true, redirectTo: dashboardPathForRole(user.role), role: user.role, token } as const;
     }),
     logout: publicProcedure.mutation(({ ctx }) => {
       ctx.res.clearCookie(COOKIE_NAME, { ...getSessionCookieOptions(ctx.req), maxAge: -1 });

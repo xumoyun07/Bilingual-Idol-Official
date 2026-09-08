@@ -1,6 +1,6 @@
 import { ArrowUp, Menu, Phone, X } from "lucide-react";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { SmartWhatsAppWidget } from "@/components/SmartWhatsAppWidget";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -103,17 +103,126 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     metaKeywords.setAttribute("content", language === "ar" ? arabicKeywords : defaultKeywords);
   }, [location, language]);
 
+  const scrollAnimRef = useRef<number | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+
   useEffect(() => {
+    const getScrollY = () =>
+      Math.max(
+        window.scrollY || 0,
+        window.pageYOffset || 0,
+        document.documentElement?.scrollTop || 0,
+        document.body?.scrollTop || 0
+      );
+
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 260);
+      setShowScrollTop(getScrollY() > 180);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("scroll", handleScroll);
+      if (scrollAnimRef.current !== null) {
+        cancelAnimationFrame(scrollAnimRef.current);
+      }
+    };
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (scrollAnimRef.current !== null) {
+      cancelAnimationFrame(scrollAnimRef.current);
+    }
+
+    const html = document.documentElement;
+    const body = document.body;
+    const mainContent = document.getElementById("main-content");
+    const root = document.getElementById("root");
+    const shell = document.querySelector(".simple-public-shell") as HTMLElement | null;
+
+    const getScrollTop = () =>
+      Math.max(
+        window.scrollY || 0,
+        window.pageYOffset || 0,
+        html?.scrollTop || 0,
+        body?.scrollTop || 0,
+        mainContent?.scrollTop || 0,
+        root?.scrollTop || 0,
+        shell?.scrollTop || 0
+      );
+
+    const startY = getScrollTop();
+    if (startY <= 0) return;
+
+    // Accessibility check: instant reset if user prefers reduced motion
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion) {
+      window.scrollTo(0, 0);
+      if (html) html.scrollTop = 0;
+      if (body) body.scrollTop = 0;
+      if (mainContent) mainContent.scrollTop = 0;
+      if (root) root.scrollTop = 0;
+      if (shell) shell.scrollTop = 0;
+      return;
+    }
+
+    setIsScrolling(true);
+
+    const originalHtmlBehavior = html ? html.style.scrollBehavior : "";
+    const originalBodyBehavior = body ? body.style.scrollBehavior : "";
+    if (html) html.style.scrollBehavior = "auto";
+    if (body) body.style.scrollBehavior = "auto";
+
+    const startTime = performance.now();
+    // Responsive duration: fast 260ms for modest scrolls, up to 480ms for very deep pages
+    const duration = Math.min(480, Math.max(260, Math.sqrt(startY) * 9.5));
+
+    // Quintic ease-out: swift initial release, silky deceleration
+    const easeOutQuint = (x: number) => 1 - Math.pow(1 - x, 5);
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const eased = easeOutQuint(progress);
+      const currentY = Math.round(startY * (1 - eased));
+
+      window.scrollTo(0, currentY);
+      if (html) html.scrollTop = currentY;
+      if (body) body.scrollTop = currentY;
+      if (mainContent) mainContent.scrollTop = currentY;
+      if (root) root.scrollTop = currentY;
+      if (shell) shell.scrollTop = currentY;
+
+      if (progress < 1) {
+        scrollAnimRef.current = requestAnimationFrame(step);
+      } else {
+        // Guarantee absolute 0 across all possible scrolling elements
+        window.scrollTo(0, 0);
+        if (html) {
+          html.scrollTop = 0;
+          html.style.scrollBehavior = originalHtmlBehavior;
+        }
+        if (body) {
+          body.scrollTop = 0;
+          body.style.scrollBehavior = originalBodyBehavior;
+        }
+        if (mainContent) mainContent.scrollTop = 0;
+        if (root) root.scrollTop = 0;
+        if (shell) shell.scrollTop = 0;
+
+        scrollAnimRef.current = null;
+        setIsScrolling(false);
+      }
+    };
+
+    scrollAnimRef.current = requestAnimationFrame(step);
   };
 
   const close = () => setOpen(false);
@@ -197,7 +306,10 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </footer>
 
       {/* Floating Actions Dock */}
-      <div className="floating-actions-dock" aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}>
+      <div
+        className={`floating-actions-dock ${isRTL ? "is-rtl" : ""}`}
+        aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
+      >
         <a
           href="tel:+60367310449"
           className="floating-call-button"
@@ -213,7 +325,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
         <button
           type="button"
-          className={`floating-scroll-top-button ${showScrollTop ? "is-visible" : ""}`}
+          id="floating-scroll-top"
+          className={`floating-scroll-top-button ${showScrollTop ? "is-visible" : ""} ${isScrolling ? "is-scrolling" : ""}`}
           onClick={scrollToTop}
           aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
           title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}

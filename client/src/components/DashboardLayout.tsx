@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { CalendarDays, FileImage, GraduationCap, LayoutDashboard, LogOut, Newspaper, ScrollText, UsersRound } from "lucide-react";
+import { CalendarDays, FileImage, GraduationCap, LayoutDashboard, LogOut, Menu, Newspaper, ScrollText, UsersRound } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
@@ -83,7 +83,7 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
 
   return (
     <>
-      <Sidebar collapsible="icon" className={`minimal-sidebar fixed inset-y-0 ${isRTL ? "right-0 border-l" : "left-0 border-r-0"}`}>
+      <Sidebar side={isRTL ? "right" : "left"} collapsible="icon" className={`minimal-sidebar fixed inset-y-0 ${isRTL ? "right-0 border-l" : "left-0 border-r-0"}`}>
         <SidebarHeader className="minimal-sidebar-header">
           <span className="minimal-brand-mark" aria-hidden="true">
             BI
@@ -136,9 +136,11 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
       </Sidebar>
       <SidebarInset className={`minimal-dashboard-inset ${isRTL ? "rtl-inset" : ""}`}>
         <BackgroundCircleField seed={`dashboard-${role}-${location}`} />
-        <header className="minimal-dashboard-header flex items-center justify-between">
+        <header className="minimal-dashboard-header fixed top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <SidebarTrigger className="minimal-mobile-trigger" />
+            <SidebarTrigger className="minimal-mobile-trigger" aria-label="Open menu">
+              <Menu className="size-5" />
+            </SidebarTrigger>
             <div>
               <p className="minimal-eyebrow">{t("nav.workspace")}</p>
               <h1>{t(active.labelKey, undefined, active.defaultLabel)}</h1>

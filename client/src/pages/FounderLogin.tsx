@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
+import { COOKIE_NAME } from "@shared/const";
 import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -27,8 +28,18 @@ export default function FounderLogin() {
 
   const login = trpc.auth.login.useMutation({
     onSuccess: async (data) => {
-      await utils.auth.me.invalidate();
-      setLocation(data.redirectTo);
+      if (data.token) {
+        try {
+          sessionStorage.setItem("manus-cookie", `${COOKIE_NAME}=${data.token}`);
+          localStorage.setItem("manus-cookie", `${COOKIE_NAME}=${data.token}`);
+          sessionStorage.setItem("manus-session-token", data.token);
+          localStorage.setItem("manus-session-token", data.token);
+        } catch {}
+      }
+      try {
+        await utils.auth.me.invalidate();
+      } catch {}
+      window.location.href = data.redirectTo;
     },
   });
 
@@ -59,6 +70,7 @@ export default function FounderLogin() {
           <p className="simple-eyebrow">{t("login.eyebrow")}</p>
           <h1 id="sign-in-title">{t("login.heroTitle")}</h1>
           <p>{t("login.heroSubtitle")}</p>
+          
           <div className="auth-help">
             <ShieldCheck size={19} aria-hidden="true" />
             <div>
@@ -123,11 +135,7 @@ export default function FounderLogin() {
 
             {login.error ? (
               <p className="auth-error" role="alert">
-                {language === "ms"
-                  ? "Emel atau kata laluan tidak sah."
-                  : language === "ar"
-                  ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
-                  : "Invalid e-mail or password."}
+                {t("login.invalidCredentials", undefined, "Invalid e-mail or password.")}
               </p>
             ) : null}
 
@@ -140,4 +148,5 @@ export default function FounderLogin() {
     </main>
   );
 }
+
 

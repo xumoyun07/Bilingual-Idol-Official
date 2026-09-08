@@ -43,6 +43,8 @@ export function useAuth(options?: UseAuthOptions) {
       // backend cookie is cleared by the logout mutation.
       try {
         sessionStorage.removeItem("manus-cookie");
+        localStorage.removeItem("manus-cookie");
+        localStorage.removeItem("manus-session-token");
       } catch {}
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
@@ -50,13 +52,15 @@ export function useAuth(options?: UseAuthOptions) {
   }, [logoutMutation, utils]);
 
   const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
+    try {
+      localStorage.setItem(
+        "manus-runtime-user-info",
+        JSON.stringify(meQuery.data)
+      );
+    } catch {}
     return {
       user: meQuery.data ?? null,
-      loading: meQuery.isLoading || logoutMutation.isPending,
+      loading: meQuery.isLoading || (meQuery.isFetching && !meQuery.data) || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
     };
@@ -64,6 +68,7 @@ export function useAuth(options?: UseAuthOptions) {
     meQuery.data,
     meQuery.error,
     meQuery.isLoading,
+    meQuery.isFetching,
     logoutMutation.error,
     logoutMutation.isPending,
   ]);

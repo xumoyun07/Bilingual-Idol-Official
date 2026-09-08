@@ -2171,6 +2171,42 @@ body:has(.blue-workspace) [role="dialog"] { border: 1px solid var(--blue-line); 
   transform: translateY(-2px);
 }
 
+.floating-scroll-top-button.is-scrolling {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: 0 8px 20px -2px rgba(23, 63, 173, 0.45);
+}
+
+.floating-scroll-top-button.is-scrolling .floating-scroll-top-icon {
+  animation: scroll-top-lift 0.38s ease-in-out infinite alternate;
+}
+
+@keyframes scroll-top-lift {
+  from {
+    transform: translateY(1px);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+/* Hide native browser scrollbars in mobile view while keeping full smooth scroll functionality */
+@media (max-width: 767px) {
+  html,
+  body,
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+}
+
 @media (max-width: 639px) {
   .floating-actions-dock {
     bottom: 1.25rem;
@@ -4003,16 +4039,6 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
   z-index: 999;
 }
 
-html[lang="ar"] .bilc-wa-popup,
-html[dir="rtl"] .bilc-wa-popup,
-html.rtl .bilc-wa-popup,
-body.rtl .bilc-wa-popup,
-body[dir="rtl"] .bilc-wa-popup,
-.is-rtl .bilc-wa-popup,
-[dir="rtl"] .bilc-wa-popup {
-  right: 80px;
-}
-
 @media (min-width: 1024px) {
   html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
   html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
@@ -4027,7 +4053,8 @@ body[dir="rtl"] .bilc-wa-popup,
   body.rtl .bilc-wa-popup,
   body[dir="rtl"] .bilc-wa-popup,
   .is-rtl .bilc-wa-popup,
-  [dir="rtl"] .bilc-wa-popup {
+  [dir="rtl"] .bilc-wa-popup,
+  .bilc-wa-floating-dock.is-rtl .bilc-wa-popup {
     right: auto !important;
     left: 80px !important;
     margin-left: 0px !important;
@@ -7339,23 +7366,36 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
   pointer-events: auto !important;
 }
 
-/* Arabic / RTL positioning: move floating quick action dock to the left side ONLY ON DESKTOP */
-@media (min-width: 1024px) {
-  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  body.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  body[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  [dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+/* Arabic / RTL positioning: move floating quick action dock to the left side ON ALL DEVICES */
+html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+html.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+body.rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+body[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+.is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+html[dir="rtl"] .floating-actions-dock,
+html[lang="ar"] .floating-actions-dock,
+html.rtl .floating-actions-dock,
+body.rtl .floating-actions-dock,
+body[dir="rtl"] .floating-actions-dock,
+.is-rtl .floating-actions-dock,
+[dir="rtl"] .floating-actions-dock,
+.floating-actions-dock.is-rtl {
+  left: clamp(1.25rem, 3vw, 2.25rem) !important;
+  right: auto !important;
+}
+
+@media (max-width: 639px) {
   html[dir="rtl"] .floating-actions-dock,
   html[lang="ar"] .floating-actions-dock,
   html.rtl .floating-actions-dock,
   body.rtl .floating-actions-dock,
   body[dir="rtl"] .floating-actions-dock,
   .is-rtl .floating-actions-dock,
-  [dir="rtl"] .floating-actions-dock {
-    left: clamp(1.25rem, 3vw, 2.25rem) !important;
+  [dir="rtl"] .floating-actions-dock,
+  .floating-actions-dock.is-rtl {
+    left: 1.25rem !important;
     right: auto !important;
   }
 }
@@ -7374,6 +7414,350 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-co
     left: 80px !important;
     margin-left: 0px !important;
     margin-right: 0px !important;
+  }
+}
+
+/* Focus Mode: About page desktop adjustments in Arabic */
+@media (min-width: 1024px) {
+  /* Selector 1: About hero header in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header:nth-of-type(1),
+  #about-page-container.is-rtl > header.about-hero-header {
+    width: 1216px !important;
+  }
+
+  /* Selector 4: About approach section in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(2),
+  #about-page-container.is-rtl > section.about-approach-section {
+    margin-left: 0px !important;
+    margin-right: 105px !important;
+  }
+
+  /* Selector 5: About community section in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(3),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(3),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(3),
+  #about-page-container.is-rtl > section.about-community-section {
+    margin-right: 105px !important;
+    margin-left: 0px !important;
+  }
+
+  /* Selector 6: About team heading in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  #about-page-container.is-rtl > section.about-team-section > div.about-team-heading--surface {
+    margin-right: 105px !important;
+    margin-left: 0px !important;
+  }
+
+  /* Selector 7: About team grid in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(2),
+  #about-page-container.is-rtl > section.about-team-section > div.about-team-grid {
+    margin-right: 105px !important;
+    margin-left: 0px !important;
+  }
+
+  /* Selector 9: About contact panel in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5),
+  #about-page-container.is-rtl > section.about-contact-panel {
+    margin-right: 105px !important;
+    margin-left: 0px !important;
+    width: 1216px !important;
+  }
+}
+
+/* Focus Mode: Adapted mobile settings in Arabic */
+@media (max-width: 1023px) {
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header:nth-of-type(1),
+  #about-page-container.is-rtl > header.about-hero-header,
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(2),
+  #about-page-container.is-rtl > section.about-approach-section,
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(3),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(3),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(3),
+  #about-page-container.is-rtl > section.about-community-section,
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  #about-page-container.is-rtl > section.about-team-section > div.about-team-heading--surface,
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(2),
+  #about-page-container.is-rtl > section.about-team-section > div.about-team-grid,
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5),
+  #about-page-container.is-rtl > section.about-contact-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* CSS selector 1: margin-bottom: 50px */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1),
+  #about-page-container.is-rtl > section.about-team-section > div.about-team-heading--surface {
+    margin-bottom: 50px !important;
+  }
+
+  /* CSS selector 2: background-color: #ffffff */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5) > div:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5) > div:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section:nth-of-type(5) > div:nth-of-type(2),
+  #about-page-container.is-rtl > section.about-contact-panel > div.about-contact-media {
+    background-color: #ffffff !important;
+  }
+}
+
+/* Focus Mode: Programs page desktop adjustments in Arabic */
+@media (min-width: 1024px) {
+  /* Selector 1: Programs header in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header:nth-of-type(1),
+  #programs-page-container.is-rtl > header:nth-of-type(1) {
+    width: 1216px !important;
+  }
+
+  /* Selector 3: Programs section 2 in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section:nth-of-type(2),
+  #programs-page-container.is-rtl > section:nth-of-type(2) {
+    margin-right: 105px !important;
+    margin-left: 0px !important;
+  }
+}
+
+/* Focus Mode: Programs page mobile adaptation in Arabic */
+@media (max-width: 1023px) {
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header:nth-of-type(1),
+  #programs-page-container.is-rtl > header:nth-of-type(1),
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section:nth-of-type(2),
+  #programs-page-container.is-rtl > section:nth-of-type(2) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Focus Mode: Contact page desktop adjustments in Arabic */
+@media (min-width: 1024px) {
+  /* Selector 2: Contact enquiry section in Arabic desktop */
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(2),
+  #contact-page-container.is-rtl > section:nth-of-type(2) {
+    margin-right: 105px !important;
+    margin-left: 0px !important;
+  }
+}
+
+/* Focus Mode: Contact page mobile adaptation in Arabic */
+@media (max-width: 1023px) {
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1),
+  #contact-page-container.is-rtl > section:nth-of-type(1) > div:nth-of-type(1),
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(2),
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(2),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section:nth-of-type(2),
+  #contact-page-container.is-rtl > section:nth-of-type(2) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Focus Mode: Dashboard header remains stationary and pinned in place wherever the user scrolls */
+/* Selector 1: Dashboard header */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+.minimal-dashboard-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 5rem !important;
+  min-height: 5rem !important;
+  z-index: 50 !important;
+  width: auto !important;
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--blue-line, #d9e2f1) !important;
+  box-shadow: 0 1px 4px 0 rgba(16, 37, 62, 0.05) !important;
+  box-sizing: border-box !important;
+  transition: left 200ms ease-linear, right 200ms ease-linear, width 200ms ease-linear !important;
+}
+
+@media (min-width: 768px) {
+  /* LTR with sidebar on left */
+  html:not([dir="rtl"]):not([lang="ar"]) div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  html:not([dir="rtl"]):not([lang="ar"]) .minimal-dashboard-header {
+    left: var(--sidebar-width, 16rem) !important;
+    right: 0 !important;
+  }
+
+  /* When sidebar is collapsed in LTR */
+  html:not([dir="rtl"]):not([lang="ar"]) .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  html:not([dir="rtl"]):not([lang="ar"]) .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) .minimal-dashboard-header {
+    left: var(--sidebar-width-icon, 3rem) !important;
+    right: 0 !important;
+  }
+
+  /* RTL with sidebar on right */
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] .minimal-dashboard-header,
+  html[lang="ar"] .minimal-dashboard-header,
+  .is-rtl .minimal-dashboard-header {
+    right: var(--sidebar-width, 16rem) !important;
+    left: 0 !important;
+  }
+
+  /* When sidebar is collapsed in RTL */
+  html[dir="rtl"] .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  html[lang="ar"] .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  .is-rtl .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1),
+  html[dir="rtl"] .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) .minimal-dashboard-header,
+  html[lang="ar"] .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) .minimal-dashboard-header,
+  .is-rtl .group\/sidebar-wrapper:has([data-slot="sidebar"][data-state="collapsed"]) .minimal-dashboard-header {
+    right: var(--sidebar-width-icon, 3rem) !important;
+    left: 0 !important;
+  }
+}
+
+/* Eliminate route-enter transform so sticky/fixed elements remain firmly anchored to viewport */
+div#root:nth-of-type(1) > div:nth-of-type(1),
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1),
+.route-enter:has(.blue-workspace),
+.route-enter:has(.minimal-dashboard-inset),
+.route-enter:has([data-slot="sidebar-wrapper"]),
+.route-enter:has(.minimal-sidebar),
+.route-enter:has(main:has(header.minimal-dashboard-header)) {
+  animation: none !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  contain: none !important;
+}
+
+/* Ensure viewport scroll container maintains sticky positioning */
+html:has(.blue-workspace),
+body:has(.blue-workspace),
+html:has(.minimal-dashboard-inset),
+body:has(.minimal-dashboard-inset) {
+  overflow-x: clip !important;
+  overflow-y: auto !important;
+}
+
+/* Parent container padding so content starts directly below fixed 5rem header */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1),
+.minimal-dashboard-inset {
+  padding-top: 5rem !important;
+  overflow: visible !important;
+  overflow-x: clip !important;
+  contain: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Selector 2: Dashboard sidebar container remains fixed in place */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+.minimal-sidebar[data-slot="sidebar-container"] {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 40 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+}
+
+/* RTL sidebar fixed position */
+html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+html[lang="ar"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+.is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* LTR sidebar fixed position */
+html:not([dir="rtl"]):not([lang="ar"]) div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+html[dir="ltr"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+  left: 0 !important;
+  right: auto !important;
+}
+
+/* Focus Mode: Mobile sidebar toggle as a burger menu button */
+/* Selector 1: Mobile burger menu button */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1),
+.minimal-mobile-trigger {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  min-width: 2.75rem !important;
+  min-height: 2.75rem !important;
+  padding: 0 !important;
+  border: 1px solid var(--blue-line, #d9e2f1) !important;
+  border-radius: 0.5rem !important;
+  background-color: #ffffff !important;
+  color: var(--blue-primary, #173fad) !important;
+  box-shadow: 0 1px 3px rgba(16, 37, 62, 0.06) !important;
+  cursor: pointer !important;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1):hover,
+.minimal-mobile-trigger:hover {
+  background-color: #eef3ff !important;
+  border-color: var(--blue-primary, #173fad) !important;
+  color: var(--blue-primary, #173fad) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1):active,
+.minimal-mobile-trigger:active {
+  transform: scale(0.95) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1) svg,
+.minimal-mobile-trigger svg {
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+  stroke-width: 2.2px !important;
+  display: block !important;
+}
+
+@media (min-width: 768px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1),
+  .minimal-mobile-trigger {
+    display: none !important;
   }
 }
 
