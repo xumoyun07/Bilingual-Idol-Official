@@ -8,6 +8,13 @@ import {
   formatLocalizedDateTime,
   formatLocalizedDate,
 } from "@/lib/timeLocalization";
+import {
+  translateDynamic,
+  batchTranslateDynamic,
+  translateDynamicObject,
+  initDynamicTranslationStorage,
+  registerDynamicTranslation,
+} from "@/lib/dynamicTranslator";
 
 interface LanguageContextType {
   language: Language;
@@ -16,6 +23,12 @@ interface LanguageContextType {
   isRTL: boolean;
   dict: TranslationDictionary;
   t: (keyPath: string, params?: Record<string, string | number>, fallback?: string) => string;
+  td: (text: string | null | undefined, fallback?: string) => string;
+  translateDynamic: (text: string | null | undefined, fallback?: string) => string;
+  batchTranslate: (texts: string[]) => string[];
+  translateObject: <T extends Record<string, any>>(obj: T) => T;
+  registerTerms: (term: string, translations: Partial<Record<Language, string>>) => void;
+  isDynamicActive: boolean;
   locale: string;
   translateAmPm: (text: string) => string;
   formatTimeSlot: (slot: string) => string;
@@ -41,6 +54,10 @@ function setCookie(name: string, value: string, days = 365) {
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
 }
 
+function isValidLanguage(val: any): val is Language {
+  return val === "en" || val === "ms" || val === "ar";
+}
+
 function detectInitialLanguage(): Language {
   if (typeof window === "undefined") return "en";
   try {
@@ -48,21 +65,21 @@ function detectInitialLanguage(): Language {
     if (window.location && window.location.search) {
       const urlParams = new URLSearchParams(window.location.search);
       const queryLang = urlParams.get("lang");
-      if (queryLang === "en" || queryLang === "ms" || queryLang === "ar") {
-        return queryLang as Language;
+      if (isValidLanguage(queryLang)) {
+        return queryLang;
       }
     }
 
     // 1. Check localStorage
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "en" || saved === "ms" || saved === "ar") {
-      return saved as Language;
+    if (isValidLanguage(saved)) {
+      return saved;
     }
 
     // 2. Check Cookie
     const cookieVal = getCookie(COOKIE_NAME);
-    if (cookieVal === "en" || cookieVal === "ms" || cookieVal === "ar") {
-      return cookieVal as Language;
+    if (isValidLanguage(cookieVal)) {
+      return cookieVal;
     }
 
     // 3. Check browser / OS preferred languages
@@ -81,6 +98,10 @@ function detectInitialLanguage(): Language {
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>(detectInitialLanguage);
+
+  useEffect(() => {
+    initDynamicTranslationStorage(language);
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
@@ -101,13 +122,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Synchronize across tabs or custom languagechange events
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && (e.newValue === "en" || e.newValue === "ms" || e.newValue === "ar")) {
-        setLanguageState(e.newValue as Language);
+      if (e.key === STORAGE_KEY && isValidLanguage(e.newValue)) {
+        setLanguageState(e.newValue);
       }
     };
     const handleCustomChange = (e: Event) => {
       const customEvent = e as CustomEvent<Language>;
-      if (customEvent.detail && (customEvent.detail === "en" || customEvent.detail === "ms" || customEvent.detail === "ar")) {
+      if (customEvent.detail && isValidLanguage(customEvent.detail)) {
         setLanguageState(customEvent.detail);
       }
     };
@@ -149,47 +170,94 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     ogLocale.setAttribute("content", localeCode);
   }, [language, dir, isRTL]);
 
-  const t = (keyPath: string, params?: Record<string, string | number>, fallback?: string): string => {
-    const parts = keyPath.split(".");
-    let current: any = dict;
-    for (const part of parts) {
-      if (current && typeof current === "object" && part in current) {
-        current = current[part];
-      } else {
-        // Fallback to English dict if missing in current language
-        let fallbackCurrent: any = translations.en;
-        for (const fbPart of parts) {
-          if (fallbackCurrent && typeof fallbackCurrent === "object" && fbPart in fallbackCurrent) {
-            fallbackCurrent = fallbackCurrent[fbPart];
-          } else {
-            fallbackCurrent = undefined;
-            break;
+  const t = useCallback(
+    (keyPath: string, params?: Record<string, string | number>, fallback?: string): string => {
+      if (!keyPath) return fallback || "";
+
+      // 1. If keyPath doesn't contain dot, it might be a direct dynamic string
+      if (!keyPath.includes(".") && !keyPath.includes("/")) {
+        const dynamicRes = translateDynamic(keyPath, language, fallback);
+        if (dynamicRes !== keyPath) {
+          return dynamicRes;
+        }
+      }
+
+      const parts = keyPath.split(".");
+      let current: any = dict;
+      for (const part of parts) {
+        if (current && typeof current === "object" && part in current) {
+          current = current[part];
+        } else {
+          // Fallback to English dict if missing in current language
+          let fallbackCurrent: any = translations.en;
+          for (const fbPart of parts) {
+            if (fallbackCurrent && typeof fallbackCurrent === "object" && fbPart in fallbackCurrent) {
+              fallbackCurrent = fallbackCurrent[fbPart];
+            } else {
+              fallbackCurrent = undefined;
+              break;
+            }
+          }
+          current = fallbackCurrent;
+          break;
+        }
+      }
+
+      // If resolved from static dictionary
+      if (typeof current === "string") {
+        let result = current;
+        if (params) {
+          for (const [k, v] of Object.entries(params)) {
+            result = result.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
           }
         }
-        current = fallbackCurrent ?? fallback ?? keyPath;
-        break;
+        return result;
       }
-    }
 
-    if (typeof current !== "string") {
-      if (fallback) return fallback;
-      // Fallback cleanly to human-readable text instead of raw dotted key
+      // If fallback provided, try dynamic translation of fallback string
+      if (fallback) {
+        return translateDynamic(fallback, language, fallback);
+      }
+
+      // Format last part of key and pass through dynamic translator
       const lastPart = parts[parts.length - 1] || keyPath;
       const formatted = lastPart
         .replace(/([A-Z])/g, " $1")
         .replace(/[._-]/g, " ")
         .trim();
-      return formatted ? (formatted.charAt(0).toUpperCase() + formatted.slice(1)) : keyPath;
-    }
+      const humanReadable = formatted ? (formatted.charAt(0).toUpperCase() + formatted.slice(1)) : keyPath;
+      return translateDynamic(humanReadable, language, humanReadable);
+    },
+    [dict, language]
+  );
 
-    let result = current;
-    if (params) {
-      for (const [k, v] of Object.entries(params)) {
-        result = result.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
-      }
-    }
-    return result;
-  };
+  const td = useCallback(
+    (text: string | null | undefined, fallback?: string): string => {
+      return translateDynamic(text, language, fallback);
+    },
+    [language]
+  );
+
+  const batchTranslateFn = useCallback(
+    (texts: string[]): string[] => {
+      return batchTranslateDynamic(texts, language);
+    },
+    [language]
+  );
+
+  const translateObjectFn = useCallback(
+    <T extends Record<string, any>>(obj: T): T => {
+      return translateDynamicObject(obj, language);
+    },
+    [language]
+  );
+
+  const registerTermsFn = useCallback(
+    (term: string, customTranslations: Partial<Record<Language, string>>) => {
+      registerDynamicTranslation(term, customTranslations);
+    },
+    []
+  );
 
   const locale = getLocaleForLanguage(language);
 
@@ -228,6 +296,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       isRTL,
       dict,
       t,
+      td,
+      translateDynamic: td,
+      batchTranslate: batchTranslateFn,
+      translateObject: translateObjectFn,
+      registerTerms: registerTermsFn,
+      isDynamicActive: true,
       locale,
       translateAmPm: translateAmPmFn,
       formatTimeSlot: formatTimeSlotFn,
@@ -240,6 +314,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       dir,
       isRTL,
       dict,
+      t,
+      td,
+      batchTranslateFn,
+      translateObjectFn,
+      registerTermsFn,
       locale,
       translateAmPmFn,
       formatTimeSlotFn,
@@ -259,4 +338,3 @@ export function useLanguage() {
   }
   return context;
 }
-

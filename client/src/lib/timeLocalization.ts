@@ -4,6 +4,7 @@ export const LOCALE_BY_LANGUAGE: Record<Language, string> = {
   en: "en-GB",
   ms: "ms-MY",
   ar: "ar-EG",
+  ru: "ru-RU",
 };
 
 /**

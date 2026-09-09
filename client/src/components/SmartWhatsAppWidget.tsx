@@ -19,16 +19,19 @@ const WHATSAPP_TOPICS: WhatsAppTopic[] = [
       en: "Course & 2026 Price Enquiry",
       ms: "Pertanyaan Kursus & Yuran 2026",
       ar: "استفسار عن الدورات وأسعار 2026",
+      ru: "Запрос стоимости и курсов 2026",
     },
     descs: {
       en: "Ask about tuition fees, timetables and course catalogs",
       ms: "Tanya tentang yuran pengajian, jadual & katalog kursus",
       ar: "استفسر عن الرسوم والجداول الدراسية وكتالوج البرامج",
+      ru: "Узнайте о ценах, расписании и каталоге программ",
     },
     msgs: {
       en: "Hello Bilingual Idol, I would like to inquire about your 2026 courses, fees, and schedule at Pavilion Embassy.",
       ms: "Salam Bilingual Idol, saya ingin bertanya mengenai kursus, yuran dan jadual 2026 di Pavilion Embassy.",
       ar: "مرحباً بايلينجوال آيدول، أود الاستفسار عن دورات 2026 والرسوم وجداول الحصص في بافيليون إمباسي.",
+      ru: "Здравствуйте, Bilingual Idol! Хочу узнать подробнее о курсах 2026 года, ценах и расписании в Pavilion Embassy.",
     },
   },
   {
@@ -38,16 +41,19 @@ const WHATSAPP_TOPICS: WhatsAppTopic[] = [
       en: "International Student & Visa",
       ms: "Pelajar Antarabangsa & Visa",
       ar: "شؤون الطلاب الدوليين والفيزا",
+      ru: "Иностранные студенты и виза",
     },
     descs: {
       en: "EMGS student visa support, accommodation & airport transfer",
       ms: "Sokongan visa pelajar EMGS, penginapan & ketibaan",
       ar: "دعم تأشيرة EMGS والسكن الجامعي والاستقبال من المطار",
+      ru: "Студенческая виза EMGS, проживание и трансфер из аэропорта",
     },
     msgs: {
       en: "Hello! I am an international student planning to study English at Bilingual Idol Malaysia. I would like details about EMGS visas and enrolment.",
       ms: "Hai! Saya seorang pelajar antarabangsa yang merancang untuk belajar Bahasa Inggeris di Bilingual Idol Malaysia. Saya ingin maklumat lanjut tentang visa EMGS.",
       ar: "مرحباً! أنا طالب دولي أخطط لدراسة اللغة الإنجليزية في بايلينجوال آيدول ماليزيا. أود معرفة تفاصيل فيزا EMGS وإجراءات القبول.",
+      ru: "Здравствуйте! Я иностранный студент и планирую учить английский в Bilingual Idol Malaysia. Подскажите детали оформления визы EMGS и зачисления.",
     },
   },
   {
@@ -57,16 +63,19 @@ const WHATSAPP_TOPICS: WhatsAppTopic[] = [
       en: "IELTS Preparation Coaching",
       ms: "Bimbingan Persediaan IELTS",
       ar: "دورات التحضير لاختبار الآيلتس",
+      ru: "Подготовка к экзамену IELTS",
     },
     descs: {
       en: "Express 4w, Intensive 8w, Premium 12w coaching",
       ms: "Pakej Ekspres 4 minggu, Intensif 8 minggu, Premium 12 minggu",
       ar: "باقات مكثفة 4، 8، و12 أسبوعاً مع تدريب امتحاني مباشر",
+      ru: "Экспресс 4 недели, Интенсив 8 недель, Премиум 12 недель",
     },
     msgs: {
       en: "Hello Bilingual Idol! I want to prepare for the IELTS exam. Please share details regarding your upcoming IELTS intakes and diagnostic test.",
       ms: "Hai Bilingual Idol! Saya ingin membuat persediaan untuk peperiksaan IELTS. Sila kongsikan maklumat pengambilan terdekat dan ujian diagnostik.",
       ar: "مرحباً بايلينجوال آيدول! أود التحضير لاختبار الآيلتس. يرجى تزويدي بمواعيد الدورات القادمة واختبار تحديد المستوى.",
+      ru: "Здравствуйте, Bilingual Idol! Хочу подготовиться к IELTS. Расскажите о ближайших наборах и диагностическом тесте.",
     },
   },
   {
@@ -76,16 +85,19 @@ const WHATSAPP_TOPICS: WhatsAppTopic[] = [
       en: "Summer Camps & Kids Programs",
       ms: "Kem Musim Panas & Program Kanak-kanak",
       ar: "المخيمات الصيفية وبرامج الصغار",
+      ru: "Летние лагеря и детские программы",
     },
     descs: {
       en: "Junior English, International Camp & Leadership Programs",
       ms: "Bahasa Inggeris Junior, Kem Antarabangsa & Kepimpinan",
       ar: "إنجليزية للصغار، مخيمات دولية وبرامج قيادية",
+      ru: "Английский для детей, международный лагерь и лидерские программы",
     },
     msgs: {
       en: "Hello! I would like information about the upcoming Summer Camps and youth programmes at Bilingual Idol.",
       ms: "Hai! Saya ingin maklumat mengenai Kem Musim Panas dan program belia yang akan datang di Bilingual Idol.",
       ar: "مرحباً! أود الحصول على معلومات حول المخيمات الصيفية القادمة وبرامج الشباب في بايلينجوال آيدول.",
+      ru: "Здравствуйте! Интересуют детали ближайших летних лагерей и подростковых программ в Bilingual Idol.",
     },
   },
   {
@@ -95,16 +107,19 @@ const WHATSAPP_TOPICS: WhatsAppTopic[] = [
       en: "Book Free Placement Test",
       ms: "Tempah Ujian Penempatan Percuma",
       ar: "حجز اختبار تحديد مستوى مجاني",
+      ru: "Запись на бесплатный тест уровня",
     },
     descs: {
       en: "Schedule a diagnostic test in person or via Zoom",
       ms: "Jadualkan ujian diagnostik secara bersemuka atau melalui Zoom",
       ar: "حدد موعداً للاختبار حضورياً أو عبر تطبيق زووم",
+      ru: "Запишитесь на очный или онлайн-тест уровня через Zoom",
     },
     msgs: {
       en: "Hello Admissions, I would like to schedule a free Placement Test to evaluate my English level.",
       ms: "Salam Pegawai Kemasukan, saya ingin menjadualkan Ujian Penempatan percuma untuk menilai tahap Bahasa Inggeris saya.",
       ar: "مرحباً قسم القبول، أود حجز موعد لاختبار تحديد المستوى المجاني لتقييم لغتي الإنجليزية.",
+      ru: "Здравствуйте! Хочу записаться на бесплатный тест для определения уровня английского языка.",
     },
   },
 ];

@@ -23,16 +23,19 @@ const FACILITIES: Facility[] = [
       en: "Smart Interactive Classrooms",
       ms: "Bilik Darjah Pintar Interaktif",
       ar: "فصول دراسية ذكية وتفاعلية",
+      ru: "Умные интерактивные аудитории",
     },
     subtitles: {
       en: "Cutting-Edge Digital Interactive Systems",
       ms: "Sistem Digital Terkini & Interaktif",
       ar: "أنظمة رقمية متطورة وتفاعلية بالكامل",
+      ru: "Передовые цифровые интерактивные системы",
     },
     descriptions: {
       en: "Every classroom is equipped with interactive digital smartboards, multimedia audio-visual learning systems, and modern collaborative spaces to transform lessons into immersive experiences.",
       ms: "Setiap bilik darjah dilengkapi dengan papan pintar digital interaktif, sistem pembelajaran audio-visual multimedia, dan ruang kolaboratif moden untuk pengalaman pembelajaran menyeluruh.",
       ar: "جميع الفصول مجهزة بشاشات تفاعلية ذكية، أنظمة صوتية ومرئية حديثة، ومساحات تعليمية تفاعلية تحول الدروس إلى تجربة مشوقة وعملية.",
+      ru: "Каждая аудитория оснащена интерактивными цифровыми досками, аудиовизуальными системами и эргономичным пространством для полного погружения в обучение.",
     },
     highlights: {
       en: [
@@ -50,6 +53,11 @@ const FACILITIES: Facility[] = [
         "تصميم صوتي هندسي يضمن وضوحاً تاماً في تدريب النطق والمحادثة",
         "إنترنت فائق السرعة للوصول إلى أحدث المراجع التعليمية العالمية",
       ],
+      ru: [
+        "Интерактивные смарт-доски и сенсорные дисплеи",
+        "Эргономичная акустика для четкой разговорной практики",
+        "Высокоскоростной интернет для доступа к мировым цифровым библиотекам",
+      ],
     },
   },
   {
@@ -60,16 +68,19 @@ const FACILITIES: Facility[] = [
       en: "Executive Lounge & Networking Hub",
       ms: "Ruang Rehat Eksekutif & Hab Jaringan",
       ar: "صالة كبار الشخصيات ومساحة التواصل",
+      ru: "Представительский лаундж и нетворкинг-хаб",
     },
     subtitles: {
       en: "Elite Collaboration & Relaxation Space",
       ms: "Ruang Kerjasama & Rehat Elit",
       ar: "مساحة راقية للتعاون وبناء العلاقات",
+      ru: "Премиальное пространство для общения и отдыха",
     },
     descriptions: {
       en: "More than a resting space—an executive salon designed for collaboration and networking. Students connect, exchange cultural perspectives, brainstorm, and relax in a private clubhouse atmosphere.",
       ms: "Lebih daripada ruang rehat—salon eksekutif yang direka untuk kerjasama dan rangkaian sosial. Pelajar dapat bertukar pandangan budaya dan berehat dalam suasana kelab peribadi.",
       ar: "أكثر من مجرد مساحة للاستراحة—صالة تنفيذية راقية مصممة للتواصل وبناء العلاقات وتبادل الثقافات في أجواء مريحة وفاخرة.",
+      ru: "Больше, чем зона отдыха — представительский салон для нетворкинга, межкультурного диалога и комфортного общения в атмосфере закрытого клуба.",
     },
     highlights: {
       en: [
@@ -87,6 +98,11 @@ const FACILITIES: Facility[] = [
         "ركن مشروبات مجاني وزوايا هادئة للمناقشة والدراسة",
         "إطلالات خلابة من بافيليون إمباسي على قلب كوالالمبور",
       ],
+      ru: [
+        "Атмосфера закрытого клуба для специалистов и дипломатов",
+        "Премиальный кофе-бар и зоны для спокойных бесед",
+        "Панорамный вид на деловой центр Куала-Лумпура из Pavilion Embassy",
+      ],
     },
   },
   {
@@ -97,16 +113,19 @@ const FACILITIES: Facility[] = [
       en: "Library & Digital Resource Center",
       ms: "Perpustakaan & Pusat Sumber Digital",
       ar: "المكتبة ومركز الموارد الرقمية",
+      ru: "Библиотека и цифровой ресурсный центр",
     },
     subtitles: {
       en: "Global Academic & Language Archive",
       ms: "Arkib Pembelajaran & Bahasa Global",
       ar: "أرشيف أكاديمي ولغوي شامل",
+      ru: "Международный архив академических и языковых ресурсов",
     },
     descriptions: {
       en: "A seamless fusion of traditional literature and modern digital learning. Access curated academic textbooks, IELTS test archives, and global linguistic databases in a serene environment.",
       ms: "Gabungan harmoni antara bahan bacaan tradisional dan pembelajaran digital moden. Akses buku teks akademik, arkib ujian IELTS, dan pangkalan data bahasa dalam suasana tenang.",
       ar: "مزيج متكامل بين الكتب الأكاديمية والمراجع الرقمية الحديثة. وصول مباشر لأرشيف اختبارات الآيلتس وقواعد البيانات اللغوية في بيئة هادئة.",
+      ru: "Гармония классической академической литературы и цифровых баз знаний. Доступ к материалам IELTS, HSK и языковым базам данных в тихой обстановке.",
     },
     highlights: {
       en: [
@@ -124,6 +143,11 @@ const FACILITIES: Facility[] = [
         "مناطق مخصصة للدراسة الهادئة ومحطات وسائط متعددة",
         "إشراف وإرشاد مستمر من المستشارين الأكاديميين",
       ],
+      ru: [
+        "Обширная коллекция материалов по ESL, IELTS, HSK и иностранным языкам",
+        "Выделенные зоны тишины и мультимедийные терминалы",
+        "Поддержка академических консультантов",
+      ],
     },
   },
   {
@@ -134,16 +158,19 @@ const FACILITIES: Facility[] = [
       en: "Designer-Inspired Modern Interior",
       ms: "Reka Bentuk Dalaman Moden Eksklusif",
       ar: "تصميم داخلي عصري وفاخر",
+      ru: "Дизайнерский современный интерьер",
     },
     subtitles: {
       en: "Where Language Meets Luxury & Focus",
       ms: "Tempat Pertemuan Bahasa & Keanggunan",
       ar: "حيث تجتمع فصاحة اللغة مع رفاهية التصميم",
+      ru: "Сочетание премиального комфорта и фокуса на обучении",
     },
     descriptions: {
       en: "Step into an ambiance that feels like an exclusive private academy rather than a conventional classroom. Warm ambient lighting, refined architectural finishes, and prestigious surroundings.",
       ms: "Melangkah masuk ke suasana akademi peribadi yang eksklusif dengan pencahayaan hangat, kemasan seni bina moden, dan persekitaran yang berprestij.",
       ar: "ادخل إلى بيئة تعليمية مصممة بأناقة تماثل الأكاديميات الدولية الكبرى. إضاءة مريحة وتشطيبات راقية تضمن أعلى درجات التركيز.",
+      ru: "Интерьер премиальной частной академии: мягкий архитектурный свет, натуральные материалы и вдохновляющая среда в престижном посольском квартале.",
     },
     highlights: {
       en: [
@@ -160,6 +187,11 @@ const FACILITIES: Facility[] = [
         "موقع متميز في بافيليون إمباسي (دقيقتين من أبراج بتروناس)",
         "إضاءة معمارية مريحة وجماليات راقية تعزز الدافعية",
         "بيئة تعليمية آمنة وملهمة لجميع الفئات العمرية",
+      ],
+      ru: [
+        "Престижный адрес Pavilion Embassy (2–3 мин до башен Петронас)",
+        "Теплое архитектурное освещение и эстетика бутик-кампуса",
+        "Безопасная, респектабельная среда для учащихся всех возрастов",
       ],
     },
   },
@@ -193,6 +225,8 @@ export function CampusFacilitiesShowcase() {
               ? "Kampus Pavilion Embassy"
               : language === "ar"
               ? "حرم بافيليون إمباسي"
+              : language === "ru"
+              ? "Кампус Pavilion Embassy"
               : "Pavilion Embassy Campus"}
           </span>
         </div>
@@ -207,6 +241,8 @@ export function CampusFacilitiesShowcase() {
             ? `Kemudahan ${selectedIndex + 1} drpd ${FACILITIES.length}`
             : language === "ar"
             ? `المرفق ${selectedIndex + 1} من ${FACILITIES.length}`
+            : language === "ru"
+            ? `Объект ${selectedIndex + 1} из ${FACILITIES.length}`
             : `Facility ${selectedIndex + 1} of ${FACILITIES.length}`}
         </span>
         <div className="flex items-center gap-2">
@@ -214,7 +250,7 @@ export function CampusFacilitiesShowcase() {
             type="button"
             className="bilc-carousel-btn"
             onClick={isRTL ? handleNext : handlePrev}
-            aria-label={language === "ar" ? "المرفق السابق" : language === "ms" ? "Kemudahan sebelumnya" : "Previous facility"}
+            aria-label={language === "ar" ? "المرفق السابق" : language === "ms" ? "Kemudahan sebelumnya" : language === "ru" ? "Предыдущий объект" : "Previous facility"}
           >
             <ChevronLeft size={20} className={isRTL ? "rotate-180" : ""} />
           </button>
@@ -222,7 +258,7 @@ export function CampusFacilitiesShowcase() {
             type="button"
             className="bilc-carousel-btn"
             onClick={isRTL ? handlePrev : handleNext}
-            aria-label={language === "ar" ? "المرفق التالي" : language === "ms" ? "Kemudahan seterusnya" : "Next facility"}
+            aria-label={language === "ar" ? "المرفق التالي" : language === "ms" ? "Kemudahan seterusnya" : language === "ru" ? "Следующий объект" : "Next facility"}
           >
             <ChevronRight size={20} className={isRTL ? "rotate-180" : ""} />
           </button>
@@ -275,6 +311,8 @@ export function CampusFacilitiesShowcase() {
                   ? "Kampus Pavilion Embassy"
                   : language === "ar"
                   ? "حرم بافيليون إمباسي"
+                  : language === "ru"
+                  ? "Кампус Pavilion Embassy"
                   : "Pavilion Embassy Campus"}
               </span>
             </div>
@@ -288,7 +326,7 @@ export function CampusFacilitiesShowcase() {
                 type="button"
                 className={`bilc-carousel-dot ${selectedIndex === i ? "is-active" : ""}`}
                 onClick={() => setSelectedIndex(i)}
-                aria-label={language === "ar" ? `الانتقال إلى المرفق ${i + 1}` : language === "ms" ? `Pergi ke kemudahan ${i + 1}` : `Go to facility ${i + 1}`}
+                aria-label={language === "ar" ? `الانتقال إلى المرفق ${i + 1}` : language === "ms" ? `Pergi ke kemudahan ${i + 1}` : language === "ru" ? `Перейти к объекту ${i + 1}` : `Go to facility ${i + 1}`}
               />
             ))}
           </div>
@@ -312,6 +350,8 @@ export function CampusFacilitiesShowcase() {
                   ? "Ketahui lebih lanjut tentang kampus"
                   : language === "ar"
                   ? "تعرف أكثر على الحرم الأكاديمي"
+                  : language === "ru"
+                  ? "Узнать больше о кампусе"
                   : "Learn more about campus"}
               </Link>
               <Link href="/contact" className="simple-button min-h-[44px]">
@@ -319,6 +359,8 @@ export function CampusFacilitiesShowcase() {
                   ? "Tempah Lawatan Kampus"
                   : language === "ar"
                   ? "احجز جولة في الحرم"
+                  : language === "ru"
+                  ? "Забронировать тур по кампусу"
                   : "Book a Campus Tour"}
               </Link>
             </div>

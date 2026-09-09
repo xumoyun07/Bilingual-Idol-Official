@@ -19,6 +19,7 @@ import { newsRouter } from "./routers/news";
 import { teacherRouter } from "./routers/teacher";
 import { studentAttendanceRouter } from "./routers/studentAttendance";
 import { marketingRouter } from "./routers/marketing";
+import { translationRouter } from "./routers/translation";
 import { createUserPasswordHash, dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 import { isFounderEmail } from "./founderIdentity";
 import { resolveLoginIdentifier } from "../shared/nickname";
@@ -79,6 +80,7 @@ export const appRouter = router({
   teacher: teacherRouter,
   studentAttendance: studentAttendanceRouter,
   marketing: marketingRouter,
+  translation: translationRouter,
 });
 
 export type AppRouter = typeof appRouter;

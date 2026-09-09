@@ -20,6 +20,7 @@ const PLACEMENT_QUESTIONS: Question[] = [
       en: "Choose the correct sentence to complete the statement:",
       ms: "Pilih ayat yang betul untuk melengkapkan kenyataan ini:",
       ar: "اختر الجملة الصحيحة لإكمال العبارة:",
+      ru: "Выберите грамматически верное предложение:",
     },
     options: [
       { text: "She don't like drinking coffee in the morning." },
@@ -34,6 +35,7 @@ const PLACEMENT_QUESTIONS: Question[] = [
       en: "If I _____ earlier, I wouldn't have missed the morning lecture.",
       ms: "If I _____ earlier, I wouldn't have missed the morning lecture.",
       ar: "If I _____ earlier, I wouldn't have missed the morning lecture.",
+      ru: "If I _____ earlier, I wouldn't have missed the morning lecture.",
     },
     options: [
       { text: "woke up" },
@@ -48,6 +50,7 @@ const PLACEMENT_QUESTIONS: Question[] = [
       en: "Which word best completes the executive statement: 'The Board will _____ the proposal at next week's meeting.'",
       ms: "Perkataan manakah yang paling sesuai: 'The Board will _____ the proposal at next week's meeting.'",
       ar: "أي كلمة تكمل الجملة بشكل صحيح: 'The Board will _____ the proposal at next week's meeting.'",
+      ru: "Выберите подходящее слово: 'The Board will _____ the proposal at next week's meeting.'",
     },
     options: [
       { text: "deliberate", correct: true },
@@ -62,6 +65,7 @@ const PLACEMENT_QUESTIONS: Question[] = [
       en: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
       ms: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
       ar: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
+      ru: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
     },
     options: [
       { text: "will complete" },
@@ -76,6 +80,7 @@ const PLACEMENT_QUESTIONS: Question[] = [
       en: "The director asked whether we had _____ to all client inquiries.",
       ms: "The director asked whether we had _____ to all client inquiries.",
       ar: "The director asked whether we had _____ to all client inquiries.",
+      ru: "The director asked whether we had _____ to all client inquiries.",
     },
     options: [
       { text: "responded", correct: true },
