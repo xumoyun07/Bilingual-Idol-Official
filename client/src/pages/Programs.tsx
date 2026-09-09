@@ -25,8 +25,8 @@ export default function Programs() {
 
   return (
     <PublicLayout>
-      <div id="programs-page-container" className={`simple-route-page programs-page ${isRTL ? "is-rtl" : ""}`}>
-        <header className="simple-route-header simple-route-header--programmes">
+      <div id="programs-page-container" data-page="programs" className={`simple-route-page programs-page page-programs ${isRTL ? "is-rtl" : ""}`}>
+        <header id="programs-hero-header" className="simple-route-header simple-route-header--programmes">
           <div className="simple-route-header-copy simple-route-header-copy--wide">
             <p className="simple-eyebrow">{t("programs.eyebrow")}</p>
             <h1>{t("programs.heroTitle")}</h1>
@@ -41,7 +41,7 @@ export default function Programs() {
           ) : null}
         </header>
 
-        <section className="simple-route-section simple-guide-section">
+        <section id="programs-guide-section" className="simple-route-section simple-guide-section">
           <div className="simple-section-heading simple-section-heading--fee-guide">
             <div>
               <p className="simple-eyebrow">{t("programs.feeGuideEyebrow")}</p>
@@ -92,7 +92,7 @@ export default function Programs() {
           </div>
         </section>
 
-        <section className="simple-route-section">
+        <section id="programs-list-section" className="simple-route-section">
           <div className="simple-filter-bar">
             <label>
               <Search size={17} />

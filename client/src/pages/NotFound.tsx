@@ -7,9 +7,9 @@ export default function NotFound() {
   const { language, isRTL } = useLanguage();
 
   return (
-    <main className={`compass-page compass-grid grid min-h-screen place-items-center p-5 ${isRTL ? "is-rtl" : ""}`}>
-      <section className="compass-card w-full max-w-xl p-8 text-center sm:p-12">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-xl bg-[#e7f0eb] text-[#397563]">
+    <main id="notfound-page-container" data-page="notfound" className={`compass-page compass-grid page-notfound grid min-h-screen place-items-center p-5 ${isRTL ? "is-rtl" : ""}`}>
+      <section id="notfound-card" className="compass-card w-full max-w-xl p-8 text-center sm:p-12">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-xl bg-[#eef4ff] text-[#173fad]">
           <Compass size={25} />
         </span>
         <p className="compass-kicker mt-7">

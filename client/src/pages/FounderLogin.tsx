@@ -49,9 +49,9 @@ export default function FounderLogin() {
   }
 
   return (
-    <main key={`auth-page-${language}`} className={`auth-page blue-auth-page ${isRTL ? "is-rtl" : ""}`}>
+    <main id="login-page-container" data-page="login" key={`auth-page-${language}`} className={`auth-page blue-auth-page page-login ${isRTL ? "is-rtl" : ""}`}>
       <BackgroundCircleField seed="auth-login" />
-      <header className="auth-header flex items-center justify-between">
+      <header id="login-hero-header" className="auth-header flex items-center justify-between">
         <Link href="/" className="auth-brand" aria-label={t("footer.centreName")}>
           <span aria-hidden="true">BI</span>
           <div>
@@ -65,7 +65,7 @@ export default function FounderLogin() {
         </Link>
       </header>
 
-      <section className="auth-content" aria-labelledby="sign-in-title">
+      <section id="login-content-section" className="auth-content" aria-labelledby="sign-in-title">
         <div className="auth-intro auth-intro--surface">
           <p className="simple-eyebrow">{t("login.eyebrow")}</p>
           <h1 id="sign-in-title">{t("login.heroTitle")}</h1>

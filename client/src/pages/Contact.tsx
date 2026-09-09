@@ -20,8 +20,8 @@ export default function Contact() {
 
   return (
     <PublicLayout>
-      <div id="contact-page-container" className={`simple-route-page contact-page ${isRTL ? "is-rtl" : ""}`}>
-        <header className="simple-route-header contact-hero-header contact-hero-header--compact contact-hero-header--spaced">
+      <div id="contact-page-container" data-page="contact" className={`simple-route-page contact-page page-contact ${isRTL ? "is-rtl" : ""}`}>
+        <header id="contact-hero-header" className="simple-route-header contact-hero-header contact-hero-header--compact contact-hero-header--spaced">
           <div className="contact-hero-copy">
             <p className="simple-eyebrow">{t("contact.eyebrow")}</p>
             <h1>{t("contact.heroTitle")}</h1>
@@ -34,7 +34,7 @@ export default function Contact() {
           ) : null}
         </header>
 
-        <section className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless">
+        <section id="contact-details-section" className="simple-route-section contact-details-section contact-details-section--transparent contact-details-section--borderless">
           <div className="simple-contact-grid">
             {contacts.map(({ icon: Icon, label, value, href }) => (
               <div className="simple-contact-item" key={label}>
@@ -61,7 +61,7 @@ export default function Contact() {
           </div>
         </section>
 
-        <section className="simple-route-section simple-section-tint contact-enquiry-section contact-enquiry-section--spaced contact-enquiry-section--wide-gap">
+        <section id="contact-enquiry-section" className="simple-route-section simple-section-tint contact-enquiry-section contact-enquiry-section--spaced contact-enquiry-section--wide-gap">
           <div className="simple-form-layout">
             <div className="contact-enquiry-copy contact-enquiry-copy--spaced">
               <p className="simple-eyebrow">{t("contact.formEyebrow")}</p>

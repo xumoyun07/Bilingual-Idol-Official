@@ -67,9 +67,9 @@ export default function Home() {
 
   return (
     <PublicLayout>
-      <div id="home-page-container" className={`simple-public-page home-page ${isRTL ? "is-rtl" : ""}`}>
+      <div id="home-page-container" data-page="home" className={`simple-public-page home-page page-home ${isRTL ? "is-rtl" : ""}`}>
         {/* Luxury Hero Section with Seamless Loop Video */}
-        <section className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580">
+        <section id="home-hero-section" className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580">
           <video
             ref={heroVideoRef}
             className="simple-home-hero-media"
@@ -178,7 +178,7 @@ export default function Home() {
         />
 
         {/* Start Here 3-Card Grid */}
-        <section className="simple-section simple-home-panel simple-home-start-panel">
+        <section id="home-start-here-section" className="simple-section simple-home-panel simple-home-start-panel">
           <div className="simple-section-heading">
             <div>
               <p className="simple-eyebrow">{t("home.startHereEyebrow")}</p>
@@ -274,7 +274,7 @@ export default function Home() {
         <VerifiedTestimonials />
 
         {/* Contact Banner at Pavilion Embassy */}
-        <section className="simple-contact-strip simple-contact-strip--refined simple-contact-strip--geometry">
+        <section id="home-contact-strip-section" className="simple-contact-strip simple-contact-strip--refined simple-contact-strip--geometry">
           <div>
             <p className="simple-eyebrow">{language === "ms" ? "Lawati Kami" : language === "ar" ? "تفضل بزيارتنا" : "Visit Bilingual Idol"}</p>
             <h2>{t("home.contactStripTitle")}</h2>

@@ -91,7 +91,7 @@ export default function TeacherDashboard() {
   };
 
   return <DashboardLayout role="teacher">
-    <section className="teacher-workspace" aria-labelledby="teacher-workspace-title">
+    <section id="teacher-dashboard-container" data-page="teacher-dashboard" className="teacher-workspace page-teacher-dashboard" aria-labelledby="teacher-workspace-title">
       <div className="teacher-workspace-intro">
         <div><p className="minimal-eyebrow">Teacher workspace</p><h2 id="teacher-workspace-title">Your assigned classes</h2><p>Review lessons assigned to your account, record attendance and prepare learner results. Class setup and teacher assignments are managed by the centre.</p></div>
         <span className="teacher-workspace-icon" aria-hidden="true"><ClipboardCheck size={24} /></span>

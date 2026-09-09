@@ -63,8 +63,8 @@ export default function ProgramDetail() {
 
   return (
     <PublicLayout>
-      <div id="program-detail-page-container" className={`simple-route-page program-detail-page ${isRTL ? "is-rtl" : ""}`}>
-        <header className="simple-route-header simple-route-header--programmes simple-route-header--program-detail">
+      <div id="program-detail-page-container" data-page="program-detail" className={`simple-route-page program-detail-page page-program-detail ${isRTL ? "is-rtl" : ""}`}>
+        <header id="program-detail-hero-header" className="simple-route-header simple-route-header--programmes simple-route-header--program-detail">
           <div className="simple-route-header-copy">
             <Link href="/programs" className="simple-text-link">
               <ArrowLeft size={16} className={isRTL ? "rotate-180" : ""} /> {language === "ms" ? "Semua program" : language === "ar" ? "جميع البرامج" : "All programmes"}
@@ -78,8 +78,8 @@ export default function ProgramDetail() {
           </div>
         </header>
 
-        <section className="simple-route-section simple-detail-layout">
-          <aside>
+        <section id="program-detail-layout-section" className="simple-route-section simple-detail-layout">
+          <aside id="program-detail-facts-aside">
             <h2>{language === "ms" ? "Maklumat Program" : language === "ar" ? "تفاصيل البرنامج" : "Programme details"}</h2>
             <dl className="simple-facts">
               {facts.map(({ icon: Icon, label, value }) => (
@@ -92,7 +92,7 @@ export default function ProgramDetail() {
               ))}
             </dl>
           </aside>
-          <div>
+          <div id="program-detail-content-block">
             <h2>{language === "ms" ? "Sebelum Membuat Pertanyaan" : language === "ar" ? "قبل التسجيل أو الاستفسار" : "Before you enquire"}</h2>
             <p className="simple-body-copy">
               {language === "ms"

@@ -43,9 +43,9 @@ export default function UserDashboard() {
       : t("userDashboard.roleMember");
 
   return (
-    <main className={`member-page blue-member-page ${isRTL ? "is-rtl" : ""}`}>
+    <main id="user-dashboard-container" data-page="user-dashboard" className={`member-page blue-member-page page-user-dashboard ${isRTL ? "is-rtl" : ""}`}>
       <BackgroundCircleField seed={`member-${user?.role ?? "user"}`} />
-      <header className="member-header flex items-center justify-between">
+      <header id="user-dashboard-header" className="member-header flex items-center justify-between">
         <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
           <span aria-hidden="true">BI</span>
           <div>

@@ -12,8 +12,8 @@ export default function Enroll() {
 
   return (
     <PublicLayout>
-      <div className={`simple-route-page enroll-page ${isRTL ? "is-rtl" : ""}`}>
-        <header className="simple-route-header enroll-hero-header">
+      <div id="enroll-page-container" data-page="enroll" className={`simple-route-page enroll-page page-enroll ${isRTL ? "is-rtl" : ""}`}>
+        <header id="enroll-hero-header" className="simple-route-header enroll-hero-header">
           <div className="enroll-hero-copy">
             <Link href="/" className="simple-text-link">
               <ArrowLeft size={16} className={isRTL ? "rotate-180" : ""} /> {t("common.backToHome")}
@@ -29,8 +29,8 @@ export default function Enroll() {
           ) : null}
         </header>
 
-        <section className="simple-route-section simple-enroll-layout">
-          <aside className="enroll-next-steps">
+        <section id="enroll-layout-section" className="simple-route-section simple-enroll-layout">
+          <aside id="enroll-next-steps-aside" className="enroll-next-steps">
             <h2>{t("enroll.nextStepsTitle")}</h2>
             <ol>
               <li>{t("enroll.step1")}</li>
@@ -38,7 +38,7 @@ export default function Enroll() {
               <li>{t("enroll.step3")}</li>
             </ol>
           </aside>
-          <div className="simple-form-card">
+          <div id="enroll-form-card" className="simple-form-card">
             <p className="simple-eyebrow">{language === "ms" ? "Maklumat Pemohon" : language === "ar" ? "بيانات المتقدم" : "Learner details"}</p>
             <p className="simple-body-copy">{language === "ms" ? "Ruangan bertanda bintang adalah wajib diisi." : language === "ar" ? "الحقول المميزة بالنجمة إلزامية." : "Fields marked with an asterisk are required."}</p>
             <div className="mt-6">

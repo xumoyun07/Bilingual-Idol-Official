@@ -47,8 +47,8 @@ export default function About() {
 
   return (
     <PublicLayout>
-      <div id="about-page-container" className={`simple-route-page about-page about-page--compact-spacing ${isRTL ? "is-rtl" : ""}`}>
-        <header className="simple-route-header about-hero-header">
+      <div id="about-page-container" data-page="about" className={`simple-route-page about-page page-about about-page--compact-spacing ${isRTL ? "is-rtl" : ""}`}>
+        <header id="about-hero-header" className="simple-route-header about-hero-header">
           <div className="about-hero-copy">
             <p className="simple-eyebrow">{t("about.eyebrow")}</p>
             <h1>{t("about.heroTitle")}</h1>
@@ -59,7 +59,7 @@ export default function About() {
           </div>
         </header>
 
-        <section className="simple-route-section about-story-section about-section--compact-spacing">
+        <section id="about-story-section" className="simple-route-section about-story-section about-section--compact-spacing">
           <div className="about-story-grid about-story-grid--surface">
             <div className="about-story-copy">
               <p className="simple-eyebrow">{t("about.storyEyebrow")}</p>
@@ -75,7 +75,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="simple-route-section about-approach-section about-section--compact-spacing">
+        <section id="about-approach-section" className="simple-route-section about-approach-section about-section--compact-spacing">
           <div className="about-approach-intro about-approach-intro--surface">
             <div>
               <p className="simple-eyebrow">{t("about.approachEyebrow")}</p>
@@ -101,7 +101,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="simple-route-section simple-section-tint about-community-section">
+        <section id="about-community-section" className="simple-route-section simple-section-tint about-community-section">
           <div className="about-community-grid">
             <figure className="about-feature-media about-community-media">
               <AboutImage media={communityMedia} />
@@ -124,7 +124,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="simple-route-section about-team-section about-section--compact-spacing">
+        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing">
           <div className="simple-section-heading about-team-heading--surface">
             <div>
               <p className="simple-eyebrow">{t("about.teamEyebrow")}</p>
@@ -183,7 +183,7 @@ export default function About() {
           )}
         </section>
 
-        <section className="about-contact-panel about-contact-panel--light">
+        <section id="about-contact-panel-section" className="about-contact-panel about-contact-panel--light">
           <div className="about-contact-copy about-contact-copy--light">
             <p className="simple-eyebrow about-contact-eyebrow--light">{t("home.contactStripTitle")}</p>
             <h2 className="about-contact-title--light">{t("about.heroTitle")}</h2>

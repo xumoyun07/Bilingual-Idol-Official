@@ -18,7 +18,7 @@ const leadSchema = z.object({
 
 type LeadValues = z.infer<typeof leadSchema>;
 
-const fieldClass = "mt-2 w-full rounded-lg border border-[#d9cbb8] bg-white px-3.5 py-3 text-sm text-[#10253e] shadow-sm outline-none placeholder:text-[#708098] focus:border-[#397563] focus:ring-2 focus:ring-[#397563]/20 min-h-[44px]";
+const fieldClass = "mt-2 w-full rounded-lg border border-[#d9cbb8] bg-white px-3.5 py-3 text-sm text-[#10253e] shadow-sm outline-none placeholder:text-[#708098] focus:border-[#173fad] focus:ring-2 focus:ring-[#173fad]/20 min-h-[44px]";
 
 export function LeadForm({ type = "enrollment", title }: { type?: "enrollment" | "inquiry"; title?: string }) {
   const [mobileStep, setMobileStep] = useState<number>(1);

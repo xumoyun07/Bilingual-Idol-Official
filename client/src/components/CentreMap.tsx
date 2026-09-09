@@ -8,7 +8,7 @@ export function CentreMap() {
 
   return (
     <div className={`centre-map-shell overflow-hidden rounded-[1rem] border border-[#e1d5c4] bg-white shadow-[0_16px_45px_rgba(16,37,62,.09)] ${isRTL ? "is-rtl" : ""}`}>
-      <div className="relative h-[330px] overflow-hidden bg-[#e7f0eb]">
+      <div className="relative h-[330px] overflow-hidden bg-[#eef4ff]">
         <iframe
           className="h-full w-full border-0"
           title={

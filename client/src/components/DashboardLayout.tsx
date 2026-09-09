@@ -128,7 +128,15 @@ function DashboardShell({ children, role }: { children: React.ReactNode; role: D
               <p className="truncate text-xs text-[#566983]">{user?.email || ""}</p>
             </div>
           </div>
-          <button className="minimal-signout group-data-[collapsible=icon]:justify-center" onClick={logout}>
+          <button
+            type="button"
+            className="minimal-signout group-data-[collapsible=icon]:justify-center"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              logout();
+            }}
+          >
             <LogOut size={16} />
             <span className="group-data-[collapsible=icon]:hidden">{t("nav.signOut", undefined, "Sign out")}</span>
           </button>

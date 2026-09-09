@@ -72,8 +72,8 @@ export default function News() {
 
   return (
     <PublicLayout>
-      <div className={`simple-route-page news-page ${isRTL ? "is-rtl" : ""}`}>
-        <header className="simple-route-header simple-route-header--news">
+      <div id="news-page-container" data-page="news" className={`simple-route-page news-page page-news ${isRTL ? "is-rtl" : ""}`}>
+        <header id="news-hero-header" className="simple-route-header simple-route-header--news">
           <div className="simple-route-header-copy">
             <p className="simple-eyebrow">{t("news.eyebrow")}</p>
             <h1>{t("news.heroTitle")}</h1>
@@ -86,7 +86,7 @@ export default function News() {
           ) : null}
         </header>
 
-        <section className="simple-route-section news-feed" aria-label={language === "ar" ? "أخبار المركز" : language === "ms" ? "Berita pusat" : "Centre news"}>
+        <section id="news-feed-section" className="simple-route-section news-feed" aria-label={language === "ar" ? "أخبار المركز" : language === "ms" ? "Berita pusat" : "Centre news"}>
           {feed.isLoading ? (
             <div className="news-grid" aria-label={language === "ar" ? "جارٍ تحميل الأخبار" : language === "ms" ? "Memuatkan berita" : "Loading news"}>
               {Array.from({ length: 6 }, (_, index) => (
