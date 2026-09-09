@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 
 export const submissionInput = z.object({
   type: z.enum(["enrollment", "inquiry"]),
@@ -16,5 +16,13 @@ export const submissionInput = z.object({
 });
 
 export const submissionsRouter = router({
+  list: adminProcedure.query(() => db.listSubmissions()),
   create: publicProcedure.input(submissionInput).mutation(({ input }) => db.createSubmission(input)),
+  updateStatus: adminProcedure
+    .input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "contacted", "interested", "enrolled", "closed"]) }))
+    .mutation(({ input }) => db.updateSubmissionStatus(input.id, input.status)),
+  delete: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(({ input }) => db.deleteSubmission(input.id)),
 });
+

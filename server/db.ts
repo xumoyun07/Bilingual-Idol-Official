@@ -6,6 +6,7 @@ import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
 import { normaliseOptions, parseFieldOptions, type RuntimeUserField, type UserFieldType, validateProfileValues } from "./userFieldSchema";
+import { BILC_DOMAIN, generateBilcEmail, resolveLoginIdentifier, validateNickname } from "../shared/nickname";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -17,7 +18,7 @@ export async function getDb() {
 }
 
 // In-Memory Data Store Fallbacks (active when DATABASE_URL is unconfigured or offline)
-const inMemoryStore = {
+export const inMemoryStore = {
   users: [
     {
       id: 1,
@@ -26,97 +27,6 @@ const inMemoryStore = {
       email: "lektor@gmail.com",
       passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
       role: "founder" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 2,
-      openId: "founder:tryingreal761@gmail.com",
-      name: "Founder",
-      email: "tryingreal761@gmail.com",
-      passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
-      role: "founder" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 6,
-      openId: "founder:founder@bilingualidol.com",
-      name: "Founder",
-      email: "founder@bilingualidol.com",
-      passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
-      role: "founder" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 3,
-      openId: "teacher:marcus@bilingualidol.com",
-      name: "Marcus Chen",
-      email: "teacher@bilingualidol.com",
-      passwordHash: createUserPasswordHash("Teacher2026!"),
-      role: "teacher" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 4,
-      openId: "student:sophia@bilingualidol.com",
-      name: "Sophia Wong",
-      email: "student@bilingualidol.com",
-      passwordHash: createUserPasswordHash("Student2026!"),
-      role: "student" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 5,
-      openId: "student:ahmad@example.com",
-      name: "Ahmad Daniel",
-      email: "ahmad.daniel@example.com",
-      passwordHash: createUserPasswordHash("Student2026!"),
-      role: "student" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 6,
-      openId: "admin:admin@bilingualidol.com",
-      name: "Operations Admin",
-      email: "admin@bilingualidol.com",
-      passwordHash: createUserPasswordHash("Admin2026!"),
-      role: "admin" as const,
-      isActive: true,
-      loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 7,
-      openId: "superadmin:superadmin@bilingualidol.com",
-      name: "Super Admin",
-      email: "superadmin@bilingualidol.com",
-      passwordHash: createUserPasswordHash("SuperAdmin2026!"),
-      role: "super_admin" as const,
       isActive: true,
       loginMethod: "email_password",
       createdAt: new Date("2026-01-01"),
@@ -137,22 +47,9 @@ const inMemoryStore = {
     { id: 9, slug: "korean", title: "Korean", language: "Korean", category: "World Languages", ageGroup: "Teens & adults", level: "Beginner to developing", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Learn Korean in a supportive environment that makes new vocabulary and expressions feel achievable.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
     { id: 10, slug: "business-english", title: "Business English", language: "English", category: "Professional", ageGroup: "Professionals", level: "Intermediate to advanced", duration: "Designed around workplace needs", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Refine professional communication for meetings, presentations, correspondence, and international workplace settings.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
   ] as Program[],
-  announcements: [
-    { id: 1, slug: "welcome-to-bilingual-idol-2026", title: "Welcome to Bilingual Idol Language Centre 2026", excerpt: "New intake dates and language pathways are now open for the 2026 academic term.", body: "We are pleased to announce our updated schedule of language courses across English, Mandarin, Bahasa Melayu, Arabic, Japanese, and Korean. Contact our advisors to arrange your initial placement assessment in our modern classroom facilities.", category: "announcement" as const, isPublished: true, publishedAt: new Date("2026-01-15"), imageUrl: "/media/hero_poster.webp", imageStorageKey: "hero_poster", imageAltText: "Bilingual Idol Language Centre classroom and study space.", createdAt: new Date("2026-01-15"), updatedAt: new Date("2026-01-15") },
-    { id: 2, slug: "ielts-intensive-intake", title: "IELTS Intensive Preparation Intake Open", excerpt: "Targeted 4-week, 8-week, and 12-week preparation tracks for international exam candidates.", body: "Our certified instructors provide structured test strategies and mock evaluation sessions to help learners achieve their required bands for university admission and global careers.", category: "event" as const, isPublished: true, publishedAt: new Date("2026-02-01"), imageUrl: "/media/prog_ielts.webp", imageStorageKey: "prog_ielts", imageAltText: "Students preparing for IELTS exam with structured coursework and study materials.", createdAt: new Date("2026-02-01"), updatedAt: new Date("2026-02-01") },
-    { id: 3, slug: "kids-and-teens-communication-workshops", title: "Kids & Teens Interactive Communication Workshops", excerpt: "Active weekend and weekday afternoon language sessions for children and teenagers.", body: "Designed to build natural speaking habits and vocabulary through guided discussions, interactive group projects, and supportive teacher coaching.", category: "announcement" as const, isPublished: true, publishedAt: new Date("2026-02-10"), imageUrl: "/media/prog_kids_english.webp", imageStorageKey: "prog_kids_english", imageAltText: "Interactive language and communication activities for young learners.", createdAt: new Date("2026-02-10"), updatedAt: new Date("2026-02-10") },
-    { id: 4, slug: "conversational-fluency-sessions", title: "Conversational Fluency & Speaking Circles", excerpt: "Practical language practice for everyday conversations, workplace communication, and travel.", body: "Small group conversation tables led by experienced instructors to help you overcome language hesitation and speak with natural fluency.", category: "event" as const, isPublished: true, publishedAt: new Date("2026-02-18"), imageUrl: "/media/prog_speaking.webp", imageStorageKey: "prog_speaking", imageAltText: "Small group conversation and speaking practice in the language centre.", createdAt: new Date("2026-02-18"), updatedAt: new Date("2026-02-18") },
-  ] as Announcement[],
-  testimonials: [
-    { id: 1, authorName: "Sarah L.", relation: "Parent of Kids English Student", quote: "The teachers at Bilingual Idol are exceptionally patient and encouraging. My daughter's vocabulary and speaking confidence blossomed in just a few months.", rating: 5, approved: true, consentConfirmed: true, createdAt: new Date("2026-01-10") },
-    { id: 2, authorName: "Kenji T.", relation: "General English Student", quote: "Practical lessons with real everyday conversations helped me adjust quickly to working and communicating in Malaysia.", rating: 5, approved: true, consentConfirmed: true, createdAt: new Date("2026-01-20") },
-    { id: 3, authorName: "Ahmad R.", relation: "IELTS Candidate", quote: "Structured exam strategies and dedicated feedback enabled me to achieve Band 7.5 on my first attempt!", rating: 5, approved: true, consentConfirmed: true, createdAt: new Date("2026-02-05") },
-  ] as Testimonial[],
-  teamProfiles: [
-    { id: 1, name: "Dr. Elena Vance", role: "Academic Director & Founder", languages: "English, Mandarin, Bahasa Melayu", bio: "Over 15 years of international linguistics and language education experience dedicated to student-centred communication mastery.", isPublished: true, sortOrder: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
-    { id: 2, name: "Marcus Chen", role: "Senior IELTS & English Lead", languages: "English, Mandarin", bio: "Certified IELTS examiner and educator passionate about helping learners unlock university and global career pathways.", isPublished: true, sortOrder: 2, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
-    { id: 3, name: "Nur Aisyah", role: "World Languages Instructor", languages: "Bahasa Melayu, Arabic, English", bio: "Specialises in conversational fluency and immersive, interactive classroom dynamics for young learners and adults.", isPublished: true, sortOrder: 3, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
-  ] as TeamProfile[],
+  announcements: [] as Announcement[],
+  testimonials: [] as Testimonial[],
+  teamProfiles: [] as TeamProfile[],
   publicMedia: [
     { id: 1, slot: "home_hero_video", label: "Home Hero Video", kind: "video" as const, altText: "Language centre classroom in action with active student engagement.", mimeType: "video/mp4", fileSize: 536870, storageKey: "home_hero_video", publicUrl: "/media/hero_video.mp4", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
     { id: 2, slot: "home_hero_poster", label: "Home Hero Poster", kind: "image" as const, altText: "Bright and modern language classroom at Bilingual Idol Language Centre.", mimeType: "image/webp", fileSize: 315874, storageKey: "home_hero_poster", publicUrl: "/media/hero_poster.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
@@ -348,13 +245,13 @@ export async function getSuperAdminManagedUser(id: number) {
 }
 
 type UserProfileValuesInput = Record<string, string>;
-export const userSystemFieldIds = ["name", "email", "role", "password", "isActive"] as const;
+export const userSystemFieldIds = ["name", "nickname", "role", "password", "isActive"] as const;
 export type UserSystemFieldId = (typeof userSystemFieldIds)[number];
-export type RuntimeUserSystemField = { id: UserSystemFieldId; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
+export type RuntimeUserSystemField = { id: UserSystemFieldId; label: string; inputType: "text" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
 const systemFieldSettingsKey = "user_create_system_fields_v1";
 const defaultSystemFields: RuntimeUserSystemField[] = [
   { id: "name", label: "Full name", inputType: "text", isRequired: true, isActive: true, sortOrder: 0, sectionId: null },
-  { id: "email", label: "E-mail", inputType: "email", isRequired: true, isActive: true, sortOrder: 1, sectionId: null },
+  { id: "nickname", label: "Nickname", inputType: "text", isRequired: true, isActive: true, sortOrder: 1, sectionId: null },
   { id: "role", label: "User type", inputType: "role", isRequired: true, isActive: true, sortOrder: 2, sectionId: null },
   { id: "password", label: "Initial password", inputType: "password", isRequired: true, isActive: true, sortOrder: 3, sectionId: null },
   { id: "isActive", label: "Account active", inputType: "checkbox", isRequired: false, isActive: true, sortOrder: 4, sectionId: null },
@@ -362,7 +259,14 @@ const defaultSystemFields: RuntimeUserSystemField[] = [
 
 function normaliseSystemFields(raw: unknown): RuntimeUserSystemField[] {
   const candidate = Array.isArray(raw) ? raw : [];
-  const configured = new Map(candidate.filter((field): field is Partial<RuntimeUserSystemField> & { id: UserSystemFieldId } => Boolean(field && typeof field === "object" && userSystemFieldIds.includes((field as { id?: string }).id as UserSystemFieldId))).map(field => [field.id, field]));
+  // Migrate legacy "email" system field id to "nickname" if present
+  const mappedCandidate = candidate.map(field => {
+    if (field && typeof field === "object" && (field as { id?: string }).id === "email") {
+      return { ...field, id: "nickname", label: "Nickname", inputType: "text" };
+    }
+    return field;
+  });
+  const configured = new Map(mappedCandidate.filter((field): field is Partial<RuntimeUserSystemField> & { id: UserSystemFieldId } => Boolean(field && typeof field === "object" && userSystemFieldIds.includes((field as { id?: string }).id as UserSystemFieldId))).map(field => [field.id, field]));
   return defaultSystemFields.map(defaultField => {
     const field = configured.get(defaultField.id);
     return {
@@ -531,15 +435,52 @@ async function validatedProfileRows(values: UserProfileValuesInput) {
   return Object.entries(validateProfileValues(fields, values)).map(([fieldId, value]) => ({ fieldId: Number(fieldId), value }));
 }
 
-export async function createManagedUser(input: { name?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+export async function createManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
   const database = await getDb();
   const systemFields = await getUserSystemFields();
-  const supplied: Record<UserSystemFieldId, unknown> = { name: input.name, email: input.email, role: input.role, password: input.password, isActive: input.isActive };
-  for (const field of systemFields) if (field.isActive && field.isRequired && (supplied[field.id] === undefined || supplied[field.id] === "")) throw new Error(`${field.label} is required by the current create form.`);
-  const suppliedEmail = input.email ? normaliseEmail(input.email) : undefined;
-  if (suppliedEmail && await getUserByEmail(suppliedEmail)) throw new Error("An account with this e-mail already exists.");
-  const email = suppliedEmail ?? `issued-${randomUUID()}@pending.bilingualidol.invalid`;
-  const credentialsIssued = Boolean(input.email && input.password);
+  
+  // Extract supplied nickname or derive from supplied email if no @ present
+  const suppliedNickname = input.nickname?.trim() || (input.email && !input.email.includes("@") ? input.email.trim() : undefined);
+  const suppliedEmail = input.email && input.email.includes("@") ? normaliseEmail(input.email) : undefined;
+  
+  const supplied: Record<UserSystemFieldId, unknown> = {
+    name: input.name,
+    nickname: suppliedNickname || suppliedEmail,
+    role: input.role,
+    password: input.password,
+    isActive: input.isActive,
+  };
+  
+  for (const field of systemFields) {
+    if (field.isActive && field.isRequired && (supplied[field.id] === undefined || supplied[field.id] === "")) {
+      throw new Error(`${field.label} is required by the current create form.`);
+    }
+  }
+
+  let finalEmail: string;
+  let finalNickname: string | undefined;
+
+  if (suppliedNickname) {
+    const validation = validateNickname(suppliedNickname);
+    if (!validation.valid) {
+      throw new Error(validation.error || "Invalid nickname.");
+    }
+    finalNickname = validation.normalised;
+    finalEmail = generateBilcEmail(finalNickname);
+  } else if (suppliedEmail) {
+    finalEmail = suppliedEmail;
+  } else {
+    const generatedNick = `user_${randomUUID().replace(/-/g, "").slice(0, 10)}`;
+    finalEmail = generateBilcEmail(generatedNick);
+    finalNickname = generatedNick;
+  }
+
+  const existing = await getUserByEmail(finalEmail);
+  if (existing) {
+    throw new Error(`An account with this nickname (${finalEmail}) already exists. Please choose a different nickname.`);
+  }
+
+  const credentialsIssued = Boolean((suppliedNickname || suppliedEmail) && input.password);
   const password = input.password ?? randomUUID().replace(/-/g, "") + randomUUID().replace(/-/g, "");
   const profileRows = await validatedProfileRows(input.profileValues ?? {});
   
@@ -547,8 +488,8 @@ export async function createManagedUser(input: { name?: string; email?: string; 
     const result = await database.transaction(async tx => {
       const created = await tx.insert(users).values({
         openId: `issued:${randomUUID()}`,
-        name: input.name?.trim() || "Unnamed account",
-        email,
+        name: input.name?.trim() || (finalNickname ? finalNickname : "Unnamed account"),
+        email: finalEmail,
         passwordHash: createUserPasswordHash(password),
         isActive: input.isActive ?? credentialsIssued,
         loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
@@ -561,7 +502,7 @@ export async function createManagedUser(input: { name?: string; email?: string; 
     });
     const created = await getManagedUser(Number(result[0].insertId));
     if (!created) throw new Error("The account could not be created.");
-    return created;
+    return { ...created, generatedEmail: finalEmail, nickname: finalNickname };
   }
 
   const now = new Date();
@@ -569,8 +510,8 @@ export async function createManagedUser(input: { name?: string; email?: string; 
   const newUser: User = {
     id: userId,
     openId: `issued:${randomUUID()}`,
-    name: input.name?.trim() || "Unnamed account",
-    email,
+    name: input.name?.trim() || (finalNickname ? finalNickname : "Unnamed account"),
+    email: finalEmail,
     passwordHash: createUserPasswordHash(password),
     isActive: input.isActive ?? credentialsIssued,
     loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
@@ -585,22 +526,36 @@ export async function createManagedUser(input: { name?: string; email?: string; 
   }
   const created = await getManagedUser(userId);
   if (!created) throw new Error("The account could not be created.");
-  return created;
+  return { ...created, generatedEmail: finalEmail, nickname: finalNickname };
 }
 
-export async function createSuperAdminManagedUser(input: { name?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+export async function createSuperAdminManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
   if (input.role && !superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
   return createManagedUser(input);
 }
 
-export async function updateManagedUser(id: number, input: { name: string; email: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
+export async function updateManagedUser(id: number, input: { name: string; nickname?: string; email?: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
   const database = await getDb();
   const existing = await getManagedUser(id);
   if (!existing) throw new Error("Account not found.");
   if (existing.role === "founder") throw new Error("Founder accounts cannot be changed in Users.");
-  const email = normaliseEmail(input.email);
+  
+  let email = existing.email ?? "";
+  if (input.nickname) {
+    const val = validateNickname(input.nickname);
+    if (!val.valid) throw new Error(val.error || "Invalid nickname.");
+    email = generateBilcEmail(val.normalised);
+  } else if (input.email) {
+    email = normaliseEmail(input.email);
+    if (!email.includes("@")) {
+      const val = validateNickname(email);
+      if (!val.valid) throw new Error(val.error || "Invalid nickname.");
+      email = generateBilcEmail(val.normalised);
+    }
+  }
+
   const matchingEmail = await getUserByEmail(email);
-  if (matchingEmail && matchingEmail.id !== id) throw new Error("An account with this e-mail already exists.");
+  if (matchingEmail && matchingEmail.id !== id) throw new Error(`An account with this email/nickname (${email}) already exists.`);
   const values: Partial<InsertUser> = { name: input.name.trim(), email, role: input.role, isActive: input.isActive };
   if (input.password) values.passwordHash = createUserPasswordHash(input.password);
   
@@ -608,7 +563,7 @@ export async function updateManagedUser(id: number, input: { name: string; email
     await database.update(users).set(values).where(eq(users.id, id));
     const updated = await getManagedUser(id);
     if (!updated) throw new Error("The account could not be updated.");
-    return updated;
+    return { ...updated, generatedEmail: email };
   }
 
   const userIndex = inMemoryStore.users.findIndex(u => u.id === id);
@@ -621,10 +576,10 @@ export async function updateManagedUser(id: number, input: { name: string; email
   }
   const updated = await getManagedUser(id);
   if (!updated) throw new Error("The account could not be updated.");
-  return updated;
+  return { ...updated, generatedEmail: email };
 }
 
-export async function updateSuperAdminManagedUser(id: number, input: { name: string; email: string; password?: string; role: SuperAdminManagedRole; isActive: boolean }) {
+export async function updateSuperAdminManagedUser(id: number, input: { name: string; nickname?: string; email?: string; password?: string; role: SuperAdminManagedRole; isActive: boolean }) {
   if (!superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
   if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
   return updateManagedUser(id, input);
@@ -692,6 +647,16 @@ export async function updateSubmissionStatus(id: number, status: "new" | "contac
   }
   const sub = inMemoryStore.submissions.find(s => s.id === id);
   if (sub) sub.status = status;
+  return { success: true };
+}
+
+export async function deleteSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(submissions).where(eq(submissions.id, id));
+    return { success: true };
+  }
+  inMemoryStore.submissions = inMemoryStore.submissions.filter(s => s.id !== id);
   return { success: true };
 }
 

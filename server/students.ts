@@ -67,58 +67,7 @@ async function writeHistory(database: any, studentId: number, actorUserId: numbe
 
 function studentBaseWhere(studentId: number) { return and(eq(users.id, studentId), eq(users.role, "student")); }
 
-const inMemoryStudentsList: Array<any> = [
-  {
-    userId: 4,
-    name: "Sophia Wong",
-    email: "student@bilingualidol.com",
-    isActive: true,
-    createdAt: new Date("2026-01-15T00:00:00.000Z"),
-    updatedAt: new Date("2026-01-15T00:00:00.000Z"),
-    guardianName: "David Wong",
-    guardianPhone: "+60 12-345 6789",
-    contactEmail: "david.wong@example.com",
-    dateOfBirth: new Date("2008-05-12T00:00:00.000Z"),
-    address: "Mont Kiara, Kuala Lumpur",
-    notes: "Active participant in oral discussions. Progressing towards IELTS track.",
-    attendedSessions: 18,
-    totalSessions: 20,
-    currentLevel: "Intermediate B2",
-    courseName: "General English",
-    courseCode: "GE-2026",
-    courseStartDate: new Date("2026-01-10T00:00:00.000Z"),
-    courseEndDate: new Date("2026-06-30T00:00:00.000Z"),
-    documents: [] as any[],
-    history: [
-      { id: 1, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date("2026-01-15T00:00:00.000Z"), actorName: "Founder" },
-    ],
-  },
-  {
-    userId: 5,
-    name: "Ahmad Daniel",
-    email: "ahmad.daniel@example.com",
-    isActive: true,
-    createdAt: new Date("2026-02-01T00:00:00.000Z"),
-    updatedAt: new Date("2026-02-01T00:00:00.000Z"),
-    guardianName: "Fatimah Zahra",
-    guardianPhone: "+60 17-889 4321",
-    contactEmail: "fatimah.zahra@example.com",
-    dateOfBirth: new Date("2005-09-20T00:00:00.000Z"),
-    address: "Ampang, Kuala Lumpur",
-    notes: "Targeting Band 7.5+ for international postgraduate admission.",
-    attendedSessions: 12,
-    totalSessions: 12,
-    currentLevel: "Advanced C1",
-    courseName: "IELTS Preparation",
-    courseCode: "IELTS-2026",
-    courseStartDate: new Date("2026-02-01T00:00:00.000Z"),
-    courseEndDate: new Date("2026-04-30T00:00:00.000Z"),
-    documents: [] as any[],
-    history: [
-      { id: 2, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date("2026-02-01T00:00:00.000Z"), actorName: "Founder" },
-    ],
-  },
-];
+const inMemoryStudentsList: Array<any> = [];
 
 export async function listStudentProfiles(filters: StudentListFilters = {}) {
   const database = await getDb();

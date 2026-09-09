@@ -8,6 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { auditRotationSchedulePath, handleScheduledAuditRotation } from "../scheduledAuditRotation";
 import { handleTeacherAttendance, handleTeacherAttendanceUpdate, handleTeacherClassSessionDetails, handleTeacherClassSessions, teacherAttendancePath, teacherClassSessionsPath } from "../teacherPortal";
+import { marketingPortalRouter } from "../portal/marketingPortal";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -42,6 +43,8 @@ async function startServer() {
   app.get(`${teacherClassSessionsPath}/:id`, handleTeacherClassSessionDetails);
   app.get(teacherAttendancePath, handleTeacherAttendance);
   app.post(teacherAttendancePath, handleTeacherAttendanceUpdate);
+  // Marketing Portal and content endpoints
+  app.use(marketingPortalRouter);
   // tRPC API
   app.use(
     "/api/trpc",

@@ -62,6 +62,15 @@ export const programs = mysqlTable("programs", {
   schedule: varchar("schedule", { length: 180 }).notNull(),
   fees: varchar("fees", { length: 180 }).notNull(),
   description: text("description").notNull(),
+  faqJson: text("faqJson"),
+  outcomes: text("outcomes"),
+  imageUrl: varchar("imageUrl", { length: 1024 }),
+  ctaLabel: varchar("ctaLabel", { length: 100 }),
+  ctaUrl: varchar("ctaUrl", { length: 512 }),
+  seoTitle: varchar("seoTitle", { length: 255 }),
+  seoDescription: varchar("seoDescription", { length: 500 }),
+  seatsEnrolled: int("seatsEnrolled").default(0).notNull(),
+  teacherId: int("teacherId"),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -339,6 +348,151 @@ export const grades = mysqlTable("grades", {
   studentPublishedIndex: index("grades_student_published_idx").on(table.studentId, table.isPublished, table.publishedAt),
 }));
 
+export const contentBlocks = mysqlTable("contentBlocks", {
+  id: int("id").autoincrement().primaryKey(),
+  pageSlug: varchar("pageSlug", { length: 160 }).notNull(),
+  sectionKey: varchar("sectionKey", { length: 100 }).notNull(),
+  blockType: varchar("blockType", { length: 64 }).notNull(),
+  title: varchar("title", { length: 255 }),
+  content: text("content"),
+  configJson: text("configJson"),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  pageSlugIdx: index("contentBlocks_pageSlug_idx").on(table.pageSlug),
+}));
+
+export const events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 180 }).notNull().unique(),
+  description: text("description").notNull(),
+  eventDate: timestamp("eventDate"),
+  location: varchar("location", { length: 255 }),
+  imageUrl: varchar("imageUrl", { length: 1024 }),
+  isPublished: boolean("isPublished").default(true).notNull(),
+  publishedAt: timestamp("publishedAt"),
+  createdByUserId: int("createdByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const blogPosts = mysqlTable("blogPosts", {
+  id: int("id").autoincrement().primaryKey(),
+  slug: varchar("slug", { length: 180 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  excerpt: text("excerpt"),
+  body: text("body").notNull(),
+  category: varchar("category", { length: 100 }).default("general").notNull(),
+  status: mysqlEnum("status", ["draft", "published"]).default("published").notNull(),
+  imageUrl: varchar("imageUrl", { length: 1024 }),
+  seoTitle: varchar("seoTitle", { length: 255 }),
+  seoDescription: varchar("seoDescription", { length: 500 }),
+  authorId: int("authorId"),
+  publishedAt: timestamp("publishedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const galleryMedia = mysqlTable("galleryMedia", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  url: varchar("url", { length: 1024 }).notNull(),
+  altText: varchar("altText", { length: 255 }),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const contentPages = mysqlTable("contentPages", {
+  id: int("id").autoincrement().primaryKey(),
+  slug: varchar("slug", { length: 180 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  pageType: mysqlEnum("pageType", ["site", "landingPage"]).default("landingPage").notNull(),
+  contentJson: text("contentJson"),
+  seoTitle: varchar("seoTitle", { length: 255 }),
+  seoDescription: varchar("seoDescription", { length: 500 }),
+  isPublished: boolean("isPublished").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const whatsappEntryPoints = mysqlTable("whatsappEntryPoints", {
+  id: int("id").autoincrement().primaryKey(),
+  label: varchar("label", { length: 160 }).notNull(),
+  whatsappNumber: varchar("whatsappNumber", { length: 64 }).notNull(),
+  prefilledMessage: text("prefilledMessage"),
+  order: int("order").default(0).notNull(),
+  active: boolean("active").default(true).notNull(),
+});
+
+export const chatbotFaqEntries = mysqlTable("chatbotFaqEntries", {
+  id: int("id").autoincrement().primaryKey(),
+  question: varchar("question", { length: 300 }).notNull(),
+  answerText: text("answerText").notNull(),
+  keywords: text("keywords"),
+  relatedCourseId: int("relatedCourseId"),
+  active: boolean("active").default(true).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const socialLinks = mysqlTable("socialLinks", {
+  id: int("id").autoincrement().primaryKey(),
+  platform: mysqlEnum("platform", ["instagram", "tiktok", "facebook", "telegram", "other"]).notNull(),
+  url: varchar("url", { length: 512 }).notNull(),
+  active: boolean("active").default(true).notNull(),
+  order: int("order").default(0).notNull(),
+});
+
+export const translations = mysqlTable("translations", {
+  id: int("id").autoincrement().primaryKey(),
+  entityType: varchar("entityType", { length: 80 }).notNull(),
+  entityId: varchar("entityId", { length: 160 }).notNull(),
+  languageCode: varchar("languageCode", { length: 16 }).notNull(),
+  fieldKey: varchar("fieldKey", { length: 80 }).notNull(),
+  translatedValue: text("translatedValue").notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  uniqueTranslation: uniqueIndex("translations_unique_idx").on(table.entityType, table.entityId, table.languageCode, table.fieldKey),
+}));
+
+export const mediaAssets = mysqlTable("mediaAssets", {
+  id: int("id").autoincrement().primaryKey(),
+  type: mysqlEnum("type", ["banner", "logo", "creative", "other"]).notNull(),
+  url: varchar("url", { length: 1024 }).notNull(),
+  tags: text("tags"),
+  uploadedByUserId: int("uploadedByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const audienceSegments = mysqlTable("audienceSegments", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 160 }).notNull(),
+  filterCriteria: text("filterCriteria").notNull(),
+  createdByUserId: int("createdByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const leadSources = mysqlTable("leadSources", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  code: varchar("code", { length: 64 }).notNull().unique(),
+  active: boolean("active").default(true).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+});
+
+export const messageTemplates = mysqlTable("messageTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 160 }).notNull(),
+  channel: mysqlEnum("channel", ["email", "sms", "whatsapp"]).notNull(),
+  subject: varchar("subject", { length: 255 }),
+  body: text("body").notNull(),
+  variables: text("variables"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type UserFormSection = typeof userFormSections.$inferSelect;
@@ -358,3 +512,16 @@ export type StudentProfileHistory = typeof studentProfileHistory.$inferSelect;
 export type ClassSession = typeof classSessions.$inferSelect;
 export type AttendanceRecord = typeof attendanceRecords.$inferSelect;
 export type Grade = typeof grades.$inferSelect;
+export type ContentBlock = typeof contentBlocks.$inferSelect;
+export type Event = typeof events.$inferSelect;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type GalleryMediaItem = typeof galleryMedia.$inferSelect;
+export type ContentPage = typeof contentPages.$inferSelect;
+export type WhatsappEntryPoint = typeof whatsappEntryPoints.$inferSelect;
+export type ChatbotFaqEntry = typeof chatbotFaqEntries.$inferSelect;
+export type SocialLink = typeof socialLinks.$inferSelect;
+export type Translation = typeof translations.$inferSelect;
+export type MediaAsset = typeof mediaAssets.$inferSelect;
+export type AudienceSegment = typeof audienceSegments.$inferSelect;
+export type LeadSource = typeof leadSources.$inferSelect;
+export type MessageTemplate = typeof messageTemplates.$inferSelect;

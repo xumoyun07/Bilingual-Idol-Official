@@ -486,7 +486,7 @@ textarea {
 .simple-enroll-layout { display: grid; gap: 2rem; border-top: 1px solid #e3e9ec; padding-top: 2rem; }.simple-enroll-layout aside { background: #f6f8f8; padding: 1.25rem; }.simple-enroll-layout h2 { color: #1f3442; font-size: 1.2rem; }.simple-enroll-layout ol { display: grid; gap: .85rem; margin-top: 1rem; counter-reset: enquiry; }.simple-enroll-layout li { display: grid; grid-template-columns: 1.5rem 1fr; gap: .55rem; color: #50636e; font-size: .88rem; line-height: 1.55; counter-increment: enquiry; }.simple-enroll-layout li::before { display: grid; width: 1.35rem; height: 1.35rem; place-items: center; border-radius: 50%; background: #264653; color: #fff; content: counter(enquiry); font-size: .67rem; font-weight: 800; }
 @media (min-width: 768px) { .simple-enroll-layout { grid-template-columns: minmax(15rem, .62fr) minmax(0, 1.38fr); align-items: start; } }
 
-/* Public demonstration media: data-driven, responsive and isolated from dashboard styling. */
+/* Public media: data-driven, responsive and isolated from dashboard styling. */
 .simple-home-intro-media { position: relative; isolation: isolate; overflow: hidden; border-bottom: 0; background: #1f3442; color: #fff; padding: 0 !important; }
 .simple-home-intro-media::after { position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(18,43,53,.94) 0%, rgba(18,43,53,.82) 48%, rgba(18,43,53,.38) 100%); content: ""; }
 .simple-home-hero-media { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: center; pointer-events: none; }

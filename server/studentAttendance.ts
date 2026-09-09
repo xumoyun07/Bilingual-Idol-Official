@@ -5,8 +5,6 @@ import { getDb } from "./db";
 export async function getStudentAttendanceSummary(studentId: number) {
   const database = await getDb();
   if (!database) {
-    if (studentId === 4) return { attendedSessions: 18, totalSessions: 20, percentage: 90 };
-    if (studentId === 5) return { attendedSessions: 12, totalSessions: 12, percentage: 100 };
     return { attendedSessions: 0, totalSessions: 0, percentage: 0 };
   }
   const [result] = await database.select({

@@ -8,17 +8,17 @@ describe("Founder Authentication & Access", () => {
   it("recognizes founder email and credentials", () => {
     expect(isFounderEmail("lektor@gmail.com")).toBe(true);
     expect(isFounderEmail("LEKTOR@GMAIL.COM ")).toBe(true);
-    expect(isFounderEmail("tryingreal761@gmail.com")).toBe(true);
+    expect(isFounderEmail("tryingreal761@gmail.com")).toBe(false);
     expect(isFounderEmail("other@example.com")).toBe(false);
 
     expect(verifyFounderCredentials("lektor@gmail.com", "Lektor$07$xumoyun")).toBe(true);
-    expect(verifyFounderCredentials("tryingreal761@gmail.com", "Lektor$07$xumoyun")).toBe(true);
+    expect(verifyFounderCredentials("tryingreal761@gmail.com", "Lektor$07$xumoyun")).toBe(false);
     expect(verifyFounderCredentials("lektor@gmail.com", "wrongpassword")).toBe(false);
   });
 
   it("grants founder role accurately", () => {
     expect(shouldGrantFounderRole({ email: "lektor@gmail.com", openId: "founder:lektor@gmail.com" })).toBe(true);
-    expect(shouldGrantFounderRole({ email: "tryingreal761@gmail.com", openId: "founder:tryingreal761@gmail.com" })).toBe(true);
+    expect(shouldGrantFounderRole({ email: "tryingreal761@gmail.com", openId: "founder:tryingreal761@gmail.com" })).toBe(false);
     expect(shouldGrantFounderRole({ email: "student@example.com", openId: "student:123" })).toBe(false);
   });
 

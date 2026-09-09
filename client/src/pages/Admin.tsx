@@ -11,7 +11,60 @@ import { trpc } from "@/lib/trpc";
 import AuditLogs from "./AuditLogs";
 import NewsManager from "./NewsManager";
 import { StudentProfileDetail, StudentsProfileList } from "./StudentsProfile";
-import { AlertCircle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleSlash, Filter, GraduationCap, Loader2, Megaphone, Pencil, Plus, RotateCcw, Search, Settings2, Shield, ShieldCheck, SlidersHorizontal, Trash2, UserPlus, UsersRound, X } from "lucide-react";
+import MediaLibrary from "./MediaLibrary";
+import {
+  FOUNDER_NAVIGATION_SECTIONS,
+  PlatformUserType,
+} from "@/components/founder/FounderNavTypes";
+import { FounderSettingsModule } from "@/components/founder/FounderSettingsModule";
+import { ProjectDossierModule } from "@/components/founder/ProjectDossierModule";
+import { AdminProgramsModule } from "@/components/founder/AdminProgramsModule";
+import { AdminLeadsModule } from "@/components/founder/AdminLeadsModule";
+import { AdminScheduleModule } from "@/components/founder/AdminScheduleModule";
+import { TeacherAttendanceModule } from "@/components/founder/TeacherAttendanceModule";
+import { TeacherGradesModule } from "@/components/founder/TeacherGradesModule";
+import { TeacherLessonsModule } from "@/components/founder/TeacherLessonsModule";
+import { MarketingCampaignsModule } from "@/components/founder/MarketingCampaignsModule";
+import { MarketingContentModule } from "@/components/founder/MarketingContentModule";
+import { MarketingTestimonialsModule } from "@/components/founder/MarketingTestimonialsModule";
+import { MarketingAnalyticsModule } from "@/components/founder/MarketingAnalyticsModule";
+import {
+  AlertCircle,
+  ArrowUpRight,
+  BookOpen,
+  Calendar,
+  CalendarDays,
+  Check,
+  ChevronRight,
+  CircleSlash,
+  Crown,
+  FileSpreadsheet,
+  FileText,
+  Filter,
+  GraduationCap,
+  Layers,
+  LayoutDashboard,
+  Loader2,
+  Megaphone,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Search,
+  Settings2,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  Tag,
+  Trash2,
+  TrendingUp,
+  UserCheck,
+  UserPlus,
+  Users,
+  UsersRound,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 
@@ -21,10 +74,10 @@ type CategoryRole = ManagedRole;
 type VisibleRole = CategoryRole | "user";
 type FilterStatus = "all" | "active" | "inactive";
 type ModalMode = "create" | "detail" | null;
-type AccountDraft = { name: string; email: string; password: string; role: ManagedRole; isActive: boolean };
+type AccountDraft = { name: string; nickname?: string; email?: string; password: string; role: ManagedRole; isActive: boolean };
 type ManagedAccount = { id: number; name: string | null; email: string | null; role: VisibleRole; isActive: boolean; openId: string; loginMethod: string | null; createdAt: Date; lastSignedIn: Date };
 
-const blankDraft: AccountDraft = { name: "", email: "", password: "", role: "student", isActive: true };
+const blankDraft: AccountDraft = { name: "", nickname: "", email: "", password: "", role: "student", isActive: true };
 const roleLabels: Record<VisibleRole, string> = { user: "Legacy user", student: "Students", teacher: "Teachers", marketing: "Marketing", admin: "Admins", super_admin: "Super admins" };
 const singularRoleLabels: Record<VisibleRole, string> = { user: "Legacy user", student: "Student", teacher: "Teacher", marketing: "Marketing", admin: "Admin", super_admin: "Super admin" };
 const roleTone: Record<VisibleRole, string> = { user: "bg-[#edf0f4] text-[#596879]", student: "bg-[#e9eef8] text-[#325c95]", teacher: "bg-[#e8eeff] text-[#173fad]", marketing: "bg-[#fff0ed] text-[#a34732]", admin: "bg-[#f4eddd] text-[#705a30]", super_admin: "bg-[#efe8fb] text-[#6e4c9a]" };
@@ -48,14 +101,285 @@ export default function Admin() {
 }
 
 function FounderConsole() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  // Search parameters for dynamic tab routing
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const roleParam = (searchParams.get("role") as PlatformUserType) || "founder";
+  const tabParam = searchParams.get("tab") || "";
+
+  // Canonical paths
   if (location === "/admin/audit-logs") return <AuditLogs role="founder" />;
   if (location === "/admin/news") return <NewsManager />;
   if (location === "/admin/students") return <StudentsProfileList />;
   const studentMatch = location.match(/^\/admin\/students\/(\d+)$/);
   if (studentMatch) return <StudentProfileDetail studentId={Number(studentMatch[1])} />;
-  return <div id="admin-dashboard-container" data-page="admin" className="workspace-page founder-command founder-workspace page-admin mx-auto w-full max-w-[88rem] pb-10">{location === "/admin/users" ? <UsersModule /> : <DashboardModule />}</div>;
+
+  // Render module based on active Tab
+  const renderActiveModule = () => {
+    switch (tabParam) {
+      case "founder-overview":
+        return <DashboardModule />;
+      case "founder-users":
+      case "superadmin-users":
+        return <UsersModule />;
+      case "founder-fields":
+      case "superadmin-fields":
+        return <UserFieldBuilderStandalone />;
+      case "founder-students":
+      case "admin-students":
+        return <StudentsProfileList />;
+      case "founder-news":
+      case "superadmin-news":
+      case "admin-news":
+        return <NewsManager />;
+      case "founder-media":
+      case "marketing-media":
+        return <MediaLibrary />;
+      case "founder-audit":
+      case "superadmin-audit":
+        return <AuditLogs role="founder" />;
+      case "founder-dossier":
+        return <ProjectDossierModule />;
+      case "founder-settings":
+        return <FounderSettingsModule />;
+      case "superadmin-overview":
+        return <SuperAdminOverviewModule />;
+      case "admin-overview":
+        return <AdminOverviewModule />;
+      case "admin-leads":
+      case "marketing-leads":
+        return <AdminLeadsModule />;
+      case "admin-programs":
+        return <AdminProgramsModule />;
+      case "admin-schedule":
+      case "teacher-schedule":
+        return <AdminScheduleModule />;
+      case "teacher-attendance":
+        return <TeacherAttendanceModule />;
+      case "teacher-grades":
+        return <TeacherGradesModule />;
+      case "teacher-lessons":
+        return <TeacherLessonsModule />;
+      case "marketing-overview":
+        return <MarketingAnalyticsModule />;
+      case "marketing-campaigns":
+        return <MarketingCampaignsModule />;
+      case "marketing-content":
+        return <MarketingContentModule />;
+      case "marketing-testimonials":
+        return <MarketingTestimonialsModule />;
+      default:
+        return location === "/admin/users" ? <UsersModule /> : <DashboardModule />;
+    }
+  };
+
+  return (
+    <div id="admin-dashboard-container" data-page="admin" className="workspace-page founder-command founder-workspace page-admin mx-auto w-full max-w-[88rem] pb-12">
+      {/* Top User Type Pill Navigator */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#708098] px-2">
+            User Type Focus:
+          </span>
+          {FOUNDER_NAVIGATION_SECTIONS.map((sec) => {
+            const isSelected = roleParam === sec.type;
+            const SecIcon = sec.icon;
+            return (
+              <button
+                key={sec.type}
+                type="button"
+                onClick={() => setLocation(`/admin?role=${sec.type}&tab=${sec.modules[0].id}`)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  isSelected
+                    ? "bg-[#10253e] text-white shadow-xs"
+                    : "bg-[#f8fafc] text-[#475569] hover:bg-[#eef2f6] border border-[#e2e8f0]"
+                }`}
+              >
+                <SecIcon size={14} className={isSelected ? "text-amber-300" : "text-[#64748b]"} />
+                <span>{sec.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-[#edf2f7] text-[#64748b]"}`}>
+                  {sec.modules.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[#53657a] font-medium hidden md:inline">
+            Active: <strong className="text-[#10253e]">{FOUNDER_NAVIGATION_SECTIONS.find(s => s.type === roleParam)?.label}</strong>
+          </span>
+        </div>
+      </div>
+
+      {renderActiveModule()}
+    </div>
+  );
 }
+
+function UserFieldBuilderStandalone() {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#efe8fb] text-[#6e4c9a] border border-[#ddcefa]">
+              <Settings2 size={13} />
+              Platform Schema
+            </span>
+            <span className="text-xs text-[#53657a]">User Profile Field Configurator</span>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Dynamic Profile Schema Builder</h2>
+          <p className="text-sm text-[#53657a]">
+            Customise registration fields, required metadata, dropdowns, and sections across all user roles.
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-2xl border border-[#dce4e7] shadow-sm">
+        <UserFieldBuilder open={open} onOpenChange={setOpen} />
+      </div>
+    </div>
+  );
+}
+
+function SuperAdminOverviewModule() {
+  const usersCount = trpc.users.list.useQuery({ page: 0, pageSize: 1 });
+  const auditCount = trpc.audit.list.useQuery({ page: 0, pageSize: 10 });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#efe8fb] text-[#6e4c9a] border border-[#ddcefa]">
+              <ShieldCheck size={13} />
+              Super Admin Console
+            </span>
+            <span className="text-xs text-[#53657a]">Core Centre Operations</span>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Super Administrator Operations</h2>
+          <p className="text-sm text-[#53657a]">
+            Global user account permissions, security audit trails, and institutional policies.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+          <span className="text-xs font-semibold text-[#53657a]">Total Staff & Managed Accounts</span>
+          <div className="text-3xl font-bold text-[#10253e] mt-1">{usersCount.data?.total ?? "..."}</div>
+          <p className="text-xs text-emerald-600 font-medium mt-1">Active multi-role directory</p>
+        </div>
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+          <span className="text-xs font-semibold text-[#53657a]">Recorded Security Events</span>
+          <div className="text-3xl font-bold text-[#173fad] mt-1">{auditCount.data?.total ?? "..."}</div>
+          <p className="text-xs text-[#53657a] mt-1">Tamper-evident logs</p>
+        </div>
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+          <span className="text-xs font-semibold text-[#53657a]">Super Admin Authority</span>
+          <div className="text-3xl font-bold text-[#6e4c9a] mt-1">Level 2</div>
+          <p className="text-xs text-[#53657a] mt-1">Governed under Founder</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link href="/admin?role=super_admin&tab=superadmin-users" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+          <div className="flex items-center gap-3">
+            <span className="p-2.5 rounded-xl bg-[#efe8fb] text-[#6e4c9a]">
+              <UsersRound size={22} />
+            </span>
+            <div>
+              <h3 className="font-bold text-base text-[#10253e] group-hover:text-[#173fad]">Manage Staff Directory</h3>
+              <p className="text-xs text-[#53657a] mt-0.5">Create, update, toggle active status, and filter staff records.</p>
+            </div>
+          </div>
+        </Link>
+        <Link href="/admin?role=super_admin&tab=superadmin-audit" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+          <div className="flex items-center gap-3">
+            <span className="p-2.5 rounded-xl bg-[#efe8fb] text-[#6e4c9a]">
+              <ShieldAlert size={22} />
+            </span>
+            <div>
+              <h3 className="font-bold text-base text-[#10253e] group-hover:text-[#173fad]">View Security Audit Logs</h3>
+              <p className="text-xs text-[#53657a] mt-0.5">Inspect user logins, profile alterations, and administrative actions.</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function AdminOverviewModule() {
+  const studentsCount = trpc.students.list.useQuery({ page: 0, pageSize: 1, sortBy: "newest" });
+  const submissionsCount = trpc.submissions.list.useQuery();
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e5d5b7]">
+              <Shield size={13} />
+              Admin Module
+            </span>
+            <span className="text-xs text-[#53657a]">Academic & Admissions Administration</span>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Administrator Dashboard</h2>
+          <p className="text-sm text-[#53657a]">
+            Manage student records, program offerings, incoming admissions leads, and class timetables.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+          <span className="text-xs font-semibold text-[#53657a]">Enrolled Students</span>
+          <div className="text-3xl font-bold text-[#10253e] mt-1">{studentsCount.data?.total ?? "..."}</div>
+          <p className="text-xs text-[#53657a] mt-1">Active learner profiles</p>
+        </div>
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+          <span className="text-xs font-semibold text-[#53657a]">Admissions Pipeline Leads</span>
+          <div className="text-3xl font-bold text-[#173fad] mt-1">{submissionsCount.data?.length ?? "..."}</div>
+          <p className="text-xs text-emerald-600 font-medium mt-1">Awaiting review / contact</p>
+        </div>
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+          <span className="text-xs font-semibold text-[#53657a]">Academic Timetable</span>
+          <div className="text-3xl font-bold text-[#705a30] mt-1">Active</div>
+          <p className="text-xs text-[#53657a] mt-1">Mon - Sat classes running</p>
+        </div>
+      </div>
+
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Link href="/admin?role=admin&tab=admin-students" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+          <GraduationCap className="text-[#325c95] size-6 mb-2" />
+          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">Students Directory</h4>
+          <p className="text-xs text-[#53657a] mt-1">Inspect profiles, CEFR tiers, and emergency contacts.</p>
+        </Link>
+        <Link href="/admin?role=admin&tab=admin-leads" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+          <Users className="text-[#173fad] size-6 mb-2" />
+          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">Admissions Leads</h4>
+          <p className="text-xs text-[#53657a] mt-1">Process enrollments and update pipeline status.</p>
+        </Link>
+        <Link href="/admin?role=admin&tab=admin-programs" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+          <BookOpen className="text-[#705a30] size-6 mb-2" />
+          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">Language Programs</h4>
+          <p className="text-xs text-[#53657a] mt-1">Create and configure courses, tuition, and CEFR levels.</p>
+        </Link>
+        <Link href="/admin?role=admin&tab=admin-schedule" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+          <Calendar className="text-[#a34732] size-6 mb-2" />
+          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">Class Timetables</h4>
+          <p className="text-xs text-[#53657a] mt-1">Manage classrooms, schedule slots, and teacher rosters.</p>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 
 function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
   return <header className="founder-command-header"><div><p className="founder-command-eyebrow">{eyebrow}</p><h1 className="founder-command-title">{title}</h1><p className="founder-command-description">{description}</p></div>{action ? <div className="founder-command-action">{action}</div> : null}</header>;
@@ -316,7 +640,7 @@ function UserModal({ mode, selected, loading, draft, setDraft, profileFields, pr
   if (mode === "detail" && loading) return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div>;
   const createMode = mode === "create";
   if (createMode) return <ConfigurableCreateUserModal draft={draft} setDraft={setDraft} profileValues={profileValues} setProfileValues={setProfileValues} pending={pending} error={error} onSubmit={onSubmit} onClose={onClose} />;
-  return <form data-testid="users-modal-form" onSubmit={onSubmit}><DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-left"><p className="founder-command-eyebrow">{createMode ? "Issue new access" : "Account profile"}</p><DialogTitle className="font-display text-4xl text-[#10253e]">{createMode ? "Create user" : "Edit user"}</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">{createMode ? "Assign protected access details, then complete any Founder-configured profile fields." : "Update profile, type, password or active status from this focused account window."}</DialogDescription></DialogHeader><div className="px-6 py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>Account action needs attention</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<div className="grid gap-4 sm:grid-cols-2"><TextField label="Full name" value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required autoComplete="name" /><TextField label="E-mail" value={draft.email} onChange={value => setDraft({ ...draft, email: value })} required type="email" autoComplete="email" /><label className="block text-xs font-extrabold text-[#53657a]">User type<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as ManagedRole })} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{managedRoles.map(role => <option key={role} value={role}>{singularRoleLabels[role]}</option>)}</select></label><TextField label={createMode ? "Initial password" : "New password (optional)"} value={draft.password} onChange={value => setDraft({ ...draft, password: value })} required={createMode} type="password" autoComplete="new-password" hint="Minimum 10 characters. Stored only as a salted hash." /></div>{createMode ? <DynamicUserProfileFields fields={profileFields} sections={profileSections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /> : null}<label className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">Account active</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">Inactive accounts cannot sign in with their password.</span></span><input aria-label="Account active" type="checkbox" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label>{!createMode && selected ? <div className="mt-5 rounded-xl bg-[#f7f2e9] p-4 text-xs leading-5 text-[#53657a]"><p><span className="font-bold text-[#29415b]">Account ID:</span> {selected.openId}</p><p className="mt-1"><span className="font-bold text-[#29415b]">Issued:</span> {new Date(selected.createdAt).toLocaleString()}</p><p className="mt-1"><span className="font-bold text-[#29415b]">Last sign-in:</span> {new Date(selected.lastSignedIn).toLocaleString()}</p></div> : null}</div><DialogFooter className="border-t border-[#e6dccd] bg-white px-6 py-5"><div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type="button" variant="outline" disabled={pending} className="min-h-12 border-[#efc4b8] text-[#b4563c] hover:bg-[#fff0ed]"><Trash2 size={15} />Delete account</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete this account?</AlertDialogTitle><AlertDialogDescription>This permanently removes the selected account. Centre content is not attached to user records and will remain unchanged.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Keep account</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-[#b4563c] hover:bg-[#923e2a]">Delete account</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog> : null}</div><div className="flex flex-col gap-2 sm:flex-row"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">Cancel</Button><Button type="submit" disabled={pending || (!createMode && !selected)} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{createMode ? "Create user" : "Save changes"}</Button></div></div></DialogFooter></form>;
+  return <form data-testid="users-modal-form" onSubmit={onSubmit}><DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-left"><p className="founder-command-eyebrow">{createMode ? "Issue new access" : "Account profile"}</p><DialogTitle className="font-display text-4xl text-[#10253e]">{createMode ? "Create user" : "Edit user"}</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">{createMode ? "Assign protected access details, then complete any Founder-configured profile fields." : "Update profile, type, password or active status from this focused account window."}</DialogDescription></DialogHeader><div className="px-6 py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>Account action needs attention</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<div className="grid gap-4 sm:grid-cols-2"><TextField label="Full name" value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required autoComplete="name" /><TextField label="E-mail" value={draft.email ?? ""} onChange={value => setDraft({ ...draft, email: value })} required type="email" autoComplete="email" /><label className="block text-xs font-extrabold text-[#53657a]">User type<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as ManagedRole })} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{managedRoles.map(role => <option key={role} value={role}>{singularRoleLabels[role]}</option>)}</select></label><TextField label={createMode ? "Initial password" : "New password (optional)"} value={draft.password} onChange={value => setDraft({ ...draft, password: value })} required={createMode} type="password" autoComplete="new-password" hint="Minimum 10 characters. Stored only as a salted hash." /></div>{createMode ? <DynamicUserProfileFields fields={profileFields} sections={profileSections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /> : null}<label className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">Account active</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">Inactive accounts cannot sign in with their password.</span></span><input aria-label="Account active" type="checkbox" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label>{!createMode && selected ? <div className="mt-5 rounded-xl bg-[#f7f2e9] p-4 text-xs leading-5 text-[#53657a]"><p><span className="font-bold text-[#29415b]">Account ID:</span> {selected.openId}</p><p className="mt-1"><span className="font-bold text-[#29415b]">Issued:</span> {new Date(selected.createdAt).toLocaleString()}</p><p className="mt-1"><span className="font-bold text-[#29415b]">Last sign-in:</span> {new Date(selected.lastSignedIn).toLocaleString()}</p></div> : null}</div><DialogFooter className="border-t border-[#e6dccd] bg-white px-6 py-5"><div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type="button" variant="outline" disabled={pending} className="min-h-12 border-[#efc4b8] text-[#b4563c] hover:bg-[#fff0ed]"><Trash2 size={15} />Delete account</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete this account?</AlertDialogTitle><AlertDialogDescription>This permanently removes the selected account. Centre content is not attached to user records and will remain unchanged.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Keep account</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-[#b4563c] hover:bg-[#923e2a]">Delete account</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog> : null}</div><div className="flex flex-col gap-2 sm:flex-row"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">Cancel</Button><Button type="submit" disabled={pending || (!createMode && !selected)} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{createMode ? "Create user" : "Save changes"}</Button></div></div></DialogFooter></form>;
 }
 
 function TextField({ label, value, onChange, type = "text", required, hint, autoComplete }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; hint?: string; autoComplete?: string }) { return <label className="block text-xs font-extrabold text-[#53657a]">{label}<input required={required} type={type} autoComplete={autoComplete} value={value} onChange={event => onChange(event.target.value)} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" />{hint ? <span className="mt-1.5 block text-[11px] font-normal leading-4 text-[#708098]">{hint}</span> : null}</label>; }

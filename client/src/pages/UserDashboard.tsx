@@ -15,14 +15,16 @@ export default function UserDashboard() {
   const { t, isRTL } = useLanguage();
   const isOperationsUser = Boolean(user && OPERATIONS_ROLES.includes(user.role));
   const isTeacher = user?.role === "teacher";
+  const isMarketing = user?.role === "marketing";
   const attendanceSummary = trpc.studentAttendance.summary.useQuery(undefined, { enabled: user?.role === "student", retry: false });
 
   useEffect(() => {
     if (isOperationsUser) window.location.href = user?.role === "super_admin" ? "/super-admin" : "/admin";
     if (isTeacher) window.location.href = "/teacher";
-  }, [isOperationsUser, isTeacher, user?.role]);
+    if (isMarketing) window.location.href = "/marketing";
+  }, [isOperationsUser, isTeacher, isMarketing, user?.role]);
 
-  if (loading || isOperationsUser || isTeacher) {
+  if (loading || isOperationsUser || isTeacher || isMarketing) {
     return (
       <main className={`minimal-auth-state ${isRTL ? "is-rtl" : ""}`}>
         <BackgroundCircleField seed="member-loading" />

@@ -114,7 +114,7 @@ export default function MediaLibrary() {
           <div>
             <p className="founder-command-eyebrow">Public website · Assets</p>
             <h1 id="media-library-title" className="founder-command-title">
-              Demonstration media
+              Media library
             </h1>
             <p className="founder-command-description">
               Replace public Hero, video and promotional card media. Published items are rendered dynamically across public pages; uploaded assets remain securely in project storage.

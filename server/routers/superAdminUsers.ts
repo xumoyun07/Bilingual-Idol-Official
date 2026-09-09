@@ -10,7 +10,8 @@ const managedRole = z.enum(["student", "teacher", "marketing", "admin"]);
 const profileValues = z.record(z.string().max(80), z.string().max(4000)).default({});
 const createInput = z.object({
   name: z.string().trim().min(2).max(160).optional(),
-  email: z.string().trim().email().max(320).optional(),
+  nickname: z.string().trim().min(3).max(30).optional(),
+  email: z.string().trim().max(320).optional(),
   password: z.string().min(10).max(256).optional(),
   role: managedRole.optional(),
   isActive: z.boolean().optional(),
@@ -19,7 +20,8 @@ const createInput = z.object({
 const updateInput = z.object({
   id: z.number().int().positive(),
   name: z.string().trim().min(2).max(160),
-  email: z.string().trim().email().max(320),
+  nickname: z.string().trim().min(3).max(30).optional(),
+  email: z.string().trim().max(320).optional(),
   password: z.string().min(10).max(256).optional().or(z.literal("")),
   role: managedRole,
   isActive: z.boolean(),

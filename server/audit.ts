@@ -82,25 +82,7 @@ export function parseAuditClientContext(request?: Pick<Request, "headers" | "ip"
   return { ipAddress, userAgent, browser, operatingSystem };
 }
 
-const inMemoryAuditLogs: Array<any> = [
-  {
-    id: 1,
-    actorUserId: 1,
-    actorRole: "founder",
-    action: "audit.view",
-    targetType: "audit_log",
-    targetId: null,
-    targetRole: null,
-    description: "Founder initialized workspace security and review console.",
-    isSuccess: true,
-    ipAddress: "127.0.0.1",
-    userAgent: "Bilingual Idol Secure Console",
-    browser: "Web",
-    operatingSystem: "Cloud",
-    metadataJson: JSON.stringify({ system: "initialized" }),
-    createdAt: new Date("2026-01-01T08:00:00.000Z"),
-  },
-];
+const inMemoryAuditLogs: Array<any> = [];
 
 export async function writeAuditEvent(input: AuditEventInput) {
   const database = await getDb();

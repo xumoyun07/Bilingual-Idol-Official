@@ -65,6 +65,22 @@ export const adminProcedure = t.procedure.use(
   }),
 );
 
+/**
+ * Shared access for site content management: Marketing is day-to-day editor;
+ * Admin, Super admin, and Founder retain full oversight and fallback access.
+ */
+export const contentManagerProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !['admin', 'marketing', 'super_admin', 'founder'].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is restricted to content managers." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+export const marketingProcedure = contentManagerProcedure;
+
 export const founderProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;

@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 import type { DynamicField, DynamicSection } from "./DynamicUserProfileFields";
 
 type FieldDraft = { label: string; fieldType: DynamicField["fieldType"]; isRequired: boolean; sortOrder: number; placeholder: string; optionsText: string; sectionId: string; isActive: boolean };
-type SystemField = { id: "name" | "email" | "role" | "password" | "isActive"; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
+type SystemField = { id: "name" | "nickname" | "role" | "password" | "isActive"; label: string; inputType: "text" | "email" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
 const emptyField = (sortOrder: number): FieldDraft => ({ label: "", fieldType: "text", isRequired: false, sortOrder, placeholder: "", optionsText: "", sectionId: "", isActive: true });
 
 export function UserFieldBuilder({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {

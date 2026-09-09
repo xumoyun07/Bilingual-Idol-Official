@@ -18,24 +18,29 @@ import { mediaRouter } from "./routers/media";
 import { newsRouter } from "./routers/news";
 import { teacherRouter } from "./routers/teacher";
 import { studentAttendanceRouter } from "./routers/studentAttendance";
+import { marketingRouter } from "./routers/marketing";
 import { createUserPasswordHash, dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 import { isFounderEmail } from "./founderIdentity";
+import { resolveLoginIdentifier } from "../shared/nickname";
 
 export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    login: publicProcedure.input(z.object({ email: z.string().email().max(320), password: z.string().min(1).max(256) })).mutation(async ({ ctx, input }) => {
-      const email = input.email.trim().toLowerCase();
-      if (isFounderEmail(email)) {
-        if (verifyFounderCredentials(email, input.password)) {
-          const openId = `founder:${email}`;
-          await db.upsertUser({ openId, name: "Founder", email, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
+    login: publicProcedure.input(z.object({ email: z.string().trim().min(1, "Enter your nickname@bilc.my address or nickname.").max(320), password: z.string().min(1).max(256) })).mutation(async ({ ctx, input }) => {
+      const raw = input.email.trim().toLowerCase();
+      const resolvedEmail = resolveLoginIdentifier(raw);
+
+      if (isFounderEmail(raw) || isFounderEmail(resolvedEmail)) {
+        const founderEmail = isFounderEmail(raw) ? raw : resolvedEmail;
+        if (verifyFounderCredentials(founderEmail, input.password)) {
+          const openId = `founder:${founderEmail}`;
+          await db.upsertUser({ openId, name: "Founder", email: founderEmail, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
           const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
           ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
           return { success: true, redirectTo: "/admin", role: "founder", token } as const;
         }
-        const existing = await db.getUserByEmail(email);
+        const existing = await db.getUserByEmail(founderEmail);
         if (existing?.isActive && verifyUserPasswordHash(input.password, existing.passwordHash)) {
           await db.recordUserSignIn(existing.openId);
           const token = await sdk.createSessionToken(existing.openId, { expiresInMs: ONE_YEAR_MS, name: existing.name ?? "Founder" });
@@ -43,10 +48,18 @@ export const appRouter = router({
           return { success: true, redirectTo: "/admin", role: "founder", token } as const;
         }
       }
-      const user = await db.getUserByEmail(email);
-      if (!user?.isActive || !verifyUserPasswordHash(input.password, user.passwordHash)) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid e-mail or password." });
+
+      let user = await db.getUserByEmail(resolvedEmail);
+      if (!user && raw !== resolvedEmail) {
+        user = await db.getUserByEmail(raw);
+      }
+
+      if (!user?.isActive || !verifyUserPasswordHash(input.password, user.passwordHash)) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid nickname@bilc.my login or password." });
+      }
+
       await db.recordUserSignIn(user.openId);
-      const token = await sdk.createSessionToken(user.openId, { expiresInMs: ONE_YEAR_MS, name: user.name ?? email });
+      const token = await sdk.createSessionToken(user.openId, { expiresInMs: ONE_YEAR_MS, name: user.name ?? user.email ?? resolvedEmail });
       ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
       return { success: true, redirectTo: dashboardPathForRole(user.role), role: user.role, token } as const;
     }),
@@ -65,6 +78,7 @@ export const appRouter = router({
   news: newsRouter,
   teacher: teacherRouter,
   studentAttendance: studentAttendanceRouter,
+  marketing: marketingRouter,
 });
 
 export type AppRouter = typeof appRouter;

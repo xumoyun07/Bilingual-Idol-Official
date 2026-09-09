@@ -13,13 +13,20 @@ const sectionInput = z.object({ title: z.string().trim().min(2).max(160), icon: 
 const fieldInput = z.object({ label: z.string().trim().min(2).max(160), fieldType: dynamicFieldType, isRequired: z.boolean(), sortOrder: z.number().int().min(0).max(10000), placeholder: z.string().trim().max(255).optional(), options: z.array(z.string().trim().min(1).max(100)).max(30).optional().default([]), sectionId: z.number().int().positive().nullable().optional(), isActive: z.boolean() });
 const profileInput = z.object({
   name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160),
-  email: z.string().trim().email("Enter a valid e-mail address.").max(320),
+  nickname: z.string().trim().min(3, "Nickname must be at least 3 characters.").max(30, "Nickname cannot exceed 30 characters.").optional(),
+  email: z.string().trim().max(320).optional(),
   role: managedRole,
   isActive: z.boolean(),
 });
 const passwordInput = z.string().min(10, "Use at least 10 characters for the password.").max(256);
-const systemFieldInput = z.object({ id: z.enum(["name", "email", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100), sectionId: z.number().int().positive().nullable().default(null) });
-const createProfileInput = z.object({ name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160).optional(), email: z.string().trim().email("Enter a valid e-mail address.").max(320).optional(), role: managedRole.optional(), isActive: z.boolean().optional() });
+const systemFieldInput = z.object({ id: z.enum(["name", "nickname", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100), sectionId: z.number().int().positive().nullable().default(null) });
+const createProfileInput = z.object({
+  name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160).optional(),
+  nickname: z.string().trim().min(3, "Nickname must be at least 3 characters.").max(30, "Nickname cannot exceed 30 characters.").optional(),
+  email: z.string().trim().max(320).optional(),
+  role: managedRole.optional(),
+  isActive: z.boolean().optional(),
+});
 
 function userError(error: unknown): never {
   const message = error instanceof Error ? error.message : "The account action could not be completed.";
