@@ -24,13 +24,11 @@ const BOOKING_SERVICES: ServiceOption[] = [
       en: "Free Placement Test",
       ms: "Ujian Penempatan Percuma",
       ar: "اختبار تحديد مستوى مجاني",
-      ru: "Бесплатное тестирование уровня",
     },
     subtitles: {
       en: "Diagnostic evaluation & level assignment (45 mins)",
       ms: "Penilaian diagnostik & penempatan tahap (45 minit)",
       ar: "تقييم تشخيصي وتحديد المستوى المناسب (45 دقيقة)",
-      ru: "Диагностическая оценка и определение уровня (45 мин)",
     },
   },
   {
@@ -39,13 +37,11 @@ const BOOKING_SERVICES: ServiceOption[] = [
       en: "Pavilion Embassy Campus Tour",
       ms: "Lawatan Kampus Pavilion Embassy",
       ar: "جولة في حرم بافيليون إمباسي",
-      ru: "Тур по кампусу Pavilion Embassy",
     },
     subtitles: {
       en: "Tour smart classrooms, lounge & library in person",
       ms: "Lawati bilik darjah pintar, ruang rehat & perpustakaan",
       ar: "استكشف الفصول الذكية وصالة الاستراحة والمكتبة شخصياً",
-      ru: "Осмотр аудиторий, лаунджа и библиотеки лично",
     },
   },
   {
@@ -54,13 +50,11 @@ const BOOKING_SERVICES: ServiceOption[] = [
       en: "1-on-1 Academic & Visa Consultation",
       ms: "Perundingan Akademik & Visa 1-sama-1",
       ar: "استشارة أكاديمية وفيزا فردية",
-      ru: "Индивидуальная академическая и визовая консультация",
     },
     subtitles: {
       en: "EMGS student visa advice, course pathways & intake planning",
       ms: "Nasihat visa pelajar EMGS, laluan kursus & perancangan pengambilan",
       ar: "استشارات فيزا الطالب EMGS وتخطيط المسار ومواعيد القبول",
-      ru: "Консультация по студенческой визе EMGS, программам и датам набора",
     },
   },
   {
@@ -69,13 +63,11 @@ const BOOKING_SERVICES: ServiceOption[] = [
       en: "Complimentary Trial Class",
       ms: "Kelas Percubaan Percuma",
       ar: "حصة تجريبية مجانية",
-      ru: "Бесплатный пробный урок",
     },
     subtitles: {
       en: "Experience an interactive lesson with our expert teachers",
       ms: "Alami sesi pembelajaran interaktif bersama guru pakar kami",
       ar: "عش تجربة درس تفاعلي مع نخبة من مدرسينا المعتمدين",
-      ru: "Интерактивный урок с нашими опытными преподавателями",
     },
   },
 ];
@@ -124,7 +116,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
           type="button"
           className={cn("bilc-modal-close-btn", isRTL && "bilc-modal-close-btn-rtl left-5 right-auto")}
           onClick={onClose}
-          aria-label={language === "ar" ? "إغلاق نافذة الحجز" : language === "ms" ? "Tutup Tempahan" : language === "ru" ? "Закрыть окно записи" : "Close Booking Modal"}
+          aria-label={language === "ar" ? "إغلاق نافذة الحجز" : language === "ms" ? "Tutup Tempahan" : "Close Booking Modal"}
         >
           <X size={20} />
         </button>
@@ -139,8 +131,6 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
                     ? "Tempahan Dalam Talian · Kampus Pavilion Embassy"
                     : language === "ar"
                     ? "حجز موعد إلكتروني · حرم بافيليون إمباسي"
-                    : language === "ru"
-                    ? "Онлайн-запись · Кампус Pavilion Embassy"
                     : "Online Booking · Pavilion Embassy Campus"}
                 </span>
               </div>
@@ -149,8 +139,6 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
                   ? "Tempah Temujanji di KL"
                   : language === "ar"
                   ? "احجز موعداً في كوالالمبور"
-                  : language === "ru"
-                  ? "Забронировать встречу в Куала-Лумпуре"
                   : "Book an Appointment in KL"}
               </h2>
               <p>
@@ -158,8 +146,6 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
                   ? "Jadualkan ujian penempatan, lawatan kampus, atau perundingan akademik bersama pegawai kemasukan kami."
                   : language === "ar"
                   ? "حدد موعداً لاختبار تحديد المستوى، زيارة الحرم، أو استشارة أكاديمية مع مسؤولي القبول والتسجيل."
-                  : language === "ru"
-                  ? "Запланируйте тестирование уровня, тур по кампусу или академическую консультацию со специалистом приемной комиссии."
                   : "Schedule your placement test, campus visit, or academic consultation with an admissions officer."}
               </p>
             </div>
@@ -167,7 +153,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
             {/* Service Selection */}
             <div className="bilc-form-group">
               <label className="bilc-form-label">
-                {language === "ms" ? "Pilih Tujuan Lawatan:" : language === "ar" ? "اختر الغرض من الزيارة:" : language === "ru" ? "Выберите цель визита:" : "Select Purpose of Visit:"}
+                {language === "ms" ? "Pilih Tujuan Lawatan:" : language === "ar" ? "اختر الغرض من الزيارة:" : "Select Purpose of Visit:"}
               </label>
               <div className="bilc-services-grid">
                 {BOOKING_SERVICES.map(srv => {
@@ -193,7 +179,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
               <div className="bilc-form-group">
                 <label className="bilc-form-label">
                   <Calendar size={14} className="inline mr-1 text-[#173fad]" />{" "}
-                  {language === "ms" ? "Tarikh Pilihan:" : language === "ar" ? "التاريخ المفضل:" : language === "ru" ? "Желаемая дата:" : "Preferred Date:"}
+                  {language === "ms" ? "Tarikh Pilihan:" : language === "ar" ? "التاريخ المفضل:" : "Preferred Date:"}
                 </label>
                 <input
                   type="date"
@@ -208,7 +194,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
               <div className="bilc-form-group">
                 <label className="bilc-form-label">
                   <Clock size={14} className="inline mr-1 text-[#173fad]" />{" "}
-                  {language === "ms" ? "Masa Pilihan:" : language === "ar" ? "الوقت المفضل:" : language === "ru" ? "Желаемое время:" : "Preferred Time Slot:"}
+                  {language === "ms" ? "Masa Pilihan:" : language === "ar" ? "الوقت المفضل:" : "Preferred Time Slot:"}
                 </label>
                 <select
                   className="bilc-input min-h-[44px]"
@@ -227,13 +213,13 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
             {/* Contact Details */}
             <div className="bilc-form-group mt-3">
               <label className="bilc-form-label">
-                {language === "ms" ? "Nama Penuh:" : language === "ar" ? "الاسم الكامل:" : language === "ru" ? "Полное имя:" : "Full Name:"}
+                {language === "ms" ? "Nama Penuh:" : language === "ar" ? "الاسم الكامل:" : "Full Name:"}
               </label>
               <input
                 type="text"
                 className="bilc-input min-h-[44px]"
                 required
-                placeholder={language === "ar" ? "مثال: طارق المنصوري" : language === "ms" ? "Cth. Ahmad Firdaus" : language === "ru" ? "например, Алексей Иванов" : "e.g. Talas Karimov"}
+                placeholder={language === "ar" ? "مثال: طارق المنصوري" : language === "ms" ? "Cth. Ahmad Firdaus" : "e.g. Talas Karimov"}
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
@@ -242,7 +228,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bilc-form-group">
                 <label className="bilc-form-label">
-                  {language === "ms" ? "No. WhatsApp / Telefon:" : language === "ar" ? "رقم الواتساب / الهاتف:" : language === "ru" ? "Телефон / WhatsApp:" : "WhatsApp / Phone Number:"}
+                  {language === "ms" ? "No. WhatsApp / Telefon:" : language === "ar" ? "رقم الواتساب / الهاتف:" : "WhatsApp / Phone Number:"}
                 </label>
                 <input
                   type="tel"
@@ -256,7 +242,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
 
               <div className="bilc-form-group">
                 <label className="bilc-form-label">
-                  {language === "ms" ? "Alamat Emel (Pilihan):" : language === "ar" ? "البريد الإلكتروني (اختياري):" : language === "ru" ? "Эл. почта (необязательно):" : "Email Address (Optional):"}
+                  {language === "ms" ? "Alamat Emel (Pilihan):" : language === "ar" ? "البريد الإلكتروني (اختياري):" : "Email Address (Optional):"}
                 </label>
                 <input
                   type="email"
@@ -270,7 +256,7 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
 
             <div className="bilc-form-group mt-2">
               <label className="bilc-form-label">
-                {language === "ms" ? "Permintaan Khas atau Soalan:" : language === "ar" ? "طلبات خاصة أو استفسارات:" : language === "ru" ? "Пожелания или вопросы:" : "Special requests or questions:"}
+                {language === "ms" ? "Permintaan Khas atau Soalan:" : language === "ar" ? "طلبات خاصة أو استفسارات:" : "Special requests or questions:"}
               </label>
               <textarea
                 className="bilc-input"
@@ -280,8 +266,6 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
                     ? "Cth. Saya ingin maklumat visa pelajar untuk kursus 6 bulan..."
                     : language === "ar"
                     ? "مثال: أود معرفة تفاصيل فيزا الطالب لدورة اللغة الإنجليزية العامة 6 أشهر..."
-                    : language === "ru"
-                    ? "например, нужна информация о визе для курса на 6 месяцев..."
                     : "e.g. I need student visa details for a 6-month General English course..."
                 }
                 value={notes}
@@ -302,10 +286,10 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
               ) : (
                 <>
                   <button type="button" className="bilc-nav-btn min-h-[44px] px-5" onClick={onClose}>
-                    {language === "ms" ? "Batal" : language === "ru" ? "Отмена" : "Cancel"}
+                    {language === "ms" ? "Batal" : "Cancel"}
                   </button>
                   <button type="submit" className="simple-button min-h-[44px] flex-1 justify-center gap-2">
-                    {language === "ms" ? "Sahkan Tempahan" : language === "ru" ? "Подтвердить запись" : "Confirm Booking"} <Send size={16} />
+                    {language === "ms" ? "Sahkan Tempahan" : "Confirm Booking"} <Send size={16} />
                   </button>
                 </>
               )}
@@ -317,15 +301,13 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
               <CheckCircle2 size={40} className="text-emerald-600" />
             </div>
             <h3>
-              {language === "ms" ? "Temujanji Disahkan!" : language === "ar" ? "تم تسجيل موعدك بنجاح!" : language === "ru" ? "Встреча забронирована!" : "Appointment Reserved!"}
+              {language === "ms" ? "Temujanji Disahkan!" : language === "ar" ? "تم تسجيل موعدك بنجاح!" : "Appointment Reserved!"}
             </h3>
             <p className="text-slate-600">
               {language === "ms" ? (
                 <>Terima kasih, <strong>{name}</strong>. Temujanji anda untuk <strong>{serviceTitle}</strong> telah didaftarkan.</>
               ) : language === "ar" ? (
                 <>شكراً لك، <strong>{name}</strong>. تم تسجيل موعدك لـ <strong>{serviceTitle}</strong> بنجاح.</>
-              ) : language === "ru" ? (
-                <>Спасибо, <strong>{name}</strong>. Ваша встреча по направлению <strong>{serviceTitle}</strong> успешно зарегистрирована.</>
               ) : (
                 <>Thank you, <strong>{name}</strong>. Your appointment for <strong>{serviceTitle}</strong> has been registered.</>
               )}
@@ -333,10 +315,10 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
 
             <div className="bilc-booking-recap-box">
               <div className="flex items-center gap-2 text-sm text-slate-700">
-                <Calendar size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Tarikh:" : language === "ar" ? "التاريخ:" : language === "ru" ? "Дата:" : "Date:"}</strong> <bdi dir="ltr">{selectedDate}</bdi> (<bdi dir="ltr">{formatTimeSlot(selectedTime)}</bdi>)
+                <Calendar size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Tarikh:" : language === "ar" ? "التاريخ:" : "Date:"}</strong> <bdi dir="ltr">{selectedDate}</bdi> (<bdi dir="ltr">{formatTimeSlot(selectedTime)}</bdi>)
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-700 mt-2">
-                <MapPin size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Lokasi:" : language === "ar" ? "الموقع:" : language === "ru" ? "Местоположение:" : "Location:"}</strong> <bdi dir="ltr">B-25-07, Pavilion Embassy, Menara G-Vestor, Kuala Lumpur</bdi>
+                <MapPin size={16} className="text-[#173fad]" /> <strong>{language === "ms" ? "Lokasi:" : language === "ar" ? "الموقع:" : "Location:"}</strong> <bdi dir="ltr">B-25-07, Pavilion Embassy, Menara G-Vestor, Kuala Lumpur</bdi>
               </div>
             </div>
 
@@ -347,18 +329,16 @@ export function BookingSystemModal({ isOpen, onClose, initialService }: BookingP
                     ? `Salam Bilingual Idol, saya telah menempah temujanji untuk "${serviceTitle}" pada ${selectedDate} pukul ${formatTimeSlot(selectedTime)}. Nama saya ${name} (${phone}).`
                     : language === "ar"
                     ? `مرحباً بايلينجوال آيدول، قمت بحجز موعد لـ "${serviceTitle}" بتاريخ ${selectedDate} في تمام الساعة ${formatTimeSlot(selectedTime)}. اسمي ${name} (${phone}).`
-                    : language === "ru"
-                    ? `Здравствуйте Bilingual Idol, я забронировал встречу по направлению "${serviceTitle}" на дату ${selectedDate} в ${formatTimeSlot(selectedTime)}. Мое имя ${name} (${phone}).`
                     : `Hello Bilingual Idol, I booked an appointment for "${serviceTitle}" on ${selectedDate} at ${formatTimeSlot(selectedTime)}. My name is ${name} (${phone}).`
                 )}`}
                 target="_blank"
                 rel="noreferrer"
                 className="simple-button bilc-wa-btn"
               >
-                💬 {language === "ms" ? "Buka Pengesahan WhatsApp" : language === "ar" ? "فتح تأكيد الواتساب" : language === "ru" ? "Подтверждение в WhatsApp" : "Open WhatsApp Confirmation"}
+                💬 {language === "ms" ? "Buka Pengesahan WhatsApp" : language === "ar" ? "فتح تأكيد الواتساب" : "Open WhatsApp Confirmation"}
               </a>
               <button type="button" className="simple-button simple-button-quiet" onClick={onClose}>
-                {language === "ms" ? "Selesai" : language === "ar" ? "تم" : language === "ru" ? "Готово" : "Done"}
+                {language === "ms" ? "Selesai" : language === "ar" ? "تم" : "Done"}
               </button>
             </div>
           </div>

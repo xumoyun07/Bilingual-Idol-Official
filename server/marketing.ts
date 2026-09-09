@@ -1115,7 +1115,7 @@ export async function setAllowMarketingPixelManagement(allowed: boolean, callerR
   if (!["founder", "super_admin"].includes(callerRole)) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: "Only Super Admin or Founder can toggle pixel management permission.",
+      message: "Only Super Admin can toggle pixel management permission.",
     });
   }
   marketingStore.systemSettings["allowMarketingPixelManagement"] = String(allowed);

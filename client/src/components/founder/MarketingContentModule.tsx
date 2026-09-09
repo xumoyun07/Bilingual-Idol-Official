@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,6 +105,7 @@ const emptyBlock: Omit<ContentBlock, "id" | "updatedAt"> = {
 };
 
 export function MarketingContentModule() {
+  const { td } = useLanguage();
   const [blocks, setBlocks] = useState<ContentBlock[]>(() => {
     const saved = localStorage.getItem("bilc_marketing_content_blocks");
     return saved ? JSON.parse(saved) : initialBlocks;
@@ -146,7 +148,7 @@ export function MarketingContentModule() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.title.trim()) {
-      toast.error("Block title is required.");
+      toast.error(td("Block title is required."));
       return;
     }
     const blockKey = formState.blockKey.trim() || formState.title.toLowerCase().replace(/[^a-z0-9]+/g, "_");
@@ -163,7 +165,7 @@ export function MarketingContentModule() {
           : b
       );
       saveBlocks(updated);
-      toast.success("Content block updated.");
+      toast.success(td("Content block updated."));
     } else {
       const newBlock: ContentBlock = {
         ...formState,
@@ -172,7 +174,7 @@ export function MarketingContentModule() {
         updatedAt: new Date().toISOString().slice(0, 10),
       };
       saveBlocks([newBlock, ...blocks]);
-      toast.success("New content block created.");
+      toast.success(td("New content block created."));
     }
     setIsModalOpen(false);
   };
@@ -181,14 +183,14 @@ export function MarketingContentModule() {
     if (!deleteTargetId) return;
     const updated = blocks.filter((b) => b.id !== deleteTargetId);
     saveBlocks(updated);
-    toast.success("Content block removed.");
+    toast.success(td("Content block removed."));
     setDeleteTargetId(null);
   };
 
   const toggleActive = (id: number) => {
     const updated = blocks.map((b) => (b.id === id ? { ...b, isActive: !b.isActive } : b));
     saveBlocks(updated);
-    toast.success("Content block status toggled.");
+    toast.success(td("Content block status toggled."));
   };
 
   const filteredBlocks = React.useMemo(() => {
@@ -210,13 +212,13 @@ export function MarketingContentModule() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#fff0ed] text-[#a34732] border border-[#ffd1c7]">
               <Layers size={13} />
-              Marketing Module
+              {td("Marketing Module")}
             </span>
-            <span className="text-xs text-[#53657a]">CRUD: CMS Dynamic Content Blocks</span>
+            <span className="text-xs text-[#53657a]">{td("CRUD")}: {td("CMS Dynamic Content Blocks")}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">CMS Content Blocks</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("CMS Content Blocks")}</h2>
           <p className="text-sm text-[#53657a]">
-            Manage promotional banners, homepage call-to-actions, trust badges, and public text copy.
+            {td("Manage promotional banners, homepage call-to-actions, trust badges, and public text copy.")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -226,7 +228,7 @@ export function MarketingContentModule() {
             className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
           >
             <Plus size={15} />
-            Add Content Block
+            {td("Add Content Block")}
           </Button>
         </div>
       </div>
@@ -238,19 +240,19 @@ export function MarketingContentModule() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search content blocks by title, key, or copy..."
+            placeholder={td("Search content blocks by title, key, or copy...")}
             className="pl-9 h-9 text-sm"
           />
         </div>
-        <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">{filteredBlocks.length} blocks</span>
+        <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">{filteredBlocks.length} {td("blocks")}</span>
       </div>
 
       {/* Grid */}
       {filteredBlocks.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
           <Layers className="mx-auto size-10 text-[#53657a]/50" />
-          <p className="mt-2 text-sm font-semibold text-[#10253e]">No content blocks found</p>
-          <p className="text-xs text-[#53657a]">Click "Add Content Block" to create a new editable message.</p>
+          <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No content blocks found")}</p>
+          <p className="text-xs text-[#53657a]">{td("Click \"Add Content Block\" to create a new editable message.")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -271,11 +273,11 @@ export function MarketingContentModule() {
                           : "bg-gray-100 text-gray-600 border-gray-200"
                       }`}
                     >
-                      {b.isActive ? "Active on Site" : "Hidden"}
+                      {b.isActive ? td("Active on Site") : td("Hidden")}
                     </button>
                   </div>
                   <h3 className="font-bold text-base text-[#10253e] mt-2">{b.title}</h3>
-                  <code className="text-[11px] font-mono text-[#173fad] mt-1 block">Key: #{b.blockKey}</code>
+                  <code className="text-[11px] font-mono text-[#173fad] mt-1 block">{td("Key")}: #{b.blockKey}</code>
                 </div>
 
                 <CardContent className="p-4 space-y-2 text-xs text-[#53657a]">
@@ -284,7 +286,7 @@ export function MarketingContentModule() {
                   </p>
                   {b.ctaText ? (
                     <div className="flex items-center gap-2 pt-1 text-[11px]">
-                      <span className="font-semibold text-[#10253e]">CTA Button:</span>
+                      <span className="font-semibold text-[#10253e]">{td("CTA Button")}:</span>
                       <span className="bg-[#e8eeff] text-[#173fad] px-2 py-0.5 rounded font-medium">
                         {b.ctaText} ({b.ctaLink})
                       </span>
@@ -294,7 +296,7 @@ export function MarketingContentModule() {
               </div>
 
               <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-between rounded-b-xl">
-                <span className="text-[10px] text-[#8292a1]">Updated {b.updatedAt}</span>
+                <span className="text-[10px] text-[#8292a1]">{td("Updated")} {b.updatedAt}</span>
                 <div className="flex items-center gap-1.5">
                   <Button
                     variant="outline"
@@ -303,7 +305,7 @@ export function MarketingContentModule() {
                     className="h-8 text-xs gap-1"
                   >
                     <Edit2 size={12} />
-                    Edit
+                    {td("Edit")}
                   </Button>
                   <Button
                     variant="outline"
@@ -312,7 +314,7 @@ export function MarketingContentModule() {
                     className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
                   >
                     <Trash2 size={12} />
-                    Delete
+                    {td("Delete")}
                   </Button>
                 </div>
               </div>
@@ -326,17 +328,17 @@ export function MarketingContentModule() {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-[#10253e]">
-              {isEditing ? "Edit Content Block" : "Add New Content Block"}
+              {isEditing ? td("Edit Content Block") : td("Add New Content Block")}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
-              Manage public copy, alert texts, and CTA links.
+              {td("Manage public copy, alert texts, and CTA links.")}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 py-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Block Title *</Label>
+                <Label className="text-xs font-semibold">{td("Block Title")} *</Label>
                 <Input
                   required
                   value={formState.title}
@@ -346,7 +348,7 @@ export function MarketingContentModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Slot Key Identifier</Label>
+                <Label className="text-xs font-semibold">{td("Slot Key Identifier")}</Label>
                 <Input
                   value={formState.blockKey}
                   onChange={(e) => setFormState((p) => ({ ...p, blockKey: e.target.value }))}
@@ -357,7 +359,7 @@ export function MarketingContentModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Category / Placement</Label>
+              <Label className="text-xs font-semibold">{td("Category / Placement")}</Label>
               <Input
                 value={formState.category}
                 onChange={(e) => setFormState((p) => ({ ...p, category: e.target.value }))}
@@ -367,20 +369,20 @@ export function MarketingContentModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Content Text / Copy *</Label>
+              <Label className="text-xs font-semibold">{td("Content Text / Copy")} *</Label>
               <Textarea
                 required
                 rows={4}
                 value={formState.content}
                 onChange={(e) => setFormState((p) => ({ ...p, content: e.target.value }))}
-                placeholder="Write the promotional text or announcement..."
+                placeholder={td("Write the promotional text or announcement...")}
                 className="text-sm"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">CTA Button Text (Optional)</Label>
+                <Label className="text-xs font-semibold">{td("CTA Button Text (Optional)")}</Label>
                 <Input
                   value={formState.ctaText || ""}
                   onChange={(e) => setFormState((p) => ({ ...p, ctaText: e.target.value }))}
@@ -389,7 +391,7 @@ export function MarketingContentModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">CTA Target URL</Label>
+                <Label className="text-xs font-semibold">{td("CTA Target URL")}</Label>
                 <Input
                   value={formState.ctaLink || ""}
                   onChange={(e) => setFormState((p) => ({ ...p, ctaLink: e.target.value }))}
@@ -401,8 +403,8 @@ export function MarketingContentModule() {
 
             <div className="flex items-center justify-between p-3 rounded-lg bg-[#f8fafc] border border-[#dce4e7]">
               <div>
-                <p className="text-xs font-semibold text-[#10253e]">Publish On Website</p>
-                <p className="text-[11px] text-[#53657a]">Enable to make this block live immediately.</p>
+                <p className="text-xs font-semibold text-[#10253e]">{td("Publish On Website")}</p>
+                <p className="text-[11px] text-[#53657a]">{td("Enable to make this block live immediately.")}</p>
               </div>
               <Switch
                 checked={formState.isActive}
@@ -412,10 +414,10 @@ export function MarketingContentModule() {
 
             <DialogFooter className="pt-3">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {td("Cancel")}
               </Button>
               <Button type="submit" size="sm" className="bg-[#173fad] hover:bg-[#12328b] text-white">
-                {isEditing ? "Save Changes" : "Create Block"}
+                {isEditing ? td("Save Changes") : td("Create Block")}
               </Button>
             </DialogFooter>
           </form>
@@ -426,15 +428,15 @@ export function MarketingContentModule() {
       <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold text-[#10253e]">Delete Content Block?</AlertDialogTitle>
+            <AlertDialogTitle className="text-base font-bold text-[#10253e]">{td("Delete Content Block?")}</AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-[#53657a]">
-              Are you sure you want to remove this CMS content block?
+              {td("Are you sure you want to remove this CMS content block?")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs">{td("Cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white text-xs">
-              Confirm Delete
+              {td("Confirm Delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

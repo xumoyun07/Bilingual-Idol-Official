@@ -124,10 +124,17 @@ export async function getStudentProfile(studentId: number) {
   if (!profile) return undefined;
   const [documents, history] = await Promise.all([
     database.select().from(studentDocuments).where(eq(studentDocuments.studentId, studentId)).orderBy(desc(studentDocuments.createdAt)),
-    database.select({ id: studentProfileHistory.id, eventType: studentProfileHistory.eventType, changesJson: studentProfileHistory.changesJson, createdAt: studentProfileHistory.createdAt, actorName: users.name }).from(studentProfileHistory).leftJoin(users, eq(users.id, studentProfileHistory.actorUserId)).where(eq(studentProfileHistory.studentId, studentId)).orderBy(desc(studentProfileHistory.createdAt)).limit(100),
+    database.select({ id: studentProfileHistory.id, eventType: studentProfileHistory.eventType, changesJson: studentProfileHistory.changesJson, createdAt: studentProfileHistory.createdAt, actorName: users.name, actorRole: users.role }).from(studentProfileHistory).leftJoin(users, eq(users.id, studentProfileHistory.actorUserId)).where(eq(studentProfileHistory.studentId, studentId)).orderBy(desc(studentProfileHistory.createdAt)).limit(100),
   ]);
   const documentsWithUrls = await Promise.all(documents.map(async document => ({ ...document, url: (await storageGet(document.storageKey)).url })));
-  return { ...profile, documents: documentsWithUrls, history };
+  const sanitizedHistory = history.map(h => ({
+    id: h.id,
+    eventType: h.eventType,
+    changesJson: h.changesJson,
+    createdAt: h.createdAt,
+    actorName: h.actorRole === "founder" ? "Super Admin" : (h.actorName || "Super Admin"),
+  }));
+  return { ...profile, documents: documentsWithUrls, history: sanitizedHistory };
 }
 
 export async function createStudentProfile(input: StudentProfileInput, actorUserId: number) {
@@ -144,7 +151,7 @@ export async function createStudentProfile(input: StudentProfileInput, actorUser
       updatedAt: new Date(),
       ...values,
       documents: [],
-      history: [{ id: 1, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date(), actorName: "Founder" }],
+      history: [{ id: 1, eventType: "student.created", changesJson: JSON.stringify({ changedFields: ["student profile"] }), createdAt: new Date(), actorName: "Super Admin" }],
     };
     inMemoryStudentsList.push(newStudent);
     return newStudent;
@@ -255,7 +262,7 @@ export async function uploadStudentDocument(input: { studentId: number; fileName
       eventType: "document.uploaded",
       changesJson: JSON.stringify({ changedFields: ["document"] }),
       createdAt: new Date(),
-      actorName: "Founder",
+      actorName: "Super Admin",
     });
     return newDoc;
   }
@@ -280,7 +287,7 @@ export async function deleteStudentDocument(studentId: number, documentId: numbe
       eventType: "document.removed",
       changesJson: JSON.stringify({ changedFields: ["document"] }),
       createdAt: new Date(),
-      actorName: "Founder",
+      actorName: "Super Admin",
     });
     return { success: true } as const;
   }

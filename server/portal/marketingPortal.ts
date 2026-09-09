@@ -12,7 +12,7 @@ export async function requireContentManager(req: Request, res: Response, next: N
     if (!user || !allowed.includes(user.role)) {
       return res.status(403).json({
         error: "forbidden",
-        message: "This endpoint requires content management privileges (marketing, admin, super_admin, founder).",
+        message: "This endpoint requires content management privileges (marketing, admin, super_admin).",
       });
     }
     (req as any).user = user;

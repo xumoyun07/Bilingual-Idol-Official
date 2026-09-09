@@ -21,19 +21,16 @@ const JOURNEY_STEPS: Step[] = [
       en: "Consultation & Goal Setting",
       ms: "Perundingan & Penetapan Matlamat",
       ar: "الاستشارة وتحديد الأهداف",
-      ru: "Консультация и постановка целей",
     },
     subtitles: {
       en: "Personalized Roadmap",
       ms: "Pelan Hala Tuju Peribadi",
       ar: "خطة دراسية مخصصة",
-      ru: "Индивидуальный образовательный трек",
     },
     summaries: {
       en: "Begin with a personalized consultation where our academic advisors analyze your linguistic goals, timeline, and career or university aspirations.",
       ms: "Mulakan dengan sesi perundingan peribadi bersama penasihat akademik kami untuk menganalisis matlamat bahasa, tempoh masa, dan aspirasi universiti atau kerjaya anda.",
       ar: "ابدأ بجلسة استشارية فردية مع مستشارينا الأكاديميين لتحديد أهدافك اللغوية، الجدول الزمني، وتطلعاتك الجامعية والمهنية بدقة.",
-      ru: "Начните с персональной консультации, где методисты проанализируют ваши цели, сроки и академические планы.",
     },
     details: {
       en: [
@@ -51,11 +48,6 @@ const JOURNEY_STEPS: Step[] = [
         "توصية بمسار دراسي مخصص (آيلتس، إنجليزية عامة، برامج تنفيذية)",
         "جدول دراسي ورسوم واضحة ومفصلة بدون أي تكاليف خفية",
       ],
-      ru: [
-        "Индивидуальная академическая консультация с экспертом",
-        "Подбор программы под цели (IELTS, общий английский, бизнес)",
-        "Прозрачный расчет стоимости и расписания без скрытых платежей",
-      ],
     },
   },
   {
@@ -65,19 +57,16 @@ const JOURNEY_STEPS: Step[] = [
       en: "Visa & Admission Support",
       ms: "Sokongan Visa & Kemasukan",
       ar: "دعم تأشيرة الطالب والقبول",
-      ru: "Визовая поддержка и зачисление",
     },
     subtitles: {
       en: "EMGS & MOE Processing",
       ms: "Pemprosesan EMGS & KPT",
       ar: "إجراءات فيزا معتمدة وسريعة",
-      ru: "Оформление визы EMGS и Мин. образования",
     },
     summaries: {
       en: "Experience a seamless, hassle-free visa application. Our experienced immigration liaison team handles your EMGS visa processing from start to finish.",
       ms: "Alami proses permohonan visa yang lancar dan mudah. Pasukan perhubungan imigresen kami menguruskan pemprosesan visa EMGS anda dari awal hingga akhir.",
       ar: "تمتع بإجراءات تأشيرة ميسرة وسريعة. يتولى فريقنا المتخصص في شؤون الهجرة استخراج تأشيرة الطالب (EMGS) من البداية وحتى استلام الجواز.",
-      ru: "Быстрое и надежное оформление студенческой визы EMGS при полной поддержке визового отдела центра.",
     },
     details: {
       en: [
@@ -95,11 +84,6 @@ const JOURNEY_STEPS: Step[] = [
         "دعم كامل لإجراءات تأشيرة الطالب عبر منظومة EMGS",
         "متابعة دورية مستمرة وقائمة إرشادات شاملة قبل السفر",
       ],
-      ru: [
-        "Официальное приглашение от аккредитованного центра (WZ10104)",
-        "Полное сопровождение подачи документов на студенческую визу EMGS",
-        "Регулярные обновления статуса и памятка перед вылетом",
-      ],
     },
   },
   {
@@ -109,19 +93,16 @@ const JOURNEY_STEPS: Step[] = [
       en: "Curated Luxury Accommodation",
       ms: "Penginapan Mewah Terpilih",
       ar: "سكن فاخر ومجهز بالكامل",
-      ru: "Премиальное проживание в Куала-Лумпуре",
     },
     subtitles: {
       en: "Safe & Central KL Residences",
       ms: "Kediaman Selamat di Pusat KL",
       ar: "أبراج سكنية راقية في قلب كوالالمبور",
-      ru: "Безопасные апартаменты в центре города",
     },
     summaries: {
       en: "Settle comfortably into handpicked high-end residential suites in Kuala Lumpur, selected for 24/7 security, modern amenities, and prime proximity.",
       ms: "Menetap dengan selesa di suite kediaman mewah terpilih di Kuala Lumpur dengan kawalan keselamatan 24/7, kemudahan moden, dan lokasi yang strategik.",
       ar: "استقر براحة تامة في أجنحة سكنية فاخرة ومختارة بعناية بالقرب من بافيليون إمباسي، مع حراسة أمنية 24/7 ومرافق ترفيهية متكاملة.",
-      ru: "Комфортное размещение в проверенных жилых комплексах с круглосуточной охраной и шаговой доступностью к центру.",
     },
     details: {
       en: [
@@ -139,11 +120,6 @@ const JOURNEY_STEPS: Step[] = [
         "شقق مؤثثة بالكامل مع مسبح ونادٍ صحي وبطاقة دخول أمنية",
         "بيئة هادئة ومثالية للدراسة ومزودة بإنترنت فائق السرعة",
       ],
-      ru: [
-        "Варианты проживания в пешей доступности от Pavilion Embassy",
-        "Меблированные апартаменты с бассейном, спортзалом и охраной",
-        "Тихая атмосфера для учебы и высокоскоростной интернет",
-      ],
     },
   },
   {
@@ -153,19 +129,16 @@ const JOURNEY_STEPS: Step[] = [
       en: "VIP Airport Meet & Greet",
       ms: "Penyambutan VIP di Lapangan Terbang",
       ar: "استقبال VIP وتوصيل من المطار",
-      ru: "VIP-встреча в аэропорту и трансфер",
     },
     subtitles: {
       en: "Direct Airport Transfer",
       ms: "Pengangkutan Terus dari Lapangan Terbang",
       ar: "خدمة استقبال وتوصيل مباشر",
-      ru: "Прямой трансфер до резиденции",
     },
     summaries: {
       en: "Arrive in Malaysia with complete peace of mind. Our dedicated representative welcomes you at KLIA airport and provides direct private transfer to your residence.",
       ms: "Tiba di Malaysia dengan ketenangan fikiran. Wakil kami menyambut anda di lapangan terbang KLIA dan menyediakan pengangkutan peribadi terus ke tempat penginapan.",
       ar: "صل إلى ماليزيا براحة واطمئنان كاملين. يستقبلك مندوبنا الرسمي في مطار كوالالمبور الدولي ويوفر لك نقلاً خاصاً ومباشراً إلى مقر إقامتك.",
-      ru: "Встреча в международном аэропорту KLIA и комфортабельный трансфер прямо до ваших апартаментов.",
     },
     details: {
       en: [
@@ -183,11 +156,6 @@ const JOURNEY_STEPS: Step[] = [
         "مساعدة فورية في شراء شريحة الاتصال المحلية وصرف العملات",
         "توصيل خاص ومباشر إلى شقتك أو مكان إقامتك",
       ],
-      ru: [
-        "Личная встреча в аэропорту Куала-Лумпура (KLIA 1/2)",
-        "Помощь с местной SIM-картой и обменом валюты",
-        "Прямой трансфер до места проживания",
-      ],
     },
   },
   {
@@ -197,19 +165,16 @@ const JOURNEY_STEPS: Step[] = [
       en: "Registration & Diagnostic Test",
       ms: "Pendaftaran & Ujian Diagnostik",
       ar: "التسجيل واختبار تحديد المستوى",
-      ru: "Регистрация и диагностический тест",
     },
     subtitles: {
       en: "Accurate CEFR Placement",
       ms: "Penempatan CEFR yang Tepat",
       ar: "تقييم دقيق وشامل لمعايير CEFR",
-      ru: "Точное определение уровня CEFR",
     },
     summaries: {
       en: "Formalize your enrollment and take our multi-skill diagnostic placement test (speaking, listening, reading, writing) to ensure precise class matching.",
       ms: "Lengkapkan pendaftaran anda dan ambil ujian diagnostik pelbagai kemahiran (pertuturan, pendengaran, pembacaan, penulisan) untuk penempatan kelas yang tepat.",
       ar: "أكمل إجراءات التسجيل الرسمية وخض اختبار تحديد المستوى التشخيصي الشامل (محادثة، استماع، قراءة، كتابة) لضمان انضمامك للمستوى الأنسب لك.",
-      ru: "Оформление зачисления и комплексное тестирование (говорение, аудирование, чтение, письмо) для идеального подбора группы.",
     },
     details: {
       en: [
@@ -227,11 +192,6 @@ const JOURNEY_STEPS: Step[] = [
         "مقابلة شفهية مباشرة لتقييم المحادثة مع المدير الأكاديمي",
         "جدول حصص دراسي مخصص وحقيبة المواد التعليمية الرسمية",
       ],
-      ru: [
-        "Комплексная оценка знаний по европейской шкале CEFR",
-        "Устное собеседование с академическим директором",
-        "Персональное расписание и комплект учебных материалов",
-      ],
     },
   },
   {
@@ -241,19 +201,16 @@ const JOURNEY_STEPS: Step[] = [
       en: "First Day & Luxury Learning",
       ms: "Hari Pertama & Pembelajaran Unggul",
       ar: "اليوم الأول وانطلاق التجربة التعليمية",
-      ru: "Первый день и погружение в обучение",
     },
     subtitles: {
       en: "Join Our Global Community",
       ms: "Sertai Komuniti Global Kami",
       ar: "انضم إلى مجتمع أكاديمي عالمي",
-      ru: "Международное студенческое сообщество",
     },
     summaries: {
       en: "Step into your new academic home—designer smart classrooms, inspiring international instructors, and an exclusive global community.",
       ms: "Langkah ke persekitaran akademik baharu anda—bilik darjah pintar eksklusif, tenaga pengajar antarabangsa yang berinspirasi, dan komuniti global yang dinamik.",
       ar: "انطلق في رحلتك التعليمية الراقية—فصول ذكية مجهزة، مدربون دوليون ملهمون، ومجتمع طلابي عالمي يعزز تطورك اللغوي والشخصي.",
-      ru: "Добро пожаловать в современный центр: интерактивные аудитории, преподаватели-носители языка и международная среда общения.",
     },
     details: {
       en: [
@@ -270,11 +227,6 @@ const JOURNEY_STEPS: Step[] = [
         "جولة تعريفية في الحرم واستخدام صالة كبار الشخصيات",
         "التعرف على المدرسين والزملاء من مختلف دول العالم",
         "متابعة دورية دقيقة للتقدم الأكاديمي وتوجيه مستمر",
-      ],
-      ru: [
-        "Ориентационный тур по кампусу и знакомство с преподавателями",
-        "Интеграция в интернациональные учебные группы",
-        "Постоянный мониторинг прогресса и наставничество",
       ],
     },
   },

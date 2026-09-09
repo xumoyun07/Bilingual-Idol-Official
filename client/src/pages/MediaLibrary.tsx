@@ -1,4 +1,3 @@
-import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,13 +102,12 @@ export default function MediaLibrary() {
   }
 
   return (
-    <DashboardLayout role="founder">
-      <section
-        id="media-library-container"
-        data-page="media-library"
-        className="founder-command media-library page-media-library mx-auto max-w-[80rem]"
-        aria-labelledby="media-library-title"
-      >
+    <section
+      id="media-library-container"
+      data-page="media-library"
+      className="founder-command media-library page-media-library mx-auto max-w-[80rem]"
+      aria-labelledby="media-library-title"
+    >
         <header className="founder-command-header">
           <div>
             <p className="founder-command-eyebrow">Public website · Assets</p>
@@ -262,7 +260,6 @@ export default function MediaLibrary() {
           )}
         </section>
       </section>
-    </DashboardLayout>
   );
 }
 

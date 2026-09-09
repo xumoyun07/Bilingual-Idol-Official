@@ -82,7 +82,7 @@ export function parseAuditClientContext(request?: Pick<Request, "headers" | "ip"
   return { ipAddress, userAgent, browser, operatingSystem };
 }
 
-const inMemoryAuditLogs: Array<any> = [];
+export const inMemoryAuditLogs: Array<any> = [];
 
 export async function writeAuditEvent(input: AuditEventInput) {
   const database = await getDb();
@@ -125,8 +125,8 @@ function scopeConditions(table: typeof auditLogs | typeof auditLogArchives, scop
   if (scope.role === "founder") return [];
   return [
     or(isNull(table.actorRole), ne(table.actorRole, "founder")),
-    or(isNull(table.targetRole), and(ne(table.targetRole, "founder"), ne(table.targetRole, "super_admin"))),
-    or(isNull(table.actorRole), ne(table.actorRole, "super_admin"), eq(table.actorUserId, scope.userId)),
+    or(isNull(table.targetRole), ne(table.targetRole, "founder")),
+    sql`LOWER(${table.description}) NOT LIKE '%founder%'`,
   ];
 }
 
@@ -140,7 +140,13 @@ function filterConditions(table: typeof auditLogs | typeof auditLogArchives, fil
       like(table.ipAddress, pattern), like(table.browser, pattern), like(table.operatingSystem, pattern), sql`${table.actorUserId} LIKE ${pattern}`,
     ));
   }
-  if (filters.actorRole) conditions.push(eq(table.actorRole, filters.actorRole));
+  if (filters.actorRole) {
+    if (scope.role !== "founder" && filters.actorRole === "founder") {
+      conditions.push(eq(table.actorRole, "__none__"));
+    } else {
+      conditions.push(eq(table.actorRole, filters.actorRole));
+    }
+  }
   if (filters.action) conditions.push(eq(table.action, filters.action));
   if (filters.targetType) conditions.push(eq(table.targetType, filters.targetType));
   if (filters.isSuccess !== undefined) conditions.push(eq(table.isSuccess, filters.isSuccess));
@@ -158,6 +164,14 @@ export async function listAuditLogs(input: AuditListInput, scope: AuditScope) {
   const source = input.source ?? "active";
   if (!database) {
     let rows = inMemoryAuditLogs;
+    if (scope.role !== "founder") {
+      rows = rows.filter(r => 
+        r.actorRole !== "founder" && 
+        r.targetRole !== "founder" && 
+        !String(r.description || "").toLowerCase().includes("founder") &&
+        !String(r.action || "").toLowerCase().includes("founder")
+      );
+    }
     if (input.action) rows = rows.filter(r => r.action === input.action);
     if (input.targetType) rows = rows.filter(r => r.targetType === input.targetType);
     if (input.actorRole) rows = rows.filter(r => r.actorRole === input.actorRole);
@@ -186,7 +200,11 @@ export async function suggestAuditSearch(input: AuditFilters & { source?: AuditS
   const seen = new Set<string>();
   return result.rows.flatMap(row => {
     const candidates = [`#${row.id}`, row.action, row.targetType, row.targetId ?? "", row.ipAddress ?? "", row.description];
-    return candidates.filter(value => Boolean(value) && !seen.has(value) && (seen.add(value), true)).map(value => truncate(value, 120));
+    return candidates.filter(value => {
+      if (!value) return false;
+      if (scope.role !== "founder" && value.toLowerCase().includes("founder")) return false;
+      return !seen.has(value) && (seen.add(value), true);
+    }).map(value => truncate(value, 120));
   }).slice(0, 10);
 }
 
@@ -194,7 +212,16 @@ export async function getAuditExportRows(filters: AuditFilters & { source?: Audi
   const database = await getDb();
   const source = filters.source ?? "active";
   if (!database) {
-    return withSource(inMemoryAuditLogs, source);
+    let rows = inMemoryAuditLogs;
+    if (scope.role !== "founder") {
+      rows = rows.filter(r => 
+        r.actorRole !== "founder" && 
+        r.targetRole !== "founder" && 
+        !String(r.description || "").toLowerCase().includes("founder") &&
+        !String(r.action || "").toLowerCase().includes("founder")
+      );
+    }
+    return withSource(rows, source);
   }
   const table = source === "archive" ? auditLogArchives : auditLogs;
   return withSource(await database.select().from(table).where(and(...filterConditions(table, filters, scope))).orderBy(desc(table.createdAt), desc(table.id)).limit(5_000), source);

@@ -223,7 +223,6 @@ function getLanguageName(langCode: string): string {
     'de': 'German',
     'it': 'Italian',
     'pt': 'Portuguese',
-    'ru': 'Russian',
     'ja': 'Japanese',
     'ko': 'Korean',
     'zh': 'Chinese',

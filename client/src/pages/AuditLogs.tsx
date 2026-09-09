@@ -18,7 +18,7 @@ const actionOptions = [
 const targetOptions = [["", "All objects"], ["audit_log", "Audit log"], ["user", "User"], ["student_profile", "Student profile"], ["student_document", "Student document"], ["user_group", "User group"], ["user_field", "User field"], ["user_form", "User form"]] as const;
 const roleOptions: Record<AuditRole, readonly (readonly [string, string])[]> = {
   founder: [["", "All roles"], ["founder", "Founder"], ["super_admin", "Super admin"], ["admin", "Admin"], ["marketing", "Marketing"], ["teacher", "Teacher"], ["student", "Student"], ["user", "Legacy user"]],
-  super_admin: [["", "All visible roles"], ["super_admin", "My role"], ["admin", "Admin"], ["marketing", "Marketing"], ["teacher", "Teacher"], ["student", "Student"], ["user", "Legacy user"]],
+  super_admin: [["", "All roles"], ["super_admin", "Super Admin"], ["admin", "Admin"], ["marketing", "Marketing"], ["teacher", "Teacher"], ["student", "Student"], ["user", "Legacy user"]],
 };
 
 function localDate(value: Date | string) { return new Date(value).toLocaleString(); }
@@ -68,7 +68,7 @@ export default function AuditLogs({ role }: { role: AuditRole }) {
 
   return <main id="auditlogs-container" data-page="auditlogs" className="workspace-page founder-command founder-workspace page-auditlogs mx-auto w-full min-w-0 max-w-[96rem] pb-10">
     <header className="founder-command-header min-w-0">
-      <div className="min-w-0"><p className="founder-command-eyebrow">{isFounder ? "Control centre" : "Operations"} · Audit logs</p><h1 className="founder-command-title">Review sensitive activity with clear scope.</h1><p className="founder-command-description">UTC-based events are stored with indexed filters and rendered in your local time. {isFounder ? "You can also review archived records and restore selected entries." : "Private-control and peer Super admin activity is excluded from this workspace."}</p></div>
+      <div className="min-w-0"><p className="founder-command-eyebrow">{isFounder ? "Control centre" : "Administration"} · Audit logs</p><h1 className="founder-command-title">{isFounder ? "Review sensitive activity with clear scope." : "Comprehensive Institutional Audit Trail"}</h1><p className="founder-command-description">{isFounder ? "UTC-based events are stored with indexed filters and rendered in your local time. You can also review archived records and restore selected entries." : "Institution-wide administrative, instructional, and operational audit trail with comprehensive event tracking and verifiable records."}</p></div>
       <div className="founder-command-action flex shrink-0 flex-wrap gap-2"><Button type="button" variant="outline" disabled={isPending} onClick={() => exportCsv.mutate(filters)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><FileSpreadsheet size={16} />CSV</Button><Button type="button" variant="outline" disabled={isPending} onClick={() => exportPdf.mutate(filters)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><FileText size={16} />PDF</Button></div>
     </header>
 

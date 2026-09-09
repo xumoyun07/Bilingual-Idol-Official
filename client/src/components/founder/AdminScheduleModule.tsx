@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -113,6 +114,7 @@ const emptySlot: Omit<ScheduleSlot, "id"> = {
 };
 
 export function AdminScheduleModule() {
+  const { td, isRTL } = useLanguage();
   const [schedules, setSchedules] = useState<ScheduleSlot[]>(() => {
     const saved = localStorage.getItem("bilc_admin_schedules");
     return saved ? JSON.parse(saved) : initialSchedules;
@@ -158,21 +160,21 @@ export function AdminScheduleModule() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.courseTitle.trim() || !formState.teacherName.trim()) {
-      toast.error("Course title and teacher name are required.");
+      toast.error(td("Course title and teacher name are required."));
       return;
     }
 
     if (isEditing && editId !== null) {
       const updated = schedules.map((s) => (s.id === editId ? { ...formState, id: editId } : s));
       saveSchedules(updated);
-      toast.success("Schedule slot updated successfully.");
+      toast.success(td("Schedule slot updated successfully."));
     } else {
       const newSlot: ScheduleSlot = {
         ...formState,
         id: Date.now(),
       };
       saveSchedules([newSlot, ...schedules]);
-      toast.success("New class schedule created successfully.");
+      toast.success(td("New class schedule created successfully."));
     }
     setIsModalOpen(false);
   };
@@ -181,7 +183,7 @@ export function AdminScheduleModule() {
     if (!deleteTargetId) return;
     const updated = schedules.filter((s) => s.id !== deleteTargetId);
     saveSchedules(updated);
-    toast.success("Class schedule removed.");
+    toast.success(td("Class schedule removed."));
     setDeleteTargetId(null);
   };
 
@@ -198,20 +200,20 @@ export function AdminScheduleModule() {
   }, [schedules, searchQuery, selectedDay]);
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e4d3b1]">
               <CalendarDays size={13} />
-              Admin Module
+              {td("Admin Module")}
             </span>
-            <span className="text-xs text-[#53657a]">CRUD: Timetable & Class Allocations</span>
+            <span className="text-xs text-[#53657a]">{td("CRUD: Timetable & Class Allocations")}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Class Timetables & Schedules</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Class Timetables & Schedules")}</h2>
           <p className="text-sm text-[#53657a]">
-            Manage teacher assignments, classroom allocations, student capacities, and weekly class times.
+            {td("Manage teacher assignments, classroom allocations, student capacities, and weekly class times.")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -221,7 +223,7 @@ export function AdminScheduleModule() {
             className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
           >
             <Plus size={15} />
-            Add Class Schedule
+            {td("Add Class Schedule")}
           </Button>
         </div>
       </div>
@@ -229,12 +231,12 @@ export function AdminScheduleModule() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
+          <Search size={15} className={`absolute top-1/2 -translate-y-1/2 text-[#53657a] ${isRTL ? "right-3" : "left-3"}`} />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search classes by course name, instructor, or room..."
-            className="pl-9 h-9 text-sm"
+            placeholder={td("Search classes by course name, instructor, or room...")}
+            className={`h-9 text-sm ${isRTL ? "pr-9 pl-3" : "pl-9 pr-3"}`}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -244,16 +246,16 @@ export function AdminScheduleModule() {
             aria-label="Filter schedules by day"
             className="h-9 px-3 text-xs font-medium rounded-lg border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
           >
-            <option value="all">All Days</option>
-            <option value="monday">Monday</option>
-            <option value="tuesday">Tuesday</option>
-            <option value="wednesday">Wednesday</option>
-            <option value="thursday">Thursday</option>
-            <option value="friday">Friday</option>
-            <option value="saturday">Saturday</option>
+            <option value="all">{td("All Days")}</option>
+            <option value="monday">{td("Monday")}</option>
+            <option value="tuesday">{td("Tuesday")}</option>
+            <option value="wednesday">{td("Wednesday")}</option>
+            <option value="thursday">{td("Thursday")}</option>
+            <option value="friday">{td("Friday")}</option>
+            <option value="saturday">{td("Saturday")}</option>
           </select>
           <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">
-            {filteredSchedules.length} classes
+            {filteredSchedules.length} {td("classes")}
           </span>
         </div>
       </div>
@@ -262,8 +264,8 @@ export function AdminScheduleModule() {
       {filteredSchedules.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
           <CalendarDays className="mx-auto size-10 text-[#53657a]/50" />
-          <p className="mt-2 text-sm font-semibold text-[#10253e]">No class schedules found</p>
-          <p className="text-xs text-[#53657a]">Click "Add Class Schedule" to allocate a classroom and teacher.</p>
+          <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No class schedules found")}</p>
+          <p className="text-xs text-[#53657a]">{td("Click \"Add Class Schedule\" to allocate a classroom and teacher.")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -274,7 +276,7 @@ export function AdminScheduleModule() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-[#173fad]">
-                        {slot.level}
+                        {td(slot.level)}
                       </span>
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
@@ -285,10 +287,10 @@ export function AdminScheduleModule() {
                             : "bg-emerald-50 text-emerald-700 border-emerald-200"
                         }`}
                       >
-                        {slot.status.toUpperCase()}
+                        {td(slot.status.toUpperCase())}
                       </span>
                     </div>
-                    <h3 className="font-bold text-base text-[#10253e] mt-1">{slot.courseTitle}</h3>
+                    <h3 className="font-bold text-base text-[#10253e] mt-1">{td(slot.courseTitle)}</h3>
                   </div>
                 </div>
 
@@ -297,29 +299,29 @@ export function AdminScheduleModule() {
                     <div className="flex items-center gap-1.5">
                       <UsersRound size={13} className="text-[#173fad]" />
                       <span>
-                        Teacher: <strong className="text-[#10253e]">{slot.teacherName}</strong>
+                        {td("Teacher")}: <strong className="text-[#10253e]">{td(slot.teacherName)}</strong>
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <MapPin size={13} className="text-[#173fad]" />
                       <span>
-                        Room: <strong className="text-[#10253e]">{slot.classroom}</strong>
+                        {td("Room")}: <strong className="text-[#10253e]">{td(slot.classroom)}</strong>
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <CalendarDays size={13} className="text-[#173fad]" />
-                      <span>{slot.dayOfWeek}</span>
+                      <span>{td(slot.dayOfWeek)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Clock size={13} className="text-[#173fad]" />
-                      <span>{slot.timeSlot}</span>
+                      <span>{td(slot.timeSlot)}</span>
                     </div>
                   </div>
 
                   <div className="pt-2 border-t border-[#edf2f5] flex items-center justify-between">
-                    <span>Class Capacity:</span>
+                    <span>{td("Class Capacity")}:</span>
                     <span className="font-semibold text-[#10253e]">
-                      {slot.enrolledStudents} / {slot.maxCapacity} Students Enrolled
+                      {slot.enrolledStudents} / {slot.maxCapacity} {td("Students Enrolled")}
                     </span>
                   </div>
                 </CardContent>
@@ -333,7 +335,7 @@ export function AdminScheduleModule() {
                   className="h-8 text-xs gap-1"
                 >
                   <Edit2 size={12} />
-                  Edit
+                  {td("Edit")}
                 </Button>
                 <Button
                   variant="outline"
@@ -342,7 +344,7 @@ export function AdminScheduleModule() {
                   className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
                 >
                   <Trash2 size={12} />
-                  Delete
+                  {td("Delete")}
                 </Button>
               </div>
             </Card>
@@ -352,19 +354,19 @@ export function AdminScheduleModule() {
 
       {/* Create / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className={`max-w-xl max-h-[90vh] overflow-y-auto ${isRTL ? "dir-rtl" : ""}`}>
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-[#10253e]">
-              {isEditing ? "Edit Class Timetable Slot" : "Create New Class Timetable Slot"}
+              {isEditing ? td("Edit Class Timetable Slot") : td("Create New Class Timetable Slot")}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
-              Assign instructors, classroom facilities, student limits, and weekly times.
+              {td("Assign instructors, classroom facilities, student limits, and weekly times.")}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Course Title *</Label>
+              <Label className="text-xs font-semibold">{td("Course Title")} *</Label>
               <Input
                 required
                 value={formState.courseTitle}
@@ -376,7 +378,7 @@ export function AdminScheduleModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Assigned Instructor *</Label>
+                <Label className="text-xs font-semibold">{td("Assigned Instructor")} *</Label>
                 <Input
                   required
                   value={formState.teacherName}
@@ -386,7 +388,7 @@ export function AdminScheduleModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Classroom</Label>
+                <Label className="text-xs font-semibold">{td("Classroom")}</Label>
                 <Input
                   value={formState.classroom}
                   onChange={(e) => setFormState((p) => ({ ...p, classroom: e.target.value }))}
@@ -398,7 +400,7 @@ export function AdminScheduleModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Days of Week</Label>
+                <Label className="text-xs font-semibold">{td("Days of Week")}</Label>
                 <Input
                   value={formState.dayOfWeek}
                   onChange={(e) => setFormState((p) => ({ ...p, dayOfWeek: e.target.value }))}
@@ -407,7 +409,7 @@ export function AdminScheduleModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Time Slot</Label>
+                <Label className="text-xs font-semibold">{td("Time Slot")}</Label>
                 <Input
                   value={formState.timeSlot}
                   onChange={(e) => setFormState((p) => ({ ...p, timeSlot: e.target.value }))}
@@ -419,7 +421,7 @@ export function AdminScheduleModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Level</Label>
+                <Label className="text-xs font-semibold">{td("Level")}</Label>
                 <Input
                   value={formState.level}
                   onChange={(e) => setFormState((p) => ({ ...p, level: e.target.value }))}
@@ -428,7 +430,7 @@ export function AdminScheduleModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Enrolled Students</Label>
+                <Label className="text-xs font-semibold">{td("Enrolled Students")}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -438,7 +440,7 @@ export function AdminScheduleModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Max Capacity</Label>
+                <Label className="text-xs font-semibold">{td("Max Capacity")}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -450,25 +452,25 @@ export function AdminScheduleModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Class Status</Label>
+              <Label className="text-xs font-semibold">{td("Class Status")}</Label>
               <select
                 value={formState.status}
                 onChange={(e) => setFormState((p) => ({ ...p, status: e.target.value as any }))}
                 aria-label="Class status"
                 className="w-full h-9 px-3 text-sm rounded-lg border border-[#dce4e7] bg-white text-[#10253e]"
               >
-                <option value="active">Active (Enrolling)</option>
-                <option value="full">Full (Waitlist Only)</option>
-                <option value="upcoming">Upcoming (Future Intake)</option>
+                <option value="active">{td("Active (Enrolling)")}</option>
+                <option value="full">{td("Full (Waitlist Only)")}</option>
+                <option value="upcoming">{td("Upcoming (Future Intake)")}</option>
               </select>
             </div>
 
             <DialogFooter className="pt-3">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {td("Cancel")}
               </Button>
               <Button type="submit" size="sm" className="bg-[#173fad] hover:bg-[#12328b] text-white">
-                {isEditing ? "Save Changes" : "Create Schedule"}
+                {isEditing ? td("Save Changes") : td("Create Schedule")}
               </Button>
             </DialogFooter>
           </form>
@@ -477,19 +479,19 @@ export function AdminScheduleModule() {
 
       {/* Delete Alert */}
       <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className={isRTL ? "dir-rtl" : ""}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-bold text-[#10253e]">
-              Remove Class Schedule Slot?
+              {td("Remove Class Schedule Slot?")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-[#53657a]">
-              Are you sure you want to delete this class schedule? Assigned students and classroom records will be updated.
+              {td("Are you sure you want to delete this class schedule? Assigned students and classroom records will be updated.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs">{td("Cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white text-xs">
-              Confirm Delete
+              {td("Confirm Delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

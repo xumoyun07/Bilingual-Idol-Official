@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,6 +107,7 @@ const emptyCampaign: Omit<CampaignItem, "id"> = {
 };
 
 export function MarketingCampaignsModule() {
+  const { td } = useLanguage();
   const [campaigns, setCampaigns] = useState<CampaignItem[]>(() => {
     const saved = localStorage.getItem("bilc_marketing_campaigns");
     return saved ? JSON.parse(saved) : initialCampaigns;
@@ -152,21 +154,21 @@ export function MarketingCampaignsModule() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.name.trim() || !formState.promoCode.trim()) {
-      toast.error("Campaign name and promo code are required.");
+      toast.error(td("Campaign name and promo code are required."));
       return;
     }
 
     if (isEditing && editId !== null) {
       const updated = campaigns.map((c) => (c.id === editId ? { ...formState, id: editId } : c));
       saveCampaigns(updated);
-      toast.success("Campaign updated successfully.");
+      toast.success(td("Campaign updated successfully."));
     } else {
       const newCamp: CampaignItem = {
         ...formState,
         id: Date.now(),
       };
       saveCampaigns([newCamp, ...campaigns]);
-      toast.success("Promotional campaign created.");
+      toast.success(td("Promotional campaign created."));
     }
     setIsModalOpen(false);
   };
@@ -175,7 +177,7 @@ export function MarketingCampaignsModule() {
     if (!deleteTargetId) return;
     const updated = campaigns.filter((c) => c.id !== deleteTargetId);
     saveCampaigns(updated);
-    toast.success("Campaign deleted.");
+    toast.success(td("Campaign deleted."));
     setDeleteTargetId(null);
   };
 
@@ -199,13 +201,13 @@ export function MarketingCampaignsModule() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#fff0ed] text-[#a34732] border border-[#ffd1c7]">
               <Tag size={13} />
-              Marketing Module
+              {td("Marketing Module")}
             </span>
-            <span className="text-xs text-[#53657a]">CRUD: Campaigns & Discount Codes</span>
+            <span className="text-xs text-[#53657a]">{td("CRUD")}: {td("Campaigns & Discount Codes")}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Marketing Campaigns & Promos</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Marketing Campaigns & Promos")}</h2>
           <p className="text-sm text-[#53657a]">
-            Manage seasonal discount codes, campaign budgets, audience targets, and run durations.
+            {td("Manage seasonal discount codes, campaign budgets, audience targets, and run durations.")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -215,7 +217,7 @@ export function MarketingCampaignsModule() {
             className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
           >
             <Plus size={15} />
-            Create Campaign
+            {td("Create Campaign")}
           </Button>
         </div>
       </div>
@@ -227,7 +229,7 @@ export function MarketingCampaignsModule() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search campaigns by name, promo code, or target audience..."
+            placeholder={td("Search campaigns by name, promo code, or target audience...")}
             className="pl-9 h-9 text-sm"
           />
         </div>
@@ -238,13 +240,13 @@ export function MarketingCampaignsModule() {
             aria-label="Filter campaigns by status"
             className="h-9 px-3 text-xs font-medium rounded-lg border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
           >
-            <option value="all">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="expired">Expired</option>
+            <option value="all">{td("All Statuses")}</option>
+            <option value="active">{td("Active")}</option>
+            <option value="scheduled">{td("Scheduled")}</option>
+            <option value="expired">{td("Expired")}</option>
           </select>
           <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">
-            {filteredCampaigns.length} campaigns
+            {filteredCampaigns.length} {td("campaigns")}
           </span>
         </div>
       </div>
@@ -253,8 +255,8 @@ export function MarketingCampaignsModule() {
       {filteredCampaigns.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
           <Tag className="mx-auto size-10 text-[#53657a]/50" />
-          <p className="mt-2 text-sm font-semibold text-[#10253e]">No campaigns found</p>
-          <p className="text-xs text-[#53657a]">Click "Create Campaign" to launch a promotional code.</p>
+          <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No campaigns found")}</p>
+          <p className="text-xs text-[#53657a]">{td("Click \"Create Campaign\" to launch a promotional code.")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -272,7 +274,7 @@ export function MarketingCampaignsModule() {
                           : "bg-gray-100 text-gray-600 border-gray-200"
                       }`}
                     >
-                      {camp.status}
+                      {td(camp.status)}
                     </span>
                     <span className="text-xs font-bold text-[#173fad] bg-[#e8eeff] px-2 py-0.5 rounded">
                       {camp.discountValue}
@@ -280,7 +282,7 @@ export function MarketingCampaignsModule() {
                   </div>
                   <h3 className="font-bold text-base text-[#10253e] mt-2">{camp.name}</h3>
                   <div className="mt-2 flex items-center gap-1.5">
-                    <span className="text-xs text-[#53657a]">Code:</span>
+                    <span className="text-xs text-[#53657a]">{td("Code")}:</span>
                     <code className="text-xs font-mono font-bold bg-[#f1f5f9] px-2 py-0.5 rounded text-[#10253e] border border-[#e2e8f0]">
                       {camp.promoCode}
                     </code>
@@ -289,18 +291,18 @@ export function MarketingCampaignsModule() {
 
                 <CardContent className="p-4 space-y-2 text-xs text-[#53657a]">
                   <div>
-                    <span className="text-[#10253e] font-semibold block">Target Audience:</span>
+                    <span className="text-[#10253e] font-semibold block">{td("Target Audience")}:</span>
                     <span className="text-[#314155]">{camp.targetAudience}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <div>
-                      <span className="text-[#10253e] font-semibold block">Duration:</span>
+                      <span className="text-[#10253e] font-semibold block">{td("Duration")}:</span>
                       <span>
-                        {camp.startDate} to {camp.endDate}
+                        {camp.startDate} {td("to")} {camp.endDate}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#10253e] font-semibold block">Allocated Budget:</span>
+                      <span className="text-[#10253e] font-semibold block">{td("Allocated Budget")}:</span>
                       <span className="text-[#10253e] font-medium">{camp.budget}</span>
                     </div>
                   </div>
@@ -320,7 +322,7 @@ export function MarketingCampaignsModule() {
                   className="h-8 text-xs gap-1"
                 >
                   <Edit2 size={12} />
-                  Edit
+                  {td("Edit")}
                 </Button>
                 <Button
                   variant="outline"
@@ -329,7 +331,7 @@ export function MarketingCampaignsModule() {
                   className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
                 >
                   <Trash2 size={12} />
-                  Delete
+                  {td("Delete")}
                 </Button>
               </div>
             </Card>
@@ -342,16 +344,16 @@ export function MarketingCampaignsModule() {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-[#10253e]">
-              {isEditing ? "Edit Promotion Campaign" : "Create Promotion Campaign"}
+              {isEditing ? td("Edit Promotion Campaign") : td("Create Promotion Campaign")}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
-              Configure discount coupons, audience segments, and budget.
+              {td("Configure discount coupons, audience segments, and budget.")}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Campaign Name *</Label>
+              <Label className="text-xs font-semibold">{td("Campaign Name")} *</Label>
               <Input
                 required
                 value={formState.name}
@@ -363,7 +365,7 @@ export function MarketingCampaignsModule() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Promo Code *</Label>
+                <Label className="text-xs font-semibold">{td("Promo Code")} *</Label>
                 <Input
                   required
                   value={formState.promoCode}
@@ -373,7 +375,7 @@ export function MarketingCampaignsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Discount Value</Label>
+                <Label className="text-xs font-semibold">{td("Discount Value")}</Label>
                 <Input
                   value={formState.discountValue}
                   onChange={(e) => setFormState((p) => ({ ...p, discountValue: e.target.value }))}
@@ -384,7 +386,7 @@ export function MarketingCampaignsModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Target Audience</Label>
+              <Label className="text-xs font-semibold">{td("Target Audience")}</Label>
               <Input
                 value={formState.targetAudience}
                 onChange={(e) => setFormState((p) => ({ ...p, targetAudience: e.target.value }))}
@@ -395,7 +397,7 @@ export function MarketingCampaignsModule() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Start Date</Label>
+                <Label className="text-xs font-semibold">{td("Start Date")}</Label>
                 <Input
                   type="date"
                   value={formState.startDate}
@@ -404,7 +406,7 @@ export function MarketingCampaignsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">End Date</Label>
+                <Label className="text-xs font-semibold">{td("End Date")}</Label>
                 <Input
                   type="date"
                   value={formState.endDate}
@@ -416,20 +418,20 @@ export function MarketingCampaignsModule() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Status</Label>
+                <Label className="text-xs font-semibold">{td("Status")}</Label>
                 <select
                   value={formState.status}
                   onChange={(e) => setFormState((p) => ({ ...p, status: e.target.value as any }))}
                   aria-label="Campaign status"
                   className="w-full h-9 px-3 text-sm rounded-lg border border-[#dce4e7] bg-white text-[#10253e]"
                 >
-                  <option value="active">Active</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="expired">Expired</option>
+                  <option value="active">{td("Active")}</option>
+                  <option value="scheduled">{td("Scheduled")}</option>
+                  <option value="expired">{td("Expired")}</option>
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Marketing Budget</Label>
+                <Label className="text-xs font-semibold">{td("Marketing Budget")}</Label>
                 <Input
                   value={formState.budget}
                   onChange={(e) => setFormState((p) => ({ ...p, budget: e.target.value }))}
@@ -440,22 +442,22 @@ export function MarketingCampaignsModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Campaign Notes</Label>
+              <Label className="text-xs font-semibold">{td("Campaign Notes")}</Label>
               <Textarea
                 rows={2}
                 value={formState.notes}
                 onChange={(e) => setFormState((p) => ({ ...p, notes: e.target.value }))}
-                placeholder="Channel strategy, UTM tags, or campaign goals..."
+                placeholder={td("Channel strategy, UTM tags, or campaign goals...")}
                 className="text-sm"
               />
             </div>
 
             <DialogFooter className="pt-3">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {td("Cancel")}
               </Button>
               <Button type="submit" size="sm" className="bg-[#173fad] hover:bg-[#12328b] text-white">
-                {isEditing ? "Save Changes" : "Launch Campaign"}
+                {isEditing ? td("Save Changes") : td("Launch Campaign")}
               </Button>
             </DialogFooter>
           </form>
@@ -466,15 +468,15 @@ export function MarketingCampaignsModule() {
       <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold text-[#10253e]">Delete Campaign Promo?</AlertDialogTitle>
+            <AlertDialogTitle className="text-base font-bold text-[#10253e]">{td("Delete Campaign Promo?")}</AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-[#53657a]">
-              Are you sure you want to delete this marketing promo code?
+              {td("Are you sure you want to delete this marketing promo code?")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs">{td("Cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white text-xs">
-              Confirm Delete
+              {td("Confirm Delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

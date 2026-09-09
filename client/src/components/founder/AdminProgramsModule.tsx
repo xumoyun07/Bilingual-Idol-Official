@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,6 +73,7 @@ const emptyForm: ProgramFormState = {
 };
 
 export function AdminProgramsModule() {
+  const { td, isRTL } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,32 +88,32 @@ export function AdminProgramsModule() {
     onSuccess: () => {
       utils.content.listPrograms.invalidate();
       utils.content.publicPrograms.invalidate();
-      toast.success("Programme created successfully.");
+      toast.success(td("Programme created successfully."));
       setIsModalOpen(false);
       setFormState(emptyForm);
     },
-    onError: (err) => toast.error(err.message || "Failed to create programme."),
+    onError: (err) => toast.error(err.message || td("Failed to create programme.")),
   });
 
   const updateMutation = trpc.content.updateProgram.useMutation({
     onSuccess: () => {
       utils.content.listPrograms.invalidate();
       utils.content.publicPrograms.invalidate();
-      toast.success("Programme updated successfully.");
+      toast.success(td("Programme updated successfully."));
       setIsModalOpen(false);
       setFormState(emptyForm);
     },
-    onError: (err) => toast.error(err.message || "Failed to update programme."),
+    onError: (err) => toast.error(err.message || td("Failed to update programme.")),
   });
 
   const deleteMutation = trpc.content.deleteProgram.useMutation({
     onSuccess: () => {
       utils.content.listPrograms.invalidate();
       utils.content.publicPrograms.invalidate();
-      toast.success("Programme removed successfully.");
+      toast.success(td("Programme removed successfully."));
       setDeleteTargetId(null);
     },
-    onError: (err) => toast.error(err.message || "Failed to delete programme."),
+    onError: (err) => toast.error(err.message || td("Failed to delete programme.")),
   });
 
   const handleOpenCreate = () => {
@@ -142,7 +144,7 @@ export function AdminProgramsModule() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.title.trim()) {
-      toast.error("Programme title is required.");
+      toast.error(td("Programme title is required."));
       return;
     }
     const slug = formState.slug.trim() || formState.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -183,20 +185,20 @@ export function AdminProgramsModule() {
   }, [programsQuery.data, searchQuery, selectedLanguage]);
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e4d3b1]">
               <BookOpen size={13} />
-              Admin Module
+              {td("Admin Module")}
             </span>
-            <span className="text-xs text-[#53657a]">CRUD: Courses & Catalog</span>
+            <span className="text-xs text-[#53657a]">{td("CRUD: Courses & Catalog")}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Language Programmes & Courses</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Language Programmes & Courses")}</h2>
           <p className="text-sm text-[#53657a]">
-            Manage institutional curriculum, tuition fees, schedules, age groups, and course descriptions.
+            {td("Manage institutional curriculum, tuition fees, schedules, age groups, and course descriptions.")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -208,7 +210,7 @@ export function AdminProgramsModule() {
             className="h-9 gap-1.5"
           >
             <RefreshCw size={14} className={programsQuery.isFetching ? "animate-spin" : ""} />
-            Refresh
+            {td("Refresh")}
           </Button>
           <Button
             size="sm"
@@ -216,7 +218,7 @@ export function AdminProgramsModule() {
             className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
           >
             <Plus size={15} />
-            Create Programme
+            {td("Create Programme")}
           </Button>
         </div>
       </div>
@@ -224,12 +226,12 @@ export function AdminProgramsModule() {
       {/* Filter Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
+          <Search size={15} className={`absolute top-1/2 -translate-y-1/2 text-[#53657a] ${isRTL ? "right-3" : "left-3"}`} />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search programs by name, category, or language..."
-            className="pl-9 h-9 text-sm"
+            placeholder={td("Search programs by name, category, or language...")}
+            className={`h-9 text-sm ${isRTL ? "pr-9 pl-3" : "pl-9 pr-3"}`}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -239,16 +241,16 @@ export function AdminProgramsModule() {
             aria-label="Filter courses by language"
             className="h-9 px-3 text-xs font-medium rounded-lg border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
           >
-            <option value="all">All Languages</option>
-            <option value="english">English</option>
-            <option value="bahasa melayu">Bahasa Melayu</option>
-            <option value="mandarin">Mandarin</option>
-            <option value="arabic">Arabic</option>
-            <option value="japanese">Japanese</option>
-            <option value="korean">Korean</option>
+            <option value="all">{td("All Languages")}</option>
+            <option value="english">{td("English")}</option>
+            <option value="bahasa melayu">{td("Bahasa Melayu")}</option>
+            <option value="mandarin">{td("Mandarin")}</option>
+            <option value="arabic">{td("Arabic")}</option>
+            <option value="japanese">{td("Japanese")}</option>
+            <option value="korean">{td("Korean")}</option>
           </select>
           <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">
-            {filteredPrograms.length} items
+            {filteredPrograms.length} {td("items")}
           </span>
         </div>
       </div>
@@ -261,8 +263,8 @@ export function AdminProgramsModule() {
       ) : filteredPrograms.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
           <BookOpen className="mx-auto size-10 text-[#53657a]/50" />
-          <p className="mt-2 text-sm font-semibold text-[#10253e]">No programmes found</p>
-          <p className="text-xs text-[#53657a]">Click "Create Programme" to add a new course.</p>
+          <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No programmes found")}</p>
+          <p className="text-xs text-[#53657a]">{td("Click \"Create Programme\" to add a new course.")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -276,39 +278,39 @@ export function AdminProgramsModule() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-[#173fad]">
-                        {prog.language}
+                        {td(prog.language)}
                       </span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0f4f8] text-[#53657a] font-medium">
-                        {prog.category}
+                        {td(prog.category)}
                       </span>
                       {prog.isActive ? (
                         <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
-                          Active
+                          {td("Active")}
                         </span>
                       ) : (
                         <span className="text-[10px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 font-semibold">
-                          Draft
+                          {td("Draft")}
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-base text-[#10253e] mt-1 leading-snug">{prog.title}</h3>
+                    <h3 className="font-bold text-base text-[#10253e] mt-1 leading-snug">{td(prog.title)}</h3>
                   </div>
                 </div>
 
                 <CardContent className="p-4 space-y-2.5 text-xs text-[#53657a]">
-                  <p className="line-clamp-2 text-[#314155]">{prog.description}</p>
+                  <p className="line-clamp-2 text-[#314155]">{td(prog.description)}</p>
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#edf2f5]">
                     <div>
-                      <span className="font-semibold text-[#10253e] block">Level:</span>
-                      <span className="truncate block">{prog.level}</span>
+                      <span className="font-semibold text-[#10253e] block">{td("Level")}:</span>
+                      <span className="truncate block">{td(prog.level)}</span>
                     </div>
                     <div>
-                      <span className="font-semibold text-[#10253e] block">Duration:</span>
-                      <span className="truncate block">{prog.duration}</span>
+                      <span className="font-semibold text-[#10253e] block">{td("Duration")}:</span>
+                      <span className="truncate block">{td(prog.duration)}</span>
                     </div>
                     <div className="col-span-2">
-                      <span className="font-semibold text-[#10253e] block">Fees:</span>
-                      <span className="text-[#173fad] font-semibold">{prog.fees}</span>
+                      <span className="font-semibold text-[#10253e] block">{td("Tuition Fees")}:</span>
+                      <span className="text-[#173fad] font-semibold">{td(prog.fees)}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -322,7 +324,7 @@ export function AdminProgramsModule() {
                   className="h-8 text-xs gap-1"
                 >
                   <Edit2 size={12} />
-                  Edit
+                  {td("Edit")}
                 </Button>
                 <Button
                   variant="outline"
@@ -331,7 +333,7 @@ export function AdminProgramsModule() {
                   className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
                 >
                   <Trash2 size={12} />
-                  Delete
+                  {td("Delete")}
                 </Button>
               </div>
             </Card>
@@ -341,20 +343,20 @@ export function AdminProgramsModule() {
 
       {/* Create / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className={`max-w-2xl max-h-[90vh] overflow-y-auto ${isRTL ? "dir-rtl" : ""}`}>
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-[#10253e]">
-              {isEditing ? "Edit Language Programme" : "Create New Language Programme"}
+              {isEditing ? td("Edit Language Programme") : td("Create New Language Programme")}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
-              Configure course details, levels, schedules, fees, and publishing status.
+              {td("Configure course details, levels, schedules, fees, and publishing status.")}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 py-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Programme Title *</Label>
+                <Label className="text-xs font-semibold">{td("Programme Title")} *</Label>
                 <Input
                   required
                   value={formState.title}
@@ -364,7 +366,7 @@ export function AdminProgramsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">URL Slug</Label>
+                <Label className="text-xs font-semibold">{td("Slug / URL Identifier")}</Label>
                 <Input
                   value={formState.slug}
                   onChange={(e) => setFormState((p) => ({ ...p, slug: e.target.value }))}
@@ -376,7 +378,7 @@ export function AdminProgramsModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Language</Label>
+                <Label className="text-xs font-semibold">{td("Language")}</Label>
                 <Input
                   value={formState.language}
                   onChange={(e) => setFormState((p) => ({ ...p, language: e.target.value }))}
@@ -385,7 +387,7 @@ export function AdminProgramsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Category</Label>
+                <Label className="text-xs font-semibold">{td("Category")}</Label>
                 <Input
                   value={formState.category}
                   onChange={(e) => setFormState((p) => ({ ...p, category: e.target.value }))}
@@ -394,7 +396,7 @@ export function AdminProgramsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Age Group</Label>
+                <Label className="text-xs font-semibold">{td("Age Group")}</Label>
                 <Input
                   value={formState.ageGroup}
                   onChange={(e) => setFormState((p) => ({ ...p, ageGroup: e.target.value }))}
@@ -406,7 +408,7 @@ export function AdminProgramsModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Proficiency Level</Label>
+                <Label className="text-xs font-semibold">{td("Level")}</Label>
                 <Input
                   value={formState.level}
                   onChange={(e) => setFormState((p) => ({ ...p, level: e.target.value }))}
@@ -415,7 +417,7 @@ export function AdminProgramsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Duration</Label>
+                <Label className="text-xs font-semibold">{td("Duration")}</Label>
                 <Input
                   value={formState.duration}
                   onChange={(e) => setFormState((p) => ({ ...p, duration: e.target.value }))}
@@ -424,7 +426,7 @@ export function AdminProgramsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Tuition Fees</Label>
+                <Label className="text-xs font-semibold">{td("Tuition Fees")}</Label>
                 <Input
                   value={formState.fees}
                   onChange={(e) => setFormState((p) => ({ ...p, fees: e.target.value }))}
@@ -435,7 +437,7 @@ export function AdminProgramsModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Class Schedule</Label>
+              <Label className="text-xs font-semibold">{td("Class Schedule")}</Label>
               <Input
                 value={formState.schedule}
                 onChange={(e) => setFormState((p) => ({ ...p, schedule: e.target.value }))}
@@ -445,7 +447,7 @@ export function AdminProgramsModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Course Description</Label>
+              <Label className="text-xs font-semibold">{td("Description")}</Label>
               <Textarea
                 rows={3}
                 value={formState.description}
@@ -457,8 +459,8 @@ export function AdminProgramsModule() {
 
             <div className="flex items-center justify-between p-3 rounded-lg bg-[#f8fafc] border border-[#dce4e7]">
               <div>
-                <p className="text-xs font-semibold text-[#10253e]">Public Visibility</p>
-                <p className="text-[11px] text-[#53657a]">Enable to publish this programme on the public website catalog.</p>
+                <p className="text-xs font-semibold text-[#10253e]">{td("Public Visibility")}</p>
+                <p className="text-[11px] text-[#53657a]">{td("Enable to publish this programme on the public website catalog.")}</p>
               </div>
               <Switch
                 checked={formState.isActive}
@@ -468,7 +470,7 @@ export function AdminProgramsModule() {
 
             <DialogFooter className="pt-3">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {td("Cancel")}
               </Button>
               <Button
                 type="submit"
@@ -477,10 +479,10 @@ export function AdminProgramsModule() {
                 className="bg-[#173fad] hover:bg-[#12328b] text-white"
               >
                 {createMutation.isPending || updateMutation.isPending
-                  ? "Saving..."
+                  ? td("Saving...")
                   : isEditing
-                  ? "Save Changes"
-                  : "Create Programme"}
+                  ? td("Save Changes")
+                  : td("Create Programme")}
               </Button>
             </DialogFooter>
           </form>
@@ -489,22 +491,22 @@ export function AdminProgramsModule() {
 
       {/* Delete Confirmation Alert */}
       <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className={isRTL ? "dir-rtl" : ""}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-bold text-[#10253e]">
-              Delete Language Programme?
+              {td("Delete Language Programme?")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-[#53657a]">
-              Are you sure you want to permanently delete this course programme? This action cannot be undone.
+              {td("Are you sure you want to permanently delete this course programme? This action cannot be undone.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs">{td("Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteTargetId && deleteMutation.mutate({ id: deleteTargetId })}
               className="bg-rose-600 hover:bg-rose-700 text-white text-xs"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Confirm Delete"}
+              {deleteMutation.isPending ? td("Deleting...") : td("Confirm Delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

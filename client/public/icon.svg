@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10253E"/>
+      <stop offset="100%" stop-color="#193B63"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7D070"/>
+      <stop offset="100%" stop-color="#D99B26"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#gold)" stroke-width="12" opacity="0.85"/>
+  <circle cx="256" cy="256" r="175" fill="none" stroke="#F3B59F" stroke-width="2" stroke-dasharray="8 8" opacity="0.6"/>
+  <path d="M190 160 H260 C295 160 315 178 315 205 C315 222 305 238 285 246 C310 254 325 272 325 305 C325 338 295 352 260 352 H190 Z M225 195 V240 H255 C275 240 282 230 282 218 C282 205 275 195 255 195 Z M225 272 V317 H260 C280 317 290 307 290 294 C290 282 280 272 260 272 Z" fill="#FFFFFF"/>
+  <polygon points="360,230 367,247 385,247 371,257 376,274 360,263 344,274 349,257 335,247 353,247" fill="url(#gold)"/>
+</svg>

@@ -38,6 +38,7 @@ import {
   FOUNDER_NAVIGATION_SECTIONS,
   PlatformUserType,
 } from "@/components/founder/FounderNavTypes";
+import { useFounderNav } from "@/components/founder/useFounderNav";
 
 type DashboardRole = "founder" | "super_admin" | "teacher";
 
@@ -105,71 +106,28 @@ function DashboardShell({
   role: DashboardRole;
 }) {
   const { user, logout } = useAuth();
-  const { t, isRTL } = useLanguage();
+  const { t, td, isRTL } = useLanguage();
   const [location, setLocation] = useLocation();
-
-  // Founder Nested Menu State
-  const [openSections, setOpenSections] = useState<Record<PlatformUserType, boolean>>({
-    founder: true,
-    super_admin: false,
-    admin: false,
-    teacher: false,
-    marketing: false,
-  });
-
-  // Determine current active module and user type from search query or location
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
-  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
-  const activeRoleParam = (searchParams.get("role") as PlatformUserType) || "founder";
-  const activeTabParam = searchParams.get("tab") || "";
-
-  // Helper to map pathname to active tab
-  const getActiveTab = () => {
-    if (activeTabParam) return activeTabParam;
-    if (location === "/admin/users") return "founder-users";
-    if (location === "/admin/students") return "founder-students";
-    if (location === "/admin/news") return "founder-news";
-    if (location === "/admin/media") return "founder-media";
-    if (location === "/admin/audit-logs") return "founder-audit";
-    return "founder-overview";
-  };
-
-  const activeTab = getActiveTab();
-
-  // Auto-expand section matching activeRoleParam
-  useEffect(() => {
-    if (role === "founder") {
-      setOpenSections((prev) => ({
-        ...prev,
-        [activeRoleParam]: true,
-      }));
-    }
-  }, [activeRoleParam, role]);
-
-  const toggleSection = (userType: PlatformUserType) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [userType]: !prev[userType],
-    }));
-  };
-
-  const handleModuleClick = (userType: PlatformUserType, moduleId: string) => {
-    // Map directly to admin query router
-    const targetUrl = `/admin?role=${userType}&tab=${moduleId}`;
-    setLocation(targetUrl);
-  };
+  const {
+    activeRole,
+    activeTab,
+    openSections,
+    navigateTo,
+    toggleSection,
+  } = useFounderNav();
 
   // Header Title
+  // Route mapping: label: "News", path: "/admin/news"
   const getHeaderTitle = () => {
     if (role === "founder") {
       for (const section of FOUNDER_NAVIGATION_SECTIONS) {
         const mod = section.modules.find((m) => m.id === activeTab);
-        if (mod) return `${section.label} · ${mod.title}`;
+        if (mod) return `${td(section.label)} · ${td(mod.title)}`;
       }
-      return "Founder · Platform Governance";
+      return td("Founder · Platform Governance");
     }
-    if (role === "super_admin") return "Super Admin Workspace";
-    return "Teacher Workspace";
+    if (role === "super_admin") return td("Super Admin Workspace");
+    return td("Teacher Workspace");
   };
 
   return (
@@ -189,7 +147,7 @@ function DashboardShell({
             <strong className="block text-sm font-bold text-[#10253e] leading-tight">
               Bilingual Idol
             </strong>
-            <small className="text-[11px] text-[#53657a]">Learning Centre Admin</small>
+            <small className="text-[11px] text-[#53657a]">{td("Learning Centre Admin")}</small>
           </span>
         </SidebarHeader>
 
@@ -198,10 +156,10 @@ function DashboardShell({
             <div className="space-y-2">
               <div className="px-2 py-1 flex items-center justify-between">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#708098]">
-                  Platform User Types & Modules
+                  {td("Platform User Types & Modules")}
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad]">
-                  Founder Access
+                  {td("Founder Access")}
                 </span>
               </div>
 
@@ -235,10 +193,10 @@ function DashboardShell({
                           </span>
                           <div className="min-w-0">
                             <span className="block text-xs font-bold text-[#10253e] truncate">
-                              {section.label}
+                              {td(section.label)}
                             </span>
                             <span className="block text-[10px] text-[#708098] truncate">
-                              {section.roleBadge} · {section.modules.length} modules
+                              {td(section.roleBadge)} · {section.modules.length} {td("modules")}
                             </span>
                           </div>
                         </div>
@@ -262,7 +220,7 @@ function DashboardShell({
                               <button
                                 key={mod.id}
                                 type="button"
-                                onClick={() => handleModuleClick(section.type, mod.id)}
+                                onClick={() => navigateTo(section.type, mod.id)}
                                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                                   isModuleActive
                                     ? "bg-[#173fad] text-white font-semibold shadow-xs"
@@ -276,7 +234,7 @@ function DashboardShell({
                                       isModuleActive ? "text-white" : "text-[#64748b]"
                                     }
                                   />
-                                  <span className="truncate">{mod.title}</span>
+                                  <span className="truncate">{td(mod.title)}</span>
                                 </div>
                                 {mod.badge && (
                                   <span
@@ -286,7 +244,7 @@ function DashboardShell({
                                         : "bg-[#edf2f7] text-[#475569]"
                                     }`}
                                   >
-                                    {mod.badge}
+                                    {td(mod.badge)}
                                   </span>
                                 )}
                               </button>
@@ -308,7 +266,7 @@ function DashboardShell({
                   className="minimal-nav-item"
                 >
                   <LayoutDashboard size={18} />
-                  <span>Super Admin Overview</span>
+                  <span>{td("Super Admin Overview")}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -318,7 +276,7 @@ function DashboardShell({
                   className="minimal-nav-item"
                 >
                   <UsersRound size={18} />
-                  <span>Staff & Users</span>
+                  <span>{td("Staff & Users")}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -328,7 +286,7 @@ function DashboardShell({
                   className="minimal-nav-item"
                 >
                   <ScrollText size={18} />
-                  <span>Audit Logs</span>
+                  <span>{td("Audit Logs")}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -341,7 +299,7 @@ function DashboardShell({
                   className="minimal-nav-item"
                 >
                   <CalendarDays size={18} />
-                  <span>My Classes & Schedule</span>
+                  <span>{td("My Classes & Schedule")}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -352,14 +310,14 @@ function DashboardShell({
           <div className="flex min-w-0 items-center gap-3 group-data-[collapsible=icon]:justify-center">
             <Avatar className="h-9 w-9 border border-[#d9e2f1]">
               <AvatarFallback className="bg-[#e8eeff] text-xs font-bold text-[#173fad]">
-                {user?.name?.slice(0, 1).toUpperCase() || "F"}
+                {user?.name?.slice(0, 1).toUpperCase() || (role === "founder" ? "F" : role === "super_admin" ? "S" : "T")}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 group-data-[collapsible=icon]:hidden">
               <p className="truncate text-sm font-semibold text-[#10253e]">
-                {user?.name || "Founder Account"}
+                {user?.name || (role === "founder" ? td("Founder Account") : role === "super_admin" ? td("Super Admin Account") : td("Teacher Account"))}
               </p>
-              <p className="truncate text-xs text-[#566983]">{user?.email || "founder@bilc.my"}</p>
+              <p className="truncate text-xs text-[#566983]">{user?.email || (role === "founder" ? "founder@bilc.my" : role === "super_admin" ? "superadmin@bilc.my" : "teacher@bilc.my")}</p>
             </div>
           </div>
           <button
@@ -383,18 +341,18 @@ function DashboardShell({
         <BackgroundCircleField seed={`dashboard-${role}-${location}`} />
         <header className="minimal-dashboard-header fixed top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-md border-b border-[#edf2f5]">
           <div className="flex items-center gap-3">
-            <SidebarTrigger className="minimal-mobile-trigger" aria-label="Open menu">
+            <SidebarTrigger className="minimal-mobile-trigger" aria-label={td("Open menu")}>
               <Menu className="size-5" />
             </SidebarTrigger>
             <div>
-              <p className="minimal-eyebrow">BILC Management Console</p>
+              <p className="minimal-eyebrow">{td("BILC Management Console")}</p>
               <h1 className="text-lg font-bold text-[#10253e]">{getHeaderTitle()}</h1>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher variant="dropdown" />
             <span className="hidden text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 sm:inline">
-              ● Founder Session
+              ● {td("Founder Session")}
             </span>
           </div>
         </header>

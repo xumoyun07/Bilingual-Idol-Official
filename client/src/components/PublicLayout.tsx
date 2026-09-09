@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { SmartWhatsAppWidget } from "@/components/SmartWhatsAppWidget";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
 
@@ -58,20 +60,11 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         "/enroll": { title: "التسجيل والاستشارة الأكاديمية | بايلينجوال آيدول", description: "سجل إلكترونياً أو احجز موعد استشارة أكاديمية مع مركز بايلينجوال آيدول." },
         "/login": { title: "بوابة الطلاب والأساتذة | بايلينجوال آيدول", description: "سجل الدخول لعرض الجداول الدراسية وسجلات الحضور والموارد الأكاديمية." },
       },
-      ru: {
-        "/": { title: "Языковой центр Bilingual Idol | Куала-Лумпур", description: "Премиальный языковой центр в Pavilion Embassy Куала-Лумпур. Общий английский, IELTS, летние лагеря и мировые языки." },
-        "/programs": { title: "Академические программы | Bilingual Idol", description: "Аккредитованные программы обучения английскому и иностранным языкам в Куала-Лумпуре." },
-        "/about": { title: "О центре | Bilingual Idol Language Centre", description: "Методика обучения, международные преподаватели и современный кампус в Pavilion Embassy." },
-        "/news": { title: "Новости и объявления | Bilingual Idol", description: "Официальные анонсы, даты наборов и события языкового центра Bilingual Idol." },
-        "/contact": { title: "Контакты и тур по кампусу | Bilingual Idol", description: "Свяжитесь с приемной комиссией или посетите наш кампус в Pavilion Embassy Куала-Лумпур." },
-        "/enroll": { title: "Зачисление и консультация | Bilingual Idol", description: "Онлайн-заявка и индивидуальная академическая консультация в центре Bilingual Idol." },
-        "/login": { title: "Портал студентов и сотрудников | Bilingual Idol", description: "Доступ к расписанию, журналу посещаемости и учебным материалам." },
-      },
     };
 
     const currentMetaMap = localizedMetadata[language] || localizedMetadata.en;
-    const fallbackTitle = language === "ar" ? "تفاصيل البرنامج | بايلينجوال آيدول" : language === "ms" ? "Maklumat Program | Bilingual Idol" : language === "ru" ? "Информация о программе | Bilingual Idol" : "Programme details | Bilingual Idol";
-    const fallbackDesc = language === "ar" ? "معلومات البرنامج من مركز بايلينجوال آيدول للغات." : language === "ms" ? "Maklumat program daripada Pusat Bahasa Bilingual Idol." : language === "ru" ? "Информация об академической программе языкового центра Bilingual Idol." : "Programme information from Bilingual Idol Language Centre.";
+    const fallbackTitle = language === "ar" ? "تفاصيل البرنامج | بايلينجوال آيدول" : language === "ms" ? "Maklumat Program | Bilingual Idol" : "Programme details | Bilingual Idol";
+    const fallbackDesc = language === "ar" ? "معلومات البرنامج من مركز بايلينجوال آيدول للغات." : language === "ms" ? "Maklumat program daripada Pusat Bahasa Bilingual Idol." : "Programme information from Bilingual Idol Language Centre.";
     
     const selected = currentMetaMap[location] ?? (location.startsWith("/programs/") ? { title: fallbackTitle, description: fallbackDesc } : currentMetaMap["/"]);
     
@@ -259,6 +252,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </nav>
           <div className="simple-public-actions flex items-center gap-2">
             <LanguageSwitcher variant="dropdown" />
+            <PWAInstallButton variant="header" />
             <Link href="/login" className="simple-button simple-button-quiet">
               {t("nav.signIn")}
             </Link>
@@ -267,6 +261,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-2 md:hidden">
+            <PWAInstallButton variant="header" className="!px-2.5 !py-1 text-[11px]" />
             <button
               className="simple-menu-button"
               onClick={() => setOpen((value) => !value)}
@@ -288,6 +283,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 {item.label}
               </Link>
             ))}
+            <div className="py-2">
+              <PWAInstallButton variant="card" />
+            </div>
             <Link href="/login" onClick={close}>
               {t("nav.signIn")}
             </Link>
@@ -297,6 +295,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </nav>
         )}
       </header>
+
+      <OfflineIndicator />
 
       <main id="main-content" className="simple-public-main" tabIndex={-1}>
         {children}

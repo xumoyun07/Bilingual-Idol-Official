@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,6 +79,7 @@ const emptyLead: LeadFormState = {
 };
 
 export function AdminLeadsModule() {
+  const { td } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,34 +92,34 @@ export function AdminLeadsModule() {
   const createMutation = trpc.submissions.create.useMutation({
     onSuccess: () => {
       utils.submissions.list.invalidate();
-      toast.success("Lead created successfully.");
+      toast.success(td("Lead created successfully."));
       setIsModalOpen(false);
       setLeadForm(emptyLead);
     },
-    onError: (err) => toast.error(err.message || "Failed to create lead."),
+    onError: (err) => toast.error(err.message || td("Failed to create lead.")),
   });
 
   const updateStatusMutation = trpc.submissions.updateStatus.useMutation({
     onSuccess: () => {
       utils.submissions.list.invalidate();
-      toast.success("Lead status updated.");
+      toast.success(td("Lead status updated."));
     },
-    onError: (err) => toast.error(err.message || "Failed to update lead status."),
+    onError: (err) => toast.error(err.message || td("Failed to update lead status.")),
   });
 
   const deleteMutation = trpc.submissions.delete.useMutation({
     onSuccess: () => {
       utils.submissions.list.invalidate();
-      toast.success("Lead removed successfully.");
+      toast.success(td("Lead removed successfully."));
       setDeleteTargetId(null);
     },
-    onError: (err) => toast.error(err.message || "Failed to delete lead."),
+    onError: (err) => toast.error(err.message || td("Failed to delete lead.")),
   });
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadForm.studentName.trim() || !leadForm.parentEmail.trim()) {
-      toast.error("Student name and email are required.");
+      toast.error(td("Student name and email are required."));
       return;
     }
     createMutation.mutate(leadForm);
@@ -145,13 +147,13 @@ export function AdminLeadsModule() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e4d3b1]">
               <FileSpreadsheet size={13} />
-              Admin Module
+              {td("Admin Module")}
             </span>
-            <span className="text-xs text-[#53657a]">CRUD: Admissions Leads</span>
+            <span className="text-xs text-[#53657a]">{td("CRUD")}: {td("Admissions Pipeline Leads")}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Admissions & Inquiries Pipeline</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Consultation & Enrolment Leads")}</h2>
           <p className="text-sm text-[#53657a]">
-            Process student enrollments, course inquiries, parental contacts, and conversion statuses.
+            {td("Track incoming inquiries, course interests, and admissions pipeline")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -163,7 +165,7 @@ export function AdminLeadsModule() {
             className="h-9 gap-1.5"
           >
             <RefreshCw size={14} className={leadsQuery.isFetching ? "animate-spin" : ""} />
-            Refresh
+            {td("Refresh")}
           </Button>
           <Button
             size="sm"
@@ -174,7 +176,7 @@ export function AdminLeadsModule() {
             className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
           >
             <Plus size={15} />
-            Add Manual Lead
+            {td("Add Lead")}
           </Button>
         </div>
       </div>
@@ -186,7 +188,7 @@ export function AdminLeadsModule() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search leads by student name, parent email, or programme..."
+            placeholder={td("Search leads by name, email, parent, phone...")}
             className="pl-9 h-9 text-sm"
           />
         </div>
@@ -197,15 +199,15 @@ export function AdminLeadsModule() {
             aria-label="Filter submissions by status"
             className="h-9 px-3 text-xs font-medium rounded-lg border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
           >
-            <option value="all">All Statuses</option>
-            <option value="new">New Lead</option>
-            <option value="contacted">Contacted</option>
-            <option value="interested">Interested</option>
-            <option value="enrolled">Enrolled</option>
-            <option value="closed">Closed</option>
+            <option value="all">{td("All Lead Statuses")}</option>
+            <option value="new">{td("New Lead")}</option>
+            <option value="contacted">{td("Contacted")}</option>
+            <option value="interested">{td("Interested")}</option>
+            <option value="enrolled">{td("Enrolled")}</option>
+            <option value="closed">{td("Closed")}</option>
           </select>
           <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">
-            {filteredLeads.length} leads
+            {filteredLeads.length} {td("leads")}
           </span>
         </div>
       </div>
@@ -218,8 +220,8 @@ export function AdminLeadsModule() {
       ) : filteredLeads.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
           <FileSpreadsheet className="mx-auto size-10 text-[#53657a]/50" />
-          <p className="mt-2 text-sm font-semibold text-[#10253e]">No admissions leads found</p>
-          <p className="text-xs text-[#53657a]">Click "Add Manual Lead" to register a walk-in or inquiry.</p>
+          <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No admissions or inquiry leads found.")}</p>
+          <p className="text-xs text-[#53657a]">{td("Try adjusting your search or status filter.")}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
@@ -227,11 +229,11 @@ export function AdminLeadsModule() {
             <table className="w-full text-left text-xs">
               <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
                 <tr>
-                  <th className="p-3.5">Student / Parent</th>
-                  <th className="p-3.5">Programme & Schedule</th>
-                  <th className="p-3.5">Source & Date</th>
-                  <th className="p-3.5">Status Stage</th>
-                  <th className="p-3.5 text-right">Actions</th>
+                  <th className="p-3.5">{td("Student & Parent")}</th>
+                  <th className="p-3.5">{td("Program & Schedule")}</th>
+                  <th className="p-3.5">{td("Source & Date")}</th>
+                  <th className="p-3.5">{td("Stage Status")}</th>
+                  <th className="p-3.5 text-right">{td("Quick Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#edf2f5]">
@@ -242,9 +244,9 @@ export function AdminLeadsModule() {
                       <td className="p-3.5">
                         <div className="font-bold text-sm text-[#10253e]">{lead.studentName}</div>
                         <div className="text-[#53657a] text-[11px] flex items-center gap-1.5 mt-0.5">
-                          <span>Parent: {lead.parentName}</span>
+                          <span>{td("Parent")}: {lead.parentName}</span>
                           <span>·</span>
-                          <span>Age {lead.studentAge}</span>
+                          <span>{td("Age")} {lead.studentAge}</span>
                         </div>
                         <div className="text-[11px] text-[#173fad] flex items-center gap-2 mt-1">
                           <span className="flex items-center gap-1">
@@ -256,8 +258,8 @@ export function AdminLeadsModule() {
                         </div>
                       </td>
                       <td className="p-3.5">
-                        <div className="font-semibold text-[#10253e]">{lead.programInterest}</div>
-                        <div className="text-[#53657a] text-[11px]">{lead.preferredSchedule}</div>
+                        <div className="font-semibold text-[#10253e]">{td(lead.programInterest)}</div>
+                        <div className="text-[#53657a] text-[11px]">{td(lead.preferredSchedule)}</div>
                         {lead.message ? (
                           <p className="text-[#53657a] text-[11px] italic mt-1 line-clamp-1 bg-[#f8fafc] p-1 rounded border border-[#edf2f5]">
                             "{lead.message}"
@@ -266,7 +268,7 @@ export function AdminLeadsModule() {
                       </td>
                       <td className="p-3.5 text-[#53657a]">
                         <span className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[11px] font-medium text-[#33475b]">
-                          {lead.source || "Website"}
+                          {td(lead.source || "Website")}
                         </span>
                         <div className="text-[10px] text-[#8292a1] mt-1">
                           {new Date(lead.createdAt).toLocaleDateString("en-GB", {
@@ -288,11 +290,11 @@ export function AdminLeadsModule() {
                           aria-label={`Update status for lead ${lead.studentName}`}
                           className={`text-xs font-semibold px-2.5 py-1 rounded-md border focus:outline-none ${statusInfo.tone}`}
                         >
-                          <option value="new">New Lead</option>
-                          <option value="contacted">Contacted</option>
-                          <option value="interested">Interested</option>
-                          <option value="enrolled">Enrolled</option>
-                          <option value="closed">Closed</option>
+                          <option value="new">{td("New Lead")}</option>
+                          <option value="contacted">{td("Contacted")}</option>
+                          <option value="interested">{td("Interested")}</option>
+                          <option value="enrolled">{td("Enrolled")}</option>
+                          <option value="closed">{td("Closed")}</option>
                         </select>
                       </td>
                       <td className="p-3.5 text-right">
@@ -318,26 +320,26 @@ export function AdminLeadsModule() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-[#10253e]">Add Manual Admission Lead</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-[#10253e]">{td("Create new enrollment or general enquiry lead")}</DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
-              Record walk-in inquiries, phone inquiries, and student admissions.
+              {td("Record walk-in inquiries, phone inquiries, and student admissions.")}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreate} className="space-y-4 py-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Student Name *</Label>
+                <Label className="text-xs font-semibold">{td("Prospective Student Name")} *</Label>
                 <Input
                   required
                   value={leadForm.studentName}
                   onChange={(e) => setLeadForm((p) => ({ ...p, studentName: e.target.value }))}
-                  placeholder="Full student name"
+                  placeholder={td("Full student name")}
                   className="h-9 text-sm"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Student Age *</Label>
+                <Label className="text-xs font-semibold">{td("Student Age (Years)")} *</Label>
                 <Input
                   required
                   type="number"
@@ -352,17 +354,17 @@ export function AdminLeadsModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Parent / Guardian Name *</Label>
+                <Label className="text-xs font-semibold">{td("Parent / Guardian Full Name")} *</Label>
                 <Input
                   required
                   value={leadForm.parentName}
                   onChange={(e) => setLeadForm((p) => ({ ...p, parentName: e.target.value }))}
-                  placeholder="Guardian full name"
+                  placeholder={td("Guardian full name")}
                   className="h-9 text-sm"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Parent Email *</Label>
+                <Label className="text-xs font-semibold">{td("Parent Email Address")} *</Label>
                 <Input
                   required
                   type="email"
@@ -373,7 +375,7 @@ export function AdminLeadsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Parent Phone *</Label>
+                <Label className="text-xs font-semibold">{td("Parent Phone / WhatsApp")} *</Label>
                 <Input
                   required
                   value={leadForm.parentPhone}
@@ -386,7 +388,7 @@ export function AdminLeadsModule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Program Interest</Label>
+                <Label className="text-xs font-semibold">{td("Program / Course Interest")}</Label>
                 <Input
                   value={leadForm.programInterest}
                   onChange={(e) => setLeadForm((p) => ({ ...p, programInterest: e.target.value }))}
@@ -395,7 +397,7 @@ export function AdminLeadsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Preferred Schedule</Label>
+                <Label className="text-xs font-semibold">{td("Preferred Schedule")}</Label>
                 <Input
                   value={leadForm.preferredSchedule}
                   onChange={(e) => setLeadForm((p) => ({ ...p, preferredSchedule: e.target.value }))}
@@ -406,19 +408,19 @@ export function AdminLeadsModule() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Inquiry Notes / Special Requests</Label>
+              <Label className="text-xs font-semibold">{td("Initial Notes & Message")}</Label>
               <Textarea
                 rows={3}
                 value={leadForm.message}
                 onChange={(e) => setLeadForm((p) => ({ ...p, message: e.target.value }))}
-                placeholder="Notes regarding student language goals, consultation notes, etc."
+                placeholder={td("Notes regarding student language goals, consultation notes, etc.")}
                 className="text-sm"
               />
             </div>
 
             <DialogFooter className="pt-3">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {td("Cancel")}
               </Button>
               <Button
                 type="submit"
@@ -426,7 +428,7 @@ export function AdminLeadsModule() {
                 disabled={createMutation.isPending}
                 className="bg-[#173fad] hover:bg-[#12328b] text-white"
               >
-                {createMutation.isPending ? "Creating..." : "Save Lead"}
+                {createMutation.isPending ? td("Creating lead...") : td("Save Lead")}
               </Button>
             </DialogFooter>
           </form>
@@ -437,18 +439,18 @@ export function AdminLeadsModule() {
       <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold text-[#10253e]">Remove Lead Record?</AlertDialogTitle>
+            <AlertDialogTitle className="text-base font-bold text-[#10253e]">{td("Delete Inquiry")}</AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-[#53657a]">
-              Are you sure you want to delete this admission inquiry? This action cannot be undone.
+              {td("Are you sure you want to delete this lead record?")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs">{td("Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteTargetId && deleteMutation.mutate({ id: deleteTargetId })}
               className="bg-rose-600 hover:bg-rose-700 text-white text-xs"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Confirm Delete"}
+              {deleteMutation.isPending ? td("Deleting...") : td("Delete Record")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

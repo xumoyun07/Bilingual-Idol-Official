@@ -150,11 +150,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (isRTL) {
       document.documentElement.classList.add("rtl");
       document.body.classList.add("rtl");
+      document.documentElement.classList.add("is-rtl");
+      document.body.classList.add("is-rtl");
       document.documentElement.classList.remove("ltr");
       document.body.classList.remove("ltr");
     } else {
       document.documentElement.classList.remove("rtl");
       document.body.classList.remove("rtl");
+      document.documentElement.classList.remove("is-rtl");
+      document.body.classList.remove("is-rtl");
       document.documentElement.classList.add("ltr");
       document.body.classList.add("ltr");
     }

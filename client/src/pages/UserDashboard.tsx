@@ -1,6 +1,9 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LocalUserDataManager } from "@/components/LocalUserDataManager";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -46,6 +49,7 @@ export default function UserDashboard() {
 
   return (
     <main id="user-dashboard-container" data-page="user-dashboard" className={`member-page blue-member-page page-user-dashboard ${isRTL ? "is-rtl" : ""}`}>
+      <OfflineIndicator />
       <BackgroundCircleField seed={`member-${user?.role ?? "user"}`} />
       <header id="user-dashboard-header" className="member-header flex items-center justify-between">
         <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
@@ -56,6 +60,7 @@ export default function UserDashboard() {
           </div>
         </Link>
         <div className="flex items-center gap-2.5">
+          <PWAInstallButton variant="header" />
           <LanguageSwitcher variant="dropdown" />
           <Button type="button" variant="outline" className="member-signout" onClick={() => logout()}>
             <LogOut size={16} />
@@ -63,7 +68,7 @@ export default function UserDashboard() {
           </Button>
         </div>
       </header>
-      <section className="member-content" aria-labelledby="member-dashboard-title">
+      <section className="member-content space-y-6" aria-labelledby="member-dashboard-title">
         <div className="member-welcome">
           <span className="member-avatar" aria-hidden="true">
             <UserRound size={23} />
@@ -75,6 +80,10 @@ export default function UserDashboard() {
           </h1>
           <p>{t("userDashboard.subtitle")}</p>
         </div>
+
+        {/* PWA Prompt Card */}
+        <PWAInstallButton variant="card" />
+
         <section className="member-next-step" aria-label={t("userDashboard.nextStepTitle")}>
           <div>
             <BookOpen aria-hidden="true" size={21} />
@@ -86,6 +95,7 @@ export default function UserDashboard() {
             <ArrowRight size={16} className={isRTL ? "rotate-180" : ""} />
           </Link>
         </section>
+
         <section className="member-status" aria-label={t("userDashboard.attendanceTitle")}>
           <ShieldCheck aria-hidden="true" size={19} />
           <div>
@@ -112,7 +122,13 @@ export default function UserDashboard() {
             )}
           </div>
         </section>
+
+        {/* Local User Data, Offline Storage & Privacy Management */}
+        <section aria-label="Local User Data Management">
+          <LocalUserDataManager />
+        </section>
       </section>
     </main>
   );
 }
+

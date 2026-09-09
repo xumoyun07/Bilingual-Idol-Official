@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import { Building2, CheckCircle2, Globe, Mail, MapPin, Phone, RefreshCw, Save, S
 import { toast } from "sonner";
 
 export function FounderSettingsModule() {
+  const { td } = useLanguage();
   const settingsQuery = trpc.content.siteSettings.useQuery();
   const utils = trpc.useUtils();
 
@@ -39,11 +41,11 @@ export function FounderSettingsModule() {
   const updateMutation = trpc.content.updateSiteSettings.useMutation({
     onSuccess: () => {
       utils.content.siteSettings.invalidate();
-      toast.success("Platform settings saved successfully.");
+      toast.success(td("Platform settings saved successfully."));
       setIsModified(false);
     },
     onError: (err) => {
-      toast.error(err.message || "Failed to update platform settings.");
+      toast.error(err.message || td("Failed to update platform settings."));
     },
   });
 
@@ -64,13 +66,13 @@ export function FounderSettingsModule() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#fff8e6] text-[#b47d00] border border-[#ffd580]">
               <ShieldCheck size={13} />
-              Founder Root Configuration
+              {td("Founder Root Configuration")}
             </span>
-            <span className="text-xs text-[#53657a]">CRUD: System Settings</span>
+            <span className="text-xs text-[#53657a]">{td("CRUD")}: {td("Centre & System Settings")}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Centre & System Settings</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Centre & System Settings")}</h2>
           <p className="text-sm text-[#53657a]">
-            Manage platform branding, emergency contacts, physical address, and global public metadata.
+            {td("Manage platform branding, emergency contacts, physical address, and global public metadata.")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -82,7 +84,7 @@ export function FounderSettingsModule() {
             className="h-9 gap-1.5"
           >
             <RefreshCw size={14} className={settingsQuery.isFetching ? "animate-spin" : ""} />
-            Refresh
+            {td("Refresh")}
           </Button>
           <Button
             size="sm"
@@ -91,7 +93,7 @@ export function FounderSettingsModule() {
             className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
           >
             <Save size={14} />
-            {updateMutation.isPending ? "Saving..." : "Save Changes"}
+            {updateMutation.isPending ? td("Saving...") : td("Save Changes")}
           </Button>
         </div>
       </div>
@@ -102,16 +104,16 @@ export function FounderSettingsModule() {
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-bold text-[#10253e] flex items-center gap-2">
               <Building2 size={18} className="text-[#173fad]" />
-              Institutional Identity
+              {td("Institutional Identity")}
             </CardTitle>
             <CardDescription className="text-xs text-[#53657a]">
-              Official centre title, marketing tagline, and public status.
+              {td("Official centre title, marketing tagline, and public status.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="centre_name" className="text-xs font-semibold text-[#10253e]">
-                Official Centre Name
+                {td("Official Centre Name")}
               </Label>
               <Input
                 id="centre_name"
@@ -123,19 +125,19 @@ export function FounderSettingsModule() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="brand_tagline" className="text-xs font-semibold text-[#10253e]">
-                Brand Tagline
+                {td("Brand Tagline / Mission Statement")}
               </Label>
               <Input
                 id="brand_tagline"
                 value={formValues.brand_tagline || ""}
                 onChange={(e) => handleFieldChange("brand_tagline", e.target.value)}
-                placeholder="Official tagline"
+                placeholder={td("Official tagline")}
                 className="h-9 text-sm"
               />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="registration_status" className="text-xs font-semibold text-[#10253e]">
-                Admissions Intake Status
+                {td("2026 Intake Registration Status")}
               </Label>
               <Input
                 id="registration_status"
@@ -153,17 +155,17 @@ export function FounderSettingsModule() {
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-bold text-[#10253e] flex items-center gap-2">
               <Phone size={18} className="text-[#173fad]" />
-              Communication & Inquiries
+              {td("Communication & Inquiries")}
             </CardTitle>
             <CardDescription className="text-xs text-[#53657a]">
-              Public phone numbers, official email, and WhatsApp line.
+              {td("Public phone numbers, official email, and WhatsApp line.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="contact_email" className="text-xs font-semibold text-[#10253e]">
-                  General Email
+                  {td("Public Email Address")}
                 </Label>
                 <Input
                   id="contact_email"
@@ -176,7 +178,7 @@ export function FounderSettingsModule() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="emergency_contact" className="text-xs font-semibold text-[#10253e]">
-                  Founder / Admin Hotline
+                  {td("Emergency Contact / Founder Escalation Email")}
                 </Label>
                 <Input
                   id="emergency_contact"
@@ -190,7 +192,7 @@ export function FounderSettingsModule() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="contact_phone" className="text-xs font-semibold text-[#10253e]">
-                  Office Phone
+                  {td("Main Reception Phone")}
                 </Label>
                 <Input
                   id="contact_phone"
@@ -202,7 +204,7 @@ export function FounderSettingsModule() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="whatsapp_number" className="text-xs font-semibold text-[#10253e]">
-                  Official WhatsApp
+                  {td("WhatsApp Direct Line")}
                 </Label>
                 <Input
                   id="whatsapp_number"
@@ -221,17 +223,17 @@ export function FounderSettingsModule() {
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-bold text-[#10253e] flex items-center gap-2">
               <MapPin size={18} className="text-[#173fad]" />
-              Campus Location & Operating Hours
+              {td("Campus Location & Operating Hours")}
             </CardTitle>
             <CardDescription className="text-xs text-[#53657a]">
-              Physical centre address and scheduled weekly opening hours for staff and students.
+              {td("Physical centre address and scheduled weekly opening hours for staff and students.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="address" className="text-xs font-semibold text-[#10253e]">
-                  Full Campus Address
+                  {td("Official Registered Address")}
                 </Label>
                 <Textarea
                   id="address"
@@ -244,7 +246,7 @@ export function FounderSettingsModule() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="operating_hours" className="text-xs font-semibold text-[#10253e]">
-                  Operating Schedule
+                  {td("Operating & Reception Hours")}
                 </Label>
                 <Textarea
                   id="operating_hours"
