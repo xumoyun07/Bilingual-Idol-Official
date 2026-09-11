@@ -27,6 +27,13 @@ import {
   Shield,
   ShieldCheck,
   UsersRound,
+  BarChart3,
+  Megaphone,
+  FileText,
+  Image as ImageIcon,
+  MessageSquare,
+  Settings2,
+  BookOpen,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -41,30 +48,45 @@ import {
 } from "@/components/founder/FounderNavTypes";
 import { useFounderNav } from "@/components/founder/useFounderNav";
 
-type DashboardRole = "founder" | "super_admin" | "teacher";
+type DashboardRole = "founder" | "super_admin" | "teacher" | "marketing" | "student";
 
 export default function DashboardLayout({
   children,
   role = "founder",
+  activeTab,
+  setActiveTab,
 }: {
   children: React.ReactNode;
   role?: DashboardRole;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
 }) {
   const { loading, user } = useAuth();
 
+  const isRoleAuthorized = () => {
+    if (!user) return false;
+    if (user.role === role) return true;
+    if (role === "marketing" && ["founder", "super_admin", "admin"].includes(user.role)) return true;
+    return false;
+  };
+
   useEffect(() => {
-    if (!loading && user && user.role !== role) {
+    if (!loading && user && !isRoleAuthorized()) {
       window.location.replace(
         user.role === "super_admin"
           ? "/super-admin"
           : user.role === "founder"
           ? "/admin"
+          : user.role === "teacher"
+          ? "/teacher"
+          : user.role === "marketing"
+          ? "/marketing"
           : "/dashboard"
       );
     }
   }, [loading, role, user]);
 
-  if (loading || (user && user.role !== role)) return <DashboardLayoutSkeleton />;
+  if (loading || (user && !isRoleAuthorized())) return <DashboardLayoutSkeleton />;
   if (!user) return <DashboardSignIn />;
 
   return (
@@ -73,7 +95,7 @@ export default function DashboardLayout({
       className="blue-workspace"
       style={{ "--sidebar-width": "18.5rem" } as React.CSSProperties}
     >
-      <DashboardShell role={role}>{children}</DashboardShell>
+      <DashboardShell role={role} activeTab={activeTab} setActiveTab={setActiveTab}>{children}</DashboardShell>
     </SidebarProvider>
   );
 }
@@ -102,9 +124,13 @@ function DashboardSignIn() {
 function DashboardShell({
   children,
   role,
+  activeTab: externalActiveTab,
+  setActiveTab: externalSetActiveTab,
 }: {
   children: React.ReactNode;
   role: DashboardRole;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
 }) {
   const { user, logout } = useAuth();
   const { t, td, isRTL } = useLanguage();
@@ -119,7 +145,6 @@ function DashboardShell({
   const { isMobile, setOpenMobile } = useSidebar();
 
   // Header Title
-  // Route mapping: label: "News", path: "/admin/news"
   const getHeaderTitle = () => {
     if (role === "founder") {
       for (const section of FOUNDER_NAVIGATION_SECTIONS) {
@@ -129,7 +154,53 @@ function DashboardShell({
       return td("Founder · Platform Governance");
     }
     if (role === "super_admin") return td("Super Admin Workspace");
-    return td("Teacher Workspace");
+    if (role === "teacher") return td("Teacher Workspace");
+    if (role === "marketing") {
+      if (externalActiveTab === "overview") return td("Marketing · Overview & Reports");
+      if (externalActiveTab === "content") return td("Marketing · Content & CMS");
+      if (externalActiveTab === "media") return td("Marketing · Media Library");
+      if (externalActiveTab === "audiences") return td("Marketing · Audience Segments");
+      if (externalActiveTab === "channels") return td("Marketing · Channels & FAQ");
+      if (externalActiveTab === "settings") return td("Marketing · Settings & Directory");
+      if (externalActiveTab === "restrictions") return td("Marketing · Guardrails");
+      return td("Marketing Console");
+    }
+    return td("Student Portal");
+  };
+
+  const getSessionBadgeLabel = () => {
+    if (role === "super_admin") return td("Super Admin");
+    if (role === "founder") return td("Founder Session");
+    if (role === "teacher") return td("Teacher Session");
+    if (role === "marketing") return td("Marketing Session");
+    return td("Student Account");
+  };
+
+  const getFallbackInitials = () => {
+    if (user?.name) return user.name.slice(0, 1).toUpperCase();
+    if (role === "founder") return "F";
+    if (role === "super_admin") return "SA";
+    if (role === "teacher") return "T";
+    if (role === "marketing") return "M";
+    return "S";
+  };
+
+  const getDefaultEmail = () => {
+    if (user?.email) return user.email;
+    if (role === "founder") return "founder@bilc.my";
+    if (role === "super_admin") return "superadmin@bilc.my";
+    if (role === "teacher") return "teacher@bilc.my";
+    if (role === "marketing") return "marketing@bilc.my";
+    return "student@bilc.my";
+  };
+
+  const getDefaultName = () => {
+    if (user?.name) return user.name;
+    if (role === "founder") return td("Founder Account");
+    if (role === "super_admin") return td("Super Admin Account");
+    if (role === "teacher") return td("Teacher Account");
+    if (role === "marketing") return td("Marketing Account");
+    return td("Student Account");
   };
 
   return (
@@ -295,6 +366,102 @@ function DashboardShell({
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
+          ) : role === "marketing" ? (
+            <SidebarMenu className="px-2 space-y-1">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "overview"}
+                  onClick={() => externalSetActiveTab?.("overview")}
+                  className="minimal-nav-item"
+                >
+                  <BarChart3 size={18} />
+                  <span>{td("Overview & Analytics")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "content"}
+                  onClick={() => externalSetActiveTab?.("content")}
+                  className="minimal-nav-item"
+                >
+                  <FileText size={18} />
+                  <span>{td("Content Management")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "media"}
+                  onClick={() => externalSetActiveTab?.("media")}
+                  className="minimal-nav-item"
+                >
+                  <ImageIcon size={18} />
+                  <span>{td("Media Assets")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "audiences"}
+                  onClick={() => externalSetActiveTab?.("audiences")}
+                  className="minimal-nav-item"
+                >
+                  <UsersRound size={18} />
+                  <span>{td("Audience Segments")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "channels"}
+                  onClick={() => externalSetActiveTab?.("channels")}
+                  className="minimal-nav-item"
+                >
+                  <MessageSquare size={18} />
+                  <span>{td("Channels & FAQ")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "settings"}
+                  onClick={() => externalSetActiveTab?.("settings")}
+                  className="minimal-nav-item"
+                >
+                  <Settings2 size={18} />
+                  <span>{td("CTA & Tracking")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "restrictions"}
+                  onClick={() => externalSetActiveTab?.("restrictions")}
+                  className="minimal-nav-item text-red-600 hover:text-red-700 hover:bg-red-50/50"
+                >
+                  <ShieldCheck size={18} />
+                  <span>{td("Guardrails")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          ) : role === "student" ? (
+            <SidebarMenu className="px-2">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={location === "/dashboard"}
+                  onClick={() => setLocation("/dashboard")}
+                  className="minimal-nav-item"
+                >
+                  <LayoutDashboard size={18} />
+                  <span>{td("My Dashboard")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={false}
+                  onClick={() => setLocation("/programs")}
+                  className="minimal-nav-item"
+                >
+                  <BookOpen size={18} />
+                  <span>{td("Browse Programs")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
           ) : (
             <SidebarMenu className="px-2">
               <SidebarMenuItem>
@@ -315,14 +482,14 @@ function DashboardShell({
           <div className="flex min-w-0 items-center gap-3 group-data-[collapsible=icon]:justify-center">
             <Avatar className="h-9 w-9 border border-[#d9e2f1]">
               <AvatarFallback className="bg-[#e8eeff] text-xs font-bold text-[#173fad]">
-                {user?.name?.slice(0, 1).toUpperCase() || (role === "founder" ? "F" : role === "super_admin" ? "S" : "T")}
+                {getFallbackInitials()}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 group-data-[collapsible=icon]:hidden">
               <p className="truncate text-sm font-semibold text-[#10253e]">
-                {user?.name || (role === "founder" ? td("Founder Account") : role === "super_admin" ? td("Super Admin Account") : td("Teacher Account"))}
+                {getDefaultName()}
               </p>
-              <p className="truncate text-xs text-[#566983]">{user?.email || (role === "founder" ? "founder@bilc.my" : role === "super_admin" ? "superadmin@bilc.my" : "teacher@bilc.my")}</p>
+              <p className="truncate text-xs text-[#566983]">{getDefaultEmail()}</p>
             </div>
           </div>
           <button
@@ -344,20 +511,22 @@ function DashboardShell({
 
       <SidebarInset className={`minimal-dashboard-inset ${isRTL ? "rtl-inset" : ""}`}>
         <BackgroundCircleField seed={`dashboard-${role}-${location}`} />
-        <header className="minimal-dashboard-header fixed top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-md border-b border-[#edf2f5]">
-          <div className="flex items-center gap-3">
-            <SidebarTrigger className="minimal-mobile-trigger" aria-label={td("Open menu")}>
+        <header className="minimal-dashboard-header fixed top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-md border-b border-[#edf2f5] px-4 sm:px-6 md:px-8">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <SidebarTrigger className="minimal-mobile-trigger shrink-0" aria-label={td("Open menu")}>
               <Menu className="size-5" />
             </SidebarTrigger>
-            <div>
-              <p className="minimal-eyebrow">{td("BILC Management Console")}</p>
-              <h1 className="text-lg font-bold text-[#10253e]">{getHeaderTitle()}</h1>
+            <div className="min-w-0">
+              <p className="minimal-eyebrow text-[10px] uppercase tracking-wider">{td("BILC Management Console")}</p>
+              <h1 className="text-xs sm:text-base md:text-lg font-bold text-[#10253e] leading-tight" title={getHeaderTitle()}>
+                {getHeaderTitle()}
+              </h1>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <LanguageSwitcher variant="dropdown" />
             <span className="hidden text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 sm:inline">
-              ● {td("Founder Session")}
+              ● {getSessionBadgeLabel()}
             </span>
           </div>
         </header>

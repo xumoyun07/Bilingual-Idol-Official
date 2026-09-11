@@ -65,22 +65,32 @@ export default function FounderLogin() {
         </Link>
       </header>
 
-      <section id="login-content-section" className="auth-content" aria-labelledby="sign-in-title">
-        <div className="auth-intro auth-intro--surface">
-          <p className="simple-eyebrow">{t("login.eyebrow")}</p>
-          <h1 id="sign-in-title">{t("login.heroTitle")}</h1>
-          <p>{t("login.heroSubtitle")}</p>
+      <section id="login-content-section" className="auth-content max-md:pt-0" aria-labelledby="sign-in-title">
+        {/* Mobile-only Header texts */}
+        <div className="md:hidden text-center max-w-md mx-auto mb-2 px-4 bg-white border border-[#edf2f5] rounded-2xl py-5 shadow-xs max-md:-mt-[10px] max-md:-mb-[20px]">
+          <p className="simple-eyebrow text-[10px] uppercase tracking-wider text-[#526d9c]">{t("login.eyebrow")}</p>
+          <h1 className="text-xl font-bold text-[#10253e] mt-1 leading-tight">{t("login.heroTitle")}</h1>
+          <p className="text-xs text-[#566983] mt-1 leading-normal">{t("login.heroSubtitle")}</p>
+        </div>
+
+        <div className="auth-intro auth-intro--surface order-2 md:order-1 max-md:!border-0 max-md:!bg-transparent max-md:!shadow-none max-md:!p-0 max-md:-mt-5">
+          {/* Desktop-only Header texts */}
+          <div className="hidden md:block">
+            <p className="simple-eyebrow">{t("login.eyebrow")}</p>
+            <h1 id="sign-in-title">{t("login.heroTitle")}</h1>
+            <p>{t("login.heroSubtitle")}</p>
+          </div>
           
-          <div className="auth-help">
-            <ShieldCheck size={19} aria-hidden="true" />
-            <div>
-              <strong>{t("login.helpTitle")}</strong>
-              <span>{t("login.helpText")}</span>
+          <div className="auth-help max-sm:p-3 max-md:mt-[15px] max-sm:gap-2">
+            <ShieldCheck size={14} className="max-sm:mt-0 max-sm:size-4" aria-hidden="true" />
+            <div className="max-sm:text-[10px]">
+              <strong className="max-sm:text-[10px] max-sm:block">{t("login.helpTitle")}</strong>
+              <span className="max-sm:text-[9px] max-sm:mt-0.5 max-sm:block max-sm:leading-tight">{t("login.helpText")}</span>
             </div>
           </div>
         </div>
 
-        <div className="auth-form-panel">
+        <div className="auth-form-panel order-1 md:order-2 max-md:bg-white max-md:border-0">
           <div>
             <p className="simple-eyebrow">{t("login.eyebrow")}</p>
             <h2>{t("login.submitButton")}</h2>

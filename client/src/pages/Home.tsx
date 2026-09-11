@@ -67,9 +67,9 @@ export default function Home() {
 
   return (
     <PublicLayout>
-      <div id="home-page-container" data-page="home" className={`simple-public-page home-page page-home ${isRTL ? "is-rtl" : ""}`}>
+      <div id="home-page-container" data-page="home" className={`simple-public-page home-page page-home ${isRTL ? "is-rtl" : ""} max-md:!mt-[10px]`}>
         {/* Luxury Hero Section with Seamless Loop Video */}
-        <section id="home-hero-section" className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580">
+        <section id="home-hero-section" className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580 max-md:!mt-[10px]">
           <video
             ref={heroVideoRef}
             className="simple-home-hero-media"
@@ -116,7 +116,7 @@ export default function Home() {
             </p>
             <p>{t("home.heroSubtitle")}</p>
             
-            <div className="simple-actions-row">
+            <div className="simple-actions-row max-md:pb-[15px]">
               <button 
                 type="button" 
                 onClick={() => setIsPlacementTestOpen(true)}

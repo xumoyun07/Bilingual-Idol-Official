@@ -33,6 +33,71 @@ export const inMemoryStore = {
       updatedAt: new Date("2026-01-01"),
       lastSignedIn: new Date("2026-01-01"),
     },
+    {
+      id: 2,
+      openId: "issued:superadmin",
+      name: "Super Admin",
+      email: "superadmin@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "super_admin" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 3,
+      openId: "issued:admin",
+      name: "Admin Manager",
+      email: "admin@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "admin" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 4,
+      openId: "issued:marketing",
+      name: "Marketing Agent",
+      email: "marketing@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "marketing" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 5,
+      openId: "issued:teacher",
+      name: "Teacher Speaker",
+      email: "teacher@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "teacher" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 6,
+      openId: "issued:student",
+      name: "Student Learner",
+      email: "student@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "student" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
   ] as User[],
   submissions: [] as Submission[],
   programs: [
@@ -824,11 +889,41 @@ export async function deleteTeamProfile(id: number) {
 
 export async function listSiteSettings() {
   const db = await getDb();
+  let settings: Record<string, string> = {};
   if (db) {
     const rows = await db.select().from(siteSettings);
-    return Object.fromEntries(rows.map(row => [row.key, row.value]));
+    settings = Object.fromEntries(rows.map(row => [row.key, row.value]));
+  } else {
+    settings = { ...inMemoryStore.siteSettings };
   }
-  return inMemoryStore.siteSettings;
+
+  // Populate default promotional values if not already defined
+  if (settings.promo_active === undefined) {
+    settings.promo_active = "true";
+  }
+  if (settings.promo_title === undefined) {
+    settings.promo_title = "Special Promotional Offer";
+  }
+  if (settings.promo_text === undefined) {
+    settings.promo_text = "Get exclusive access to all bilingual academic language programmes with a limited-time intake discount! Apply now and claim your student starter package.";
+  }
+  if (settings.promo_discount === undefined) {
+    settings.promo_discount = "15% OFF";
+  }
+  if (settings.promo_code === undefined) {
+    settings.promo_code = "BILC15";
+  }
+  if (settings.promo_cta_text === undefined) {
+    settings.promo_cta_text = "View Programmes";
+  }
+  if (settings.promo_cta_url === undefined) {
+    settings.promo_cta_url = "/programs";
+  }
+  if (settings.promo_color === undefined) {
+    settings.promo_color = "red";
+  }
+
+  return settings;
 }
 
 export async function updateSiteSettings(values: Record<string, string>) {
@@ -1003,3 +1098,88 @@ export async function deleteAnnouncement(id: number) {
   inMemoryStore.announcements = inMemoryStore.announcements.filter(a => a.id !== id);
   return { success: true };
 }
+
+export async function seedDatabaseDefaultUsers() {
+  const db = await getDb();
+  if (!db) return;
+
+  const defaultUsers = [
+    {
+      openId: "issued:superadmin",
+      name: "Super Admin",
+      email: "superadmin@bilc.my",
+      role: "super_admin" as const,
+    },
+    {
+      openId: "issued:admin",
+      name: "Admin Manager",
+      email: "admin@bilc.my",
+      role: "admin" as const,
+    },
+    {
+      openId: "issued:marketing",
+      name: "Marketing Agent",
+      email: "marketing@bilc.my",
+      role: "marketing" as const,
+    },
+    {
+      openId: "issued:teacher",
+      name: "Teacher Speaker",
+      email: "teacher@bilc.my",
+      role: "teacher" as const,
+    },
+    {
+      openId: "issued:student",
+      name: "Student Learner",
+      email: "student@bilc.my",
+      role: "student" as const,
+    },
+  ];
+
+  for (const item of defaultUsers) {
+    try {
+      const existing = await db.select().from(users).where(eq(users.email, item.email)).limit(1);
+      if (!existing.length) {
+        const created = await db.insert(users).values({
+          openId: item.openId,
+          name: item.name,
+          email: item.email,
+          passwordHash: createUserPasswordHash("lektor07xumoyun"),
+          role: item.role,
+          isActive: true,
+          loginMethod: "issued_by_founder",
+          lastSignedIn: new Date(),
+        });
+        
+        // If it's a student, also create a student profile
+        if (item.role === "student") {
+          const userId = Number(created[0].insertId);
+          const { studentProfiles: spTable } = await import("../drizzle/schema");
+          const existingProfile = await db.select().from(spTable).where(eq(spTable.userId, userId)).limit(1);
+          if (!existingProfile.length) {
+            await db.insert(spTable).values({
+              userId,
+              guardianName: "Parent Learner",
+              guardianPhone: "+60123456789",
+              contactEmail: "guardian@bilc.my",
+              dateOfBirth: new Date("2010-05-15"),
+              address: "123 Learning Street, Kuala Lumpur",
+              notes: "Requires intermediate grammar support.",
+              attendedSessions: 18,
+              totalSessions: 20,
+              currentLevel: "Intermediate",
+              courseName: "General English",
+              courseCode: "GEN-ENG",
+              courseStartDate: new Date("2026-01-10"),
+              courseEndDate: new Date("2026-06-30"),
+            });
+          }
+        }
+        console.log(`[Seed] Created user in database: ${item.email}`);
+      }
+    } catch (e) {
+      console.error(`[Seed] Error seeding user ${item.email}:`, e);
+    }
+  }
+}
+

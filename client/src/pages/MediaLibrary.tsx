@@ -363,12 +363,12 @@ function MediaRecord({
               </span>
             </div>
 
-            {/* Open Original Link on Hover */}
+            {/* Open Original Link */}
             <a
               href={item.publicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/90"
+              className="absolute bottom-2.5 right-2.5 rtl:right-auto rtl:left-2.5 inline-flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium text-white opacity-100 sm:opacity-0 transition-opacity sm:group-hover:opacity-100 hover:bg-black/90 min-h-[36px]"
               title="Open full-resolution asset in new tab"
             >
               <span>{td("View asset")}</span>

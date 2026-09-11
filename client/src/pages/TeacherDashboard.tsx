@@ -90,17 +90,18 @@ export default function TeacherDashboard() {
   };
 
   return <DashboardLayout role="teacher">
-    <section id="teacher-dashboard-container" data-page="teacher-dashboard" className="teacher-workspace page-teacher-dashboard" aria-labelledby="teacher-workspace-title">
-      <div className="teacher-workspace-intro">
+    <div id="teacher-dashboard-container" data-page="teacher-dashboard" className="workspace-page founder-command founder-workspace page-teacher mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10" aria-labelledby="teacher-workspace-title">
+      <header className="founder-command-header">
         <div>
-          <p className="minimal-eyebrow">{td("Teacher workspace")}</p>
-          <h2 id="teacher-workspace-title">{td("Your assigned classes")}</h2>
-          <p>{td("Review lessons assigned to your account, record attendance and prepare learner results. Class setup and teacher assignments are managed by the centre.")}</p>
+          <p className="founder-command-eyebrow">{td("Teacher Workspace")}</p>
+          <h1 id="teacher-workspace-title" className="founder-command-title">{td("Your Assigned Classes")}</h1>
+          <p className="founder-command-description">
+            {td("Review lessons assigned to your account, record attendance and prepare learner results. Class setup and teacher assignments are managed by the centre.")}
+          </p>
         </div>
-        <span className="teacher-workspace-icon" aria-hidden="true"><ClipboardCheck size={24} /></span>
-      </div>
+      </header>
 
-      <div className="teacher-workspace-grid">
+      <div className="teacher-workspace-grid mt-6">
         <Card className="teacher-session-list"><CardHeader><CardTitle><CalendarDays size={19} /> {td("My classes")}</CardTitle><CardDescription>{td("Only sessions assigned to you are shown.")}</CardDescription></CardHeader><CardContent>
           <div className="teacher-schedule-filters" aria-label="Schedule date filter">
             <Label htmlFor="teacher-schedule-range">{td("Show")}</Label>
@@ -144,6 +145,6 @@ export default function TeacherDashboard() {
           </> : null}
         </div>
       </div>
-    </section>
+    </div>
   </DashboardLayout>;
 }

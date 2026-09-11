@@ -7,7 +7,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { ConfigurableCreateUserModal } from "@/components/ConfigurableCreateUserModal";
 import { trpc } from "@/lib/trpc";
 import AuditLogs from "./AuditLogs";
-import { AlertCircle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleSlash, Filter, GraduationCap, Loader2, Megaphone, Plus, RotateCcw, Search, Shield, SlidersHorizontal, Trash2, UserPlus, UsersRound, X } from "lucide-react";
+import { AlertCircle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleSlash, Filter, GraduationCap, Loader2, Megaphone, Pencil, Plus, RotateCcw, Search, Shield, SlidersHorizontal, Trash2, UserPlus, UsersRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 
@@ -47,7 +47,7 @@ export default function SuperAdmin() {
 function SuperAdminConsole() {
   const [location] = useLocation();
   if (location === "/super-admin/audit-logs") return <AuditLogs role="super_admin" />;
-  return <div id="superadmin-dashboard-container" data-page="superadmin" className="workspace-page founder-command founder-workspace page-superadmin mx-auto w-full max-w-[88rem] pb-10">{location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}</div>;
+  return <div id="superadmin-dashboard-container" data-page="superadmin" className="workspace-page founder-command founder-workspace page-superadmin mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10">{location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}</div>;
 }
 
 function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
@@ -270,7 +270,106 @@ function SuperAdminUserModal({ mode, selected, loading, draft, setDraft, profile
 function FilterSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: [string, string][] }) { return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{label}<select value={value} onChange={event => onChange(event.target.value)} className="mt-1 block h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{options.map(([key, copy]) => <option key={key} value={key}>{copy}</option>)}</select></label>; }
 function DateFilter({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{label}<span className="relative mt-1 block"><CalendarDays className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={15} /><input type="date" value={value} onChange={event => onChange(event.target.value)} className="h-12 w-full rounded-xl border border-[#dfd1bf] bg-white pl-9 pr-2 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></span></label>; }
 function TextField({ label, value, onChange, type = "text", required, hint }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; hint?: string }) { return <label className="block text-xs font-extrabold text-[#53657a]">{label}<input required={required} type={type} value={value} onChange={event => onChange(event.target.value)} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" />{hint ? <span className="mt-1.5 block text-[11px] font-normal leading-4 text-[#708098]">{hint}</span> : null}</label>; }
-function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: () => void }) { return <button type="button" onClick={onClick} className="grid w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 bg-white px-5 py-4 text-left transition-colors hover:bg-[#faf6ef] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"><span className="min-w-0"><span className="block truncate font-bold text-[#10253e]">{account.name || "Unnamed account"}</span><span className="mt-1 block truncate text-xs text-[#708098]">{account.email || "No e-mail"}</span></span><span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold ${roleTone[account.role]}`}>{singularRoleLabels[account.role]}</span><span className={`inline-flex items-center gap-1 text-[11px] font-bold ${account.isActive ? "text-[#173fad]" : "text-[#9a5a47]"}`}>{account.isActive ? <Check size={13} /> : <CircleSlash size={13} />}{account.isActive ? "Active" : "Paused"}</span></button>; }
+function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-white hover:bg-[#faf6ef] transition-colors border-b border-[#f0e9df]">
+      {/* Mobile Card Layout (< sm) */}
+      <div className="block sm:hidden p-4">
+        {/* Toggle Expansion on Header click or tap */}
+        <div 
+          onClick={() => setExpanded(!expanded)} 
+          className="flex items-start justify-between gap-3 cursor-pointer select-none"
+        >
+          <div className="min-w-0 flex-1">
+            <span className="block truncate font-bold text-[#10253e] text-base">
+              {account.name || "Unnamed account"}
+            </span>
+            <span className="mt-0.5 block truncate text-xs text-[#708098]">
+              {account.email || "No e-mail"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-extrabold ${roleTone[account.role]}`}>
+              {singularRoleLabels[account.role]}
+            </span>
+            <span className="text-[#708098] transition-transform duration-200" style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)" }}>
+              <ChevronRight size={16} />
+            </span>
+          </div>
+        </div>
+
+        {/* Priority fields (2-4 fields in collapsed state) */}
+        <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-2.5 rounded-xl border border-[#edf2f4] bg-[#fafbfc] p-3 text-xs">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#708098]">Account status</span>
+            <span className={`inline-flex items-center gap-1 font-bold ${account.isActive ? "text-[#173fad]" : "text-[#9a5a47]"}`}>
+              {account.isActive ? <Check size={13} /> : <CircleSlash size={13} />}
+              {account.isActive ? "Active" : "Paused"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#708098]">Email Verified</span>
+            <span className="font-semibold text-[#29415b] truncate">{account.email ? "Yes" : "No"}</span>
+          </div>
+        </div>
+
+        {/* Expandable Section (with smooth height transition/animation) */}
+        <div 
+          className={`grid transition-all duration-300 ease-in-out ${
+            expanded ? "grid-rows-[1fr] opacity-100 mt-3.5" : "grid-rows-[0fr] opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="space-y-2.5 rounded-xl border border-[#e1d5c4] bg-[#fbf8f2] p-3 text-xs">
+              <div className="flex justify-between items-center gap-2 border-b border-[#eee4d7] pb-2">
+                <span className="font-bold text-[#708098]">Account ID:</span>
+                <span className="font-mono text-[11px] text-[#29415b] truncate max-w-[180px]" title={account.openId}>{account.openId}</span>
+              </div>
+              <div className="flex justify-between items-center gap-2 border-b border-[#eee4d7] pb-2">
+                <span className="font-bold text-[#708098]">Issued:</span>
+                <span className="font-semibold text-[#29415b]">{new Date(account.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="font-bold text-[#708098]">Last sign-in:</span>
+                <span className="font-semibold text-[#29415b]">{new Date(account.lastSignedIn).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Full-width primary action button */}
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
+            className="flex w-full min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#10253e] hover:bg-[#173fad] active:bg-[#0c1b2e] px-4 text-xs font-bold text-white transition-all shadow-xs"
+          >
+            <Pencil size={13} />
+            <span>Configure Account</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Grid Row (>= sm) */}
+      <button
+        type="button"
+        onClick={onClick}
+        className="hidden sm:grid w-full grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-3 sm:px-5 sm:py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"
+      >
+        <span className="min-w-0">
+          <span className="block truncate font-bold text-[#10253e]">{account.name || "Unnamed account"}</span>
+          <span className="mt-1 block truncate text-xs text-[#708098]">{account.email || "No e-mail"}</span>
+        </span>
+        <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold ${roleTone[account.role]}`}>{singularRoleLabels[account.role]}</span>
+        <span className={`inline-flex items-center gap-1 text-[11px] font-bold ${account.isActive ? "text-[#173fad]" : "text-[#9a5a47]"}`}>{account.isActive ? <Check size={13} /> : <CircleSlash size={13} />}{account.isActive ? "Active" : "Paused"}</span>
+      </button>
+    </div>
+  );
+}
 function LoadingDirectory() { return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div>; }
 function DirectoryError() { return <div className="p-8"><Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>Directory unavailable</AlertTitle><AlertDescription>Refresh the page or try again shortly.</AlertDescription></Alert></div>; }
 function EmptyDirectory({ role, onCreate }: { role: string; onCreate: () => void }) { return <div className="p-10 text-center"><UsersRound className="mx-auto text-[#aab5c1]" size={28} /><h3 className="mt-4 font-display text-3xl text-[#10253e]">No {role.toLowerCase()} yet</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#53657a]">Adjust the local filters or create an account for this part of the platform.</p><Button type="button" onClick={onCreate} className="compass-btn-primary mt-6"><Plus size={16} />Create user</Button></div>; }

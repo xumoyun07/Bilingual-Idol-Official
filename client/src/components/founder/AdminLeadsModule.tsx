@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clock,
   FileSpreadsheet,
   Filter,
@@ -37,11 +39,17 @@ import {
   Plus,
   RefreshCw,
   Search,
+  SlidersHorizontal,
+  Tag,
   Trash2,
   UserCheck,
+  X,
+  BookOpen,
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FounderModuleHeader } from "./FounderModuleHeader";
+import { FilterDrawer } from "@/components/ui/FilterDrawer";
 
 type SubmissionStatus = "new" | "contacted" | "interested" | "enrolled" | "closed";
 
@@ -52,6 +60,36 @@ const statusConfig: Record<SubmissionStatus, { label: string; tone: string }> = 
   enrolled: { label: "Enrolled", tone: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   closed: { label: "Closed", tone: "bg-gray-100 text-gray-700 border-gray-200" },
 };
+
+export const LEAD_STATUS_OPTIONS = [
+  { value: "all", label: "All Lead Statuses" },
+  { value: "new", label: "New Lead" },
+  { value: "contacted", label: "Contacted" },
+  { value: "interested", label: "Interested" },
+  { value: "enrolled", label: "Enrolled" },
+  { value: "closed", label: "Closed" },
+] as const;
+
+export const LEAD_SOURCE_OPTIONS = [
+  { value: "all", label: "All Sources" },
+  { value: "Admin Manual Entry", label: "Admin Manual Entry" },
+  { value: "website", label: "Website Form / Online" },
+  { value: "whatsapp", label: "WhatsApp Consultation" },
+  { value: "phone", label: "Phone Call Inquiry" },
+  { value: "referral", label: "Referral / Word of Mouth" },
+  { value: "social", label: "Social Media (Instagram/TikTok)" },
+  { value: "event", label: "Event / Campus Tour" },
+] as const;
+
+export const LEAD_COURSE_OPTIONS = [
+  { value: "all", label: "All Courses & Programs" },
+  { value: "General English", label: "General English" },
+  { value: "IELTS Preparation", label: "IELTS Preparation" },
+  { value: "Summer Camp", label: "Summer Camp" },
+  { value: "Private English Lessons", label: "Private English Lessons" },
+  { value: "Executive English", label: "Executive English" },
+  { value: "World Languages", label: "World Languages" },
+] as const;
 
 interface LeadFormState {
   type: "enrollment" | "inquiry";
@@ -80,11 +118,23 @@ const emptyLead: LeadFormState = {
 };
 
 export function AdminLeadsModule() {
-  const { td } = useLanguage();
+  const { td, isRTL } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedSource, setSelectedSource] = useState<string>("all");
+  const [selectedCourse, setSelectedCourse] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [expandedLeadIds, setExpandedLeadIds] = useState<Set<number>>(new Set());
+
+  const toggleExpand = (id: number) => {
+    setExpandedLeadIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
   const [leadForm, setLeadForm] = useState<LeadFormState>(emptyLead);
 
   const utils = trpc.useUtils();
@@ -126,7 +176,7 @@ export function AdminLeadsModule() {
     createMutation.mutate(leadForm);
   };
 
-  const filteredLeads = React.useMemo(() => {
+  const filteredLeads = useMemo(() => {
     const list = leadsQuery.data || [];
     return list.filter((lead) => {
       const matchSearch =
@@ -134,11 +184,35 @@ export function AdminLeadsModule() {
         lead.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lead.parentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lead.parentEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lead.programInterest.toLowerCase().includes(searchQuery.toLowerCase());
+        lead.programInterest.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (lead.source && lead.source.toLowerCase().includes(searchQuery.toLowerCase()));
+
       const matchStatus = selectedStatus === "all" || lead.status === selectedStatus;
-      return matchSearch && matchStatus;
+
+      const matchSource =
+        selectedSource === "all" ||
+        (lead.source && lead.source.toLowerCase().includes(selectedSource.toLowerCase()));
+
+      const matchCourse =
+        selectedCourse === "all" ||
+        (lead.programInterest &&
+          lead.programInterest.toLowerCase().includes(selectedCourse.toLowerCase()));
+
+      return matchSearch && matchStatus && matchSource && matchCourse;
     });
-  }, [leadsQuery.data, searchQuery, selectedStatus]);
+  }, [leadsQuery.data, searchQuery, selectedStatus, selectedSource, selectedCourse]);
+
+  const activeFiltersCount =
+    (selectedStatus !== "all" ? 1 : 0) +
+    (selectedSource !== "all" ? 1 : 0) +
+    (selectedCourse !== "all" ? 1 : 0);
+
+  const resetAllFilters = () => {
+    setSelectedStatus("all");
+    setSelectedSource("all");
+    setSelectedCourse("all");
+    setSearchQuery("");
+  };
 
   return (
     <div className="space-y-6">
@@ -179,38 +253,202 @@ export function AdminLeadsModule() {
         }
       />
 
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
-        <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={td("Search leads by name, email, parent, phone...")}
-            className="pl-9 h-9 text-sm"
-          />
+      {/* Filter Bar with FilterDrawer */}
+      <div className="space-y-2.5 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#dce4e7] shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search
+              size={15}
+              className={`absolute top-1/2 -translate-y-1/2 text-[#53657a] ${isRTL ? "right-3.5" : "left-3.5"}`}
+            />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={td("Search leads by student, parent, email, phone, course...")}
+              className={`h-11 text-sm rounded-xl border-[#dce4e7] bg-[#fbfcfe] focus:bg-white transition-colors ${
+                isRTL ? "pr-10 pl-3.5 text-right" : "pl-10 pr-3.5 text-left"
+              }`}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Quick Status select for Desktop only */}
+            <div className="hidden md:block">
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                aria-label="Quick filter by lead status"
+                className="h-11 px-3.5 text-xs font-medium rounded-xl border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad] min-w-[150px]"
+              >
+                {LEAD_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {td(opt.label)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Reusable FilterDrawer (Mobile Bottom Sheet & Desktop Panel) */}
+            <FilterDrawer
+              title={td("Filter Leads Pipeline (MK1)")}
+              description={td("Select status, source, and academic program to refine leads.")}
+              activeCount={activeFiltersCount}
+              triggerLabel={td("Filters")}
+              onReset={resetAllFilters}
+              resetLabel={td("Reset all")}
+              applyLabel={td("Apply filters")}
+            >
+              {/* Filter 1: Lead Status */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#10253e] uppercase tracking-wider flex items-center gap-1.5">
+                  <CheckCircle2 size={14} className="text-[#173fad]" />
+                  <span>{td("Lead Status")}</span>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {LEAD_STATUS_OPTIONS.map((opt) => {
+                    const isSelected = selectedStatus === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setSelectedStatus(opt.value)}
+                        className={`min-h-11 px-3 py-2 rounded-xl text-xs font-semibold border text-start transition-all ${
+                          isSelected
+                            ? "border-[#173fad] bg-[#eef4ff] text-[#173fad] shadow-xs ring-1 ring-[#173fad]"
+                            : "border-[#dce4e7] bg-white text-[#29415b] hover:bg-[#f8fafb]"
+                        }`}
+                      >
+                        {td(opt.label)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Filter 2: Lead Acquisition Source */}
+              <div className="space-y-2 pt-2 border-t border-[#edf2f5]">
+                <label className="text-xs font-bold text-[#10253e] uppercase tracking-wider flex items-center gap-1.5">
+                  <Tag size={14} className="text-[#173fad]" />
+                  <span>{td("Acquisition Source")}</span>
+                </label>
+                <select
+                  value={selectedSource}
+                  onChange={(e) => setSelectedSource(e.target.value)}
+                  className="w-full min-h-11 px-3.5 text-xs font-medium rounded-xl border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
+                >
+                  {LEAD_SOURCE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {td(opt.label)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filter 3: Course & Program Interest */}
+              <div className="space-y-2 pt-2 border-t border-[#edf2f5]">
+                <label className="text-xs font-bold text-[#10253e] uppercase tracking-wider flex items-center gap-1.5">
+                  <BookOpen size={14} className="text-[#173fad]" />
+                  <span>{td("Course & Program Interest")}</span>
+                </label>
+                <select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  className="w-full min-h-11 px-3.5 text-xs font-medium rounded-xl border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
+                >
+                  {LEAD_COURSE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {td(opt.label)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </FilterDrawer>
+
+            {/* Total count badge */}
+            <span className="text-xs font-semibold text-[#53657a] px-2 whitespace-nowrap hidden sm:inline">
+              {filteredLeads.length} {td("leads")}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            aria-label="Filter submissions by status"
-            className="h-9 px-3 text-xs font-medium rounded-lg border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
-          >
-            <option value="all">{td("All Lead Statuses")}</option>
-            <option value="new">{td("New Lead")}</option>
-            <option value="contacted">{td("Contacted")}</option>
-            <option value="interested">{td("Interested")}</option>
-            <option value="enrolled">{td("Enrolled")}</option>
-            <option value="closed">{td("Closed")}</option>
-          </select>
-          <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">
-            {filteredLeads.length} {td("leads")}
-          </span>
-        </div>
+
+        {/* Active Filter Chips Bar */}
+        {(activeFiltersCount > 0 || searchQuery.trim()) && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[#edf2f5]">
+            <span className="text-[11px] font-bold text-[#53657a] me-1">{td("Active filters")}:</span>
+
+            {/* Status chip */}
+            {selectedStatus !== "all" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#eef4ff] text-[#173fad] border border-[#c0d4ff]">
+                <span>{statusConfig[selectedStatus as SubmissionStatus]?.label || selectedStatus}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedStatus("all")}
+                  aria-label="Remove status filter"
+                  className="hover:text-rose-600 focus:outline-none ms-0.5"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+
+            {/* Source chip */}
+            {selectedSource !== "all" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f4eddd] text-[#705a30] border border-[#e4d3b1]">
+                <span>{selectedSource}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSource("all")}
+                  aria-label="Remove source filter"
+                  className="hover:text-rose-600 focus:outline-none ms-0.5"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+
+            {/* Course chip */}
+            {selectedCourse !== "all" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#efe8fb] text-[#6e4c9a] border border-[#d8c3f8]">
+                <span>{selectedCourse}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCourse("all")}
+                  aria-label="Remove course filter"
+                  className="hover:text-rose-600 focus:outline-none ms-0.5"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+
+            {/* Search query chip */}
+            {searchQuery.trim() && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f0f4f7] text-[#29415b] border border-[#dce4e7]">
+                <span>"{searchQuery}"</span>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search query"
+                  className="hover:text-rose-600 focus:outline-none ms-0.5"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={resetAllFilters}
+              className="text-xs font-semibold text-[#173fad] hover:text-[#10253e] underline ms-2 py-0.5"
+            >
+              {td("Reset all")}
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Leads Table / Cards */}
+      {/* Leads Table (Desktop) / Cards (Mobile) */}
       {leadsQuery.isLoading ? (
         <div className="text-center py-16">
           <RefreshCw className="animate-spin text-[#173fad] size-6 mx-auto" />
@@ -222,94 +460,220 @@ export function AdminLeadsModule() {
           <p className="text-xs text-[#53657a]">{td("Try adjusting your search or status filter.")}</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
-                <tr>
-                  <th className="p-3.5">{td("Student & Parent")}</th>
-                  <th className="p-3.5">{td("Program & Schedule")}</th>
-                  <th className="p-3.5">{td("Source & Date")}</th>
-                  <th className="p-3.5">{td("Stage Status")}</th>
-                  <th className="p-3.5 text-right">{td("Quick Actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#edf2f5]">
-                {filteredLeads.map((lead) => {
-                  const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
-                  return (
-                    <tr key={lead.id} className="hover:bg-[#fbfcfe] transition-colors">
-                      <td className="p-3.5">
-                        <div className="font-bold text-sm text-[#10253e]">{lead.studentName}</div>
-                        <div className="text-[#53657a] text-[11px] flex items-center gap-1.5 mt-0.5">
-                          <span>{td("Parent")}: {lead.parentName}</span>
-                          <span>·</span>
-                          <span>{td("Age")} {lead.studentAge}</span>
-                        </div>
-                        <div className="text-[11px] text-[#173fad] flex items-center gap-2 mt-1">
-                          <span className="flex items-center gap-1">
-                            <Mail size={11} /> {lead.parentEmail}
+        <div className="space-y-3">
+          {/* Mobile View: High-Accessibility Cards (< md) */}
+          <div className="block md:hidden space-y-3">
+            {filteredLeads.map((lead) => {
+              const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
+              const isExpanded = expandedLeadIds.has(lead.id);
+              return (
+                <div
+                  key={`lead-card-${lead.id}`}
+                  className="bg-white rounded-xl border border-[#dce4e7] p-4 shadow-xs space-y-3"
+                >
+                  {/* Card Header: Name + Status Badge */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="font-bold text-base text-[#10253e] leading-snug">{lead.studentName}</h4>
+                      <p className="text-xs text-[#53657a] mt-0.5">
+                        {td("Age")} {lead.studentAge} · {td("Parent")}: {lead.parentName}
+                      </p>
+                    </div>
+                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${statusInfo.tone}`}>
+                      {statusInfo.label}
+                    </span>
+                  </div>
+
+                  {/* Primary Data Points */}
+                  <div className="grid grid-cols-1 gap-1.5 text-xs">
+                    <div className="flex items-center gap-2 text-[#10253e]">
+                      <GraduationCap size={14} className="text-[#173fad] shrink-0" />
+                      <span className="font-medium">{td(lead.programInterest)}</span>
+                      {lead.preferredSchedule && (
+                        <span className="text-[#53657a] text-[11px]">({td(lead.preferredSchedule)})</span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 pt-1 text-[#173fad]">
+                      <a
+                        href={`mailto:${lead.parentEmail}`}
+                        className="inline-flex items-center gap-1 text-xs hover:underline min-h-[36px] py-1"
+                      >
+                        <Mail size={13} /> {lead.parentEmail}
+                      </a>
+                      <a
+                        href={`tel:${lead.parentPhone}`}
+                        className="inline-flex items-center gap-1 text-xs font-semibold hover:underline min-h-[36px] py-1"
+                      >
+                        <Phone size={13} /> {lead.parentPhone}
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Collapsible Secondary Details (Notes, Source, Date) */}
+                  <div className="border-t border-[#edf2f5] pt-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(lead.id)}
+                      className="w-full flex items-center justify-between text-xs text-[#53657a] font-medium py-1.5 hover:text-[#10253e]"
+                    >
+                      <span>{isExpanded ? td("Hide details") : td("View inquiry notes & origin")}</span>
+                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    </button>
+
+                    {isExpanded && (
+                      <div className="mt-2 space-y-2 text-xs bg-[#f8fafc] p-3 rounded-lg border border-[#edf2f5]">
+                        {lead.message && (
+                          <div>
+                            <span className="font-semibold text-[#10253e] block mb-0.5">{td("Inquiry Notes")}:</span>
+                            <p className="text-[#53657a] italic">"{lead.message}"</p>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between text-[11px] text-[#53657a] pt-1 border-t border-[#edf2f5]">
+                          <span>
+                            {td("Source")}: <strong className="text-[#10253e]">{td(lead.source || "Website")}</strong>
                           </span>
-                          <span className="flex items-center gap-1">
-                            <Phone size={11} /> {lead.parentPhone}
+                          <span>
+                            {new Date(lead.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
                           </span>
                         </div>
-                      </td>
-                      <td className="p-3.5">
-                        <div className="font-semibold text-[#10253e]">{td(lead.programInterest)}</div>
-                        <div className="text-[#53657a] text-[11px]">{td(lead.preferredSchedule)}</div>
-                        {lead.message ? (
-                          <p className="text-[#53657a] text-[11px] italic mt-1 line-clamp-1 bg-[#f8fafc] p-1 rounded border border-[#edf2f5]">
-                            "{lead.message}"
-                          </p>
-                        ) : null}
-                      </td>
-                      <td className="p-3.5 text-[#53657a]">
-                        <span className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[11px] font-medium text-[#33475b]">
-                          {td(lead.source || "Website")}
-                        </span>
-                        <div className="text-[10px] text-[#8292a1] mt-1">
-                          {new Date(lead.createdAt).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </div>
-                      </td>
-                      <td className="p-3.5">
-                        <select
-                          value={lead.status}
-                          onChange={(e) =>
-                            updateStatusMutation.mutate({
-                              id: lead.id,
-                              status: e.target.value as SubmissionStatus,
-                            })
-                          }
-                          aria-label={`Update status for lead ${lead.studentName}`}
-                          className={`text-xs font-semibold px-2.5 py-1 rounded-md border focus:outline-none ${statusInfo.tone}`}
-                        >
-                          <option value="new">{td("New Lead")}</option>
-                          <option value="contacted">{td("Contacted")}</option>
-                          <option value="interested">{td("Interested")}</option>
-                          <option value="enrolled">{td("Enrolled")}</option>
-                          <option value="closed">{td("Closed")}</option>
-                        </select>
-                      </td>
-                      <td className="p-3.5 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeleteTargetId(lead.id)}
-                          className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Action Footer: Full-Width Status Selector & Delete */}
+                  <div className="pt-2 border-t border-[#edf2f5] flex items-center gap-2">
+                    <div className="flex-1">
+                      <label htmlFor={`lead-status-${lead.id}`} className="sr-only">
+                        {td("Update Status")}
+                      </label>
+                      <select
+                        id={`lead-status-${lead.id}`}
+                        value={lead.status}
+                        onChange={(e) =>
+                          updateStatusMutation.mutate({
+                            id: lead.id,
+                            status: e.target.value as SubmissionStatus,
+                          })
+                        }
+                        className={`w-full min-h-[44px] text-xs font-semibold px-3 py-2 rounded-lg border focus:outline-none ${statusInfo.tone}`}
+                      >
+                        <option value="new">{td("New Lead")}</option>
+                        <option value="contacted">{td("Contacted")}</option>
+                        <option value="interested">{td("Interested")}</option>
+                        <option value="enrolled">{td("Enrolled")}</option>
+                        <option value="closed">{td("Closed")}</option>
+                      </select>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteTargetId(lead.id)}
+                      className="min-h-[44px] min-w-[44px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0"
+                      aria-label={td("Delete lead record")}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop View: Multi-Column Table (>= md) */}
+          <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
+                  <tr>
+                    <th className="p-3.5">{td("Student & Parent")}</th>
+                    <th className="p-3.5">{td("Program & Schedule")}</th>
+                    <th className="p-3.5">{td("Source & Date")}</th>
+                    <th className="p-3.5">{td("Stage Status")}</th>
+                    <th className="p-3.5 text-right">{td("Quick Actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#edf2f5]">
+                  {filteredLeads.map((lead) => {
+                    const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
+                    return (
+                      <tr key={lead.id} className="hover:bg-[#fbfcfe] transition-colors">
+                        <td className="p-3.5">
+                          <div className="font-bold text-sm text-[#10253e]">{lead.studentName}</div>
+                          <div className="text-[#53657a] text-[11px] flex items-center gap-1.5 mt-0.5">
+                            <span>{td("Parent")}: {lead.parentName}</span>
+                            <span>·</span>
+                            <span>{td("Age")} {lead.studentAge}</span>
+                          </div>
+                          <div className="text-[11px] text-[#173fad] flex items-center gap-2 mt-1">
+                            <a href={`mailto:${lead.parentEmail}`} className="flex items-center gap-1 hover:underline">
+                              <Mail size={11} /> {lead.parentEmail}
+                            </a>
+                            <a href={`tel:${lead.parentPhone}`} className="flex items-center gap-1 hover:underline">
+                              <Phone size={11} /> {lead.parentPhone}
+                            </a>
+                          </div>
+                        </td>
+                        <td className="p-3.5">
+                          <div className="font-semibold text-[#10253e]">{td(lead.programInterest)}</div>
+                          <div className="text-[#53657a] text-[11px]">{td(lead.preferredSchedule)}</div>
+                          {lead.message ? (
+                            <p className="text-[#53657a] text-[11px] italic mt-1 line-clamp-1 bg-[#f8fafc] p-1 rounded border border-[#edf2f5]">
+                              "{lead.message}"
+                            </p>
+                          ) : null}
+                        </td>
+                        <td className="p-3.5 text-[#53657a]">
+                          <span className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[11px] font-medium text-[#33475b]">
+                            {td(lead.source || "Website")}
+                          </span>
+                          <div className="text-[10px] text-[#8292a1] mt-1">
+                            {new Date(lead.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </div>
+                        </td>
+                        <td className="p-3.5">
+                          <select
+                            value={lead.status}
+                            onChange={(e) =>
+                              updateStatusMutation.mutate({
+                                id: lead.id,
+                                status: e.target.value as SubmissionStatus,
+                              })
+                            }
+                            aria-label={`Update status for lead ${lead.studentName}`}
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-md border focus:outline-none ${statusInfo.tone}`}
+                          >
+                            <option value="new">{td("New Lead")}</option>
+                            <option value="contacted">{td("Contacted")}</option>
+                            <option value="interested">{td("Interested")}</option>
+                            <option value="enrolled">{td("Enrolled")}</option>
+                            <option value="closed">{td("Closed")}</option>
+                          </select>
+                        </td>
+                        <td className="p-3.5 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeleteTargetId(lead.id)}
+                            className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

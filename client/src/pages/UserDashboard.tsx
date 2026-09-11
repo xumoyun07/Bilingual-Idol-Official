@@ -1,20 +1,18 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { BackgroundCircleField } from "@/components/BackgroundCircleField";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LocalUserDataManager } from "@/components/LocalUserDataManager";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, LogOut, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowRight, BookOpen, ShieldCheck } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "wouter";
+import DashboardLayout from "@/components/DashboardLayout";
 
 const OPERATIONS_ROLES = ["founder", "super_admin"];
 
 export default function UserDashboard() {
-  const { user, loading, logout } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
+  const { user, loading } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
   const { t, isRTL } = useLanguage();
   const isOperationsUser = Boolean(user && OPERATIONS_ROLES.includes(user.role));
   const isTeacher = user?.role === "teacher";
@@ -29,14 +27,13 @@ export default function UserDashboard() {
 
   if (loading || isOperationsUser || isTeacher || isMarketing) {
     return (
-      <main className={`minimal-auth-state ${isRTL ? "is-rtl" : ""}`}>
-        <BackgroundCircleField seed="member-loading" />
-        <div>
-          <p className="minimal-eyebrow">{t("nav.workspace")}</p>
-          <h1>{t("userDashboard.preparing")}</h1>
-          <p>{t("userDashboard.preparingText")}</p>
+      <div className="grid min-h-screen place-items-center bg-white">
+        <div className="text-center">
+          <p className="text-sm font-semibold text-[#173fad] uppercase tracking-wider">{t("nav.workspace")}</p>
+          <h1 className="text-2xl font-bold text-[#10253e] mt-2">{t("userDashboard.preparing")}</h1>
+          <p className="text-sm text-[#53657a] mt-1">{t("userDashboard.preparingText")}</p>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -48,87 +45,69 @@ export default function UserDashboard() {
       : t("userDashboard.roleMember");
 
   return (
-    <main id="user-dashboard-container" data-page="user-dashboard" className={`member-page blue-member-page page-user-dashboard ${isRTL ? "is-rtl" : ""}`}>
-      <OfflineIndicator />
-      <BackgroundCircleField seed={`member-${user?.role ?? "user"}`} />
-      <header id="user-dashboard-header" className="member-header flex items-center justify-between">
-        <Link href="/" className="auth-brand" aria-label="Bilingual Idol Learning Centre home">
-          <span aria-hidden="true">BI</span>
-          <div>
-            <strong>Bilingual Idol</strong>
-            <small>Learning centre</small>
-          </div>
-        </Link>
-        <div className="flex items-center gap-2.5">
-          <PWAInstallButton variant="header" />
-          <LanguageSwitcher variant="dropdown" />
-          <Button type="button" variant="outline" className="member-signout" onClick={() => logout()}>
-            <LogOut size={16} />
-            {t("userDashboard.signOut")}
-          </Button>
+    <DashboardLayout role="student">
+      <div id="user-dashboard-container" data-page="user-dashboard" className={`workspace-page founder-command founder-workspace page-student mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10 ${isRTL ? "dir-rtl" : ""}`}>
+        <OfflineIndicator />
+        <div className="member-content space-y-6">
+          <header className="founder-command-header">
+            <div>
+              <p className="founder-command-eyebrow">{roleLabel}</p>
+              <h1 id="member-dashboard-title" className="founder-command-title">
+                {t("userDashboard.welcome")}
+                {user?.name ? `, ${user.name}` : ""}.
+              </h1>
+              <p className="founder-command-description">{t("userDashboard.subtitle")}</p>
+            </div>
+          </header>
+
+          {/* PWA Prompt Card */}
+          <PWAInstallButton variant="card" />
+
+          <section className="member-next-step" aria-label={t("userDashboard.nextStepTitle")}>
+            <div>
+              <BookOpen aria-hidden="true" size={21} />
+              <h2>{t("userDashboard.nextStepTitle")}</h2>
+              <p>{t("userDashboard.nextStepText")}</p>
+            </div>
+            <Link href="/programs" className="simple-button">
+              {t("userDashboard.nextStepButton")}
+              <ArrowRight size={16} className={isRTL ? "rotate-180" : ""} />
+            </Link>
+          </section>
+
+          <section className="member-status" aria-label={t("userDashboard.attendanceTitle")}>
+            <ShieldCheck aria-hidden="true" size={19} />
+            <div>
+              {attendanceSummary.isLoading ? (
+                <>
+                  <strong>{t("userDashboard.attendanceLoading")}</strong>
+                  <p>{t("userDashboard.attendanceLoadingText")}</p>
+                </>
+              ) : attendanceSummary.data?.totalSessions ? (
+                <>
+                  <strong>{t("userDashboard.attendanceScore", { percentage: attendanceSummary.data.percentage })}</strong>
+                  <p>
+                    {t("userDashboard.attendanceScoreText", {
+                      attended: attendanceSummary.data.attendedSessions,
+                      total: attendanceSummary.data.totalSessions,
+                    })}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <strong>{t("userDashboard.attendanceNotAvailable", undefined, "Attendance is not available yet.")}</strong>
+                  <p>{t("userDashboard.attendanceNotAvailableText")}</p>
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Local User Data, Offline Storage & Privacy Management */}
+          <section aria-label="Local User Data Management">
+            <LocalUserDataManager />
+          </section>
         </div>
-      </header>
-      <section className="member-content space-y-6" aria-labelledby="member-dashboard-title">
-        <div className="member-welcome">
-          <span className="member-avatar" aria-hidden="true">
-            <UserRound size={23} />
-          </span>
-          <p className="simple-eyebrow">{roleLabel}</p>
-          <h1 id="member-dashboard-title">
-            {t("userDashboard.welcome")}
-            {user?.name ? `, ${user.name}` : ""}.
-          </h1>
-          <p>{t("userDashboard.subtitle")}</p>
-        </div>
-
-        {/* PWA Prompt Card */}
-        <PWAInstallButton variant="card" />
-
-        <section className="member-next-step" aria-label={t("userDashboard.nextStepTitle")}>
-          <div>
-            <BookOpen aria-hidden="true" size={21} />
-            <h2>{t("userDashboard.nextStepTitle")}</h2>
-            <p>{t("userDashboard.nextStepText")}</p>
-          </div>
-          <Link href="/programs" className="simple-button">
-            {t("userDashboard.nextStepButton")}
-            <ArrowRight size={16} className={isRTL ? "rotate-180" : ""} />
-          </Link>
-        </section>
-
-        <section className="member-status" aria-label={t("userDashboard.attendanceTitle")}>
-          <ShieldCheck aria-hidden="true" size={19} />
-          <div>
-            {attendanceSummary.isLoading ? (
-              <>
-                <strong>{t("userDashboard.attendanceLoading")}</strong>
-                <p>{t("userDashboard.attendanceLoadingText")}</p>
-              </>
-            ) : attendanceSummary.data?.totalSessions ? (
-              <>
-                <strong>{t("userDashboard.attendanceScore", { percentage: attendanceSummary.data.percentage })}</strong>
-                <p>
-                  {t("userDashboard.attendanceScoreText", {
-                    attended: attendanceSummary.data.attendedSessions,
-                    total: attendanceSummary.data.totalSessions,
-                  })}
-                </p>
-              </>
-            ) : (
-              <>
-                <strong>{t("userDashboard.attendanceNotAvailable", undefined, "Attendance is not available yet.")}</strong>
-                <p>{t("userDashboard.attendanceNotAvailableText")}</p>
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* Local User Data, Offline Storage & Privacy Management */}
-        <section aria-label="Local User Data Management">
-          <LocalUserDataManager />
-        </section>
-      </section>
-    </main>
+      </div>
+    </DashboardLayout>
   );
 }
-

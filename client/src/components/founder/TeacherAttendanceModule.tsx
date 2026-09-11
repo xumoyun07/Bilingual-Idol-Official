@@ -264,7 +264,7 @@ export function TeacherAttendanceModule() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table (Desktop) / Cards (Mobile) */}
       {filteredRecords.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
           <CheckCircle2 className="mx-auto size-10 text-[#53657a]/50" />
@@ -272,77 +272,153 @@ export function TeacherAttendanceModule() {
           <p className="text-xs text-[#53657a]">Click "Record Attendance" to log a student session.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
-                <tr>
-                  <th className="p-3.5">Student</th>
-                  <th className="p-3.5">Course / Date</th>
-                  <th className="p-3.5">Attendance Status</th>
-                  <th className="p-3.5">Observation Notes</th>
-                  <th className="p-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#edf2f5]">
-                {filteredRecords.map((rec) => {
-                  const style = statusStyles[rec.status] || statusStyles.present;
-                  return (
-                    <tr key={rec.id} className="hover:bg-[#fbfcfe] transition-colors">
-                      <td className="p-3.5">
-                        <div className="font-bold text-sm text-[#10253e]">{rec.studentName}</div>
-                        <div className="text-[#53657a] text-[11px] mt-0.5">{rec.studentEmail}</div>
-                      </td>
-                      <td className="p-3.5">
-                        <div className="font-semibold text-[#10253e]">{rec.courseTitle}</div>
-                        <div className="text-[#53657a] text-[11px] flex items-center gap-1 mt-0.5">
-                          <CalendarDays size={11} /> {rec.sessionDate}
-                        </div>
-                      </td>
-                      <td className="p-3.5">
-                        <div className="flex items-center gap-1.5">
-                          <select
-                            value={rec.status}
-                            onChange={(e) => handleQuickStatus(rec.id, e.target.value as AttendanceStatus)}
-                            aria-label={`Update status for ${rec.studentName}`}
-                            className={`text-xs font-semibold px-2 py-0.5 rounded-md border focus:outline-none ${style.tone}`}
-                          >
-                            <option value="present">Present</option>
-                            <option value="late">Late</option>
-                            <option value="absent">Absent</option>
-                            <option value="excused">Excused</option>
-                          </select>
-                        </div>
-                      </td>
-                      <td className="p-3.5 text-[#53657a] max-w-xs">
-                        <p className="line-clamp-2">{rec.note || "No note recorded."}</p>
-                        <span className="text-[10px] text-[#8292a1] block mt-0.5">Marked by {rec.markedBy}</span>
-                      </td>
-                      <td className="p-3.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenEdit(rec)}
-                            className="h-8 w-8 p-0 text-[#173fad] hover:bg-[#e8eeff]"
-                          >
-                            <Edit2 size={13} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeleteTargetId(rec.id)}
-                            className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                          >
-                            <Trash2 size={13} />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        <div className="space-y-3">
+          {/* Mobile View: High-Accessibility Cards (< md) */}
+          <div className="block md:hidden space-y-3">
+            {filteredRecords.map((rec) => {
+              const style = statusStyles[rec.status] || statusStyles.present;
+              return (
+                <div
+                  key={`attendance-card-${rec.id}`}
+                  className="bg-white rounded-xl border border-[#dce4e7] p-4 shadow-xs space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="font-bold text-base text-[#10253e]">{rec.studentName}</h4>
+                      <p className="text-xs text-[#53657a]">{rec.studentEmail}</p>
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#53657a] flex items-center gap-1 bg-[#f8fafc] px-2 py-1 rounded-md border border-[#edf2f5]">
+                      <CalendarDays size={12} /> {rec.sessionDate}
+                    </span>
+                  </div>
+
+                  <div className="text-xs space-y-1">
+                    <div className="font-medium text-[#10253e]">{rec.courseTitle}</div>
+                    {rec.note && (
+                      <p className="text-[#53657a] italic bg-[#f8fafc] p-2 rounded border border-[#edf2f5]">
+                        "{rec.note}"
+                      </p>
+                    )}
+                    <span className="text-[10px] text-[#8292a1] block">Marked by {rec.markedBy}</span>
+                  </div>
+
+                  {/* Status Selection Full-Width */}
+                  <div>
+                    <label htmlFor={`attendance-status-${rec.id}`} className="sr-only">
+                      Update attendance status
+                    </label>
+                    <select
+                      id={`attendance-status-${rec.id}`}
+                      value={rec.status}
+                      onChange={(e) => handleQuickStatus(rec.id, e.target.value as AttendanceStatus)}
+                      aria-label={`Update status for ${rec.studentName}`}
+                      className={`w-full min-h-[44px] text-xs font-semibold px-3 py-2 rounded-lg border focus:outline-none ${style.tone}`}
+                    >
+                      <option value="present">Present</option>
+                      <option value="late">Late</option>
+                      <option value="absent">Absent</option>
+                      <option value="excused">Excused</option>
+                    </select>
+                  </div>
+
+                  {/* Card Actions Footer */}
+                  <div className="pt-2 border-t border-[#edf2f5] flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenEdit(rec)}
+                      className="flex-1 min-h-[44px] text-xs font-semibold text-[#173fad] border-[#c0d4ff] hover:bg-[#e8eeff] gap-1.5"
+                    >
+                      <Edit2 size={14} /> Edit Entry
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteTargetId(rec.id)}
+                      className="min-h-[44px] min-w-[44px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0"
+                      aria-label="Delete attendance entry"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop View: Multi-Column Table (>= md) */}
+          <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
+                  <tr>
+                    <th className="p-3.5">Student</th>
+                    <th className="p-3.5">Course / Date</th>
+                    <th className="p-3.5">Attendance Status</th>
+                    <th className="p-3.5">Observation Notes</th>
+                    <th className="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#edf2f5]">
+                  {filteredRecords.map((rec) => {
+                    const style = statusStyles[rec.status] || statusStyles.present;
+                    return (
+                      <tr key={rec.id} className="hover:bg-[#fbfcfe] transition-colors">
+                        <td className="p-3.5">
+                          <div className="font-bold text-sm text-[#10253e]">{rec.studentName}</div>
+                          <div className="text-[#53657a] text-[11px] mt-0.5">{rec.studentEmail}</div>
+                        </td>
+                        <td className="p-3.5">
+                          <div className="font-semibold text-[#10253e]">{rec.courseTitle}</div>
+                          <div className="text-[#53657a] text-[11px] flex items-center gap-1 mt-0.5">
+                            <CalendarDays size={11} /> {rec.sessionDate}
+                          </div>
+                        </td>
+                        <td className="p-3.5">
+                          <div className="flex items-center gap-1.5">
+                            <select
+                              value={rec.status}
+                              onChange={(e) => handleQuickStatus(rec.id, e.target.value as AttendanceStatus)}
+                              aria-label={`Update status for ${rec.studentName}`}
+                              className={`text-xs font-semibold px-2 py-0.5 rounded-md border focus:outline-none ${style.tone}`}
+                            >
+                              <option value="present">Present</option>
+                              <option value="late">Late</option>
+                              <option value="absent">Absent</option>
+                              <option value="excused">Excused</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td className="p-3.5 text-[#53657a] max-w-xs">
+                          <p className="line-clamp-2">{rec.note || "No note recorded."}</p>
+                          <span className="text-[10px] text-[#8292a1] block mt-0.5">Marked by {rec.markedBy}</span>
+                        </td>
+                        <td className="p-3.5 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenEdit(rec)}
+                              className="h-8 w-8 p-0 text-[#173fad] hover:bg-[#e8eeff]"
+                            >
+                              <Edit2 size={13} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeleteTargetId(rec.id)}
+                              className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                            >
+                              <Trash2 size={13} />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

@@ -180,11 +180,11 @@ function FounderConsole() {
   const currentSection = FOUNDER_NAVIGATION_SECTIONS.find((sec) => sec.type === roleParam) || FOUNDER_NAVIGATION_SECTIONS[0];
 
   return (
-    <div id="admin-dashboard-container" data-page="admin" className={`workspace-page founder-command founder-workspace page-admin mx-auto w-full max-w-[88rem] pb-12 ${isRTL ? "dir-rtl" : ""}`}>
+    <div id="admin-dashboard-container" data-page="admin" className={`workspace-page founder-command founder-workspace page-admin mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-12 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Top User Type Pill Navigator */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#708098] px-2">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-2.5 sm:p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth pb-1 sm:pb-0 sm:flex-wrap">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#708098] px-2 shrink-0 hidden xs:inline">
             {td("User Type Focus:")}
           </span>
           {FOUNDER_NAVIGATION_SECTIONS.map((sec) => {
@@ -195,7 +195,7 @@ function FounderConsole() {
                 key={sec.type}
                 type="button"
                 onClick={() => navigateTo(sec.type, sec.modules[0].id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
                   isSelected
                     ? "bg-[#10253e] text-white shadow-xs"
                     : "bg-[#f8fafc] text-[#475569] hover:bg-[#eef2f6] border border-[#e2e8f0]"
@@ -211,8 +211,8 @@ function FounderConsole() {
           })}
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-[#53657a] font-medium hidden md:inline">
+        <div className="flex items-center justify-between sm:justify-end gap-2 px-1">
+          <span className="text-xs text-[#53657a] font-medium">
             {td("Active:")} <strong className="text-[#10253e]">{td(currentSection?.label || "")}</strong>
           </span>
         </div>
@@ -229,7 +229,7 @@ function FounderConsole() {
                 key={mod.id}
                 type="button"
                 onClick={() => navigateTo(currentSection.type, mod.id)}
-                className={`shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`shrink-0 inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
                   isModActive
                     ? "bg-[#173fad] text-white shadow-xs"
                     : "bg-white text-[#53657a] hover:bg-[#f1f5f9] hover:text-[#10253e] border border-[#dce4e7]"
@@ -732,21 +732,130 @@ function UsersModule() {
     </section>
     {mutationError && !modal ? <Alert variant="destructive" className="mt-5"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Account action needs attention")}</AlertTitle><AlertDescription>{mutationError.message}</AlertDescription></Alert> : null}
     <section className="founder-panel founder-panel-paper mt-6 overflow-hidden p-0"><div className="border-b border-[#eee4d7] px-5 py-5"><h2 className="font-display text-3xl text-[#10253e]">{td(roleLabels[category])}</h2><p className="mt-1 text-sm text-[#53657a]">{td("Open an account to view its full profile and authorised actions.")}</p></div>{list.isLoading ? <LoadingDirectory /> : list.error ? <DirectoryError /> : !list.data?.rows.length ? <EmptyDirectory role={roleLabels[category]} onCreate={openCreate} /> : <div className="divide-y divide-[#f0e9df]">{list.data.rows.map(account => <AccountRow key={account.id} account={account as ManagedAccount} onClick={() => openDetail(account.id)} />)}</div>}</section>
-    <Dialog open={modal !== null} onOpenChange={open => { if (!open) closeModal(); }}><DialogContent className="max-h-[calc(100dvh-2rem)] max-w-[calc(100%-1rem)] overflow-y-auto rounded-[1.25rem] border-[#dfd1bf] bg-[#fbf8f2] p-0 sm:max-w-2xl" showCloseButton={false}><UserModal mode={modal} selected={selected} loading={detail.isLoading} draft={draft} setDraft={setDraft} profileFields={(formSchema.data?.fields ?? []) as DynamicField[]} profileSections={(formSchema.data?.sections ?? []) as DynamicSection[]} profileValues={profileValues} setProfileValues={setProfileValues} pending={create.isPending || update.isPending || remove.isPending} error={mutationError?.message} onSubmit={submit} onClose={closeModal} onDelete={() => selectedId && remove.mutate({ id: selectedId })} /></DialogContent></Dialog>
+    <Dialog open={modal !== null} onOpenChange={open => { if (!open) closeModal(); }}><DialogContent className="w-full h-full max-h-screen max-w-none overflow-y-auto rounded-none border-0 bg-[#fbf8f2] p-0 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:max-w-2xl sm:rounded-[1.25rem] sm:border sm:border-[#dfd1bf]" showCloseButton={false}><UserModal mode={modal} selected={selected} loading={detail.isLoading} draft={draft} setDraft={setDraft} profileFields={(formSchema.data?.fields ?? []) as DynamicField[]} profileSections={(formSchema.data?.sections ?? []) as DynamicSection[]} profileValues={profileValues} setProfileValues={setProfileValues} pending={create.isPending || update.isPending || remove.isPending} error={mutationError?.message} onSubmit={submit} onClose={closeModal} onDelete={() => selectedId && remove.mutate({ id: selectedId })} /></DialogContent></Dialog>
     <UserFieldBuilder open={builderOpen} onOpenChange={setBuilderOpen} />
   </>;
 }
 
 function FilterSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: [string, string][] }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<select value={value} onChange={event => onChange(event.target.value)} className="mt-1 block h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{options.map(([key, copy]) => <option key={key} value={key}>{td(copy)}</option>)}</select></label>; }
 function DateFilter({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<span className="relative mt-1 block"><CalendarDays className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={15} /><input type="date" value={value} onChange={event => onChange(event.target.value)} className="h-12 w-full rounded-xl border border-[#dfd1bf] bg-white pl-9 pr-2 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></span></label>; }
-function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: () => void }) { const { td } = useLanguage(); return <button type="button" onClick={onClick} className="grid w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 bg-white px-5 py-4 text-left transition-colors hover:bg-[#faf6ef] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"><span className="min-w-0"><span className="block truncate font-bold text-[#10253e]">{account.name || td("Unnamed account")}</span><span className="mt-1 block truncate text-xs text-[#708098]">{account.email || td("No e-mail")}</span></span><span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold ${roleTone[account.role]}`}>{td(singularRoleLabels[account.role])}</span><span className={`inline-flex items-center gap-1 text-[11px] font-bold ${account.isActive ? "text-[#173fad]" : "text-[#9a5a47]"}`}>{account.isActive ? <Check size={13} /> : <CircleSlash size={13} />}{account.isActive ? td("Active") : td("Paused")}</span></button>; }
+function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: () => void }) {
+  const { td } = useLanguage();
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-white hover:bg-[#faf6ef] transition-colors border-b border-[#f0e9df]">
+      {/* Mobile Card Layout (< sm) */}
+      <div className="block sm:hidden p-4">
+        {/* Toggle Expansion on Header click or tap */}
+        <div 
+          onClick={() => setExpanded(!expanded)} 
+          className="flex items-start justify-between gap-3 cursor-pointer select-none"
+        >
+          <div className="min-w-0 flex-1">
+            <span className="block truncate font-bold text-[#10253e] text-base">
+              {account.name || td("Unnamed account")}
+            </span>
+            <span className="mt-0.5 block truncate text-xs text-[#708098]">
+              {account.email || td("No e-mail")}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-extrabold ${roleTone[account.role]}`}>
+              {td(singularRoleLabels[account.role])}
+            </span>
+            <span className="text-[#708098] transition-transform duration-200" style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)" }}>
+              <ChevronRight size={16} />
+            </span>
+          </div>
+        </div>
+
+        {/* Priority fields (2-4 fields in collapsed state) */}
+        <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-2.5 rounded-xl border border-[#edf2f4] bg-[#fafbfc] p-3 text-xs">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#708098]">{td("Account status")}</span>
+            <span className={`inline-flex items-center gap-1 font-bold ${account.isActive ? "text-[#173fad]" : "text-[#9a5a47]"}`}>
+              {account.isActive ? <Check size={13} /> : <CircleSlash size={13} />}
+              {account.isActive ? td("Active") : td("Paused")}
+            </span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#708098]">{td("Email Verified")}</span>
+            <span className="font-semibold text-[#29415b] truncate">{account.email ? td("Yes") : td("No")}</span>
+          </div>
+        </div>
+
+        {/* Expandable Section (with smooth height transition/animation) */}
+        <div 
+          className={`grid transition-all duration-300 ease-in-out ${
+            expanded ? "grid-rows-[1fr] opacity-100 mt-3.5" : "grid-rows-[0fr] opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="space-y-2.5 rounded-xl border border-[#e1d5c4] bg-[#fbf8f2] p-3 text-xs">
+              <div className="flex justify-between items-center gap-2 border-b border-[#eee4d7] pb-2">
+                <span className="font-bold text-[#708098]">{td("Account ID:")}</span>
+                <span className="font-mono text-[11px] text-[#29415b] truncate max-w-[180px]" title={account.openId}>{account.openId}</span>
+              </div>
+              <div className="flex justify-between items-center gap-2 border-b border-[#eee4d7] pb-2">
+                <span className="font-bold text-[#708098]">{td("Issued:")}</span>
+                <span className="font-semibold text-[#29415b]">{new Date(account.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center gap-2 border-b border-[#eee4d7] pb-2">
+                <span className="font-bold text-[#708098]">{td("Last sign-in:")}</span>
+                <span className="font-semibold text-[#29415b]">{new Date(account.lastSignedIn).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="font-bold text-[#708098]">{td("Sign-In Method:")}</span>
+                <span className="font-semibold text-[#29415b] uppercase">{account.loginMethod || td("Password")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Full-width primary action button */}
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
+            className="flex w-full min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#10253e] hover:bg-[#173fad] active:bg-[#0c1b2e] px-4 text-xs font-bold text-white transition-all shadow-xs"
+          >
+            <Pencil size={13} />
+            <span>{td("Configure Account")}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Grid Row (>= sm) */}
+      <button
+        type="button"
+        onClick={onClick}
+        className="hidden sm:grid w-full grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-3 sm:px-5 sm:py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"
+      >
+        <span className="min-w-0">
+          <span className="block truncate font-bold text-[#10253e]">{account.name || td("Unnamed account")}</span>
+          <span className="mt-1 block truncate text-xs text-[#708098]">{account.email || td("No e-mail")}</span>
+        </span>
+        <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold ${roleTone[account.role]}`}>
+          {td(singularRoleLabels[account.role])}
+        </span>
+        <span className={`inline-flex items-center gap-1 text-[11px] font-bold ${account.isActive ? "text-[#173fad]" : "text-[#9a5a47]"}`}>
+          {account.isActive ? <Check size={13} /> : <CircleSlash size={13} />}
+          {account.isActive ? td("Active") : td("Paused")}
+        </span>
+      </button>
+    </div>
+  );
+}
 
 function UserModal({ mode, selected, loading, draft, setDraft, profileFields, profileSections, profileValues, setProfileValues, pending, error, onSubmit, onClose, onDelete }: { mode: ModalMode; selected: ManagedAccount | undefined; loading: boolean; draft: AccountDraft; setDraft: (draft: AccountDraft) => void; profileFields: DynamicField[]; profileSections: DynamicSection[]; profileValues: Record<string, string>; setProfileValues: (values: Record<string, string>) => void; pending: boolean; error?: string; onSubmit: (event: React.FormEvent<HTMLFormElement>) => void; onClose: () => void; onDelete: () => void }) {
   const { td } = useLanguage();
   if (mode === "detail" && loading) return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div>;
   const createMode = mode === "create";
   if (createMode) return <ConfigurableCreateUserModal draft={draft} setDraft={setDraft} profileValues={profileValues} setProfileValues={setProfileValues} pending={pending} error={error} onSubmit={onSubmit} onClose={onClose} />;
-  return <form data-testid="users-modal-form" onSubmit={onSubmit}><DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-left"><p className="founder-command-eyebrow">{createMode ? td("Issue new access") : td("Account profile")}</p><DialogTitle className="font-display text-4xl text-[#10253e]">{createMode ? td("Create user") : td("Edit user")}</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">{createMode ? td("Assign protected access details, then complete any Founder-configured profile fields.") : td("Update profile, type, password or active status from this focused account window.")}</DialogDescription></DialogHeader><div className="px-6 py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Account action needs attention")}</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<div className="grid gap-4 sm:grid-cols-2"><TextField label={td("Full name")} value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required autoComplete="name" /><TextField label={td("E-mail")} value={draft.email ?? ""} onChange={value => setDraft({ ...draft, email: value })} required type="email" autoComplete="email" /><label className="block text-xs font-extrabold text-[#53657a]">{td("User type")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as ManagedRole })} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{managedRoles.map(role => <option key={role} value={role}>{td(singularRoleLabels[role])}</option>)}</select></label><TextField label={createMode ? td("Initial password") : td("New password (optional)")} value={draft.password} onChange={value => setDraft({ ...draft, password: value })} required={createMode} type="password" autoComplete="new-password" hint={td("Minimum 10 characters. Stored only as a salted hash.")} /></div>{createMode ? <DynamicUserProfileFields fields={profileFields} sections={profileSections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /> : null}<label className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">{td("Account active")}</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">{td("Inactive accounts cannot sign in with their password.")}</span></span><input aria-label="Account active" type="checkbox" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label>{!createMode && selected ? <div className="mt-5 rounded-xl bg-[#f7f2e9] p-4 text-xs leading-5 text-[#53657a]"><p><span className="font-bold text-[#29415b]">{td("Account ID:")}</span> {selected.openId}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Issued:")}</span> {new Date(selected.createdAt).toLocaleString()}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Last sign-in:")}</span> {new Date(selected.lastSignedIn).toLocaleString()}</p></div> : null}</div><DialogFooter className="border-t border-[#e6dccd] bg-white px-6 py-5"><div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type="button" variant="outline" disabled={pending} className="min-h-12 border-[#efc4b8] text-[#b4563c] hover:bg-[#fff0ed]"><Trash2 size={15} />{td("Delete account")}</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{td("Delete this account?")}</AlertDialogTitle><AlertDialogDescription>{td("This permanently removes the selected account. Centre content is not attached to user records and will remain unchanged.")}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{td("Keep account")}</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-[#b4563c] hover:bg-[#923e2a]">{td("Delete account")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog> : null}</div><div className="flex flex-col gap-2 sm:flex-row"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">{td("Cancel")}</Button><Button type="submit" disabled={pending || (!createMode && !selected)} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{createMode ? td("Create user") : td("Save changes")}</Button></div></div></DialogFooter></form>;
+  return <form data-testid="users-modal-form" onSubmit={onSubmit}><DialogHeader className="border-b border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-6 text-left"><p className="founder-command-eyebrow">{createMode ? td("Issue new access") : td("Account profile")}</p><DialogTitle className="font-display text-2xl sm:text-4xl text-[#10253e]">{createMode ? td("Create user") : td("Edit user")}</DialogTitle><DialogDescription className="max-w-xl text-xs sm:text-sm text-[#53657a]">{createMode ? td("Assign protected access details, then complete any Founder-configured profile fields.") : td("Update profile, type, password or active status from this focused account window.")}</DialogDescription></DialogHeader><div className="px-4 py-4 sm:px-6 sm:py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Account action needs attention")}</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<div className="grid gap-4 sm:grid-cols-2"><TextField label={td("Full name")} value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required autoComplete="name" /><TextField label={td("E-mail")} value={draft.email ?? ""} onChange={value => setDraft({ ...draft, email: value })} required type="email" autoComplete="email" /><label className="block text-xs font-extrabold text-[#53657a]">{td("User type")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as ManagedRole })} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{managedRoles.map(role => <option key={role} value={role}>{td(singularRoleLabels[role])}</option>)}</select></label><TextField label={createMode ? td("Initial password") : td("New password (optional)")} value={draft.password} onChange={value => setDraft({ ...draft, password: value })} required={createMode} type="password" autoComplete="new-password" hint={td("Minimum 10 characters. Stored only as a salted hash.")} /></div>{createMode ? <DynamicUserProfileFields fields={profileFields} sections={profileSections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /> : null}<label className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">{td("Account active")}</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">{td("Inactive accounts cannot sign in with their password.")}</span></span><input aria-label="Account active" type="checkbox" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label>{!createMode && selected ? <div className="mt-5 rounded-xl bg-[#f7f2e9] p-4 text-xs leading-5 text-[#53657a]"><p><span className="font-bold text-[#29415b]">{td("Account ID:")}</span> {selected.openId}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Issued:")}</span> {new Date(selected.createdAt).toLocaleString()}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Last sign-in:")}</span> {new Date(selected.lastSignedIn).toLocaleString()}</p></div> : null}</div><DialogFooter className="border-t border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-5"><div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type="button" variant="outline" disabled={pending} className="min-h-12 border-[#efc4b8] text-[#b4563c] hover:bg-[#fff0ed] w-full sm:w-auto"><Trash2 size={15} />{td("Delete account")}</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{td("Delete this account?")}</AlertDialogTitle><AlertDialogDescription>{td("This permanently removes the selected account. Centre content is not attached to user records and will remain unchanged.")}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{td("Keep account")}</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-[#b4563c] hover:bg-[#923e2a]">{td("Delete account")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog> : null}</div><div className="flex flex-col gap-2 sm:flex-row"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">{td("Cancel")}</Button><Button type="submit" disabled={pending || (!createMode && !selected)} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{createMode ? td("Create user") : td("Save changes")}</Button></div></div></DialogFooter></form>;
 }
 
 function TextField({ label, value, onChange, type = "text", required, hint, autoComplete }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; hint?: string; autoComplete?: string }) { return <label className="block text-xs font-extrabold text-[#53657a]">{label}<input required={required} type={type} autoComplete={autoComplete} value={value} onChange={event => onChange(event.target.value)} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" />{hint ? <span className="mt-1.5 block text-[11px] font-normal leading-4 text-[#708098]">{hint}</span> : null}</label>; }

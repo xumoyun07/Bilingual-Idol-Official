@@ -1,10 +1,11 @@
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, SlidersHorizontal, X, Layers, CheckCircle2, GraduationCap } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { PublicLayout } from "@/components/PublicLayout";
 import { OFFICIAL_PROGRAMME_GUIDE, PROGRAM_CATEGORIES } from "@/lib/siteData";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FilterDrawer } from "@/components/ui/FilterDrawer";
 
 export default function Programs() {
   const [category, setCategory] = useState<(typeof PROGRAM_CATEGORIES)[number]>("All");
@@ -93,35 +94,243 @@ export default function Programs() {
         </section>
 
         <section id="programs-list-section" className="simple-route-section">
+          {/* Main Search & Filter Bar */}
           <div className="simple-filter-bar">
-            <label>
-              <Search size={17} />
-              <span className="sr-only">{t("programs.searchPlaceholder")}</span>
-              <input value={query} onChange={event => setQuery(event.target.value)} placeholder={t("programs.searchPlaceholder")} />
-            </label>
-            <div className="simple-filter-options" aria-label={language === "ar" ? "تصفية فئات البرامج" : language === "ms" ? "Penapis kategori program" : "Programme category filters"}>
+            <div className="flex items-center gap-2 w-full">
+              <label className="flex-1">
+                <Search size={17} />
+                <span className="sr-only">{t("programs.searchPlaceholder")}</span>
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={t("programs.searchPlaceholder")}
+                />
+              </label>
+
+              {/* Mobile Filter Drawer Button */}
+              <div className="sm:hidden shrink-0">
+                <FilterDrawer
+                  title={
+                    language === "ar"
+                      ? "تصفية كتالوج الدورات"
+                      : language === "ms"
+                      ? "Penapis Katalog Kursus"
+                      : "Course Catalog Filters"
+                  }
+                  description={
+                    language === "ar"
+                      ? "اختر الفئة الأكاديمية لعرض البرامج المتاحة"
+                      : language === "ms"
+                      ? "Pilih kategori akademik untuk melihat kursus"
+                      : "Select an academic category to filter available courses."
+                  }
+                  activeCount={category !== "All" ? 1 : 0}
+                  triggerLabel={
+                    language === "ar" ? "تصفية" : language === "ms" ? "Tapis" : "Filters"
+                  }
+                  onReset={() => {
+                    setCategory("All");
+                    setQuery("");
+                  }}
+                  resetLabel={
+                    language === "ar" ? "إعادة ضبط" : language === "ms" ? "Set semula" : "Reset"
+                  }
+                  applyLabel={
+                    language === "ar" ? "تطبيق" : language === "ms" ? "Guna" : "Apply"
+                  }
+                >
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-[#10253e] uppercase tracking-wider flex items-center gap-1.5">
+                      <GraduationCap size={15} className="text-[#173fad]" />
+                      <span>
+                        {language === "ar"
+                          ? "فئة البرامج"
+                          : language === "ms"
+                          ? "Kategori Program"
+                          : "Program Category"}
+                      </span>
+                    </label>
+
+                    <div className="flex flex-col gap-2">
+                      {PROGRAM_CATEGORIES.map((item) => {
+                        const isSelected = category === item;
+                        const label =
+                          item === "All"
+                            ? t("programs.filterAll")
+                            : item === "Kids"
+                            ? language === "ar"
+                              ? "الأطفال والمخيمات الصيفية"
+                              : language === "ms"
+                              ? "Kanak-kanak & Kem Musim Panas"
+                              : "Kids & Holiday Camps"
+                            : item === "English"
+                            ? language === "ar"
+                              ? "اللغة الإنجليزية وآيلتس"
+                              : language === "ms"
+                              ? "Bahasa Inggeris & IELTS"
+                              : "English & IELTS Prep"
+                            : item === "World Languages"
+                            ? language === "ar"
+                              ? "لغات عالمية (ماندرين، عربية، ملايو)"
+                              : language === "ms"
+                              ? "Bahasa Antarabangsa (Mandarin/Arab)"
+                              : "World Languages (Mandarin, Arabic, Malay)"
+                            : language === "ar"
+                            ? "مهني وتدريب مؤسسي"
+                            : language === "ms"
+                            ? "Profesional & Korporat"
+                            : "Corporate & Executive";
+
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setCategory(item)}
+                            className={`w-full min-h-12 px-4 py-3 rounded-xl text-xs font-semibold border flex items-center justify-between transition-all text-start ${
+                              isSelected
+                                ? "border-[#173fad] bg-[#eef4ff] text-[#173fad] shadow-xs ring-1 ring-[#173fad]"
+                                : "border-[#dce4e7] bg-white text-[#29415b] hover:bg-[#f8fafb]"
+                            }`}
+                          >
+                            <span className="truncate">{label}</span>
+                            {isSelected && (
+                              <CheckCircle2 size={16} className="text-[#173fad] shrink-0 ms-2" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </FilterDrawer>
+              </div>
+            </div>
+
+            {/* Desktop Filter Options */}
+            <div
+              className="hidden sm:flex simple-filter-options"
+              aria-label={
+                language === "ar"
+                  ? "تصفية فئات البرامج"
+                  : language === "ms"
+                  ? "Penapis kategori program"
+                  : "Programme category filters"
+              }
+            >
               <span>
                 <Filter size={15} /> {t("programs.filterAll")}
               </span>
-              {PROGRAM_CATEGORIES.map(item => {
+              {PROGRAM_CATEGORIES.map((item) => {
                 const label =
                   item === "All"
                     ? t("programs.filterAll")
                     : item === "Kids"
-                    ? (language === "ar" ? "الأطفال" : language === "ms" ? "Kanak-kanak" : "Kids")
+                    ? language === "ar"
+                      ? "الأطفال"
+                      : language === "ms"
+                      ? "Kanak-kanak"
+                      : "Kids"
                     : item === "English"
-                    ? (language === "ar" ? "اللغة الإنجليزية" : language === "ms" ? "Bahasa Inggeris" : "English")
+                    ? language === "ar"
+                      ? "اللغة الإنجليزية"
+                      : language === "ms"
+                      ? "Bahasa Inggeris"
+                      : "English"
                     : item === "World Languages"
-                    ? (language === "ar" ? "لغات عالمية" : language === "ms" ? "Bahasa Antarabangsa" : "World Languages")
-                    : (language === "ar" ? "مهني وتطويري" : language === "ms" ? "Profesional" : "Professional");
+                    ? language === "ar"
+                      ? "لغات عالمية"
+                      : language === "ms"
+                      ? "Bahasa Antarabangsa"
+                      : "World Languages"
+                    : language === "ar"
+                    ? "مهني وتطويري"
+                    : language === "ms"
+                    ? "Profesional"
+                    : "Professional";
                 return (
-                  <button key={item} onClick={() => setCategory(item)} aria-pressed={category === item}>
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setCategory(item)}
+                    aria-pressed={category === item}
+                  >
                     {label}
                   </button>
                 );
               })}
             </div>
           </div>
+
+          {/* Active Filter Chips */}
+          {(category !== "All" || query.trim()) && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1 px-1">
+              <span className="text-[11px] font-bold text-[#53657a] me-1">
+                {language === "ar" ? "الفلاتر النشطة:" : language === "ms" ? "Penapis aktif:" : "Active filters:"}
+              </span>
+
+              {category !== "All" && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#eef4ff] text-[#173fad] border border-[#c0d4ff]">
+                  <span>
+                    {category === "Kids"
+                      ? language === "ar"
+                        ? "الأطفال"
+                        : language === "ms"
+                        ? "Kanak-kanak"
+                        : "Kids"
+                      : category === "English"
+                      ? language === "ar"
+                        ? "اللغة الإنجليزية"
+                        : language === "ms"
+                        ? "Bahasa Inggeris"
+                        : "English"
+                      : category === "World Languages"
+                      ? language === "ar"
+                        ? "لغات عالمية"
+                        : language === "ms"
+                        ? "Bahasa Antarabangsa"
+                        : "World Languages"
+                      : language === "ar"
+                      ? "مهني"
+                      : language === "ms"
+                      ? "Profesional"
+                      : "Professional"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCategory("All")}
+                    aria-label="Remove category filter"
+                    className="hover:text-rose-600 focus:outline-none ms-0.5"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              {query.trim() && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f0f4f7] text-[#29415b] border border-[#dce4e7]">
+                  <span>"{query}"</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    aria-label="Clear search query"
+                    className="hover:text-rose-600 focus:outline-none ms-0.5"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCategory("All");
+                  setQuery("");
+                }}
+                className="text-xs font-semibold text-[#173fad] hover:text-[#10253e] underline ms-2 py-0.5"
+              >
+                {language === "ar" ? "إعادة ضبط الكل" : language === "ms" ? "Set semula semua" : "Reset all"}
+              </button>
+            </div>
+          )}
 
           <p className="simple-list-summary simple-list-summary--surface">
             <strong>{matches.length}</strong> {t("programs.showingCount", { count: matches.length })}

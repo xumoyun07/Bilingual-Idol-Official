@@ -80,6 +80,14 @@ async function startServer() {
     serveStatic(app);
   }
 
+  // Seed default users if database is connected
+  try {
+    const { seedDatabaseDefaultUsers } = await import("../db");
+    await seedDatabaseDefaultUsers();
+  } catch (error) {
+    console.error("[Seed] Failed to seed default users:", error);
+  }
+
   const port = 3000;
 
   server.listen(port, "0.0.0.0", () => {

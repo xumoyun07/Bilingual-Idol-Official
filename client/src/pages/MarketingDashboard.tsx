@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DashboardLayout from "@/components/DashboardLayout";
 import {
   BarChart3,
   BookOpen,
@@ -15,6 +16,7 @@ import {
   CheckCircle2,
   Download,
   FileText,
+  Gift,
   Globe,
   Image as ImageIcon,
   Layers,
@@ -171,6 +173,41 @@ export default function MarketingDashboard() {
   const [ctaApplyLink, setCtaApplyLink] = useState("");
   const [ctaConsultText, setCtaConsultText] = useState("");
 
+  // Promotional Campaign settings (red popup window)
+  const [promoActive, setPromoActive] = useState("false");
+  const [promoTitle, setPromoTitle] = useState("");
+  const [promoText, setPromoText] = useState("");
+  const [promoDiscount, setPromoDiscount] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [promoCtaText, setPromoCtaText] = useState("");
+  const [promoCtaUrl, setPromoCtaUrl] = useState("");
+  const [promoColor, setPromoColor] = useState("red");
+
+  const siteSettingsQuery = trpc.content.siteSettings.useQuery();
+
+  React.useEffect(() => {
+    if (siteSettingsQuery.data) {
+      setPromoActive(siteSettingsQuery.data.promo_active || "false");
+      setPromoTitle(siteSettingsQuery.data.promo_title || "");
+      setPromoText(siteSettingsQuery.data.promo_text || "");
+      setPromoDiscount(siteSettingsQuery.data.promo_discount || "");
+      setPromoCode(siteSettingsQuery.data.promo_code || "");
+      setPromoCtaText(siteSettingsQuery.data.promo_cta_text || "");
+      setPromoCtaUrl(siteSettingsQuery.data.promo_cta_url || "");
+      setPromoColor(siteSettingsQuery.data.promo_color || "red");
+    }
+  }, [siteSettingsQuery.data]);
+
+  const updatePromoMutation = trpc.content.updateMarketingPromo.useMutation({
+    onSuccess: () => {
+      toast.success("Promotional popup campaign settings updated successfully!");
+      siteSettingsQuery.refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Could not update promo settings");
+    }
+  });
+
   React.useEffect(() => {
     if (ctaQuery.data) {
       setCtaApplyText(ctaQuery.data["cta.apply_now.text"] || "Apply Now");
@@ -222,79 +259,10 @@ export default function MarketingDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="font-bold text-lg text-blue-900 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow-xs">
-              BI
-            </span>
-            <span className="hidden sm:inline">Bilingual Idol</span>
-          </Link>
-          <span className="text-slate-300">/</span>
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-semibold text-slate-800">Marketing & Content Management</h1>
-            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200 text-xs">
-              MK6–MK11 Active
-            </Badge>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-slate-600 text-xs">
-              My Profile
-            </Button>
-          </Link>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => logout()}
-            className="text-slate-700 border-slate-300 text-xs gap-1.5"
-          >
-            <LogOut size={14} />
-            Sign Out
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <DashboardLayout role="marketing" activeTab={activeTab} setActiveTab={setActiveTab}>
+      <div id="marketing-dashboard-container" data-page="marketing" className="workspace-page founder-command founder-workspace page-marketing mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10">
         {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="overflow-x-auto pb-1">
-            <TabsList className="bg-white border border-slate-200 p-1 rounded-xl shadow-xs inline-flex h-auto">
-              <TabsTrigger value="overview" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <BarChart3 size={15} />
-                Overview & Reports (MK9)
-              </TabsTrigger>
-              <TabsTrigger value="content" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <FileText size={15} />
-                Content & CMS (MK6)
-              </TabsTrigger>
-              <TabsTrigger value="media" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <ImageIcon size={15} />
-                Media Library (MK7)
-              </TabsTrigger>
-              <TabsTrigger value="audiences" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <Users size={15} />
-                Audiences (MK8)
-              </TabsTrigger>
-              <TabsTrigger value="channels" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <MessageSquare size={15} />
-                Channels & FAQ
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <Settings size={15} />
-                Settings & Directory (MK10)
-              </TabsTrigger>
-              <TabsTrigger value="restrictions" className="gap-1.5 text-xs sm:text-sm py-2 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                <Lock size={15} />
-                Guardrails (MK11)
-              </TabsTrigger>
-            </TabsList>
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 mt-6">
 
           {/* TAB 1: OVERVIEW & REPORTS (MK9) */}
           <TabsContent value="overview" className="space-y-6">
@@ -961,6 +929,146 @@ export default function MarketingDashboard() {
                 </CardContent>
               </Card>
 
+              {/* Promotional Popup Campaign Customizer */}
+              <Card className="bg-white border-red-100 shadow-sm border-t-4 border-t-red-600">
+                <CardHeader>
+                  <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-red-50 text-red-600">
+                      <Gift size={16} />
+                    </span>
+                    <span>Promotional Popup Campaign Banner</span>
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Create and publish seasonal campaigns, urgent discounts, or custom discount badges.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-red-50/50 border border-red-100 rounded-xl">
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Campaign Display Status</p>
+                      <p className="text-[10px] text-slate-500">Toggle whether the modal and floating button are visible.</p>
+                    </div>
+                    <select
+                      value={promoActive}
+                      onChange={(e) => setPromoActive(e.target.value)}
+                      className="bg-white border border-red-200 text-xs font-bold text-red-700 py-1.5 px-3 rounded-lg focus:outline-hidden cursor-pointer"
+                    >
+                      <option value="false">🔴 Disabled (Offline)</option>
+                      <option value="true">🟢 Active (Live)</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Discount Badge (e.g. 20% OFF)</label>
+                      <Input
+                        value={promoDiscount}
+                        onChange={(e) => setPromoDiscount(e.target.value)}
+                        placeholder="e.g. 20% OFF"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Promo Code (e.g. AUTUMN20)</label>
+                      <Input
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        placeholder="e.g. AUTUMN20"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Title</label>
+                    <Input
+                      value={promoTitle}
+                      onChange={(e) => setPromoTitle(e.target.value)}
+                      placeholder="e.g. Grand Autumn Academic Intake Sale"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Text</label>
+                    <textarea
+                      value={promoText}
+                      onChange={(e) => setPromoText(e.target.value)}
+                      placeholder="Input the promotion description, details or intake deadlines..."
+                      className="w-full min-h-[90px] border border-slate-200 rounded-md p-2.5 text-sm focus:outline-hidden focus:ring-1 focus:ring-red-500 bg-white text-slate-900"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      💡 Standard text-interpolation secures this text against XSS/malicious code injections automatically.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">CTA Button Label</label>
+                      <Input
+                        value={promoCtaText}
+                        onChange={(e) => setPromoCtaText(e.target.value)}
+                        placeholder="e.g. Claim Discount"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">CTA Redirect Link</label>
+                      <Input
+                        value={promoCtaUrl}
+                        onChange={(e) => setPromoCtaUrl(e.target.value)}
+                        placeholder="e.g. /programs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-2">Campaign Theme Color</label>
+                    <div className="flex flex-wrap gap-2.5">
+                      {[
+                        { id: "red", name: "Crimson Red", class: "bg-red-600" },
+                        { id: "blue", name: "Royal Blue", class: "bg-blue-600" },
+                        { id: "green", name: "Emerald Green", class: "bg-emerald-600" },
+                        { id: "amber", name: "Warm Amber", class: "bg-amber-500" },
+                        { id: "purple", name: "Royal Purple", class: "bg-purple-600" },
+                        { id: "slate", name: "Classic Slate", class: "bg-slate-700" },
+                      ].map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => setPromoColor(c.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                            promoColor === c.id
+                              ? "bg-slate-900 border-slate-900 text-white ring-2 ring-offset-1 ring-slate-900"
+                              : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span className={`w-3 h-3 rounded-full ${c.class}`} />
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <Button
+                      onClick={() => {
+                        updatePromoMutation.mutate({
+                          active: promoActive,
+                          title: promoTitle,
+                          text: promoText,
+                          discount: promoDiscount,
+                          code: promoCode,
+                          ctaText: promoCtaText,
+                          ctaUrl: promoCtaUrl,
+                          color: promoColor,
+                        });
+                      }}
+                      disabled={updatePromoMutation.isPending}
+                      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold cursor-pointer"
+                    >
+                      {updatePromoMutation.isPending ? "Publishing Changes..." : "Publish Promo Campaign"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Editable Lead Sources Directory */}
               <Card className="bg-white border-slate-200 shadow-xs">
                 <CardHeader>
@@ -1098,7 +1206,7 @@ export default function MarketingDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

@@ -8,8 +8,10 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
+import { PromotionalPopupModal, PromotionalFloatingBadge } from "@/components/PromotionalPopup";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
+  const [promoOpen, setPromoOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [location] = useLocation();
@@ -286,7 +288,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <div className="py-2">
               <PWAInstallButton variant="card" />
             </div>
-            <Link href="/login" onClick={close}>
+            <Link href="/login" className="simple-button simple-button-quiet mt-2" onClick={close}>
               {t("nav.signIn")}
             </Link>
             <Link href="/enroll" className="simple-button" onClick={close}>
@@ -314,11 +316,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </footer>
 
+      {/* Promotional Campaign Modal Popup */}
+      <PromotionalPopupModal isOpen={promoOpen} setIsOpen={setPromoOpen} />
+
       {/* Floating Actions Dock */}
       <div
         className={`floating-actions-dock ${isRTL ? "is-rtl" : ""}`}
         aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
       >
+        {/* Promotional Campaign Floating Badge rendered directly in the flex dock */}
+        <PromotionalFloatingBadge isOpen={promoOpen} setIsOpen={setPromoOpen} />
+
         <a
           href="tel:+60367310449"
           className="floating-call-button"

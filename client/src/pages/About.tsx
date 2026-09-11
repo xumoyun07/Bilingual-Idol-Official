@@ -60,7 +60,7 @@ export default function About() {
         </header>
 
         <section id="about-story-section" className="simple-route-section about-story-section about-section--compact-spacing">
-          <div className="about-story-grid about-story-grid--surface">
+          <div className="about-story-grid about-story-grid--surface md:!ml-0">
             <div className="about-story-copy">
               <p className="simple-eyebrow">{t("about.storyEyebrow")}</p>
               <h2>{t("about.storyTitle")}</h2>

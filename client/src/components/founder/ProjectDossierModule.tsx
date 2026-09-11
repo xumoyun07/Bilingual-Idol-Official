@@ -220,11 +220,11 @@ export function ProjectDossierModule() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-center w-full md:w-auto">
             <button
               onClick={handleDownloadDoc}
               title="Скачать в формате Microsoft Word (.doc)"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition-all shadow-xs"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] sm:min-h-[36px] flex-1 sm:flex-initial rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition-all shadow-xs"
             >
               <FileText size={15} className="text-blue-200" />
               <span>Скачать Word (.doc)</span>
@@ -232,7 +232,7 @@ export function ProjectDossierModule() {
             <button
               onClick={handleDownloadMarkdown}
               title="Скачать в формате Markdown (.md)"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition-all shadow-xs"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] sm:min-h-[36px] flex-1 sm:flex-initial rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition-all shadow-xs"
             >
               <Download size={15} className="text-amber-200" />
               <span>Скачать .MD</span>
@@ -240,7 +240,7 @@ export function ProjectDossierModule() {
             <button
               onClick={handleCopyMarkdown}
               title="Скопировать весь текст досье в буфер"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition-all shadow-xs"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] sm:min-h-[36px] flex-1 sm:flex-initial rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition-all shadow-xs"
             >
               {copied ? <CheckCircle2 size={15} className="text-emerald-300" /> : <Copy size={15} />}
               <span>{copied ? "Скопировано" : "Копировать"}</span>
@@ -248,7 +248,7 @@ export function ProjectDossierModule() {
             <button
               onClick={handlePrint}
               title="Распечатать или сохранить как PDF через диалог печати"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-[#10253e] hover:bg-amber-50 transition-all shadow-xs"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] sm:min-h-[36px] flex-1 sm:flex-initial rounded-xl text-xs font-bold bg-white text-[#10253e] hover:bg-amber-50 transition-all shadow-xs"
             >
               <Printer size={15} />
               <span>Печать / PDF</span>
@@ -283,12 +283,12 @@ export function ProjectDossierModule() {
 
       {/* Navigation and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
-        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 sm:pb-0">
           {sections.map((sec) => (
             <button
               key={sec.id}
               onClick={() => setActiveSection(sec.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-3 py-2 min-h-[40px] rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center ${
                 activeSection === sec.id
                   ? "bg-[#10253e] text-white shadow-xs"
                   : "bg-[#f8fafc] text-[#475569] hover:bg-[#eef2f6] border border-[#e2e8f0]"
@@ -305,7 +305,7 @@ export function ProjectDossierModule() {
             placeholder="Поиск по досье..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[#f8fafc] border border-[#dce4e7] focus:outline-hidden focus:border-[#173fad]"
+            className="w-full pl-8 pr-3 h-10 text-xs rounded-xl bg-[#f8fafc] border border-[#dce4e7] focus:outline-hidden focus:border-[#173fad]"
           />
         </div>
       </div>
@@ -562,8 +562,63 @@ export function ProjectDossierModule() {
               </div>
             </div>
 
-            {/* Financial Overview Table */}
-            <div className="overflow-x-auto">
+            {/* Financial Overview - Mobile Cards */}
+            <div className="block md:hidden space-y-3">
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-[#10253e]">Q1 2026 (Запуск & Core Dev)</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Завершен</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#edf2f5]">
+                  <div><span className="text-[#64748b] block text-[11px]">План:</span><span className="font-semibold text-[#10253e]">$38,000</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Факт:</span><span className="font-semibold text-[#10253e]">$36,400</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Выручка:</span><span className="font-semibold text-[#10253e]">$18,200</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Прибыль:</span><span className="font-semibold text-amber-700">-$18,200</span></div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-[#10253e]">Q2 2026 (Масштабирование)</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Завершен</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#edf2f5]">
+                  <div><span className="text-[#64748b] block text-[11px]">План:</span><span className="font-semibold text-[#10253e]">$28,000</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Факт:</span><span className="font-semibold text-[#10253e]">$26,800</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Выручка:</span><span className="font-semibold text-[#10253e]">$54,600</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Прибыль:</span><span className="font-bold text-emerald-600">+$27,800 (+51%)</span></div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-[#10253e]">Q3 2026 (Текущий квартал)</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">В процессе</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-emerald-100">
+                  <div><span className="text-[#64748b] block text-[11px]">План:</span><span className="font-semibold text-[#10253e]">$24,000</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Факт:</span><span className="font-semibold text-[#10253e]">$18,900</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Выручка:</span><span className="font-bold text-emerald-700">$78,400</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Прибыль:</span><span className="font-bold text-emerald-700">+$59,500 (+76%)</span></div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-[#10253e]">Q4 2026 (Прогноз релиза v2.1)</span>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px]">Запланирован</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#edf2f5]">
+                  <div><span className="text-[#64748b] block text-[11px]">План:</span><span className="font-semibold text-[#10253e]">$22,000</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Факт:</span><span className="font-semibold text-[#64748b]">$22,000 (прогноз)</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Выручка:</span><span className="font-semibold text-[#10253e]">$95,000 (прогноз)</span></div>
+                  <div><span className="text-[#64748b] block text-[11px]">Прибыль:</span><span className="font-bold text-emerald-600">+$73,000 (+77%)</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Overview Table (Desktop) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-xs text-left">
                 <thead className="bg-[#f8fafc] text-[#64748b] uppercase tracking-wider font-semibold border-b border-[#e2e8f0]">
                   <tr>
@@ -735,7 +790,81 @@ export function ProjectDossierModule() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* KPI Overview - Mobile Cards */}
+            <div className="block md:hidden space-y-3">
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-xs text-[#10253e]">Активные платящие ученики</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] whitespace-nowrap">+27.9%</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div><span className="text-[#64748b] text-[11px] block">План:</span><span className="font-medium text-[#10253e]">380 чел.</span></div>
+                  <div><span className="text-[#64748b] text-[11px] block">Факт:</span><span className="font-bold text-emerald-700">486 чел.</span></div>
+                </div>
+                <p className="text-[11px] text-[#64748b] pt-1.5 border-t border-[#edf2f5]">
+                  Успешный запуск летних интенсивных программ и таргетинга.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-xs text-[#10253e]">Конверсия входящего лида в оплату</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] whitespace-nowrap">+9.2 п.п.</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div><span className="text-[#64748b] text-[11px] block">План:</span><span className="font-medium text-[#10253e]">25.0%</span></div>
+                  <div><span className="text-[#64748b] text-[11px] block">Факт:</span><span className="font-bold text-emerald-700">34.2%</span></div>
+                </div>
+                <p className="text-[11px] text-[#64748b] pt-1.5 border-t border-[#edf2f5]">
+                  Сокращение времени первого контакта менеджера с 4ч до 12 минут.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-xs text-[#10253e]">Коэффициент удержания (Retention 6M)</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] whitespace-nowrap">+3.4 п.п.</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div><span className="text-[#64748b] text-[11px] block">План:</span><span className="font-medium text-[#10253e]">85.0%</span></div>
+                  <div><span className="text-[#64748b] text-[11px] block">Факт:</span><span className="font-bold text-emerald-700">88.4%</span></div>
+                </div>
+                <p className="text-[11px] text-[#64748b] pt-1.5 border-t border-[#edf2f5]">
+                  Прозрачность прогресса через электронный журнал для родителей.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-xs text-[#10253e]">Стоимость привлечения клиента (CAC)</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] whitespace-nowrap">-27.7% (лучше)</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div><span className="text-[#64748b] text-[11px] block">План:</span><span className="font-medium text-[#10253e]">$45.00</span></div>
+                  <div><span className="text-[#64748b] text-[11px] block">Факт:</span><span className="font-bold text-emerald-700">$32.50</span></div>
+                </div>
+                <p className="text-[11px] text-[#64748b] pt-1.5 border-t border-[#edf2f5]">
+                  Высокая доля органических рекомендаций (WOM) — 38% от общего объема.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-xs text-[#10253e]">Полнота заполнения журналов</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] whitespace-nowrap">-3.9 п.п.</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div><span className="text-[#64748b] text-[11px] block">План:</span><span className="font-medium text-[#10253e]">98.0%</span></div>
+                  <div><span className="text-[#64748b] text-[11px] block">Факт:</span><span className="font-bold text-amber-700">94.1%</span></div>
+                </div>
+                <p className="text-[11px] text-[#64748b] pt-1.5 border-t border-[#edf2f5]">
+                  Внедрены автоматические ежедневные напоминания и упрощенный интерфейс.
+                </p>
+              </div>
+            </div>
+
+            {/* KPI Table (Desktop) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-xs text-left">
                 <thead className="bg-[#f8fafc] text-[#64748b] uppercase tracking-wider font-semibold border-b border-[#e2e8f0]">
                   <tr>
@@ -801,7 +930,71 @@ export function ProjectDossierModule() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Risks Overview - Mobile Cards */}
+            <div className="block md:hidden space-y-3">
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-bold text-xs text-[#10253e]">Безопасность персональных данных</div>
+                  <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 font-bold text-[10px] whitespace-nowrap">Критическое (High)</span>
+                </div>
+                <p className="text-[11px] text-[#64748b]">Риск утечки личных данных учеников и родителей.</p>
+                <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edf2f5] text-xs">
+                  <span className="text-[#64748b] text-[11px]">Вероятность: <strong className="text-emerald-700">Низкая</strong></span>
+                  <span className="text-[#64748b] text-[11px] ml-auto">Ответственный: <strong className="text-[#10253e]">Security Officer</strong></span>
+                </div>
+                <p className="text-[11px] text-[#475569] bg-white p-2 rounded-xl border border-[#eef2f6]">
+                  План: Шифрование данных at-rest / in-transit, строгий RBAC, аудит всех сессий.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-bold text-xs text-[#10253e]">Сезонный отток студентов</div>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold text-[10px] whitespace-nowrap">Умеренное (Med)</span>
+                </div>
+                <p className="text-[11px] text-[#64748b]">Снижение активности в период каникул (январь / май).</p>
+                <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edf2f5] text-xs">
+                  <span className="text-[#64748b] text-[11px]">Вероятность: <strong className="text-amber-700">Средняя</strong></span>
+                  <span className="text-[#64748b] text-[11px] ml-auto">Ответственный: <strong className="text-[#10253e]">Head of Marketing</strong></span>
+                </div>
+                <p className="text-[11px] text-[#475569] bg-white p-2 rounded-xl border border-[#eef2f6]">
+                  План: Запуск межсезонных интенсивов, разговорных клубов и спецкурсов.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-bold text-xs text-[#10253e]">Ротация преподавательского состава</div>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold text-[10px] whitespace-nowrap">Умеренное (Med)</span>
+                </div>
+                <p className="text-[11px] text-[#64748b]">Уход ключевых педагогов-носителей языка.</p>
+                <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edf2f5] text-xs">
+                  <span className="text-[#64748b] text-[11px]">Вероятность: <strong className="text-amber-700">Средняя</strong></span>
+                  <span className="text-[#64748b] text-[11px] ml-auto">Ответственный: <strong className="text-[#10253e]">Academic Director</strong></span>
+                </div>
+                <p className="text-[11px] text-[#475569] bg-white p-2 rounded-xl border border-[#eef2f6]">
+                  План: Централизованная база учебных планов (Curriculum Hub), программа бонусов.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-bold text-xs text-[#10253e]">Пиковые нагрузки на сервер</div>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold text-[10px] whitespace-nowrap">Низкое (Low)</span>
+                </div>
+                <p className="text-[11px] text-[#64748b]">Замедление работы во время синхронного выставления оценок.</p>
+                <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edf2f5] text-xs">
+                  <span className="text-[#64748b] text-[11px]">Вероятность: <strong className="text-emerald-700">Низкая</strong></span>
+                  <span className="text-[#64748b] text-[11px] ml-auto">Ответственный: <strong className="text-[#10253e]">Lead Architect</strong></span>
+                </div>
+                <p className="text-[11px] text-[#475569] bg-white p-2 rounded-xl border border-[#eef2f6]">
+                  План: Serverless Cloud Run автоскейлинг и кэширование справочников.
+                </p>
+              </div>
+            </div>
+
+            {/* Risks Table (Desktop) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-xs text-left">
                 <thead className="bg-[#f8fafc] text-[#64748b] uppercase tracking-wider font-semibold border-b border-[#e2e8f0]">
                   <tr>

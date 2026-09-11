@@ -67,7 +67,39 @@ async function writeHistory(database: any, studentId: number, actorUserId: numbe
 
 function studentBaseWhere(studentId: number) { return and(eq(users.id, studentId), eq(users.role, "student")); }
 
-const inMemoryStudentsList: Array<any> = [];
+const inMemoryStudentsList: Array<any> = [
+  {
+    userId: 6,
+    name: "Student Learner",
+    email: "student@bilc.my",
+    isActive: true,
+    createdAt: new Date("2026-01-01"),
+    updatedAt: new Date("2026-01-01"),
+    guardianName: "Parent Learner",
+    guardianPhone: "+60123456789",
+    contactEmail: "guardian@bilc.my",
+    dateOfBirth: new Date("2010-05-15"),
+    address: "123 Learning Street, Kuala Lumpur",
+    notes: "Requires intermediate grammar support.",
+    attendedSessions: 18,
+    totalSessions: 20,
+    currentLevel: "Intermediate",
+    courseName: "General English",
+    courseCode: "GEN-ENG",
+    courseStartDate: new Date("2026-01-10"),
+    courseEndDate: new Date("2026-06-30"),
+    documents: [],
+    history: [
+      {
+        id: 1,
+        eventType: "student_profile.create",
+        changesJson: JSON.stringify({ changedFields: ["profile"] }),
+        createdAt: new Date("2026-01-01"),
+        actorName: "Super Admin",
+      },
+    ],
+  },
+];
 
 export async function listStudentProfiles(filters: StudentListFilters = {}) {
   const database = await getDb();

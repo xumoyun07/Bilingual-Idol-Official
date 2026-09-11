@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
 import { AlertCircle, ArchiveRestore, CalendarDays, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, Filter, History, Loader2, RotateCcw, Search, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { FilterDrawer } from "@/components/ui/FilterDrawer";
 
 type AuditRole = "founder" | "super_admin";
 type AuditSource = "active" | "archive";
@@ -129,7 +130,7 @@ export default function AuditLogs({ role }: { role: AuditRole }) {
           {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)) > 0 && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#eef4ff] px-2.5 py-0.5 text-xs font-semibold text-[#173fad]">
               <Filter size={12} />
-              {(query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)} active
+              {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0))} active
             </span>
           )}
           {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)) > 0 && (
@@ -145,32 +146,27 @@ export default function AuditLogs({ role }: { role: AuditRole }) {
         </div>
       </div>
 
-      <div className="grid min-w-0 gap-3.5 lg:grid-cols-12">
-        {/* Search Query */}
-        <div className="lg:col-span-6 relative">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#53657a] mb-1.5">
-            Search Audit Records
-          </label>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
-            <input
-              value={query}
-              onChange={event => { setQuery(event.target.value); setPage(0); }}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-10 pr-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
-              placeholder="Search ID, description, IP, browser, action or object…"
-              aria-describedby={suggestions.data?.length ? "audit-search-suggestions" : undefined}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => { setQuery(""); setPage(0); }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
-                title="Clear search"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 md:gap-3">
+        {/* Search Query Inline */}
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
+          <input
+            value={query}
+            onChange={event => { setQuery(event.target.value); setPage(0); }}
+            className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-10 pr-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+            placeholder="Search ID, description, IP, browser, action or object…"
+            aria-describedby={suggestions.data?.length ? "audit-search-suggestions" : undefined}
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => { setQuery(""); setPage(0); }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
+              title="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
           {suggestions.data?.length ? (
             <div id="audit-search-suggestions" className="absolute z-20 mt-1 max-h-52 w-full overflow-auto rounded-xl border border-[#dce4e7] bg-white p-1 shadow-lg" role="listbox" aria-label="Search suggestions">
               {suggestions.data.map((item: string) => (
@@ -188,31 +184,118 @@ export default function AuditLogs({ role }: { role: AuditRole }) {
           ) : null}
         </div>
 
-        {/* Role Select */}
-        <div className="sm:col-span-6 lg:col-span-2">
-          <Select label="Role" value={actorRole} onChange={value => { setActorRole(value as AuditActorRole); setPage(0); }} options={roleOptions[role]} />
-        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Quick Execution Result filter for Desktop */}
+          <div className="hidden md:block">
+            <select
+              value={success}
+              onChange={event => { setSuccess(event.target.value); setPage(0); }}
+              aria-label="Quick filter by result"
+              className="h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad] min-w-[150px]"
+            >
+              <option value="all">All results</option>
+              <option value="success">Successful</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
 
-        {/* Action Select */}
-        <div className="sm:col-span-6 lg:col-span-2">
-          <Select label="Action" value={action} onChange={value => { setAction(value); setPage(0); }} options={actionOptions} />
-        </div>
+          <FilterDrawer
+            title="Filter Audit Logs"
+            description="Select actor role, operations action, target object and UTC date ranges to audit."
+            activeCount={(dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)}
+            triggerLabel="Filters"
+            onReset={resetFilters}
+          >
+            {/* Filter 1: Actor Role */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Actor Role
+              </label>
+              <select
+                value={actorRole}
+                onChange={event => { setActorRole(event.target.value as AuditActorRole); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                {roleOptions[role].map(([key, copy]) => (
+                  <option key={key || "all"} value={key}>{copy}</option>
+                ))}
+              </select>
+            </div>
 
-        {/* Target Object Select */}
-        <div className="sm:col-span-6 lg:col-span-2">
-          <Select label="Target object" value={targetType} onChange={value => { setTargetType(value); setPage(0); }} options={targetOptions} />
-        </div>
-      </div>
+            {/* Filter 2: Action */}
+            <div className="space-y-1.5 pt-2 border-t border-[#edf2f5]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Operations Action
+              </label>
+              <select
+                value={action}
+                onChange={event => { setAction(event.target.value); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                {actionOptions.map(([key, copy]) => (
+                  <option key={key || "all"} value={key}>{copy}</option>
+                ))}
+              </select>
+            </div>
 
-      <div className="mt-3.5 grid min-w-0 gap-3.5 sm:grid-cols-2 lg:grid-cols-12">
-        <div className="sm:col-span-1 lg:col-span-3">
-          <DateInput label="UTC Date From" value={dateFrom} onChange={value => { setDateFrom(value); setPage(0); }} />
-        </div>
-        <div className="sm:col-span-1 lg:col-span-3">
-          <DateInput label="UTC Date To" value={dateTo} onChange={value => { setDateTo(value); setPage(0); }} />
-        </div>
-        <div className="sm:col-span-1 lg:col-span-3">
-          <Select label="Execution Result" value={success} onChange={value => { setSuccess(value); setPage(0); }} options={[["all", "All results"], ["success", "Successful"], ["failed", "Failed"]]} />
+            {/* Filter 3: Target Object */}
+            <div className="space-y-1.5 pt-2 border-t border-[#edf2f5]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Target Object
+              </label>
+              <select
+                value={targetType}
+                onChange={event => { setTargetType(event.target.value); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                {targetOptions.map(([key, copy]) => (
+                  <option key={key || "all"} value={key}>{copy}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filter 4: UTC Date range */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#edf2f5]">
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#53657a]">
+                  UTC Date From
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={event => { setDateFrom(event.target.value); setPage(0); }}
+                  className="w-full h-11 px-3 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#53657a]">
+                  UTC Date To
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={event => { setDateTo(event.target.value); setPage(0); }}
+                  className="w-full h-11 px-3 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+                />
+              </div>
+            </div>
+
+            {/* Filter 5: Result (for mobile bottom sheet) */}
+            <div className="space-y-1.5 pt-2 border-t border-[#edf2f5] md:hidden">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Result Status
+              </label>
+              <select
+                value={success}
+                onChange={event => { setSuccess(event.target.value); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                <option value="all">All results</option>
+                <option value="success">Successful</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+          </FilterDrawer>
         </div>
       </div>
 
@@ -274,7 +357,5 @@ export default function AuditLogs({ role }: { role: AuditRole }) {
   </main>;
 }
 
-function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: readonly (readonly [string, string])[] }) { return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{label}<select value={value} onChange={event => onChange(event.target.value)} className="mt-1 block h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{options.map(([key, copy]) => <option key={key || "all"} value={key}>{copy}</option>)}</select></label>; }
-function DateInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{label}<input type="date" value={value} onChange={event => onChange(event.target.value)} className="mt-1 block h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></label>; }
 function AuditLogCard({ row, selectable, selected, onToggle }: { row: AuditRow; selectable: boolean; selected: boolean; onToggle: () => void }) { return <article data-testid="audit-log-card" className="min-w-0 rounded-xl border border-[#e5dacb] bg-white p-4 shadow-sm"><div className="flex min-w-0 items-start justify-between gap-3"><div className="min-w-0"><p className="break-words text-xs font-extrabold tracking-[.08em] text-[#708098] uppercase">{row.targetType} · #{row.targetId ?? row.id}</p><h3 className="mt-1 break-words text-sm font-extrabold text-[#29415b]">{labelAction(row.action)}</h3></div>{selectable ? <Checkbox checked={selected} onCheckedChange={onToggle} aria-label={`Select archived audit record ${row.id} for restoration`} className="mt-1 h-5 w-5 shrink-0 border-[#708098]" /> : <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-extrabold ${row.isSuccess ? "bg-[#e8eeff] text-[#173fad]" : "bg-[#fff0ed] text-[#a34732]"}`}>{row.isSuccess ? "Success" : "Failed"}</span>}</div><p className="mt-3 break-words text-sm leading-6 text-[#53657a]">{row.description}</p><dl className="mt-4 grid gap-x-4 gap-y-3 border-t border-[#eee4d7] pt-4 text-xs sm:grid-cols-2"><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Time</dt><dd className="mt-1 break-words font-semibold text-[#29415b]">{localDate(row.createdAt)}<span className="mt-0.5 block font-normal text-[#708098]">{new Date(row.createdAt).toISOString()}</span></dd></div><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Actor</dt><dd className="mt-1 font-semibold text-[#29415b]">{row.actorUserId ?? "System"}<span className="ml-1 font-normal text-[#708098]">{row.actorRole ?? "—"}</span></dd></div><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Client</dt><dd className="mt-1 break-words text-[#29415b]">{row.ipAddress ?? "—"}<span className="mt-0.5 block text-[#708098]">{row.browser ?? "Unknown"} · {row.operatingSystem ?? "Unknown"}</span></dd></div><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Target role</dt><dd className="mt-1 break-words text-[#29415b]">{row.targetRole ?? "—"}</dd></div></dl>{selectable ? <span className={`mt-4 inline-flex rounded-full px-2.5 py-1 text-xs font-extrabold ${row.isSuccess ? "bg-[#e8eeff] text-[#173fad]" : "bg-[#fff0ed] text-[#a34732]"}`}>{row.isSuccess ? "Success" : "Failed"}</span> : null}</article>; }
 function paginationItems(totalPages: number, currentPage: number): Array<number | string> { if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1); const current = currentPage + 1; const items: Array<number | string> = [1]; if (current > 3) items.push("leading-ellipsis"); for (let page = Math.max(2, current - 1); page <= Math.min(totalPages - 1, current + 1); page += 1) items.push(page); if (current < totalPages - 2) items.push("trailing-ellipsis"); items.push(totalPages); return items; }

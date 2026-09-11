@@ -312,23 +312,23 @@ export function MarketingCampaignsModule() {
                 </CardContent>
               </div>
 
-              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-1.5 rounded-b-xl">
+              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-2 rounded-b-xl">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenEdit(camp)}
-                  className="h-8 text-xs gap-1"
+                  className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs gap-1 flex-1 sm:flex-initial"
                 >
-                  <Edit2 size={12} />
+                  <Edit2 size={13} />
                   {td("Edit")}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setDeleteTargetId(camp.id)}
-                  className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
+                  className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1 flex-1 sm:flex-initial"
                 >
-                  <Trash2 size={12} />
+                  <Trash2 size={13} />
                   {td("Delete")}
                 </Button>
               </div>
@@ -339,9 +339,9 @@ export function MarketingCampaignsModule() {
 
       {/* Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-full h-full max-h-screen max-w-none rounded-none sm:rounded-2xl sm:max-h-[90vh] sm:max-w-lg overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-[#10253e]">
+            <DialogTitle className="text-lg sm:text-xl font-bold text-[#10253e]">
               {isEditing ? td("Edit Promotion Campaign") : td("Create Promotion Campaign")}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
@@ -357,11 +357,11 @@ export function MarketingCampaignsModule() {
                 value={formState.name}
                 onChange={(e) => setFormState((p) => ({ ...p, name: e.target.value }))}
                 placeholder="e.g. September Back-to-School Special"
-                className="h-9 text-sm"
+                className="h-10 text-sm"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">{td("Promo Code")} *</Label>
                 <Input
@@ -369,7 +369,7 @@ export function MarketingCampaignsModule() {
                   value={formState.promoCode}
                   onChange={(e) => setFormState((p) => ({ ...p, promoCode: e.target.value.toUpperCase() }))}
                   placeholder="e.g. SEP2026"
-                  className="h-9 text-sm font-mono uppercase"
+                  className="h-10 text-sm font-mono uppercase"
                 />
               </div>
               <div className="space-y-1.5">
@@ -378,7 +378,7 @@ export function MarketingCampaignsModule() {
                   value={formState.discountValue}
                   onChange={(e) => setFormState((p) => ({ ...p, discountValue: e.target.value }))}
                   placeholder="e.g. 15% OFF or RM 150 OFF"
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
             </div>
@@ -389,18 +389,18 @@ export function MarketingCampaignsModule() {
                 value={formState.targetAudience}
                 onChange={(e) => setFormState((p) => ({ ...p, targetAudience: e.target.value }))}
                 placeholder="e.g. New Adult English Learners"
-                className="h-9 text-sm"
+                className="h-10 text-sm"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">{td("Start Date")}</Label>
                 <Input
                   type="date"
                   value={formState.startDate}
                   onChange={(e) => setFormState((p) => ({ ...p, startDate: e.target.value }))}
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
               <div className="space-y-1.5">
@@ -409,19 +409,19 @@ export function MarketingCampaignsModule() {
                   type="date"
                   value={formState.endDate}
                   onChange={(e) => setFormState((p) => ({ ...p, endDate: e.target.value }))}
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">{td("Status")}</Label>
                 <select
                   value={formState.status}
                   onChange={(e) => setFormState((p) => ({ ...p, status: e.target.value as any }))}
                   aria-label="Campaign status"
-                  className="w-full h-9 px-3 text-sm rounded-lg border border-[#dce4e7] bg-white text-[#10253e]"
+                  className="w-full h-10 px-3 text-sm rounded-lg border border-[#dce4e7] bg-white text-[#10253e]"
                 >
                   <option value="active">{td("Active")}</option>
                   <option value="scheduled">{td("Scheduled")}</option>
@@ -434,7 +434,7 @@ export function MarketingCampaignsModule() {
                   value={formState.budget}
                   onChange={(e) => setFormState((p) => ({ ...p, budget: e.target.value }))}
                   placeholder="e.g. RM 2,000"
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
             </div>
@@ -450,11 +450,19 @@ export function MarketingCampaignsModule() {
               />
             </div>
 
-            <DialogFooter className="pt-3">
-              <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
+            <DialogFooter className="pt-3 flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px]"
+              >
                 {td("Cancel")}
               </Button>
-              <Button type="submit" size="sm" className="bg-[#173fad] hover:bg-[#12328b] text-white">
+              <Button
+                type="submit"
+                className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] bg-[#173fad] hover:bg-[#12328b] text-white"
+              >
                 {isEditing ? td("Save Changes") : td("Launch Campaign")}
               </Button>
             </DialogFooter>

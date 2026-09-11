@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { adminProcedure, founderProcedure, publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, contentManagerProcedure, founderProcedure, publicProcedure, router } from "../_core/trpc";
 
 export const programInput = z.object({
   slug: z.string().trim().min(2).max(160),
@@ -96,6 +96,33 @@ export const contentRouter = router({
 
   // Founder Settings
   updateSiteSettings: founderProcedure.input(z.record(z.string(), z.string())).mutation(({ input }) => db.updateSiteSettings(input)),
+
+  // Marketing Promo Campaign Management
+  updateMarketingPromo: contentManagerProcedure
+    .input(
+      z.object({
+        active: z.string(),
+        title: z.string(),
+        text: z.string(),
+        discount: z.string(),
+        code: z.string(),
+        ctaText: z.string(),
+        ctaUrl: z.string(),
+        color: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return db.updateSiteSettings({
+        promo_active: input.active,
+        promo_title: input.title,
+        promo_text: input.text,
+        promo_discount: input.discount,
+        promo_code: input.code,
+        promo_cta_text: input.ctaText,
+        promo_cta_url: input.ctaUrl,
+        promo_color: input.color,
+      });
+    }),
 });
 
 

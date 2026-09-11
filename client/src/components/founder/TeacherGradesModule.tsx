@@ -277,40 +277,50 @@ export function TeacherGradesModule() {
           <p className="text-xs text-[#53657a]">Click "Record Assessment" to grade a student quiz or exam.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
-                <tr>
-                  <th className="p-3.5">Student</th>
-                  <th className="p-3.5">Assessment & Category</th>
-                  <th className="p-3.5">Score / Max</th>
-                  <th className="p-3.5">Teacher Feedback</th>
-                  <th className="p-3.5">Status</th>
-                  <th className="p-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#edf2f5]">
-                {filteredGrades.map((g) => {
-                  const percentage = Math.round((g.score / g.maxScore) * 100);
-                  return (
-                    <tr key={g.id} className="hover:bg-[#fbfcfe] transition-colors">
-                      <td className="p-3.5">
-                        <div className="font-bold text-sm text-[#10253e]">{g.studentName}</div>
-                        <div className="text-[#53657a] text-[11px]">{g.courseTitle}</div>
-                      </td>
-                      <td className="p-3.5">
-                        <div className="font-semibold text-[#10253e]">{g.assessmentTitle}</div>
-                        <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-[#f0f4f8] text-[#173fad] text-[10px] font-semibold uppercase">
-                          {g.category}
+        <div className="space-y-3">
+          {/* Mobile View: High-Accessibility Cards (< md) */}
+          <div className="block md:hidden space-y-3">
+            {filteredGrades.map((g) => {
+              const percentage = Math.round((g.score / g.maxScore) * 100);
+              return (
+                <div
+                  key={`grade-card-${g.id}`}
+                  className="bg-white rounded-xl border border-[#dce4e7] p-4 shadow-xs space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="font-bold text-base text-[#10253e]">{g.studentName}</h4>
+                      <p className="text-xs text-[#53657a]">{g.courseTitle}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => togglePublish(g.id)}
+                      className={`text-[11px] px-3 py-1 rounded-full font-semibold border min-h-[36px] transition-colors shrink-0 ${
+                        g.isPublished
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                          : "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
+                      }`}
+                    >
+                      {g.isPublished ? "Published" : "Draft"}
+                    </button>
+                  </div>
+
+                  <div className="text-xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-[#10253e]">{g.assessmentTitle}</span>
+                      <span className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[#173fad] text-[10px] font-semibold uppercase">
+                        {g.category}
+                      </span>
+                    </div>
+
+                    {/* Visual Progress Bar */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-[#10253e]">
+                          {g.score} <span className="text-[#53657a] font-normal text-[11px]">/ {g.maxScore}</span>
                         </span>
-                      </td>
-                      <td className="p-3.5">
-                        <div className="font-bold text-sm text-[#10253e]">
-                          {g.score} <span className="text-[#53657a] font-normal text-xs">/ {g.maxScore}</span>
-                        </div>
                         <span
-                          className={`text-[10px] font-semibold ${
+                          className={`font-semibold text-xs ${
                             percentage >= 85
                               ? "text-emerald-600"
                               : percentage >= 70
@@ -318,50 +328,142 @@ export function TeacherGradesModule() {
                               : "text-amber-600"
                           }`}
                         >
-                          {percentage}% Grade
+                          {percentage}%
                         </span>
-                      </td>
-                      <td className="p-3.5 text-[#53657a] max-w-xs">
-                        <p className="line-clamp-2 text-xs text-[#314155]">{g.feedback || "No feedback."}</p>
-                      </td>
-                      <td className="p-3.5">
-                        <button
-                          type="button"
-                          onClick={() => togglePublish(g.id)}
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border transition-colors ${
-                            g.isPublished
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                              : "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
+                      </div>
+                      <div className="w-full bg-[#eef2f6] rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            percentage >= 85
+                              ? "bg-emerald-500"
+                              : percentage >= 70
+                              ? "bg-blue-500"
+                              : "bg-amber-500"
                           }`}
-                        >
-                          {g.isPublished ? "Published" : "Draft"}
-                        </button>
-                      </td>
-                      <td className="p-3.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenEdit(g)}
-                            className="h-8 w-8 p-0 text-[#173fad] hover:bg-[#e8eeff]"
+                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {g.feedback && (
+                      <p className="text-xs text-[#53657a] italic bg-[#f8fafc] p-2 rounded border border-[#edf2f5] mt-2">
+                        "{g.feedback}"
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Card Actions Footer */}
+                  <div className="pt-2 border-t border-[#edf2f5] flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenEdit(g)}
+                      className="flex-1 min-h-[44px] text-xs font-semibold text-[#173fad] border-[#c0d4ff] hover:bg-[#e8eeff] gap-1.5"
+                    >
+                      <Edit2 size={14} /> Edit Assessment
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteTargetId(g.id)}
+                      className="min-h-[44px] min-w-[44px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0"
+                      aria-label="Delete grade record"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop View: Multi-Column Table (>= md) */}
+          <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
+                  <tr>
+                    <th className="p-3.5">Student</th>
+                    <th className="p-3.5">Assessment & Category</th>
+                    <th className="p-3.5">Score / Max</th>
+                    <th className="p-3.5">Teacher Feedback</th>
+                    <th className="p-3.5">Status</th>
+                    <th className="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#edf2f5]">
+                  {filteredGrades.map((g) => {
+                    const percentage = Math.round((g.score / g.maxScore) * 100);
+                    return (
+                      <tr key={g.id} className="hover:bg-[#fbfcfe] transition-colors">
+                        <td className="p-3.5">
+                          <div className="font-bold text-sm text-[#10253e]">{g.studentName}</div>
+                          <div className="text-[#53657a] text-[11px]">{g.courseTitle}</div>
+                        </td>
+                        <td className="p-3.5">
+                          <div className="font-semibold text-[#10253e]">{g.assessmentTitle}</div>
+                          <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-[#f0f4f8] text-[#173fad] text-[10px] font-semibold uppercase">
+                            {g.category}
+                          </span>
+                        </td>
+                        <td className="p-3.5">
+                          <div className="font-bold text-sm text-[#10253e]">
+                            {g.score} <span className="text-[#53657a] font-normal text-xs">/ {g.maxScore}</span>
+                          </div>
+                          <span
+                            className={`text-[10px] font-semibold ${
+                              percentage >= 85
+                                ? "text-emerald-600"
+                                : percentage >= 70
+                                ? "text-blue-600"
+                                : "text-amber-600"
+                            }`}
                           >
-                            <Edit2 size={13} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeleteTargetId(g.id)}
-                            className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                            {percentage}% Grade
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-[#53657a] max-w-xs">
+                          <p className="line-clamp-2 text-xs text-[#314155]">{g.feedback || "No feedback."}</p>
+                        </td>
+                        <td className="p-3.5">
+                          <button
+                            type="button"
+                            onClick={() => togglePublish(g.id)}
+                            className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border transition-colors ${
+                              g.isPublished
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                                : "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
+                            }`}
                           >
-                            <Trash2 size={13} />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                            {g.isPublished ? "Published" : "Draft"}
+                          </button>
+                        </td>
+                        <td className="p-3.5 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenEdit(g)}
+                              className="h-8 w-8 p-0 text-[#173fad] hover:bg-[#e8eeff]"
+                            >
+                              <Edit2 size={13} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeleteTargetId(g.id)}
+                              className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                            >
+                              <Trash2 size={13} />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

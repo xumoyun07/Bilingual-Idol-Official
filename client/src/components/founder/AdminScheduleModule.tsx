@@ -258,6 +258,49 @@ export function AdminScheduleModule() {
         </div>
       </div>
 
+      {/* Active Filter Chips */}
+      {(searchQuery.trim() || selectedDay !== "all") && (
+        <div className="flex flex-wrap items-center gap-2 px-1 text-xs">
+          <span className="text-[#708098] font-medium">{td("Active filters")}:</span>
+          {searchQuery.trim() && (
+            <span className="inline-flex items-center gap-1 bg-[#e8eeff] text-[#173fad] px-2.5 py-1 rounded-full font-medium">
+              "{searchQuery}"
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="hover:text-[#0f2970] p-0.5"
+                aria-label="Clear search query"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          {selectedDay !== "all" && (
+            <span className="inline-flex items-center gap-1 bg-[#e8eeff] text-[#173fad] px-2.5 py-1 rounded-full font-medium capitalize">
+              {selectedDay}
+              <button
+                type="button"
+                onClick={() => setSelectedDay("all")}
+                className="hover:text-[#0f2970] p-0.5"
+                aria-label="Clear day filter"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedDay("all");
+            }}
+            className="text-[#53657a] hover:text-[#10253e] underline ml-1 min-h-[32px] inline-flex items-center"
+          >
+            {td("Reset all")}
+          </button>
+        </div>
+      )}
+
       {/* Grid */}
       {filteredSchedules.length === 0 ? (
         <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
@@ -325,23 +368,23 @@ export function AdminScheduleModule() {
                 </CardContent>
               </div>
 
-              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-1.5 rounded-b-xl">
+              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-2 rounded-b-xl">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenEdit(slot)}
-                  className="h-8 text-xs gap-1"
+                  className="flex-1 sm:flex-initial min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs font-semibold gap-1.5"
                 >
-                  <Edit2 size={12} />
+                  <Edit2 size={14} />
                   {td("Edit")}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setDeleteTargetId(slot.id)}
-                  className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
+                  className="flex-1 sm:flex-initial min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1.5"
                 >
-                  <Trash2 size={12} />
+                  <Trash2 size={14} />
                   {td("Delete")}
                 </Button>
               </div>

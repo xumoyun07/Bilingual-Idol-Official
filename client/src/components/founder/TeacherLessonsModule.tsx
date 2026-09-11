@@ -265,23 +265,23 @@ export function TeacherLessonsModule() {
                 </CardContent>
               </div>
 
-              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-1.5 rounded-b-xl">
+              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-2 rounded-b-xl">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenEdit(plan)}
-                  className="h-8 text-xs gap-1"
+                  className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs gap-1 flex-1 sm:flex-initial"
                 >
-                  <Edit2 size={12} />
+                  <Edit2 size={13} />
                   Edit
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setDeleteTargetId(plan.id)}
-                  className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1"
+                  className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1 flex-1 sm:flex-initial"
                 >
-                  <Trash2 size={12} />
+                  <Trash2 size={13} />
                   Delete
                 </Button>
               </div>
@@ -292,9 +292,9 @@ export function TeacherLessonsModule() {
 
       {/* Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-full h-full max-h-screen max-w-none rounded-none sm:rounded-2xl sm:max-h-[90vh] sm:max-w-xl overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-[#10253e]">
+            <DialogTitle className="text-lg sm:text-xl font-bold text-[#10253e]">
               {isEditing ? "Edit Lesson Plan" : "Create New Lesson Plan"}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#53657a]">
@@ -310,7 +310,7 @@ export function TeacherLessonsModule() {
                   required
                   value={formState.courseTitle}
                   onChange={(e) => setFormState((p) => ({ ...p, courseTitle: e.target.value }))}
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
               <div className="space-y-1.5">
@@ -320,7 +320,7 @@ export function TeacherLessonsModule() {
                   min={1}
                   value={formState.lessonNumber}
                   onChange={(e) => setFormState((p) => ({ ...p, lessonNumber: Number(e.target.value) }))}
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
             </div>
@@ -332,7 +332,7 @@ export function TeacherLessonsModule() {
                 value={formState.topicTitle}
                 onChange={(e) => setFormState((p) => ({ ...p, topicTitle: e.target.value }))}
                 placeholder="e.g. Present Perfect Continuous in Business Meetings"
-                className="h-9 text-sm"
+                className="h-10 text-sm"
               />
             </div>
 
@@ -370,11 +370,19 @@ export function TeacherLessonsModule() {
               </div>
             </div>
 
-            <DialogFooter className="pt-3">
-              <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
+            <DialogFooter className="pt-3 flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px]"
+              >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" className="bg-[#173fad] hover:bg-[#12328b] text-white">
+              <Button
+                type="submit"
+                className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] bg-[#173fad] hover:bg-[#12328b] text-white"
+              >
                 {isEditing ? "Save Changes" : "Create Plan"}
               </Button>
             </DialogFooter>
