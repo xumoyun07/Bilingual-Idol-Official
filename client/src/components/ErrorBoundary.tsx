@@ -40,7 +40,17 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  if ("caches" in window) {
+                    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).then(() => {
+                      (window as Window).location.reload();
+                    });
+                  } else {
+                    (window as Window).location.reload();
+                  }
+                }
+              }}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg",
                 "bg-primary text-primary-foreground",

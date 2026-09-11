@@ -42,6 +42,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FounderModuleHeader } from "./FounderModuleHeader";
 
 interface ProgramFormState {
   id?: number;
@@ -187,41 +188,38 @@ export function AdminProgramsModule() {
   return (
     <div className={`space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e4d3b1]">
-              <BookOpen size={13} />
-              {td("Admin Module")}
-            </span>
-            <span className="text-xs text-[#53657a]">{td("CRUD: Courses & Catalog")}</span>
+      <FounderModuleHeader
+        badgeIcon={BookOpen}
+        badgeLabel="Admin Module"
+        badgeTone="bg-[#f4eddd] text-[#705a30] border-[#e4d3b1]"
+        subtitle="Course Catalogue"
+        title="Language Programmes & Courses"
+        description="Manage institutional curriculum, tuition fees, schedules, age groups, and course descriptions."
+        decorativeIcon={BookOpen}
+        statusText="Active Catalogue"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => programsQuery.refetch()}
+              disabled={programsQuery.isFetching}
+              className="h-10 px-3.5 gap-1.5 border-[#dce4e7]"
+            >
+              <RefreshCw size={14} className={programsQuery.isFetching ? "animate-spin" : ""} />
+              {td("Refresh")}
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleOpenCreate}
+              className="compass-btn-primary h-10 px-4 gap-1.5 shadow-xs w-full sm:w-auto"
+            >
+              <Plus size={15} />
+              {td("Create Programme")}
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Language Programmes & Courses")}</h2>
-          <p className="text-sm text-[#53657a]">
-            {td("Manage institutional curriculum, tuition fees, schedules, age groups, and course descriptions.")}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => programsQuery.refetch()}
-            disabled={programsQuery.isFetching}
-            className="h-9 gap-1.5"
-          >
-            <RefreshCw size={14} className={programsQuery.isFetching ? "animate-spin" : ""} />
-            {td("Refresh")}
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleOpenCreate}
-            className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
-          >
-            <Plus size={15} />
-            {td("Create Programme")}
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filter Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">

@@ -36,6 +36,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FounderModuleHeader } from "./FounderModuleHeader";
 
 interface ScheduleSlot {
   id: number;
@@ -202,31 +203,28 @@ export function AdminScheduleModule() {
   return (
     <div className={`space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e4d3b1]">
-              <CalendarDays size={13} />
-              {td("Admin Module")}
-            </span>
-            <span className="text-xs text-[#53657a]">{td("CRUD: Timetable & Class Allocations")}</span>
+      <FounderModuleHeader
+        badgeIcon={CalendarDays}
+        badgeLabel="Admin Module"
+        badgeTone="bg-[#f4eddd] text-[#705a30] border-[#e4d3b1]"
+        subtitle="Class Allocations"
+        title="Class Timetables & Schedules"
+        description="Manage teacher assignments, classroom allocations, student capacities, and weekly class times."
+        decorativeIcon={CalendarDays}
+        statusText="Schedule Active"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Button
+              size="sm"
+              onClick={handleOpenCreate}
+              className="compass-btn-primary h-10 px-4 gap-1.5 shadow-xs w-full sm:w-auto"
+            >
+              <Plus size={15} />
+              {td("Add Class Schedule")}
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Class Timetables & Schedules")}</h2>
-          <p className="text-sm text-[#53657a]">
-            {td("Manage teacher assignments, classroom allocations, student capacities, and weekly class times.")}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            onClick={handleOpenCreate}
-            className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
-          >
-            <Plus size={15} />
-            {td("Add Class Schedule")}
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">

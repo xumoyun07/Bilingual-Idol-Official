@@ -20,10 +20,57 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>Bilingual Idol Language Centre</title>
+    <script>
+      (function() {
+        if (typeof window === 'undefined') return;
+        // Immediate cleanup of any stale Service Worker and CacheStorage
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            var hadController = !!navigator.serviceWorker.controller;
+            for (var r of regs) { r.unregister(); }
+            if ('caches' in window) {
+              caches.keys().then(function(keys) {
+                Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+                  if (hadController && !sessionStorage.getItem('__sw_purged')) {
+                    sessionStorage.setItem('__sw_purged', '1');
+                    window.location.reload();
+                  }
+                });
+              });
+            }
+          });
+        } else if ('caches' in window) {
+          caches.keys().then(function(keys) {
+            for (var k of keys) { caches.delete(k); }
+          });
+        }
+        // Auto-recover once if stale chunk / React hook mismatch occurs in browser memory
+        window.addEventListener('error', function(event) {
+          var text = (event && (event.message || (event.error && event.error.message))) || '';
+          if (
+            text.indexOf('useState') !== -1 ||
+            text.indexOf('Invalid hook call') !== -1 ||
+            text.indexOf('Outdated Optimize Dep') !== -1
+          ) {
+            if (!sessionStorage.getItem('__hook_fix_reload')) {
+              sessionStorage.setItem('__hook_fix_reload', '1');
+              if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                  Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+                    window.location.reload();
+                  });
+                });
+              } else {
+                window.location.reload();
+              }
+            }
+          }
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>
 </html>

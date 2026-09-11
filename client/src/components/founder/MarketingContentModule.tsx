@@ -36,6 +36,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FounderModuleHeader } from "./FounderModuleHeader";
 
 interface ContentBlock {
   id: number;

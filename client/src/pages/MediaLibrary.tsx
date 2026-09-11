@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   AlertCircle,
   CheckCircle2,
@@ -44,6 +45,7 @@ function toBase64(file: File) {
 }
 
 export default function MediaLibrary() {
+  const { td } = useLanguage();
   const utils = trpc.useUtils();
   const inventory = trpc.media.list.useQuery();
   const upload = trpc.media.upload.useMutation({
@@ -124,14 +126,14 @@ export default function MediaLibrary() {
         </header>
 
         {/* Upload Panel */}
-        <section className="founder-panel founder-panel-paper mt-6 rounded-2xl border border-[#dce4e7] bg-white p-5 sm:p-6 shadow-sm">
+        <section className="founder-panel founder-panel-paper mt-6 h-[319px] pb-6 overflow-y-auto rounded-2xl border border-[#dce4e7] bg-white p-5 sm:p-6 shadow-sm">
           <div className="flex items-center gap-2.5 border-b border-[#edf2f4] pb-4 mb-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef4ff] text-[#173fad]">
               <Upload size={16} />
             </div>
             <div>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-[#10253e]">Upload or replace media asset</h2>
-              <p className="text-xs text-[#53657a]">Images: JPEG / WebP up to 3 MB · Hero video: MP4 up to 12 MB</p>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[#10253e]">{td("Upload or replace media asset")}</h2>
+              <p className="text-xs text-[#53657a]">{td("Images: JPEG / WebP up to 3 MB · Hero video: MP4 up to 12 MB")}</p>
             </div>
           </div>
 
@@ -219,9 +221,9 @@ export default function MediaLibrary() {
         <section className="mt-8" aria-labelledby="media-inventory-title">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#dce4e7] pb-4">
             <div>
-              <p className="founder-command-eyebrow">Active library</p>
+              <p className="founder-command-eyebrow">{td("Active library")}</p>
               <h2 id="media-inventory-title" className="mt-1 font-display text-2xl text-[#10253e]">
-                Published Media Inventory
+                {td("Published Media Inventory")}
               </h2>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full bg-[#f0f4f8] px-3 py-1 text-xs font-semibold text-[#29415b]">
@@ -250,9 +252,9 @@ export default function MediaLibrary() {
               ) : (
                 <div className="founder-state founder-state-empty rounded-2xl border border-dashed border-[#cfd9de] bg-white p-10 text-center">
                   <FileImage className="mx-auto text-[#94a3b8]" size={36} />
-                  <h3 className="mt-3 text-base font-bold text-[#10253e]">No custom media uploaded</h3>
+                  <h3 className="mt-3 text-base font-bold text-[#10253e]">{td("No custom media uploaded")}</h3>
                   <p className="mt-1 text-sm text-[#53657a]">
-                    Public pages are currently using default fallback visual assets until custom media is uploaded.
+                    {td("Public pages are currently using default fallback visual assets until custom media is uploaded.")}
                   </p>
                 </div>
               )}
@@ -284,6 +286,7 @@ function MediaRecord({
   onUpdate: (values: { label: string; altText: string; isPublished: boolean }) => Promise<unknown>;
   onRemove: () => Promise<unknown>;
 }) {
+  const { td } = useLanguage();
   const [label, setLabel] = useState(item.label);
   const [altText, setAltText] = useState(item.altText);
   const [published, setPublished] = useState(item.isPublished);
@@ -368,7 +371,7 @@ function MediaRecord({
               className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/90"
               title="Open full-resolution asset in new tab"
             >
-              <span>View asset</span>
+              <span>{td("View asset")}</span>
               <ExternalLink size={11} />
             </a>
           </div>
@@ -484,7 +487,7 @@ function MediaRecord({
                   className="h-10 rounded-xl border border-[#f0d5ce] bg-white px-3.5 text-xs font-bold text-[#b4563c] transition-colors hover:bg-[#fff0ed] hover:border-[#efc4b8]"
                 >
                   <Trash2 size={14} />
-                  <span>Remove</span>
+                  <span>{td("Remove")}</span>
                 </Button>
               </div>
 

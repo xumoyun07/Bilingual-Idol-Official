@@ -157,6 +157,7 @@ const plugins = [
   vitePluginManusDebugCollector(),
   VitePWA({
     registerType: "autoUpdate",
+    injectRegister: null,
     includeAssets: ["icon.svg", "apple-touch-icon.png", "pwa-192x192.png", "pwa-512x512.png"],
     manifest: {
       id: "/",
@@ -192,6 +193,7 @@ const plugins = [
       ],
     },
     workbox: {
+      maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
       globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
       runtimeCaching: [
         {
@@ -233,11 +235,27 @@ const plugins = [
 export default defineConfig({
   plugins,
   resolve: {
+    dedupe: ["react", "react-dom"],
     alias: {
+      "react": path.resolve(import.meta.dirname, "node_modules/react"),
+      "react-dom/client": path.resolve(import.meta.dirname, "node_modules/react-dom/client.js"),
+      "react-dom": path.resolve(import.meta.dirname, "node_modules/react-dom"),
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
+  },
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-dom/client",
+      "@trpc/react-query",
+      "@trpc/client",
+      "@tanstack/react-query",
+      "wouter",
+      "superjson",
+    ],
   },
   envDir: path.resolve(import.meta.dirname),
   root: path.resolve(import.meta.dirname, "client"),

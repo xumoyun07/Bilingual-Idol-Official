@@ -7,6 +7,20 @@ import superjson from "superjson";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 
+function getCurrentBrowserHash(): string | null {
+  try {
+    const metaPath = path.resolve(
+      import.meta.dirname,
+      "../../node_modules/.vite/deps/_metadata.json"
+    );
+    if (fs.existsSync(metaPath)) {
+      const meta = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+      return meta.browserHash || null;
+    }
+  } catch {}
+  return null;
+}
+
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
@@ -19,6 +33,30 @@ export async function setupVite(app: Express, server: Server) {
     configFile: false,
     server: serverOptions,
     appType: "custom",
+  });
+
+  // Intercept requests to Vite deps to prevent stale browser caches and 504 Outdated Dep errors
+  app.use((req, res, next) => {
+    const currentHash = getCurrentBrowserHash();
+    if (currentHash && typeof req.url === "string" && (req.url.includes("/.vite/deps/") || req.url.includes("react-dom") || req.url.includes("@trpc"))) {
+      const vMatch = req.url.match(/[?&]v=([^&]+)/);
+      if (vMatch && vMatch[1] !== currentHash) {
+        req.url = req.url.replace(/[?&]v=[^&]+/, (match) =>
+          match.startsWith("?") ? `?v=${currentHash}` : `&v=${currentHash}`
+        );
+      }
+    }
+
+    // In dev mode, prevent Vite from sending immutable / long-lived cache headers
+    const originalSetHeader = res.setHeader.bind(res);
+    res.setHeader = function (name: string, value: any) {
+      if (typeof name === "string" && name.toLowerCase() === "cache-control") {
+        return originalSetHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
+      }
+      return originalSetHeader(name, value);
+    };
+
+    next();
   });
 
   app.use(vite.middlewares);
@@ -53,7 +91,13 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      res.status(200).set({
+        "Content-Type": "text/html",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "Clear-Site-Data": '"cache"',
+      }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);

@@ -20,6 +20,7 @@ import {
 import { useFounderNav } from "@/components/founder/useFounderNav";
 import { FounderSettingsModule } from "@/components/founder/FounderSettingsModule";
 import { ProjectDossierModule } from "@/components/founder/ProjectDossierModule";
+import { FounderModuleHeader } from "@/components/founder/FounderModuleHeader";
 import { AdminProgramsModule } from "@/components/founder/AdminProgramsModule";
 import { AdminLeadsModule } from "@/components/founder/AdminLeadsModule";
 import { AdminScheduleModule } from "@/components/founder/AdminScheduleModule";
@@ -176,10 +177,12 @@ function FounderConsole() {
     }
   };
 
+  const currentSection = FOUNDER_NAVIGATION_SECTIONS.find((sec) => sec.type === roleParam) || FOUNDER_NAVIGATION_SECTIONS[0];
+
   return (
     <div id="admin-dashboard-container" data-page="admin" className={`workspace-page founder-command founder-workspace page-admin mx-auto w-full max-w-[88rem] pb-12 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Top User Type Pill Navigator */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#708098] px-2">
             {td("User Type Focus:")}
@@ -210,10 +213,44 @@ function FounderConsole() {
 
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#53657a] font-medium hidden md:inline">
-            {td("Active:")} <strong className="text-[#10253e]">{td(FOUNDER_NAVIGATION_SECTIONS.find(s => s.type === roleParam)?.label || "")}</strong>
+            {td("Active:")} <strong className="text-[#10253e]">{td(currentSection?.label || "")}</strong>
           </span>
         </div>
       </div>
+
+      {/* Secondary Sub-Module Navigation Bar */}
+      {currentSection && currentSection.modules.length > 1 && (
+        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar scroll-smooth">
+          {currentSection.modules.map((mod) => {
+            const isModActive = tabParam === mod.id;
+            const ModIcon = mod.icon;
+            return (
+              <button
+                key={mod.id}
+                type="button"
+                onClick={() => navigateTo(currentSection.type, mod.id)}
+                className={`shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  isModActive
+                    ? "bg-[#173fad] text-white shadow-xs"
+                    : "bg-white text-[#53657a] hover:bg-[#f1f5f9] hover:text-[#10253e] border border-[#dce4e7]"
+                }`}
+              >
+                <ModIcon size={14} className={isModActive ? "text-white" : "text-[#64748b]"} />
+                <span>{td(mod.title)}</span>
+                {mod.badge && (
+                  <span
+                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                      isModActive ? "bg-white/20 text-white" : "bg-[#edf2f7] text-[#53657a]"
+                    }`}
+                  >
+                    {td(mod.badge)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {renderActiveModule()}
     </div>
@@ -229,45 +266,45 @@ function UserFieldBuilderStandalone() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#efe8fb] text-[#6e4c9a] border border-[#ddcefa]">
-              <Settings2 size={13} />
-              {td("Platform Schema")}
-            </span>
-            <span className="text-xs text-[#53657a]">{td("User Profile Field Configurator")}</span>
-          </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Dynamic Profile Schema Builder")}</h2>
-          <p className="text-sm text-[#53657a]">
-            {td("Customise registration fields, required metadata, dropdowns, and sections across all user roles.")}
-          </p>
-        </div>
-        <Button onClick={() => setOpen(true)} className="compass-btn-primary inline-flex items-center gap-2">
-          <Settings2 size={16} />
-          {td("Launch Field Builder")}
-        </Button>
-      </div>
+      <FounderModuleHeader
+        badgeIcon={Settings2}
+        badgeLabel="Platform Schema"
+        badgeTone="bg-[#efe8fb] text-[#6e4c9a] border-[#ddcefa]"
+        subtitle="Dynamic Profile Schema"
+        title="User Profile Schema & Custom Attributes"
+        description="Configure registration fields, required metadata, dropdowns, and grouped sections across all user roles."
+        decorativeIcon={Settings2}
+        statusText="Active Schema"
+        actions={
+          <Button
+            onClick={() => setOpen(true)}
+            className="compass-btn-primary inline-flex items-center gap-2 min-h-11 px-5 shadow-xs w-full sm:w-auto"
+          >
+            <Settings2 size={16} />
+            {td("Launch Field Builder")}
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Custom Dynamic Fields")}</span>
           <div className="text-3xl font-bold text-[#10253e] mt-1">{fieldsCount}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Active form attributes")}</p>
         </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Organisational Groups")}</span>
           <div className="text-3xl font-bold text-[#173fad] mt-1">{sectionsCount}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Form category sections")}</p>
         </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Schema Status")}</span>
           <div className="text-3xl font-bold text-emerald-600 mt-1">{td("Synchronized")}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Applies to User Creation Modal")}</p>
         </div>
       </div>
 
-      <div className="p-8 rounded-2xl bg-white border border-[#dce4e7] text-center space-y-4 shadow-sm">
+      <div className="p-8 rounded-2xl bg-white border border-[#dce4e7] text-center space-y-4 shadow-xs">
         <div className="mx-auto w-12 h-12 rounded-2xl bg-[#efe8fb] text-[#6e4c9a] flex items-center justify-center">
           <Settings2 size={24} />
         </div>
@@ -294,34 +331,45 @@ function SuperAdminOverviewModule() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#efe8fb] text-[#6e4c9a] border border-[#ddcefa]">
-              <ShieldCheck size={13} />
-              {td("Super Admin Console")}
-            </span>
-            <span className="text-xs text-[#53657a]">{td("Core Centre Operations")}</span>
+      <FounderModuleHeader
+        badgeIcon={ShieldCheck}
+        badgeLabel="Super Admin"
+        badgeTone="bg-[#efe8fb] text-[#6e4c9a] border-[#ddcefa]"
+        subtitle="Core Operations Centre"
+        title="Super Administrator Operations"
+        description="Global user account permissions, security audit trails, and institutional policies."
+        decorativeIcon={ShieldCheck}
+        statusText="Operational"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Link href="/admin?role=super_admin&tab=superadmin-users" className="w-full sm:w-auto">
+              <Button variant="outline" className="min-h-11 border-[#dce4e7] gap-2 w-full sm:w-auto">
+                <UsersRound size={16} />
+                {td("Staff Directory")}
+              </Button>
+            </Link>
+            <Link href="/admin?role=super_admin&tab=superadmin-audit" className="w-full sm:w-auto">
+              <Button className="compass-btn-primary min-h-11 gap-2 shadow-xs w-full sm:w-auto">
+                <ShieldCheck size={16} />
+                {td("Audit Traces")}
+              </Button>
+            </Link>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Super Administrator Operations")}</h2>
-          <p className="text-sm text-[#53657a]">
-            {td("Global user account permissions, security audit trails, and institutional policies.")}
-          </p>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Total Staff & Managed Accounts")}</span>
           <div className="text-3xl font-bold text-[#10253e] mt-1">{usersCount.data?.total ?? "..."}</div>
           <p className="text-xs text-emerald-600 font-medium mt-1">{td("Active multi-role directory")}</p>
         </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Recorded Security Events")}</span>
           <div className="text-3xl font-bold text-[#173fad] mt-1">{auditCount.data?.total ?? "..."}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Tamper-evident logs")}</p>
         </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Super Admin Authority")}</span>
           <div className="text-3xl font-bold text-[#6e4c9a] mt-1">{td("Level 2")}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Governed under Founder")}</p>
@@ -329,7 +377,7 @@ function SuperAdminOverviewModule() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link href="/admin?role=super_admin&tab=superadmin-users" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+        <Link href="/admin?role=super_admin&tab=superadmin-users" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-xs transition-all block group">
           <div className="flex items-center gap-3">
             <span className="p-2.5 rounded-xl bg-[#efe8fb] text-[#6e4c9a]">
               <UsersRound size={22} />
@@ -340,7 +388,7 @@ function SuperAdminOverviewModule() {
             </div>
           </div>
         </Link>
-        <Link href="/admin?role=super_admin&tab=superadmin-audit" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
+        <Link href="/admin?role=super_admin&tab=superadmin-audit" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-xs transition-all block group">
           <div className="flex items-center gap-3">
             <span className="p-2.5 rounded-xl bg-[#efe8fb] text-[#6e4c9a]">
               <ShieldAlert size={22} />
@@ -363,34 +411,45 @@ function AdminOverviewModule() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#f4eddd] text-[#705a30] border border-[#e5d5b7]">
-              <Shield size={13} />
-              {td("Admin Module")}
-            </span>
-            <span className="text-xs text-[#53657a]">{td("Academic & Admissions Administration")}</span>
+      <FounderModuleHeader
+        badgeIcon={Shield}
+        badgeLabel="Admin Console"
+        badgeTone="bg-[#f4eddd] text-[#705a30] border-[#e5d5b7]"
+        subtitle="Admissions & Academics"
+        title="Administrator Operational Dashboard"
+        description="Manage learner enrollments, language program catalogues, admissions pipeline, and class timetables."
+        decorativeIcon={Shield}
+        statusText="Admissions Open"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Link href="/admin?role=admin&tab=admin-students" className="w-full sm:w-auto">
+              <Button variant="outline" className="min-h-11 border-[#dce4e7] gap-2 w-full sm:w-auto">
+                <GraduationCap size={16} />
+                {td("Student Directory")}
+              </Button>
+            </Link>
+            <Link href="/admin?role=admin&tab=admin-leads" className="w-full sm:w-auto">
+              <Button className="compass-btn-primary min-h-11 gap-2 shadow-xs w-full sm:w-auto">
+                <Plus size={16} />
+                {td("Admissions Pipeline")}
+              </Button>
+            </Link>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Administrator Dashboard")}</h2>
-          <p className="text-sm text-[#53657a]">
-            {td("Manage student records, program offerings, incoming admissions leads, and class timetables.")}
-          </p>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Enrolled Students")}</span>
           <div className="text-3xl font-bold text-[#10253e] mt-1">{studentsCount.data?.total ?? "..."}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Active learner profiles")}</p>
         </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Admissions Pipeline Leads")}</span>
           <div className="text-3xl font-bold text-[#173fad] mt-1">{submissionsCount.data?.length ?? "..."}</div>
           <p className="text-xs text-emerald-600 font-medium mt-1">{td("Awaiting review / contact")}</p>
         </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-sm">
+        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
           <span className="text-xs font-semibold text-[#53657a]">{td("Academic Timetable")}</span>
           <div className="text-3xl font-bold text-[#705a30] mt-1">{td("Active")}</div>
           <p className="text-xs text-[#53657a] mt-1">{td("Mon - Sat classes running")}</p>

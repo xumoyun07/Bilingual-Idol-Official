@@ -37,6 +37,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FounderModuleHeader } from "./FounderModuleHeader";
 
 type AttendanceStatus = "present" | "late" | "absent" | "excused";
 
@@ -210,31 +211,28 @@ export function TeacherAttendanceModule() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#e8eeff] text-[#173fad] border border-[#c0d4ff]">
-              <CheckCircle2 size={13} />
-              Teacher Module
-            </span>
-            <span className="text-xs text-[#53657a]">CRUD: Student Attendance Tracking</span>
+      <FounderModuleHeader
+        badgeIcon={CheckCircle2}
+        badgeLabel="Teacher Module"
+        badgeTone="bg-[#e8eeff] text-[#173fad] border-[#c0d4ff]"
+        subtitle="Attendance Tracking"
+        title="Student Attendance Records"
+        description="Record daily lesson attendance, mark present/late/absent status, and log participation notes."
+        decorativeIcon={CheckCircle2}
+        statusText="Active Register"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Button
+              size="sm"
+              onClick={handleOpenCreate}
+              className="compass-btn-primary h-10 px-4 gap-1.5 shadow-xs w-full sm:w-auto"
+            >
+              <Plus size={15} />
+              Record Attendance
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Student Attendance Records</h2>
-          <p className="text-sm text-[#53657a]">
-            Record daily lesson attendance, mark present/late/absent, and log participation notes.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            onClick={handleOpenCreate}
-            className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
-          >
-            <Plus size={15} />
-            Record Attendance
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">

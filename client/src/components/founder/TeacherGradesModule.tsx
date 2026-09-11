@@ -36,6 +36,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FounderModuleHeader } from "./FounderModuleHeader";
 
 interface GradeRecord {
   id: number;
@@ -214,31 +215,28 @@ export function TeacherGradesModule() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#e8eeff] text-[#173fad] border border-[#c0d4ff]">
-              <FileText size={13} />
-              Teacher Module
-            </span>
-            <span className="text-xs text-[#53657a]">CRUD: Student Grading & Feedback</span>
+      <FounderModuleHeader
+        badgeIcon={FileText}
+        badgeLabel="Teacher Module"
+        badgeTone="bg-[#e8eeff] text-[#173fad] border-[#c0d4ff]"
+        subtitle="Evaluation & Feedback"
+        title="Assessments & Grading"
+        description="Record evaluation marks, write pedagogical feedback, and publish academic report cards."
+        decorativeIcon={FileText}
+        statusText="Grading Active"
+        actions={
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Button
+              size="sm"
+              onClick={handleOpenCreate}
+              className="compass-btn-primary h-10 px-4 gap-1.5 shadow-xs w-full sm:w-auto"
+            >
+              <Plus size={15} />
+              Record Assessment
+            </Button>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">Assessments & Grading</h2>
-          <p className="text-sm text-[#53657a]">
-            Record evaluation marks, write pedagogical feedback, and publish academic report cards.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            onClick={handleOpenCreate}
-            className="h-9 gap-1.5 bg-[#173fad] hover:bg-[#12328b] text-white"
-          >
-            <Plus size={15} />
-            Record Assessment
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">

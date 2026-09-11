@@ -2,6 +2,7 @@ import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FounderModuleHeader } from "./FounderModuleHeader";
 import {
   BarChart3,
   CheckCircle2,
@@ -20,21 +21,16 @@ export function MarketingAnalyticsModule() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#fff0ed] text-[#a34732] border border-[#ffd1c7]">
-              <BarChart3 size={13} />
-              {td("Marketing Module")}
-            </span>
-            <span className="text-xs text-[#53657a]">{td("Growth & Conversion Performance")}</span>
-          </div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#10253e] mt-1">{td("Marketing Analytics & Lead Funnel")}</h2>
-          <p className="text-sm text-[#53657a]">
-            {td("Review admissions conversion metrics, visitor inquiries by marketing channel, and campaign ROI.")}
-          </p>
-        </div>
-      </div>
+      <FounderModuleHeader
+        badgeIcon={BarChart3}
+        badgeLabel="Marketing Module"
+        badgeTone="bg-[#fff0ed] text-[#a34732] border-[#ffd1c7]"
+        subtitle="Growth & Funnel Analytics"
+        title="Marketing Analytics & Lead Funnel"
+        description="Review admissions conversion metrics, visitor inquiries by marketing channel, and campaign ROI."
+        decorativeIcon={BarChart3}
+        statusText="Tracking Live"
+      />
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

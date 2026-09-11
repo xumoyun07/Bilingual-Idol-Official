@@ -1,3 +1,4 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import React, { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -35,6 +36,7 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 
 export default function MarketingDashboard() {
+  const { td } = useLanguage();
   const { user, loading, logout } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
   const [activeTab, setActiveTab] = useState("overview");
 

@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   CalendarDays,
@@ -115,6 +116,7 @@ function DashboardShell({
     navigateTo,
     toggleSection,
   } = useFounderNav();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   // Header Title
   // Route mapping: label: "News", path: "/admin/news"
@@ -220,7 +222,10 @@ function DashboardShell({
                               <button
                                 key={mod.id}
                                 type="button"
-                                onClick={() => navigateTo(section.type, mod.id)}
+                                onClick={() => {
+                                  navigateTo(section.type, mod.id);
+                                  if (isMobile) setOpenMobile(false);
+                                }}
                                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                                   isModuleActive
                                     ? "bg-[#173fad] text-white font-semibold shadow-xs"
