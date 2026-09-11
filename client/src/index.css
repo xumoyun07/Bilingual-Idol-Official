@@ -6455,7 +6455,15 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-co
 .programs-page header.simple-route-header--programmes {
   padding-top: 0px;
   padding-bottom: 0px;
-  height: 450px;
+  height: 580px;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#program-detail-page-container:nth-of-type(1) > header#program-detail-hero-header:nth-of-type(1),
+#program-detail-page-container > header#program-detail-hero-header:nth-of-type(1),
+#program-detail-page-container > header#program-detail-hero-header,
+.program-detail-page header.simple-route-header--program-detail,
+.program-detail-page header#program-detail-hero-header {
+  height: 620.75px;
 }
 
 #programs-page-container > header:nth-of-type(1) > div:nth-of-type(1),
