@@ -85,7 +85,7 @@ export function AdminProgramsModule() {
   const utils = trpc.useUtils();
   const programsQuery = trpc.content.listPrograms.useQuery();
 
-  const createMutation = trpc.content.createProgram.useMutation({
+  const createMutation = trpc.content.addProgram.useMutation({
     onSuccess: () => {
       utils.content.listPrograms.invalidate();
       utils.content.publicPrograms.invalidate();

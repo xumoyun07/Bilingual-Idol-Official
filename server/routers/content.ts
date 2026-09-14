@@ -54,7 +54,7 @@ export const contentRouter = router({
 
   // Admin / Founder CRUD: Programs
   listPrograms: adminProcedure.query(() => db.listPrograms()),
-  createProgram: adminProcedure.input(programInput).mutation(({ input }) => {
+  addProgram: adminProcedure.input(programInput).mutation(({ input }) => {
     return db.createProgram({
       ...input,
       faqJson: input.faqJson ?? null,
@@ -90,7 +90,7 @@ export const contentRouter = router({
 
   // Admin / Founder CRUD: Team Profiles
   listTeamProfiles: adminProcedure.query(() => db.listTeamProfiles()),
-  createTeamProfile: adminProcedure.input(teamProfileInput).mutation(({ input }) => db.createTeamProfile(input)),
+  addTeamProfile: adminProcedure.input(teamProfileInput).mutation(({ input }) => db.createTeamProfile(input)),
   updateTeamProfile: adminProcedure.input(z.object({ id: z.number().int().positive(), data: teamProfileInput })).mutation(({ input }) => db.updateTeamProfile(input.id, input.data)),
   deleteTeamProfile: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => db.deleteTeamProfile(input.id)),
 

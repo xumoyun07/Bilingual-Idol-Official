@@ -45,6 +45,7 @@ function toBase64(file: File) {
 }
 
 export default function MediaLibrary() {
+  // Nested under DashboardLayout role="founder" in the console hierarchy.
   const { td } = useLanguage();
   const utils = trpc.useUtils();
   const inventory = trpc.media.list.useQuery();

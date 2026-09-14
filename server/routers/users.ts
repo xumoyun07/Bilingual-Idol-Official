@@ -19,7 +19,7 @@ const profileInput = z.object({
   isActive: z.boolean(),
 });
 const passwordInput = z.string().min(10, "Use at least 10 characters for the password.").max(256);
-const systemFieldInput = z.object({ id: z.enum(["name", "nickname", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100), sectionId: z.number().int().positive().nullable().default(null) });
+const systemFieldInput = z.object({ id: z.enum(["name", "nickname", "email", "role", "password", "isActive"]), label: z.string().trim().min(2).max(160), isRequired: z.boolean(), isActive: z.boolean(), sortOrder: z.number().int().min(0).max(100), sectionId: z.number().int().positive().nullable().default(null) });
 const createProfileInput = z.object({
   name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160).optional(),
   nickname: z.string().trim().min(3, "Nickname must be at least 3 characters.").max(30, "Nickname cannot exceed 30 characters.").optional(),

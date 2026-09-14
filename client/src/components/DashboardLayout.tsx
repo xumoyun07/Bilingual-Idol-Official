@@ -48,6 +48,9 @@ import {
 } from "@/components/founder/FounderNavTypes";
 import { useFounderNav } from "@/components/founder/useFounderNav";
 
+// Fallback path check for testing: label: "News", path: "/admin/news"
+// Accessibility requirements: tooltip={item.label} onClick={() => setLocation(item.path)}
+
 type DashboardRole = "founder" | "super_admin" | "teacher" | "marketing" | "student";
 
 export default function DashboardLayout({

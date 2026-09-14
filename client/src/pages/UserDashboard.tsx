@@ -46,7 +46,7 @@ export default function UserDashboard() {
 
   return (
     <DashboardLayout role="student">
-      <div id="user-dashboard-container" data-page="user-dashboard" className={`workspace-page founder-command founder-workspace page-student mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10 ${isRTL ? "dir-rtl" : ""}`}>
+      <div id="user-dashboard-container" data-page="user-dashboard" className={`member-page blue-member-page workspace-page founder-command founder-workspace page-student mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10 ${isRTL ? "dir-rtl" : ""}`}>
         <OfflineIndicator />
         <div className="member-content space-y-6">
           <header className="founder-command-header">

@@ -353,11 +353,26 @@ export async function getUserSystemFields() {
   try { return normaliseSystemFields(JSON.parse(setting.value)); } catch { return defaultSystemFields; }
 }
 
-export async function updateUserSystemFields(fields: Array<Omit<RuntimeUserSystemField, "inputType">>) {
+export type UserSystemFieldInput = {
+  id: UserSystemFieldId | "email";
+  label: string;
+  isRequired: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  sectionId: number | null;
+};
+
+export async function updateUserSystemFields(fields: UserSystemFieldInput[]) {
   const database = await getDb();
-  const ids = fields.map(field => field.id);
-  if (fields.length !== userSystemFieldIds.length || new Set(ids).size !== userSystemFieldIds.length || userSystemFieldIds.some(id => !ids.includes(id))) throw new Error("The system field configuration must include each base field exactly once.");
-  const normalised = normaliseSystemFields(fields);
+  const mappedFields = fields.map(field => {
+    if (field.id === "email") {
+      return { ...field, id: "nickname" as const } as Omit<RuntimeUserSystemField, "inputType">;
+    }
+    return field as Omit<RuntimeUserSystemField, "inputType">;
+  });
+  const ids = mappedFields.map(field => field.id);
+  if (mappedFields.length !== userSystemFieldIds.length || new Set(ids).size !== userSystemFieldIds.length || userSystemFieldIds.some(id => !ids.includes(id))) throw new Error("The system field configuration must include each base field exactly once.");
+  const normalised = normaliseSystemFields(mappedFields);
   if (database) {
     await database.insert(siteSettings).values({ key: systemFieldSettingsKey, value: JSON.stringify(normalised) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(normalised) } });
   } else {

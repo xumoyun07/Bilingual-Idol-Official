@@ -106,7 +106,7 @@ export default function FounderLogin() {
                   id="sign-in-email"
                   key={`sign-in-email-${language}`}
                   type="text"
-                  autoComplete="username"
+                  autoComplete="email"
                   placeholder={t("login.emailPlaceholder")}
                   required
                   value={email}
