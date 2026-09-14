@@ -498,7 +498,12 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                 </div>
 
                 <div className="bilc-result-actions">
-                  <Link href={`/programs/${rec.slug}`} className="simple-button">
+                  <Link href={`/enroll?program=${encodeURIComponent(rec.title)}`} className="simple-button bg-[#173fad] hover:bg-[#12318a] text-white flex items-center gap-1.5 font-bold shadow-md">
+                    <Sparkles size={16} />
+                    {language === "ms" ? "Daftar Sekarang" : language === "ar" ? "سجل في هذه الدورة الآن" : "Register for This Course"}
+                  </Link>
+
+                  <Link href={`/programs/${rec.slug}`} className="simple-button simple-button-quiet">
                     {language === "ms" ? "Lihat Butiran Kursus" : language === "ar" ? "تفاصيل البرنامج" : "View Course Details"} <ArrowRight size={16} className={isRTL ? "rotate-180" : ""} />
                   </Link>
 
@@ -508,7 +513,7 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                       className="simple-button simple-button-quiet"
                       onClick={onOpenPlacementTest}
                     >
-                      <Sparkles size={16} /> {language === "ms" ? "Ambil Ujian Penempatan Percuma" : language === "ar" ? "اختبار تحديد المستوى المجاني" : "Take Free Placement Test"}
+                      <span>📝</span> {language === "ms" ? "Ambil Ujian Penempatan" : language === "ar" ? "اختبار تحديد المستوى" : "Take Placement Test"}
                     </button>
                   )}
 

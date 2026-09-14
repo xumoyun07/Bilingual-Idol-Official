@@ -7,10 +7,10 @@ import type { Request } from "express";
 import type { User } from "../../drizzle/schema";
 
 const managedRole = z.enum(["student", "teacher", "marketing", "admin", "super_admin"]);
-const dynamicFieldType = z.enum(["text", "textarea", "number", "date", "dropdown", "checkbox"]);
+const dynamicFieldType = z.enum(["text", "textarea", "number", "date", "dropdown", "checkbox", "file"]);
 const profileValues = z.record(z.string().max(80), z.string().max(4000)).default({});
 const sectionInput = z.object({ title: z.string().trim().min(2).max(160), icon: z.string().trim().max(64).optional(), sortOrder: z.number().int().min(0).max(10000), isActive: z.boolean() });
-const fieldInput = z.object({ label: z.string().trim().min(2).max(160), fieldType: dynamicFieldType, isRequired: z.boolean(), sortOrder: z.number().int().min(0).max(10000), placeholder: z.string().trim().max(255).optional(), options: z.array(z.string().trim().min(1).max(100)).max(30).optional().default([]), sectionId: z.number().int().positive().nullable().optional(), isActive: z.boolean() });
+const fieldInput = z.object({ label: z.string().trim().min(2).max(160), fieldType: dynamicFieldType, isRequired: z.boolean(), sortOrder: z.number().int().min(0).max(10000), placeholder: z.string().trim().max(255).optional(), options: z.array(z.string().trim().min(1).max(100)).max(30).optional().default([]), sectionId: z.number().int().positive().nullable().optional(), isActive: z.boolean(), collectionStage: z.enum(["atRegistration", "atFirstLogin"]).optional() });
 const profileInput = z.object({
   name: z.string().trim().min(2, "Enter a name with at least 2 characters.").max(160),
   nickname: z.string().trim().min(3, "Nickname must be at least 3 characters.").max(30, "Nickname cannot exceed 30 characters.").optional(),

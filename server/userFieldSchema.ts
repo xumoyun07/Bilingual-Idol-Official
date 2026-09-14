@@ -1,4 +1,4 @@
-export const userFieldTypes = ["text", "textarea", "number", "date", "dropdown", "checkbox"] as const;
+export const userFieldTypes = ["text", "textarea", "number", "date", "dropdown", "checkbox", "file"] as const;
 export type UserFieldType = (typeof userFieldTypes)[number];
 
 export type RuntimeUserField = {
@@ -12,6 +12,7 @@ export type RuntimeUserField = {
   sectionId: number | null;
   sortOrder: number;
   isActive: boolean;
+  collectionStage: "atRegistration" | "atFirstLogin";
 };
 
 export function parseFieldOptions(value: string | null): string[] {

@@ -119,6 +119,7 @@ const emptyLead: LeadFormState = {
 
 export function AdminLeadsModule() {
   const { td, isRTL } = useLanguage();
+  const [activeTab, setActiveTab] = useState<"inquiries" | "registrations">("inquiries");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [selectedSource, setSelectedSource] = useState<string>("all");
@@ -139,6 +140,9 @@ export function AdminLeadsModule() {
 
   const utils = trpc.useUtils();
   const leadsQuery = trpc.submissions.list.useQuery();
+  const registrationsQuery = trpc.submissions.listRegistrations.useQuery(undefined, {
+    enabled: activeTab === "registrations",
+  });
 
   const createMutation = trpc.submissions.create.useMutation({
     onSuccess: () => {
@@ -156,6 +160,14 @@ export function AdminLeadsModule() {
       toast.success(td("Lead status updated."));
     },
     onError: (err) => toast.error(err.message || td("Failed to update lead status.")),
+  });
+
+  const updateRegStatusMutation = trpc.submissions.updateRegistrationStatus.useMutation({
+    onSuccess: () => {
+      utils.submissions.listRegistrations.invalidate();
+      toast.success(td("Registration status updated."));
+    },
+    onError: (err) => toast.error(err.message || td("Failed to update status.")),
   });
 
   const deleteMutation = trpc.submissions.delete.useMutation({
@@ -201,6 +213,27 @@ export function AdminLeadsModule() {
       return matchSearch && matchStatus && matchSource && matchCourse;
     });
   }, [leadsQuery.data, searchQuery, selectedStatus, selectedSource, selectedCourse]);
+
+  const filteredRegistrations = useMemo(() => {
+    const list = registrationsQuery.data || [];
+    return list.filter((reg) => {
+      const matchSearch =
+        !searchQuery.trim() ||
+        reg.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        reg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        reg.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        reg.programInterest.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchStatus = selectedStatus === "all" || reg.status === selectedStatus;
+
+      const matchCourse =
+        selectedCourse === "all" ||
+        (reg.programInterest &&
+          reg.programInterest.toLowerCase().includes(selectedCourse.toLowerCase()));
+
+      return matchSearch && matchStatus && matchCourse;
+    });
+  }, [registrationsQuery.data, searchQuery, selectedStatus, selectedCourse]);
 
   const activeFiltersCount =
     (selectedStatus !== "all" ? 1 : 0) +
@@ -448,199 +481,145 @@ export function AdminLeadsModule() {
         )}
       </div>
 
-      {/* Leads Table (Desktop) / Cards (Mobile) */}
-      {leadsQuery.isLoading ? (
-        <div className="text-center py-16">
-          <RefreshCw className="animate-spin text-[#173fad] size-6 mx-auto" />
-        </div>
-      ) : filteredLeads.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
-          <FileSpreadsheet className="mx-auto size-10 text-[#53657a]/50" />
-          <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No admissions or inquiry leads found.")}</p>
-          <p className="text-xs text-[#53657a]">{td("Try adjusting your search or status filter.")}</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {/* Mobile View: High-Accessibility Cards (< md) */}
-          <div className="block md:hidden space-y-3">
-            {filteredLeads.map((lead) => {
-              const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
-              const isExpanded = expandedLeadIds.has(lead.id);
-              return (
-                <div
-                  key={`lead-card-${lead.id}`}
-                  className="bg-white rounded-xl border border-[#dce4e7] p-4 shadow-xs space-y-3"
-                >
-                  {/* Card Header: Name + Status Badge */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="font-bold text-base text-[#10253e] leading-snug">{lead.studentName}</h4>
-                      <p className="text-xs text-[#53657a] mt-0.5">
-                        {td("Age")} {lead.studentAge} · {td("Parent")}: {lead.parentName}
-                      </p>
-                    </div>
-                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${statusInfo.tone}`}>
-                      {statusInfo.label}
-                    </span>
-                  </div>
+      {/* Tabs Switcher */}
+      <div className="flex border-b border-[#edf2f5] gap-6 mb-4">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("inquiries");
+            setSelectedStatus("all");
+          }}
+          className={`pb-3 text-sm font-bold border-b-2 transition-all focus:outline-none ${
+            activeTab === "inquiries"
+              ? "border-[#173fad] text-[#173fad]"
+              : "border-transparent text-[#53657a] hover:text-[#10253e]"
+          }`}
+        >
+          📁 {td("General Enquiries (Form 1)")}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("registrations");
+            setSelectedStatus("all");
+          }}
+          className={`pb-3 text-sm font-bold border-b-2 transition-all focus:outline-none ${
+            activeTab === "registrations"
+              ? "border-[#173fad] text-[#173fad]"
+              : "border-transparent text-[#53657a] hover:text-[#10253e]"
+          }`}
+        >
+          🎓 {td("Course Applications (Form 2)")}
+        </button>
+      </div>
 
-                  {/* Primary Data Points */}
-                  <div className="grid grid-cols-1 gap-1.5 text-xs">
-                    <div className="flex items-center gap-2 text-[#10253e]">
-                      <GraduationCap size={14} className="text-[#173fad] shrink-0" />
-                      <span className="font-medium">{td(lead.programInterest)}</span>
-                      {lead.preferredSchedule && (
-                        <span className="text-[#53657a] text-[11px]">({td(lead.preferredSchedule)})</span>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-3 pt-1 text-[#173fad]">
-                      <a
-                        href={`mailto:${lead.parentEmail}`}
-                        className="inline-flex items-center gap-1 text-xs hover:underline min-h-[36px] py-1"
-                      >
-                        <Mail size={13} /> {lead.parentEmail}
-                      </a>
-                      <a
-                        href={`tel:${lead.parentPhone}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold hover:underline min-h-[36px] py-1"
-                      >
-                        <Phone size={13} /> {lead.parentPhone}
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Collapsible Secondary Details (Notes, Source, Date) */}
-                  <div className="border-t border-[#edf2f5] pt-2">
-                    <button
-                      type="button"
-                      onClick={() => toggleExpand(lead.id)}
-                      className="w-full flex items-center justify-between text-xs text-[#53657a] font-medium py-1.5 hover:text-[#10253e]"
+      {activeTab === "inquiries" ? (
+        <>
+          {/* Leads Table (Desktop) / Cards (Mobile) */}
+          {leadsQuery.isLoading ? (
+            <div className="text-center py-16">
+              <RefreshCw className="animate-spin text-[#173fad] size-6 mx-auto" />
+            </div>
+          ) : filteredLeads.length === 0 ? (
+            <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
+              <FileSpreadsheet className="mx-auto size-10 text-[#53657a]/50" />
+              <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No admissions or inquiry leads found.")}</p>
+              <p className="text-xs text-[#53657a]">{td("Try adjusting your search or status filter.")}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Mobile View: High-Accessibility Cards (< md) */}
+              <div className="block md:hidden space-y-3">
+                {filteredLeads.map((lead) => {
+                  const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
+                  const isExpanded = expandedLeadIds.has(lead.id);
+                  return (
+                    <div
+                      key={`lead-card-${lead.id}`}
+                      className="bg-white rounded-xl border border-[#dce4e7] p-4 shadow-xs space-y-3"
                     >
-                      <span>{isExpanded ? td("Hide details") : td("View inquiry notes & origin")}</span>
-                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    </button>
+                      {/* Card Header: Name + Status Badge */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h4 className="font-bold text-base text-[#10253e] leading-snug">{lead.studentName}</h4>
+                          <p className="text-xs text-[#53657a] mt-0.5">
+                            {td("Age")} {lead.studentAge} · {td("Parent")}: {lead.parentName}
+                          </p>
+                        </div>
+                        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${statusInfo.tone}`}>
+                          {statusInfo.label}
+                        </span>
+                      </div>
 
-                    {isExpanded && (
-                      <div className="mt-2 space-y-2 text-xs bg-[#f8fafc] p-3 rounded-lg border border-[#edf2f5]">
-                        {lead.message && (
-                          <div>
-                            <span className="font-semibold text-[#10253e] block mb-0.5">{td("Inquiry Notes")}:</span>
-                            <p className="text-[#53657a] italic">"{lead.message}"</p>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between text-[11px] text-[#53657a] pt-1 border-t border-[#edf2f5]">
-                          <span>
-                            {td("Source")}: <strong className="text-[#10253e]">{td(lead.source || "Website")}</strong>
-                          </span>
-                          <span>
-                            {new Date(lead.createdAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </span>
+                      {/* Primary Data Points */}
+                      <div className="grid grid-cols-1 gap-1.5 text-xs">
+                        <div className="flex items-center gap-2 text-[#10253e]">
+                          <GraduationCap size={14} className="text-[#173fad] shrink-0" />
+                          <span className="font-medium">{td(lead.programInterest)}</span>
+                          {lead.preferredSchedule && (
+                            <span className="text-[#53657a] text-[11px]">({td(lead.preferredSchedule)})</span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-3 pt-1 text-[#173fad]">
+                          <a
+                            href={`mailto:${lead.parentEmail}`}
+                            className="inline-flex items-center gap-1 text-xs hover:underline min-h-[36px] py-1"
+                          >
+                            <Mail size={13} /> {lead.parentEmail}
+                          </a>
+                          <a
+                            href={`tel:${lead.parentPhone}`}
+                            className="inline-flex items-center gap-1 text-xs font-semibold hover:underline min-h-[36px] py-1"
+                          >
+                            <Phone size={13} /> {lead.parentPhone}
+                          </a>
                         </div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Card Action Footer: Full-Width Status Selector & Delete */}
-                  <div className="pt-2 border-t border-[#edf2f5] flex items-center gap-2">
-                    <div className="flex-1">
-                      <label htmlFor={`lead-status-${lead.id}`} className="sr-only">
-                        {td("Update Status")}
-                      </label>
-                      <select
-                        id={`lead-status-${lead.id}`}
-                        value={lead.status}
-                        onChange={(e) =>
-                          updateStatusMutation.mutate({
-                            id: lead.id,
-                            status: e.target.value as SubmissionStatus,
-                          })
-                        }
-                        className={`w-full min-h-[44px] text-xs font-semibold px-3 py-2 rounded-lg border focus:outline-none ${statusInfo.tone}`}
-                      >
-                        <option value="new">{td("New Lead")}</option>
-                        <option value="contacted">{td("Contacted")}</option>
-                        <option value="interested">{td("Interested")}</option>
-                        <option value="enrolled">{td("Enrolled")}</option>
-                        <option value="closed">{td("Closed")}</option>
-                      </select>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeleteTargetId(lead.id)}
-                      className="min-h-[44px] min-w-[44px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0"
-                      aria-label={td("Delete lead record")}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                      {/* Collapsible Secondary Details (Notes, Source, Date) */}
+                      <div className="border-t border-[#edf2f5] pt-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(lead.id)}
+                          className="w-full flex items-center justify-between text-xs text-[#53657a] font-medium py-1.5 hover:text-[#10253e]"
+                        >
+                          <span>{isExpanded ? td("Hide details") : td("View inquiry notes & origin")}</span>
+                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
 
-          {/* Desktop View: Multi-Column Table (>= md) */}
-          <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
-                  <tr>
-                    <th className="p-3.5">{td("Student & Parent")}</th>
-                    <th className="p-3.5">{td("Program & Schedule")}</th>
-                    <th className="p-3.5">{td("Source & Date")}</th>
-                    <th className="p-3.5">{td("Stage Status")}</th>
-                    <th className="p-3.5 text-right">{td("Quick Actions")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#edf2f5]">
-                  {filteredLeads.map((lead) => {
-                    const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
-                    return (
-                      <tr key={lead.id} className="hover:bg-[#fbfcfe] transition-colors">
-                        <td className="p-3.5">
-                          <div className="font-bold text-sm text-[#10253e]">{lead.studentName}</div>
-                          <div className="text-[#53657a] text-[11px] flex items-center gap-1.5 mt-0.5">
-                            <span>{td("Parent")}: {lead.parentName}</span>
-                            <span>·</span>
-                            <span>{td("Age")} {lead.studentAge}</span>
+                        {isExpanded && (
+                          <div className="mt-2 space-y-2 text-xs bg-[#f8fafc] p-3 rounded-lg border border-[#edf2f5]">
+                            {lead.message && (
+                              <div>
+                                <span className="font-semibold text-[#10253e] block mb-0.5">{td("Inquiry Notes")}:</span>
+                                <p className="text-[#53657a] italic">"{lead.message}"</p>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between text-[11px] text-[#53657a] pt-1 border-t border-[#edf2f5]">
+                              <span>
+                                {td("Source")}: <strong className="text-[#10253e]">{td(lead.source || "Website")}</strong>
+                              </span>
+                              <span>
+                                {new Date(lead.createdAt).toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-[11px] text-[#173fad] flex items-center gap-2 mt-1">
-                            <a href={`mailto:${lead.parentEmail}`} className="flex items-center gap-1 hover:underline">
-                              <Mail size={11} /> {lead.parentEmail}
-                            </a>
-                            <a href={`tel:${lead.parentPhone}`} className="flex items-center gap-1 hover:underline">
-                              <Phone size={11} /> {lead.parentPhone}
-                            </a>
-                          </div>
-                        </td>
-                        <td className="p-3.5">
-                          <div className="font-semibold text-[#10253e]">{td(lead.programInterest)}</div>
-                          <div className="text-[#53657a] text-[11px]">{td(lead.preferredSchedule)}</div>
-                          {lead.message ? (
-                            <p className="text-[#53657a] text-[11px] italic mt-1 line-clamp-1 bg-[#f8fafc] p-1 rounded border border-[#edf2f5]">
-                              "{lead.message}"
-                            </p>
-                          ) : null}
-                        </td>
-                        <td className="p-3.5 text-[#53657a]">
-                          <span className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[11px] font-medium text-[#33475b]">
-                            {td(lead.source || "Website")}
-                          </span>
-                          <div className="text-[10px] text-[#8292a1] mt-1">
-                            {new Date(lead.createdAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </div>
-                        </td>
-                        <td className="p-3.5">
+                        )}
+                      </div>
+
+                      {/* Card Action Footer: Full-Width Status Selector & Delete */}
+                      <div className="pt-2 border-t border-[#edf2f5] flex items-center gap-2">
+                        <div className="flex-1">
+                          <label htmlFor={`lead-status-${lead.id}`} className="sr-only">
+                            {td("Update Status")}
+                          </label>
                           <select
+                            id={`lead-status-${lead.id}`}
                             value={lead.status}
                             onChange={(e) =>
                               updateStatusMutation.mutate({
@@ -648,8 +627,7 @@ export function AdminLeadsModule() {
                                 status: e.target.value as SubmissionStatus,
                               })
                             }
-                            aria-label={`Update status for lead ${lead.studentName}`}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-md border focus:outline-none ${statusInfo.tone}`}
+                            className={`w-full min-h-[44px] text-xs font-semibold px-3 py-2 rounded-lg border focus:outline-none ${statusInfo.tone}`}
                           >
                             <option value="new">{td("New Lead")}</option>
                             <option value="contacted">{td("Contacted")}</option>
@@ -657,25 +635,292 @@ export function AdminLeadsModule() {
                             <option value="enrolled">{td("Enrolled")}</option>
                             <option value="closed">{td("Closed")}</option>
                           </select>
-                        </td>
-                        <td className="p-3.5 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeleteTargetId(lead.id)}
-                            className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </td>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteTargetId(lead.id)}
+                          className="min-h-[44px] min-w-[44px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0"
+                          aria-label={td("Delete lead record")}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop View: Multi-Column Table (>= md) */}
+              <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
+                      <tr>
+                        <th className="p-3.5">{td("Student & Parent")}</th>
+                        <th className="p-3.5">{td("Program & Schedule")}</th>
+                        <th className="p-3.5">{td("Source & Date")}</th>
+                        <th className="p-3.5">{td("Stage Status")}</th>
+                        <th className="p-3.5 text-right">{td("Quick Actions")}</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#edf2f5]">
+                      {filteredLeads.map((lead) => {
+                        const statusInfo = statusConfig[lead.status as SubmissionStatus] || statusConfig.new;
+                        return (
+                          <tr key={lead.id} className="hover:bg-[#fbfcfe] transition-colors">
+                            <td className="p-3.5">
+                              <div className="font-bold text-sm text-[#10253e]">{lead.studentName}</div>
+                              <div className="text-[#53657a] text-[11px] flex items-center gap-1.5 mt-0.5">
+                                <span>{td("Parent")}: {lead.parentName}</span>
+                                <span>·</span>
+                                <span>{td("Age")} {lead.studentAge}</span>
+                              </div>
+                              <div className="text-[11px] text-[#173fad] flex items-center gap-2 mt-1">
+                                <a href={`mailto:${lead.parentEmail}`} className="flex items-center gap-1 hover:underline">
+                                  <Mail size={11} /> {lead.parentEmail}
+                                </a>
+                                <a href={`tel:${lead.parentPhone}`} className="flex items-center gap-1 hover:underline">
+                                  <Phone size={11} /> {lead.parentPhone}
+                                </a>
+                              </div>
+                            </td>
+                            <td className="p-3.5">
+                              <div className="font-semibold text-[#10253e]">{td(lead.programInterest)}</div>
+                              <div className="text-[#53657a] text-[11px]">{td(lead.preferredSchedule)}</div>
+                              {lead.message ? (
+                                <p className="text-[#53657a] text-[11px] italic mt-1 line-clamp-1 bg-[#f8fafc] p-1 rounded border border-[#edf2f5]">
+                                  "{lead.message}"
+                                </p>
+                              ) : null}
+                            </td>
+                            <td className="p-3.5 text-[#53657a]">
+                              <span className="px-2 py-0.5 rounded bg-[#f0f4f8] text-[11px] font-medium text-[#33475b]">
+                                {td(lead.source || "Website")}
+                              </span>
+                              <div className="text-[10px] text-[#8292a1] mt-1">
+                                {new Date(lead.createdAt).toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </div>
+                            </td>
+                            <td className="p-3.5">
+                              <select
+                                value={lead.status}
+                                onChange={(e) =>
+                                  updateStatusMutation.mutate({
+                                    id: lead.id,
+                                    status: e.target.value as SubmissionStatus,
+                                  })
+                                }
+                                aria-label={`Update status for lead ${lead.studentName}`}
+                                className={`text-xs font-semibold px-2.5 py-1 rounded-md border focus:outline-none ${statusInfo.tone}`}
+                              >
+                                <option value="new">{td("New Lead")}</option>
+                                <option value="contacted">{td("Contacted")}</option>
+                                <option value="interested">{td("Interested")}</option>
+                                <option value="enrolled">{td("Enrolled")}</option>
+                                <option value="closed">{td("Closed")}</option>
+                              </select>
+                            </td>
+                            <td className="p-3.5 text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeleteTargetId(lead.id)}
+                                className="h-8 w-8 p-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                              >
+                                <Trash2 size={14} />
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
+      ) : (
+        <>
+          {/* Form 2 Registrations Table / Cards */}
+          {registrationsQuery.isLoading ? (
+            <div className="text-center py-16">
+              <RefreshCw className="animate-spin text-[#173fad] size-6 mx-auto" />
+            </div>
+          ) : filteredRegistrations.length === 0 ? (
+            <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
+              <GraduationCap className="mx-auto size-10 text-[#53657a]/50" />
+              <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No course registrations found.")}</p>
+              <p className="text-xs text-[#53657a]">{td("Try submitting a course registration from the public website.")}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Mobile View */}
+              <div className="block md:hidden space-y-3">
+                {(filteredRegistrations as any[]).map((reg) => {
+                  const isExpanded = expandedLeadIds.has(reg.id);
+                  const statusInfo =
+                    reg.status === "new"
+                      ? { label: "New Application", tone: "bg-blue-50 text-blue-700 border-blue-200" }
+                      : reg.status === "routed"
+                      ? { label: "Routed to Academic", tone: "bg-purple-50 text-purple-700 border-purple-200" }
+                      : reg.status === "accountCreated"
+                      ? { label: "Portal Setup Complete", tone: "bg-emerald-50 text-emerald-700 border-emerald-200" }
+                      : { label: "Rejected", tone: "bg-rose-50 text-rose-700 border-rose-200" };
+
+                  return (
+                    <div key={`reg-card-${reg.id}`} className="bg-white rounded-xl border border-[#dce4e7] p-4 shadow-xs space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h4 className="font-bold text-base text-[#10253e] leading-snug">{reg.fullName}</h4>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#173fad] bg-[#eef4ff] px-2 py-0.5 rounded mt-1 inline-block">
+                            {reg.applicantCategory}
+                          </span>
+                        </div>
+                        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${statusInfo.tone}`}>
+                          {statusInfo.label}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-1 text-xs">
+                        <div className="font-semibold text-[#10253e]">{reg.programInterest}</div>
+                        <div className="text-[#53657a]">{reg.email} · {reg.phone}</div>
+                      </div>
+
+                      <div className="border-t border-[#edf2f5] pt-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(reg.id)}
+                          className="w-full flex items-center justify-between text-xs text-[#53657a] font-medium py-1"
+                        >
+                          <span>{isExpanded ? td("Hide custom form values") : td("View custom form values")}</span>
+                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+
+                        {isExpanded && (
+                          <div className="mt-2 space-y-2 text-xs bg-slate-50 p-3 rounded-lg border border-[#edf2f5]">
+                            {Object.entries(reg.values || {}).length > 0 ? (
+                              <div className="space-y-1.5">
+                                {Object.entries(reg.values || {}).map(([key, val]) => (
+                                  <div key={key} className="grid grid-cols-3 gap-2">
+                                    <span className="text-slate-500 font-medium col-span-1 break-words">{key}:</span>
+                                    <span className="text-slate-800 font-semibold col-span-2 break-all">{val as string}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-[#53657a] italic">{td("No additional custom form responses collected.")}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-2 border-t border-[#edf2f5]">
+                        <select
+                          value={reg.status}
+                          onChange={(e) =>
+                            updateRegStatusMutation.mutate({
+                              id: reg.id,
+                              status: e.target.value as any,
+                            })
+                          }
+                          className={`w-full min-h-[44px] text-xs font-semibold px-3 py-2 rounded-lg border focus:outline-none ${statusInfo.tone}`}
+                        >
+                          <option value="new">{td("New Application")}</option>
+                          <option value="routed">{td("Routed to Academic")}</option>
+                          <option value="accountCreated">{td("Portal Setup Complete")}</option>
+                          <option value="rejected">{td("Rejected")}</option>
+                        </select>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop View */}
+              <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
+                      <tr>
+                        <th className="p-3.5">{td("Applicant (Form 2)")}</th>
+                        <th className="p-3.5">{td("Program & Category")}</th>
+                        <th className="p-3.5">{td("Stage A Custom Fields")}</th>
+                        <th className="p-3.5">{td("Application Status")}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#edf2f5]">
+                      {(filteredRegistrations as any[]).map((reg) => {
+                        const statusInfo =
+                          reg.status === "new"
+                            ? { label: "New Application", tone: "bg-blue-50 text-blue-700 border-blue-200" }
+                            : reg.status === "routed"
+                            ? { label: "Routed to Academic", tone: "bg-purple-50 text-purple-700 border-purple-200" }
+                            : reg.status === "accountCreated"
+                            ? { label: "Portal Setup Complete", tone: "bg-emerald-50 text-emerald-700 border-emerald-200" }
+                            : { label: "Rejected", tone: "bg-rose-50 text-rose-700 border-rose-200" };
+
+                        return (
+                          <tr key={reg.id} className="hover:bg-[#fbfcfe] transition-colors">
+                            <td className="p-3.5">
+                              <div className="font-bold text-sm text-[#10253e]">{reg.fullName}</div>
+                              <div className="text-[11px] text-[#173fad] space-y-0.5 mt-1">
+                                <div>✉ {reg.email}</div>
+                                <div>☎ {reg.phone}</div>
+                              </div>
+                            </td>
+                            <td className="p-3.5">
+                              <div className="font-semibold text-sm text-[#10253e]">{reg.programInterest}</div>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#173fad] bg-[#eef4ff] px-2 py-0.5 rounded mt-1.5 inline-block">
+                                {reg.applicantCategory}
+                              </span>
+                            </td>
+                            <td className="p-3.5 max-w-sm">
+                              {Object.entries(reg.values || {}).length > 0 ? (
+                                <div className="space-y-1 max-h-24 overflow-y-auto bg-slate-50 border border-slate-100 p-2 rounded text-[11px]">
+                                  {Object.entries(reg.values || {}).map(([key, val]) => (
+                                    <div key={key} className="flex gap-1.5">
+                                      <span className="text-slate-500 font-semibold shrink-0">{key}:</span>
+                                      <span className="text-slate-800 break-all font-medium">{val as string}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-slate-400 italic">No custom fields filled.</span>
+                              )}
+                            </td>
+                            <td className="p-3.5">
+                              <select
+                                value={reg.status}
+                                onChange={(e) =>
+                                  updateRegStatusMutation.mutate({
+                                    id: reg.id,
+                                    status: e.target.value as any,
+                                  })
+                                }
+                                className={`text-xs font-semibold px-2.5 py-1 rounded-md border focus:outline-none ${statusInfo.tone}`}
+                              >
+                                <option value="new">{td("New Application")}</option>
+                                <option value="routed">{td("Routed to Academic")}</option>
+                                <option value="accountCreated">{td("Portal Setup Complete")}</option>
+                                <option value="rejected">{td("Rejected")}</option>
+                              </select>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Add Lead Modal */}

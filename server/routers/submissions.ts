@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, publicProcedure, studentProcedure, router } from "../_core/trpc";
 
 export const submissionInput = z.object({
   type: z.enum(["enrollment", "inquiry"]),
@@ -24,5 +24,54 @@ export const submissionsRouter = router({
   delete: adminProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .mutation(({ input }) => db.deleteSubmission(input.id)),
+
+  // Form 1: Inquiry Submission
+  createInquiry: publicProcedure
+    .input(z.object({
+      name: z.string().trim().min(2, "Name is too short.").max(160),
+      email: z.string().trim().max(320).optional().default(""),
+      phone: z.string().trim().max(64).optional().default(""),
+      message: z.string().trim().max(1500).optional(),
+      reasonType: z.enum(["general", "consultation", "campusTour"]),
+      sourcePage: z.string().trim().max(255).optional().default(""),
+    }).refine(data => data.email.length > 0 || data.phone.length > 0, {
+      message: "Please provide at least an email or phone number.",
+      path: ["email"],
+    }))
+    .mutation(({ input }) => db.createInquiry(input)),
+
+  // Form 2 Schema & Submission
+  getRegistrationSchema: publicProcedure.query(() => db.getRegistrationFormSchema()),
+  createRegistration: publicProcedure
+    .input(z.object({
+      programInterest: z.string().trim().min(1, "Please select a program."),
+      applicantCategory: z.enum(["child", "adult", "international"]),
+      fullName: z.string().trim().min(2, "Name must be at least 2 characters."),
+      email: z.string().trim().email("Please enter a valid email address."),
+      phone: z.string().trim().min(7, "Please enter a valid phone number."),
+      values: z.record(z.string(), z.string()).default({}),
+    }))
+    .mutation(({ input }) => db.createRegistrationSubmission(input)),
+
+  // CRM & Admin controls for Registration Submissions
+  listRegistrations: adminProcedure
+    .input(z.object({ assignedToUserId: z.number().optional() }).optional())
+    .query(({ input }) => db.listRegistrationSubmissions(input?.assignedToUserId)),
+  getRegistration: adminProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .query(({ input }) => db.getRegistrationSubmission(input.id)),
+  updateRegistrationStatus: adminProcedure
+    .input(z.object({
+      id: z.number().int().positive(),
+      status: z.enum(["new", "routed", "accountCreated", "rejected"]),
+      assignedToUserId: z.number().nullable().optional(),
+    }))
+    .mutation(({ input }) => db.updateRegistrationSubmissionStatus(input.id, input.status, input.assignedToUserId)),
+
+  // Stage B: Onboarding (Completed by student upon first login)
+  getOnboardingSchema: studentProcedure.query(({ ctx }) => db.getStudentOnboardingSchema(ctx.user.id)),
+  submitOnboarding: studentProcedure
+    .input(z.record(z.string(), z.string()))
+    .mutation(({ ctx, input }) => db.saveUserProfileValues(ctx.user.id, input)),
 });
 

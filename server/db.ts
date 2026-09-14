@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, RegistrationSubmission, RegistrationSubmissionValue } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
@@ -133,6 +133,8 @@ export const inMemoryStore = {
   userFormSections: [] as any[],
   userFormFields: [] as any[],
   userProfileValues: [] as { userId: number; fieldId: number; value: string }[],
+  registrationSubmissions: [] as RegistrationSubmission[],
+  registrationSubmissionValues: [] as RegistrationSubmissionValue[],
   nextId: 100,
 };
 
@@ -382,7 +384,7 @@ export async function updateUserSystemFields(fields: UserSystemFieldInput[]) {
 }
 
 function toRuntimeField(field: typeof userFormFields.$inferSelect): RuntimeUserField {
-  return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive };
+  return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive, collectionStage: (field.collectionStage as "atRegistration" | "atFirstLogin") ?? "atFirstLogin" };
 }
 
 export async function getUserFormSchema(includeInactive = false) {
@@ -445,17 +447,18 @@ export async function deleteUserFormSection(id: number) {
   return { success: true } as const;
 }
 
-type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean };
+type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean; collectionStage?: "atRegistration" | "atFirstLogin" };
 
 export async function createUserFormField(input: FormFieldInput) {
   const database = await getDb();
   const options = normaliseOptions(input.fieldType, input.options);
+  const collectionStage = input.collectionStage ?? "atFirstLogin";
   if (!database) {
-    const field = { id: ++inMemoryStore.nextId, key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, createdAt: new Date(), updatedAt: new Date() };
+    const field = { id: ++inMemoryStore.nextId, key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage, createdAt: new Date(), updatedAt: new Date() };
     inMemoryStore.userFormFields.push(field);
     return toRuntimeField(field as any);
   }
-  const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive });
+  const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage });
   const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, Number(result[0].insertId))).limit(1))[0];
   return toRuntimeField(field);
 }
@@ -463,15 +466,16 @@ export async function createUserFormField(input: FormFieldInput) {
 export async function updateUserFormField(id: number, input: FormFieldInput) {
   const database = await getDb();
   const options = normaliseOptions(input.fieldType, input.options);
+  const collectionStage = input.collectionStage ?? "atFirstLogin";
   if (!database) {
     const idx = inMemoryStore.userFormFields.findIndex(f => f.id === id);
     if (idx !== -1) {
-      inMemoryStore.userFormFields[idx] = { ...inMemoryStore.userFormFields[idx], label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, updatedAt: new Date() };
+      inMemoryStore.userFormFields[idx] = { ...inMemoryStore.userFormFields[idx], label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage, updatedAt: new Date() };
       return toRuntimeField(inMemoryStore.userFormFields[idx] as any);
     }
     throw new Error("Field not found.");
   }
-  await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive }).where(eq(userFormFields.id, id));
+  await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage }).where(eq(userFormFields.id, id));
   const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, id)).limit(1))[0];
   if (!field) throw new Error("Field not found.");
   return toRuntimeField(field);
@@ -704,6 +708,8 @@ export async function createSubmission(input: SubmissionInput) {
     message: input.message?.trim() || null,
     source: input.source?.trim() || "website",
     status: "new",
+    reasonType: "general",
+    sourcePage: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -1196,5 +1202,263 @@ export async function seedDatabaseDefaultUsers() {
       console.error(`[Seed] Error seeding user ${item.email}:`, e);
     }
   }
+}
+
+export type InquiryInput = {
+  name: string;
+  email: string;
+  phone: string;
+  message?: string;
+  reasonType: "general" | "consultation" | "campusTour";
+  sourcePage?: string;
+};
+
+export async function createInquiry(input: InquiryInput) {
+  const db = await getDb();
+  const data = {
+    type: "inquiry" as const,
+    studentName: input.name,
+    studentAge: 0,
+    parentName: input.name,
+    parentEmail: input.email || "",
+    parentPhone: input.phone || "",
+    programInterest: "",
+    preferredSchedule: "",
+    message: input.message?.trim() || null,
+    source: "website",
+    status: "new" as const,
+    reasonType: input.reasonType,
+    sourcePage: input.sourcePage || null,
+  };
+
+  if (db) {
+    const result = await db.insert(submissions).values(data);
+    return { id: Number(result[0].insertId) };
+  }
+  const id = ++inMemoryStore.nextId;
+  const newSubmission: Submission = {
+    id,
+    ...data,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.submissions.unshift(newSubmission);
+  return { id };
+}
+
+export type RegistrationSubmissionInput = {
+  programInterest: string;
+  applicantCategory: string; // child / adult / international
+  fullName: string;
+  email: string;
+  phone: string;
+  values: Record<string, string>; // keys of active registration fields
+};
+
+export async function createRegistrationSubmission(input: RegistrationSubmissionInput) {
+  const db = await getDb();
+  // Routing rules:
+  // child -> admin (id 3)
+  // international -> founder (id 1)
+  // others -> admin (id 3)
+  let assignedToUserId: number | null = 3; // default Admin Manager
+  const lowerCat = input.applicantCategory.toLowerCase();
+  if (lowerCat.includes("international") || lowerCat.includes("иностранец") || lowerCat.includes("visa")) {
+    assignedToUserId = 1; // Founder
+  } else if (lowerCat.includes("child") || lowerCat.includes("kid") || lowerCat.includes("ребенок")) {
+    assignedToUserId = 3; // Admin Manager
+  }
+
+  const subData = {
+    programInterest: input.programInterest,
+    applicantCategory: input.applicantCategory,
+    fullName: input.fullName,
+    email: input.email,
+    phone: input.phone,
+    status: "new" as const,
+    assignedToUserId,
+  };
+
+  if (db) {
+    const result = await db.insert(registrationSubmissions).values(subData);
+    const submissionId = Number(result[0].insertId);
+
+    // Save field values (only those that correspond to active userFormFields where collectionStage = 'atRegistration')
+    const fields = await db.select().from(userFormFields).where(eq(userFormFields.collectionStage, "atRegistration"));
+    for (const field of fields) {
+      if (input.values[field.key] !== undefined) {
+        await db.insert(registrationSubmissionValues).values({
+          submissionId,
+          fieldId: field.id,
+          value: input.values[field.key],
+        });
+      }
+    }
+
+    return { id: submissionId };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newSub: RegistrationSubmission = {
+    id,
+    ...subData,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.registrationSubmissions.unshift(newSub);
+
+  // Save values to inMemory
+  const fields = inMemoryStore.userFormFields.filter(f => f.collectionStage === "atRegistration");
+  for (const field of fields) {
+    if (input.values[field.key] !== undefined) {
+      inMemoryStore.registrationSubmissionValues.push({
+        id: ++inMemoryStore.nextId,
+        submissionId: id,
+        fieldId: field.id,
+        value: input.values[field.key],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+  }
+
+  return { id };
+}
+
+export async function listRegistrationSubmissions(assignedToUserId?: number) {
+  const db = await getDb();
+  if (db) {
+    let query = db.select().from(registrationSubmissions);
+    if (assignedToUserId) {
+      // @ts-ignore
+      query = query.where(eq(registrationSubmissions.assignedToUserId, assignedToUserId));
+    }
+    // @ts-ignore
+    const subs = await query.orderBy(desc(registrationSubmissions.createdAt));
+    const allFields = await db.select().from(userFormFields);
+    const fieldMap = new Map<number, string>();
+    for (const f of allFields) {
+      fieldMap.set(f.id, f.key);
+    }
+    const results = [];
+    for (const sub of subs) {
+      const vals = await db.select().from(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, sub.id));
+      const valObj: Record<string, string> = {};
+      for (const v of vals) {
+        const key = fieldMap.get(v.fieldId) || `field_${v.fieldId}`;
+        valObj[key] = v.value;
+      }
+      results.push({ ...sub, values: valObj });
+    }
+    return results;
+  }
+  let subs = inMemoryStore.registrationSubmissions;
+  if (assignedToUserId) {
+    subs = subs.filter(s => s.assignedToUserId === assignedToUserId);
+  }
+  const allFields = inMemoryStore.userFormFields;
+  const fieldMap = new Map<number, string>();
+  for (const f of allFields) {
+    fieldMap.set(f.id, f.key);
+  }
+  return subs.map(sub => {
+    const vals = inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === sub.id);
+    const valObj: Record<string, string> = {};
+    for (const v of vals) {
+      const key = fieldMap.get(v.fieldId) || `field_${v.fieldId}`;
+      valObj[key] = v.value;
+    }
+    return { ...sub, values: valObj };
+  });
+}
+
+export async function getRegistrationSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    const sub = (await db.select().from(registrationSubmissions).where(eq(registrationSubmissions.id, id)).limit(1))[0];
+    if (!sub) return null;
+    const vals = await db.select().from(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, id));
+    return { ...sub, values: vals };
+  }
+  const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
+  if (!sub) return null;
+  const vals = inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === id);
+  return { ...sub, values: vals };
+}
+
+export async function updateRegistrationSubmissionStatus(id: number, status: "new" | "routed" | "accountCreated" | "rejected", assignedToUserId?: number | null) {
+  const db = await getDb();
+  const updateData: any = { status };
+  if (assignedToUserId !== undefined) {
+    updateData.assignedToUserId = assignedToUserId;
+  }
+  if (db) {
+    await db.update(registrationSubmissions).set(updateData).where(eq(registrationSubmissions.id, id));
+    return { success: true };
+  }
+  const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
+  if (sub) {
+    sub.status = status;
+    if (assignedToUserId !== undefined) {
+      sub.assignedToUserId = assignedToUserId;
+    }
+    return { success: true };
+  }
+  throw new Error("Registration submission not found.");
+}
+
+export async function getRegistrationFormSchema() {
+  const { fields, sections } = await getUserFormSchema(false);
+  const filteredFields = fields.filter(f => f.collectionStage === "atRegistration");
+  return { sections, fields: filteredFields };
+}
+
+export async function getStudentOnboardingSchema(userId: number) {
+  const { fields, sections } = await getUserFormSchema(false);
+  const stageBFields = fields.filter(f => f.collectionStage === "atFirstLogin");
+  
+  // Find already filled profile values for this user
+  const db = await getDb();
+  let filledFieldIds = new Set<number>();
+  if (db) {
+    const filled = await db.select({ fieldId: userProfileValues.fieldId }).from(userProfileValues).where(eq(userProfileValues.userId, userId));
+    filledFieldIds = new Set(filled.map(f => f.fieldId));
+  } else {
+    const filled = inMemoryStore.userProfileValues.filter(v => v.userId === userId);
+    filledFieldIds = new Set(filled.map(f => f.fieldId));
+  }
+
+  // Filter out already filled fields
+  const unfilledFields = stageBFields.filter(f => !filledFieldIds.has(f.id));
+  return { sections, fields: unfilledFields };
+}
+
+export async function saveUserProfileValues(userId: number, values: Record<string, string>) {
+  const db = await getDb();
+  const { fields } = await getUserFormSchema(false);
+  const rows = Object.entries(values).map(([key, value]) => {
+    const field = fields.find(f => f.key === key);
+    if (!field) return null;
+    return { fieldId: field.id, value };
+  }).filter((r): r is { fieldId: number; value: string } => r !== null);
+
+  if (db) {
+    await db.transaction(async tx => {
+      for (const row of rows) {
+        // delete existing if any
+        await tx.delete(userProfileValues).where(and(eq(userProfileValues.userId, userId), eq(userProfileValues.fieldId, row.fieldId)));
+        // insert new
+        await tx.insert(userProfileValues).values({ userId, fieldId: row.fieldId, value: row.value });
+      }
+    });
+    return { success: true };
+  }
+
+  // in memory fallback
+  for (const row of rows) {
+    inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(v => !(v.userId === userId && v.fieldId === row.fieldId));
+    inMemoryStore.userProfileValues.push({ userId, fieldId: row.fieldId, value: row.value });
+  }
+  return { success: true };
 }
 

@@ -8,6 +8,7 @@ import { ArrowRight, BookOpen, ShieldCheck } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
+import { StudentOnboardingForm } from "@/components/StudentOnboardingForm";
 
 const OPERATIONS_ROLES = ["founder", "super_admin", "admin"];
 
@@ -59,6 +60,9 @@ export default function UserDashboard() {
               <p className="founder-command-description">{t("userDashboard.subtitle")}</p>
             </div>
           </header>
+
+          {/* Student Portal Onboarding Setup Form (Stage B) */}
+          <StudentOnboardingForm />
 
           {/* PWA Prompt Card */}
           <PWAInstallButton variant="card" />

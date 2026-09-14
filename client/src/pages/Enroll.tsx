@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
-import { LeadForm } from "@/components/LeadForm";
+import { RegistrationForm } from "@/components/RegistrationForm";
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -42,7 +42,7 @@ export default function Enroll() {
             <p className="simple-eyebrow">{language === "ms" ? "Maklumat Pemohon" : language === "ar" ? "بيانات المتقدم" : "Learner details"}</p>
             <p className="simple-body-copy">{language === "ms" ? "Ruangan bertanda bintang adalah wajib diisi." : language === "ar" ? "الحقول المميزة بالنجمة إلزامية." : "Fields marked with an asterisk are required."}</p>
             <div className="mt-6">
-              <LeadForm />
+              <RegistrationForm />
             </div>
           </div>
         </section>

@@ -28,13 +28,14 @@ export const userFormFields = mysqlTable("userFormFields", {
   id: int("id").autoincrement().primaryKey(),
   key: varchar("key", { length: 80 }).notNull().unique(),
   label: varchar("label", { length: 160 }).notNull(),
-  fieldType: mysqlEnum("fieldType", ["text", "textarea", "number", "date", "dropdown", "checkbox"]).notNull(),
+  fieldType: mysqlEnum("fieldType", ["text", "textarea", "number", "date", "dropdown", "checkbox", "file"]).notNull(),
   isRequired: boolean("isRequired").default(false).notNull(),
   sortOrder: int("sortOrder").default(0).notNull(),
   placeholder: varchar("placeholder", { length: 255 }),
   optionsJson: text("optionsJson"),
   sectionId: int("sectionId"),
   isActive: boolean("isActive").default(true).notNull(),
+  collectionStage: mysqlEnum("collectionStage", ["atRegistration", "atFirstLogin"]).default("atFirstLogin").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -89,6 +90,8 @@ export const submissions = mysqlTable("submissions", {
   message: text("message"),
   source: varchar("source", { length: 100 }).default("website").notNull(),
   status: mysqlEnum("status", ["new", "contacted", "interested", "enrolled", "closed"]).default("new").notNull(),
+  reasonType: mysqlEnum("reasonType", ["general", "consultation", "campusTour"]).default("general").notNull(),
+  sourcePage: varchar("sourcePage", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -493,6 +496,28 @@ export const messageTemplates = mysqlTable("messageTemplates", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const registrationSubmissions = mysqlTable("registrationSubmissions", {
+  id: int("id").autoincrement().primaryKey(),
+  programInterest: varchar("programInterest", { length: 180 }).notNull(),
+  applicantCategory: varchar("applicantCategory", { length: 80 }).notNull(), // child / adult / international
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 64 }).notNull(),
+  status: mysqlEnum("status", ["new", "routed", "accountCreated", "rejected"]).default("new").notNull(),
+  assignedToUserId: int("assignedToUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const registrationSubmissionValues = mysqlTable("registrationSubmissionValues", {
+  id: int("id").autoincrement().primaryKey(),
+  submissionId: int("submissionId").notNull(),
+  fieldId: int("fieldId").notNull(),
+  value: text("value").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type UserFormSection = typeof userFormSections.$inferSelect;
@@ -525,3 +550,5 @@ export type MediaAsset = typeof mediaAssets.$inferSelect;
 export type AudienceSegment = typeof audienceSegments.$inferSelect;
 export type LeadSource = typeof leadSources.$inferSelect;
 export type MessageTemplate = typeof messageTemplates.$inferSelect;
+export type RegistrationSubmission = typeof registrationSubmissions.$inferSelect;
+export type RegistrationSubmissionValue = typeof registrationSubmissionValues.$inferSelect;
