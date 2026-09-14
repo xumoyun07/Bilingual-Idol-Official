@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { marketingProcedure, contentManagerProcedure, publicProcedure, router } from "../_core/trpc";
+import { marketingProcedure, publicProcedure, router } from "../_core/trpc";
 
 export const promotionsRouter = router({
   validate: publicProcedure
@@ -68,7 +68,6 @@ export const promotionsRouter = router({
       maxUses: z.number().int().positive().nullable().optional(),
       startsAt: z.date().nullable().optional(),
       expiresAt: z.date().nullable().optional(),
-      bannerUrl: z.string().trim().nullable().optional(),
       isActive: z.boolean().default(true),
     }))
     .mutation(async ({ input }) => {
@@ -77,7 +76,6 @@ export const promotionsRouter = router({
         maxUses: input.maxUses ?? null,
         startsAt: input.startsAt ?? null,
         expiresAt: input.expiresAt ?? null,
-        bannerUrl: input.bannerUrl ?? null,
       });
     }),
 
@@ -85,31 +83,5 @@ export const promotionsRouter = router({
     .input(z.object({ id: z.number().int().positive() }))
     .mutation(async ({ input }) => {
       return db.deletePromotion(input.id);
-    }),
-
-  update: contentManagerProcedure
-    .input(z.object({
-      id: z.number().int().positive(),
-      code: z.string().trim().toUpperCase().min(1, "Code is required").optional(),
-      title: z.string().trim().min(1, "Title is required").optional(),
-      description: z.string().trim().min(1, "Description is required").optional(),
-      discountType: z.enum(["percentage", "fixed"]).optional(),
-      discountValue: z.number().int().positive("Value must be positive").optional(),
-      scope: z.string().optional(),
-      maxUses: z.number().int().positive().nullable().optional(),
-      startsAt: z.date().nullable().optional(),
-      expiresAt: z.date().nullable().optional(),
-      bannerUrl: z.string().trim().nullable().optional(),
-      isActive: z.boolean().optional(),
-    }))
-    .mutation(async ({ input }) => {
-      const { id, ...data } = input;
-      return db.updatePromotion(id, {
-        ...data,
-        maxUses: data.maxUses === undefined ? undefined : (data.maxUses ?? null),
-        startsAt: data.startsAt === undefined ? undefined : (data.startsAt ?? null),
-        expiresAt: data.expiresAt === undefined ? undefined : (data.expiresAt ?? null),
-        bannerUrl: data.bannerUrl === undefined ? undefined : (data.bannerUrl ?? null),
-      });
     }),
 });

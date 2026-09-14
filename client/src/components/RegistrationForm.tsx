@@ -38,7 +38,7 @@ export function RegistrationForm({ title }: { title?: string }) {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const progPrefill = searchParams.get("programInterest") || searchParams.get("course") || searchParams.get("language");
+    const progPrefill = searchParams.get("programInterest");
     const catPrefill = searchParams.get("applicantCategory");
 
     if (progPrefill) {

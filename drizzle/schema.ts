@@ -91,9 +91,9 @@ export const submissions = mysqlTable("submissions", {
   message: text("message"),
   source: varchar("source", { length: 100 }).default("website").notNull(),
   status: mysqlEnum("status", ["new", "contacted", "interested", "enrolled", "closed"]).default("new").notNull(),
-  utmSource: text("utmSource"),
-  utmMedium: text("utmMedium"),
-  utmCampaign: text("utmCampaign"),
+  utmSource: varchar("utmSource", { length: 100 }),
+  utmMedium: varchar("utmMedium", { length: 100 }),
+  utmCampaign: varchar("utmCampaign", { length: 100 }),
   utmTerm: varchar("utmTerm", { length: 100 }),
   utmContent: varchar("utmContent", { length: 100 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -509,9 +509,9 @@ export const registrationSubmissions = mysqlTable("registrationSubmissions", {
   phone: varchar("phone", { length: 64 }).notNull(),
   status: mysqlEnum("status", ["new", "routed", "accountCreated", "rejected"]).default("new").notNull(),
   assignedToUserId: int("assignedToUserId"),
-  utmSource: text("utmSource"),
-  utmMedium: text("utmMedium"),
-  utmCampaign: text("utmCampaign"),
+  utmSource: varchar("utmSource", { length: 100 }),
+  utmMedium: varchar("utmMedium", { length: 100 }),
+  utmCampaign: varchar("utmCampaign", { length: 100 }),
   utmTerm: varchar("utmTerm", { length: 100 }),
   utmContent: varchar("utmContent", { length: 100 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -572,7 +572,6 @@ export const promotions = mysqlTable("promotions", {
   usedCount: int("usedCount").default(0).notNull(),
   startsAt: timestamp("startsAt"),
   expiresAt: timestamp("expiresAt"),
-  bannerUrl: varchar("bannerUrl", { length: 1024 }),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -637,17 +636,3 @@ export type PlacementTest = typeof placementTests.$inferSelect;
 export type PlacementTestAttempt = typeof placementTestAttempts.$inferSelect;
 export type Promotion = typeof promotions.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
-
-export const notificationLogs = mysqlTable("notificationLogs", {
-  id: int("id").autoincrement().primaryKey(),
-  triggerEvent: varchar("triggerEvent", { length: 100 }).notNull(),
-  recipient: varchar("recipient", { length: 320 }).notNull(),
-  templateId: int("templateId"),
-  resolvedContent: text("resolvedContent").notNull(),
-  status: mysqlEnum("status", ["pending", "sent", "failed"]).default("pending").notNull(),
-  errorMessage: text("errorMessage"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type NotificationLog = typeof notificationLogs.$inferSelect;
-

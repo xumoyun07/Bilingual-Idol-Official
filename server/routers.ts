@@ -25,7 +25,6 @@ import { registrationRouter } from "./routers/registration";
 import { placementTestsRouter } from "./routers/placementTests";
 import { promotionsRouter } from "./routers/promotions";
 import { paymentsRouter } from "./routers/payments";
-import { applicationsRouter } from "./routers/applications";
 import { createUserPasswordHash, dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 import { isFounderEmail } from "./founderIdentity";
 import { resolveLoginIdentifier } from "../shared/nickname";
@@ -92,7 +91,6 @@ export const appRouter = router({
   placementTests: placementTestsRouter,
   promotions: promotionsRouter,
   payments: paymentsRouter,
-  applications: applicationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

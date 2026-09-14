@@ -1,37 +1,253 @@
-import { ClipboardList, ListChecks } from "lucide-react";
+import React from "react";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-export type DynamicField = {
+export type DynamicFieldType = "text" | "textarea" | "number" | "date" | "dropdown" | "checkbox" | "file";
+
+export interface DynamicField {
   id: number;
   key: string;
   label: string;
-  fieldType: "text" | "textarea" | "number" | "date" | "dropdown" | "checkbox";
+  fieldType: DynamicFieldType;
   isRequired: boolean;
-  placeholder: string | null;
+  placeholder?: string | null;
   options: string[];
   sectionId: number | null;
   sortOrder: number;
   isActive: boolean;
-};
-
-export type DynamicSection = { id: number; title: string; icon: string; sortOrder: number; isActive: boolean };
-
-export function DynamicUserProfileFields({ fields, sections, values, onChange }: { fields: DynamicField[]; sections: DynamicSection[]; values: Record<string, string>; onChange: (key: string, value: string) => void }) {
-  const activeFields = fields.filter(field => field.isActive);
-  if (!activeFields.length) return <section className="mt-6 rounded-xl border border-dashed border-[#d8cfbf] bg-[#faf6ef] p-5"><div className="flex gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#eef4ff] text-[#173fad]"><ListChecks size={18} /></span><div><p className="font-bold text-[#10253e]">No more fields are configured.</p><p className="mt-1 text-sm leading-5 text-[#53657a]">Use Configure create form to create or edit fields and organise them into groups.</p></div></div></section>;
-  const activeSections = sections.filter(section => section.isActive);
-  const ungrouped = activeFields.filter(field => !field.sectionId || !activeSections.some(section => section.id === field.sectionId));
-  return <section className="mt-6 space-y-4" aria-label="Configured fields"><div className="border-t border-[#e6dccd] pt-6"><p className="founder-command-eyebrow">Configured fields</p><h3 className="mt-2 font-display text-3xl text-[#10253e]">More details</h3><p className="mt-1 text-sm leading-6 text-[#53657a]">Required fields are checked again by the server.</p></div>{activeSections.map(section => { const sectionFields = activeFields.filter(field => field.sectionId === section.id); return sectionFields.length ? <ProfileSection key={section.id} title={section.title} fields={sectionFields} values={values} onChange={onChange} /> : null; })}{ungrouped.length ? <ProfileSection title="No group" fields={ungrouped} values={values} onChange={onChange} /> : null}</section>;
 }
 
-function ProfileSection({ title, fields, values, onChange }: { title: string; fields: DynamicField[]; values: Record<string, string>; onChange: (key: string, value: string) => void }) {
-  return <section className="rounded-xl border border-[#e6dccd] bg-[#faf6ef] p-4 sm:p-5"><div className="mb-4 flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-lg bg-[#eef4ff] text-[#173fad]"><ClipboardList size={15} /></span><h4 className="font-bold text-[#10253e]">{title}</h4></div><div className="grid gap-4 sm:grid-cols-2">{fields.map(field => <RuntimeField key={field.id} field={field} value={values[field.key] ?? ""} onChange={value => onChange(field.key, value)} />)}</div></section>;
+export interface DynamicSection {
+  id: number;
+  title: string;
+  icon?: string;
+  sortOrder: number;
+  isActive: boolean;
 }
 
-function RuntimeField({ field, value, onChange }: { field: DynamicField; value: string; onChange: (value: string) => void }) {
-  const label = <span>{field.label}{field.isRequired ? <span className="ml-1 text-[#c55e44]" aria-hidden="true">*</span> : null}</span>;
-  const shared = "mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]";
-  if (field.fieldType === "textarea") return <label data-profile-field-key={field.key} className="block text-xs font-extrabold text-[#53657a] sm:col-span-2">{label}<textarea required={field.isRequired} value={value} placeholder={field.placeholder ?? undefined} onChange={event => onChange(event.target.value)} className="mt-1.5 min-h-28 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 py-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></label>;
-  if (field.fieldType === "dropdown") return <label data-profile-field-key={field.key} className="block text-xs font-extrabold text-[#53657a]">{label}<select required={field.isRequired} value={value} onChange={event => onChange(event.target.value)} className={shared}><option value="">Select an option</option>{field.options.map(option => <option key={option} value={option}>{option}</option>)}</select></label>;
-  if (field.fieldType === "checkbox") return <label data-profile-field-key={field.key} className="flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-white px-4 text-sm font-bold text-[#29415b]"><span>{label}<span className="mt-0.5 block text-xs font-normal text-[#708098]">Select if applicable.</span></span><input aria-label={field.label} required={field.isRequired} type="checkbox" checked={value === "true"} onChange={event => onChange(event.target.checked ? "true" : "false")} className="h-5 w-5 accent-[#173fad]" /></label>;
-  return <label data-profile-field-key={field.key} className="block text-xs font-extrabold text-[#53657a]">{label}<input required={field.isRequired} type={field.fieldType} value={value} placeholder={field.placeholder ?? undefined} onChange={event => onChange(event.target.value)} className={shared} /></label>;
+interface DynamicUserProfileFieldsProps {
+  fields: DynamicField[];
+  sections: DynamicSection[];
+  values: Record<string, any>;
+  onChange: (key: string, value: any) => void;
+  className?: string;
 }
+
+export function DynamicUserProfileFields({
+  fields,
+  sections,
+  values,
+  onChange,
+  className,
+}: DynamicUserProfileFieldsProps) {
+  // Filter and sort active sections and fields
+  const activeSections = React.useMemo(() => {
+    return [...sections]
+      .filter((s) => s.isActive)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+  }, [sections]);
+
+  const activeFields = React.useMemo(() => {
+    return [...fields]
+      .filter((f) => f.isActive)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+  }, [fields]);
+
+  // Group fields by sectionId
+  const fieldsBySection = React.useMemo(() => {
+    const grouped: Record<string, DynamicField[]> = {};
+    activeFields.forEach((field) => {
+      const secId = field.sectionId ? String(field.sectionId) : "unsectioned";
+      if (!grouped[secId]) {
+        grouped[secId] = [];
+      }
+      grouped[secId]!.push(field);
+    });
+    return grouped;
+  }, [activeFields]);
+
+  const renderFieldInput = (field: DynamicField) => {
+    const value = values[field.key] ?? "";
+    const id = `dynamic-field-${field.key}`;
+
+    switch (field.fieldType) {
+      case "text":
+        return (
+          <Input
+            id={id}
+            type="text"
+            required={field.isRequired}
+            placeholder={field.placeholder || ""}
+            value={value}
+            onChange={(e) => onChange(field.key, e.target.value)}
+            className="h-11 border-slate-200 dark:border-slate-800"
+          />
+        );
+      case "number":
+        return (
+          <Input
+            id={id}
+            type="number"
+            required={field.isRequired}
+            placeholder={field.placeholder || ""}
+            value={value}
+            onChange={(e) => onChange(field.key, e.target.value)}
+            className="h-11 border-slate-200 dark:border-slate-800"
+          />
+        );
+      case "date":
+        return (
+          <Input
+            id={id}
+            type="date"
+            required={field.isRequired}
+            value={value}
+            onChange={(e) => onChange(field.key, e.target.value)}
+            className="h-11 border-slate-200 dark:border-slate-800"
+          />
+        );
+      case "textarea":
+        return (
+          <Textarea
+            id={id}
+            required={field.isRequired}
+            placeholder={field.placeholder || ""}
+            value={value}
+            onChange={(e) => onChange(field.key, e.target.value)}
+            className="min-h-[80px] border-slate-200 dark:border-slate-800"
+          />
+        );
+      case "dropdown":
+        return (
+          <div className="relative">
+            <select
+              id={id}
+              required={field.isRequired}
+              value={value}
+              onChange={(e) => onChange(field.key, e.target.value)}
+              className="w-full h-11 px-3 py-2 text-sm bg-white border border-slate-200 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:bg-slate-950 dark:border-slate-800"
+            >
+              <option value="">{field.placeholder || "Select an option..."}</option>
+              {field.options.map((opt, i) => (
+                <option key={i} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      case "checkbox":
+        return (
+          <div className="flex items-center space-x-2 py-2">
+            <input
+              id={id}
+              type="checkbox"
+              required={field.isRequired}
+              checked={Boolean(value)}
+              onChange={(e) => onChange(field.key, e.target.checked)}
+              className="h-4.5 w-4.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label
+              htmlFor={id}
+              className="text-xs font-semibold text-slate-700 dark:text-slate-300 select-none cursor-pointer"
+            >
+              {field.placeholder || "Agree or acknowledge this setting"}
+            </label>
+          </div>
+        );
+      case "file":
+        return (
+          <div className="flex flex-col gap-1.5">
+            <Input
+              id={id}
+              type="file"
+              required={field.isRequired}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // Mock a file upload object for dynamic profile compatibility
+                  onChange(field.key, {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified,
+                  });
+                } else {
+                  onChange(field.key, null);
+                }
+              }}
+              className="cursor-pointer file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-900/40 dark:file:text-blue-300 hover:file:bg-blue-100"
+            />
+            {value && typeof value === "object" && (
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Selected: {value.name} ({Math.round(value.size / 1024)} KB)
+              </span>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderFieldsList = (fieldList: DynamicField[]) => {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {fieldList.map((field) => (
+          <div
+            key={field.id}
+            className={cn(
+              "space-y-1.5",
+              field.fieldType === "textarea" ? "sm:col-span-2" : ""
+            )}
+          >
+            <label
+              htmlFor={`dynamic-field-${field.key}`}
+              className="block text-xs font-bold text-slate-700 dark:text-slate-300"
+            >
+              {field.label}
+              {field.isRequired && <span className="text-red-500 ml-1">*</span>}
+            </label>
+            {renderFieldInput(field)}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  if (activeFields.length === 0) return null;
+
+  return (
+    <div className={cn("space-y-6 mt-4", className)}>
+      {/* Sections with their specific fields */}
+      {activeSections.map((sec) => {
+        const sectionFields = fieldsBySection[String(sec.id)] || [];
+        if (sectionFields.length === 0) return null;
+
+        return (
+          <div
+            key={sec.id}
+            className="p-5 rounded-xl border border-slate-200/60 bg-slate-50/50 dark:border-slate-800/60 dark:bg-slate-900/30 space-y-4"
+          >
+            <div className="border-b border-slate-200/50 dark:border-slate-800/50 pb-2">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                {sec.title}
+              </h4>
+            </div>
+            {renderFieldsList(sectionFields)}
+          </div>
+        );
+      })}
+
+      {/* Unsectioned Fields */}
+      {fieldsBySection["unsectioned"] && fieldsBySection["unsectioned"].length > 0 && (
+        <div className="space-y-4 pt-2">
+          {renderFieldsList(fieldsBySection["unsectioned"])}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default DynamicUserProfileFields;

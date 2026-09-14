@@ -1,285 +1,387 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, CheckCircle, HelpCircle, Loader2, Award, ChevronRight, ChevronLeft, RefreshCw } from "lucide-react";
+import { Language } from "@/lib/translations";
+import { Award, CheckCircle2, ChevronRight, Clock, HelpCircle, RefreshCw, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface Question {
+  id: number;
+  question: Record<Language, string>;
+  options: { text: string; correct?: boolean }[];
+}
+
+const PLACEMENT_QUESTIONS: Question[] = [
+  {
+    id: 1,
+    question: {
+      en: "Choose the correct sentence to complete the statement:",
+      ms: "Pilih ayat yang betul untuk melengkapkan kenyataan ini:",
+      ar: "اختر الجملة الصحيحة لإكمال العبارة:",
+    },
+    options: [
+      { text: "She don't like drinking coffee in the morning." },
+      { text: "She doesn't likes drinking coffee in the morning." },
+      { text: "She doesn't like drinking coffee in the morning.", correct: true },
+      { text: "She isn't like drinking coffee in the morning." },
+    ],
+  },
+  {
+    id: 2,
+    question: {
+      en: "If I _____ earlier, I wouldn't have missed the morning lecture.",
+      ms: "If I _____ earlier, I wouldn't have missed the morning lecture.",
+      ar: "If I _____ earlier, I wouldn't have missed the morning lecture.",
+    },
+    options: [
+      { text: "woke up" },
+      { text: "had woken up", correct: true },
+      { text: "have woken up" },
+      { text: "would wake up" },
+    ],
+  },
+  {
+    id: 3,
+    question: {
+      en: "Which word best completes the executive statement: 'The Board will _____ the proposal at next week's meeting.'",
+      ms: "Perkataan manakah yang paling sesuai: 'The Board will _____ the proposal at next week's meeting.'",
+      ar: "أي كلمة تكمل الجملة بشكل صحيح: 'The Board will _____ the proposal at next week's meeting.'",
+    },
+    options: [
+      { text: "deliberate", correct: true },
+      { text: "deliberation" },
+      { text: "deliberately" },
+      { text: "deliberating" },
+    ],
+  },
+  {
+    id: 4,
+    question: {
+      en: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
+      ms: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
+      ar: "By this time next year, Sarah _____ her master's degree in Kuala Lumpur.",
+    },
+    options: [
+      { text: "will complete" },
+      { text: "will be completed" },
+      { text: "will have completed", correct: true },
+      { text: "has completed" },
+    ],
+  },
+  {
+    id: 5,
+    question: {
+      en: "The director asked whether we had _____ to all client inquiries.",
+      ms: "The director asked whether we had _____ to all client inquiries.",
+      ar: "The director asked whether we had _____ to all client inquiries.",
+    },
+    options: [
+      { text: "responded", correct: true },
+      { text: "respond" },
+      { text: "responding" },
+      { text: "response" },
+    ],
+  },
+];
+
+interface TestResult {
+  score: number;
+  total: number;
+  level: string;
+  recommended: string;
+  date: string;
+}
 
 export function DiagnosticPlacementTest() {
-  const { language, isRTL } = useLanguage();
-  const [activeTestId, setActiveTestId] = useState<number | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [attemptResult, setAttemptResult] = useState<any>(null);
+  const { t, language, isRTL } = useLanguage();
+  const [testState, setTestState] = useState<"idle" | "quiz" | "result">("idle");
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [savedResult, setSavedResult] = useState<TestResult | null>(null);
 
-  const testsQuery = trpc.placementTests.list.useQuery();
-  const testMutation = trpc.placementTests.submitAttempt.useMutation();
+  // Load saved result from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("bidi_placement_test_result");
+      if (stored) {
+        setSavedResult(JSON.parse(stored));
+        setTestState("result");
+      }
+    } catch (e) {
+      console.warn("localStorage is blocked in this environment");
+    }
+  }, []);
 
-  const handleStartTest = (testId: number) => {
-    setActiveTestId(testId);
-    setCurrentQuestionIndex(0);
+  const handleStart = () => {
     setAnswers({});
-    setIsSubmitted(false);
-    setAttemptResult(null);
+    setCurrentIdx(0);
+    setSelectedAnswer(null);
+    setTestState("quiz");
   };
 
-  const handleSelectAnswer = (questionId: number, option: string) => {
-    setAnswers(prev => ({ ...prev, [questionId]: option }));
+  const handleSelectOption = (optIdx: number) => {
+    setSelectedAnswer(optIdx);
   };
 
-  const handleNext = (totalQuestions: number) => {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+  const handleNext = () => {
+    if (selectedAnswer === null) return;
+    
+    const newAnswers = { ...answers, [currentIdx]: selectedAnswer };
+    setAnswers(newAnswers);
+    setSelectedAnswer(null);
+
+    if (currentIdx < PLACEMENT_QUESTIONS.length - 1) {
+      setCurrentIdx(currentIdx + 1);
+    } else {
+      // Calculate score
+      let score = 0;
+      Object.entries(newAnswers).forEach(([qIdx, ansIdx]) => {
+        const question = PLACEMENT_QUESTIONS[Number(qIdx)];
+        if (question && question.options[ansIdx]?.correct) {
+          score++;
+        }
+      });
+
+      // Map score to CEFR and Course recommendations
+      let level = "Beginner (A1)";
+      let recommended = "General English Foundation";
+
+      if (score === 5) {
+        level = "Advanced (C1)";
+        recommended = "IELTS Preparation / Business English Elite";
+      } else if (score >= 4) {
+        level = "Upper-Intermediate (B2)";
+        recommended = "Advanced Speaking / IELTS Excellence";
+      } else if (score >= 3) {
+        level = "Intermediate (B1)";
+        recommended = "General English Intermediate";
+      } else if (score >= 2) {
+        level = "Elementary (A2)";
+        recommended = "General English Elementary";
+      }
+
+      const result: TestResult = {
+        score,
+        total: PLACEMENT_QUESTIONS.length,
+        level,
+        recommended,
+        date: new Date().toLocaleDateString(),
+      };
+
+      try {
+        localStorage.setItem("bidi_placement_test_result", JSON.stringify(result));
+      } catch (e) {
+        console.warn("localStorage is blocked in this environment");
+      }
+
+      setSavedResult(result);
+      setTestState("result");
     }
   };
 
-  const handlePrev = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+  const handleReset = () => {
+    try {
+      localStorage.removeItem("bidi_placement_test_result");
+    } catch (e) {
+      console.warn("localStorage is blocked in this environment");
     }
+    setSavedResult(null);
+    setTestState("idle");
   };
 
-  const handleSubmit = async (questions: any[]) => {
-    if (!activeTestId) return;
-
-    const result = await testMutation.mutateAsync({
-      testId: activeTestId,
-      answers,
-    });
-
-    setAttemptResult(result);
-    setIsSubmitted(true);
-  };
-
-  const resetAll = () => {
-    setActiveTestId(null);
-    setCurrentQuestionIndex(0);
-    setAnswers({});
-    setIsSubmitted(false);
-    setAttemptResult(null);
-  };
-
-  if (testsQuery.isLoading) {
-    return (
-      <div className="p-6 bg-white rounded-xl border border-slate-100 animate-pulse">
-        <div className="h-6 w-48 bg-slate-200 rounded mb-4" />
-        <div className="h-4 bg-slate-100 rounded w-full" />
-      </div>
-    );
-  }
-
-  const tests = testsQuery.data || [];
-
-  // 1. SELECT TEST SCREEN
-  if (!activeTestId) {
-    return (
-      <div className="p-6 sm:p-8 bg-white rounded-xl border border-[#d9cbb8] shadow-sm">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-[#173fad]/10 text-[#173fad] rounded-lg">
-            <BookOpen size={22} />
-          </div>
-          <div>
-            <span className="text-xs font-bold text-[#173fad] uppercase tracking-wider block">
-              {language === "ms" ? "Ujian Diagnostik Pintar" : language === "ar" ? "الاختبار التشخيصي الذكي" : "Diagnostic Assessments"}
-            </span>
-            <h2 className="text-xl font-extrabold text-[#10253e] mt-1">
-              {language === "ms" ? "Ujian Penempatan Bahasa" : language === "ar" ? "اختبار تحديد المستوى اللغوي" : "Interactive Language Placement"}
-            </h2>
-            <p className="text-sm text-[#53657a] mt-1">
-              {language === "ms" 
-                ? "Kenal pasti tahap CEFR anda dengan ujian pintar kami untuk mendapatkan cadangan kursus yang paling sesuai." 
-                : language === "ar" 
-                ? "اكتشف مستواك وفق الإطار الأوروبي المرجعي (CEFR) من خلال اختبار تشخيصي دقيق للحصول على توصية بالبرنامج الدراسي الأنسب." 
-                : "Diagnose your exact CEFR level (A1 - C1) instantly. Unlocks personalized course matching and custom modules."}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid gap-4 mt-6">
-          {tests.map(test => (
-            <div key={test.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-xl border border-[#d9cbb8] hover:border-[#173fad] bg-[#fcfbfa] hover:bg-slate-50 transition-all gap-4">
-              <div>
-                <span className="px-2.5 py-1 bg-[#173fad]/10 text-[#173fad] text-xs font-extrabold rounded-full">
-                  {test.language}
-                </span>
-                <h3 className="text-md font-extrabold text-[#10253e] mt-2">{test.title}</h3>
-                <p className="text-xs text-[#708098] mt-1">
-                  {language === "ms" ? "10 Soalan Aneka Pilihan • Masa diusyorkan: 15 min" : language === "ar" ? "١٠ أسئلة اختيار من متعدد • الوقت المقترح: ١٥ دقيقة" : "10 Interactive MCQ • Recommended: 15 mins"}
-                </p>
-              </div>
-              <button
-                onClick={() => handleStartTest(test.id)}
-                className="w-full sm:w-auto px-5 py-2.5 bg-[#173fad] hover:bg-[#102c7e] text-white text-sm font-extrabold rounded-lg shadow transition-colors min-h-[44px]"
-              >
-                {language === "ms" ? "Mula Ujian" : language === "ar" ? "ابدأ الاختبار" : "Start Placement"}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  const activeTest = tests.find(t => t.id === activeTestId);
-  const questions = activeTest ? JSON.parse(activeTest.questionsJson) : [];
-  const currentQuestion = questions[currentQuestionIndex];
-
-  // 2. RESULTS SCREEN
-  if (isSubmitted && attemptResult) {
-    return (
-      <div className="p-6 sm:p-8 bg-white rounded-xl border border-emerald-100 bg-emerald-50/10 shadow-sm text-center">
-        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Award size={32} />
-        </div>
-        <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">
-          {language === "ms" ? "Tahniah! Keputusan Selesai" : language === "ar" ? "تهانينا! اكتمل الاختبار" : "Placement Results"}
-        </span>
-        <h2 className="text-2xl font-extrabold text-[#10253e] mt-1">
-          {language === "ms" ? "Tahap Penempatan Bahasa Anda" : language === "ar" ? "مستوى تحديد المستوى اللغوي الخاص بك" : "Your Evaluated CEFR Placement"}
-        </h2>
-
-        <div className="my-8 max-w-md mx-auto p-6 bg-white border border-[#d9cbb8] rounded-2xl shadow-sm">
-          <div className="text-5xl font-extrabold text-[#173fad]">{attemptResult.cefrLevel}</div>
-          <p className="text-xs text-[#708098] mt-1.5 uppercase tracking-wide font-semibold">
-            {language === "ms" ? `Skor Ujian: ${attemptResult.score} / ${attemptResult.maxScore}` : language === "ar" ? `النتيجة: ${attemptResult.score} / ${attemptResult.maxScore}` : `Test Score: ${attemptResult.score} / ${attemptResult.maxScore}`}
-          </p>
-          <div className="h-px bg-slate-100 my-4" />
-          <p className="text-xs text-[#708098] font-bold">
-            {language === "ms" ? "Kursus Cadangan Pintar:" : language === "ar" ? "البرنامج الدراسي المقترح:" : "Recommended Programme Path:"}
-          </p>
-          <p className="text-md font-extrabold text-[#10253e] mt-1">
-            {attemptResult.recommendedCourse}
-          </p>
-        </div>
-
-        <p className="text-sm text-[#53657a] max-w-lg mx-auto">
-          {language === "ms" 
-            ? "Keputusan ujian ini telah direkodkan dalam fail kemasukan anda. Pegawai pendaftaran kami akan menggunakannya untuk menyusun jadual peribadi anda." 
-            : language === "ar" 
-            ? "تم تسجيل نتيجة هذا الاختبار في ملف القبول الخاص بك. سيستخدمها مستشار القبول لتصميم جدولك الدراسي الشخصي." 
-            : "This diagnostics entry has been synchronized with your admissions file. Your advisor will refer to this for class scheduling and textbook material distributions."}
-        </p>
-
-        <button
-          onClick={resetAll}
-          className="mt-6 inline-flex items-center gap-2 px-6 py-3 border border-[#d9cbb8] hover:bg-slate-50 text-sm font-extrabold rounded-lg text-[#10253e] transition-colors min-h-[44px]"
-        >
-          <RefreshCw size={16} />
-          {language === "ms" ? "Ambil Ujian Lain" : language === "ar" ? "أعد اختبارًا آخر" : "Take Another Test"}
-        </button>
-      </div>
-    );
-  }
-
-  // 3. QUIZ INTERACTIVE VIEW
-  const totalQuestions = questions.length;
-  const progressPercent = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+  const q = PLACEMENT_QUESTIONS[currentIdx]!;
 
   return (
-    <div className="p-6 sm:p-8 bg-white rounded-xl border border-[#d9cbb8] shadow-sm">
-      {/* Quiz Header */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
-        <div>
-          <span className="text-xs font-bold text-[#173fad]">
-            {activeTest?.title}
-          </span>
-          <p className="text-sm text-[#708098] mt-0.5">
-            {language === "ms" ? `Soalan ${currentQuestionIndex + 1} daripada ${totalQuestions}` : language === "ar" ? `السؤال ${currentQuestionIndex + 1} من ${totalQuestions}` : `Question ${currentQuestionIndex + 1} of ${totalQuestions}`}
-          </p>
-        </div>
-        <button
-          onClick={resetAll}
-          className="text-xs font-extrabold text-red-600 hover:underline min-h-[44px]"
-        >
-          {language === "ms" ? "Keluar Ujian" : language === "ar" ? "إنهاء الاختبار" : "Exit Quiz"}
-        </button>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden mb-6">
-        <div 
-          className="h-full bg-[#173fad] transition-all duration-300" 
-          style={{ width: `${progressPercent}%` }} 
-        />
-      </div>
-
-      {/* Question Card */}
-      {currentQuestion && (
-        <div className="my-6">
-          <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
-            Level: {currentQuestion.level}
-          </span>
-          <h3 className="text-md sm:text-lg font-extrabold text-[#10253e] mt-2 mb-4 leading-relaxed">
-            {currentQuestion.text}
-          </h3>
-
-          <div className="grid gap-3">
-            {currentQuestion.options.map((opt: string) => {
-              const isSelected = answers[currentQuestion.id] === opt;
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => handleSelectAnswer(currentQuestion.id, opt)}
-                  className={`w-full text-left p-4 rounded-xl border text-sm font-semibold transition-all flex items-center justify-between min-h-[44px] ${
-                    isSelected 
-                      ? "border-[#173fad] bg-[#173fad]/5 text-[#173fad] font-extrabold" 
-                      : "border-[#d9cbb8] bg-white text-[#10253e] hover:bg-slate-50"
-                  }`}
-                  style={{ textAlign: isRTL ? "right" : "left" }}
-                >
-                  <span>{opt}</span>
-                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                    isSelected ? "border-[#173fad] bg-[#173fad] text-white" : "border-slate-300 bg-white"
-                  }`}>
-                    {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                  </div>
-                </button>
-              );
-            })}
+    <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm overflow-hidden transition-all duration-300">
+      
+      {/* Idle / Welcome State */}
+      {testState === "idle" && (
+        <div className="p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex-1 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-semibold">
+              <Sparkles size={12} className="animate-pulse" />
+              <span>Diagnostic Level Audit</span>
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              {language === "ms"
+                ? "Sahkan Tahap Penguasaan Bahasa Inggeris Anda"
+                : language === "ar"
+                ? "تقييم مستوى لغتك الإنجليزية"
+                : "Evaluate Your English Competency"}
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-2xl">
+              {language === "ms"
+                ? "Ambil penilaian pantas 5 soalan kami untuk menganggarkan tahap CEFR anda dan dapatkan cadangan modul pembelajaran yang sesuai."
+                : language === "ar"
+                ? "أجب عن 5 أسئلة سريعة لتحديد مستوى لغتك الإنجليزية والحصول على التوصيات الدراسية المناسبة لك."
+                : "Complete our quick 5-question evaluation. It measures your core syntactic comprehension and maps you to an ideal learning course track."}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              id="start-placement-test-btn"
+              onClick={handleStart}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl transition-all flex items-center gap-2 text-sm shadow-xs"
+            >
+              <span>
+                {language === "ms"
+                  ? "Mulakan Penilaian"
+                  : language === "ar"
+                  ? "ابدأ التقييم"
+                  : "Start Evaluation"}
+              </span>
+              <ChevronRight size={16} className={isRTL ? "rotate-180" : ""} />
+            </Button>
           </div>
         </div>
       )}
 
-      {/* Navigation Controls */}
-      <div className="flex items-center justify-between mt-8 pt-4 border-t border-slate-100">
-        <button
-          onClick={handlePrev}
-          disabled={currentQuestionIndex === 0}
-          className="px-4 py-2 border border-[#d9cbb8] rounded-lg text-xs sm:text-sm font-extrabold text-[#10253e] hover:bg-slate-50 transition-all disabled:opacity-35 min-h-[44px] inline-flex items-center gap-1.5"
-        >
-          <ChevronLeft size={16} className={isRTL ? "rotate-180" : ""} />
-          {language === "ms" ? "Kembali" : language === "ar" ? "السابق" : "Previous"}
-        </button>
+      {/* Quiz State */}
+      {testState === "quiz" && (
+        <div className="p-6 sm:p-8 space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                Question {currentIdx + 1} of {PLACEMENT_QUESTIONS.length}
+              </span>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">
+                {language === "ms"
+                  ? "Penilaian Tahap Bahasa"
+                  : language === "ar"
+                  ? "تقييم مستوى اللغة"
+                  : "English Evaluation"}
+              </h3>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+              <Clock size={13} />
+              <span>~2 mins left</span>
+            </div>
+          </div>
 
-        {currentQuestionIndex === totalQuestions - 1 ? (
-          <button
-            onClick={() => handleSubmit(questions)}
-            disabled={testMutation.isPending || !answers[currentQuestion.id]}
-            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs sm:text-sm font-extrabold shadow-md transition-all disabled:opacity-35 min-h-[44px] inline-flex items-center gap-1.5"
-          >
-            {testMutation.isPending ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                {language === "ms" ? "Mengira..." : language === "ar" ? "جاري الحساب..." : "Grading..."}
-              </>
-            ) : (
-              <>
-                {language === "ms" ? "Hantar Jawapan" : language === "ar" ? "إنهاء وإرسال" : "Submit Test"}
-                <CheckCircle size={16} />
-              </>
-            )}
-          </button>
-        ) : (
-          <button
-            onClick={() => handleNext(totalQuestions)}
-            disabled={!answers[currentQuestion.id]}
-            className="px-6 py-2 bg-[#173fad] hover:bg-[#102c7e] text-white rounded-lg text-xs sm:text-sm font-extrabold shadow-md transition-all disabled:opacity-35 min-h-[44px] inline-flex items-center gap-1.5"
-          >
-            {language === "ms" ? "Seterusnya" : language === "ar" ? "التالي" : "Next"}
-            <ChevronRight size={16} className={isRTL ? "rotate-180" : ""} />
-          </button>
-        )}
-      </div>
-    </div>
+          {/* Progress Bar */}
+          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-600 dark:bg-blue-500 transition-all duration-300"
+              style={{ width: `${((currentIdx + 1) / PLACEMENT_QUESTIONS.length) * 100}%` }}
+            />
+          </div>
+
+          {/* Question Text */}
+          <div className="space-y-4">
+            <p className="text-base font-medium text-slate-800 dark:text-slate-100 leading-relaxed">
+              {q.question[language] || q.question.en}
+            </p>
+
+            {/* Options */}
+            <div className="grid grid-cols-1 gap-3">
+              {q.options.map((option, idx) => {
+                const isSelected = selectedAnswer === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleSelectOption(idx)}
+                    className={`text-left p-4 rounded-xl border transition-all duration-200 text-sm flex items-center justify-between ${
+                      isSelected
+                        ? "bg-blue-50/50 border-blue-600 text-blue-900 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-100"
+                        : "border-slate-200/80 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>{option.text}</span>
+                    <div
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                        isSelected
+                          ? "border-blue-600 bg-blue-600 text-white dark:border-blue-500 dark:bg-blue-500"
+                          : "border-slate-300 dark:border-slate-700"
+                      }`}
+                    >
+                      {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Controls Footer */}
+          <div className="flex justify-end pt-2">
+            <Button
+              disabled={selectedAnswer === null}
+              onClick={handleNext}
+              className="bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-6 rounded-lg transition-colors text-sm disabled:opacity-50"
+            >
+              <span>{currentIdx === PLACEMENT_QUESTIONS.length - 1 ? "Finish Test" : "Next Question"}</span>
+              <ChevronRight size={14} className={`ml-1.5 ${isRTL ? "rotate-180" : ""}`} />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Result State */}
+      {testState === "result" && savedResult && (
+        <div className="p-6 sm:p-8 flex flex-col md:flex-row md:items-stretch justify-between gap-6 divide-y md:divide-y-0 md:divide-x dark:divide-slate-800/60 divide-slate-100">
+          
+          {/* Level Assessment Card Left */}
+          <div className="flex-1 space-y-4 md:pr-6">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+              <CheckCircle2 size={12} />
+              <span>Assessment Completed</span>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+              Estimated CEFR English Level
+            </h3>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 flex items-center justify-center text-2xl font-black shadow-inner">
+                {savedResult.level.match(/\(([^)]+)\)/)?.[1] || "B1"}
+              </div>
+              <div>
+                <p className="text-base font-bold text-slate-800 dark:text-slate-100">
+                  {savedResult.level}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Diagnostic Score: {savedResult.score}/{savedResult.total} ({Math.round((savedResult.score / savedResult.total) * 100)}%) · Tested on {savedResult.date}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommended Track Card Right */}
+          <div className="flex-1 pt-6 md:pt-0 md:pl-6 flex flex-col justify-between gap-4">
+            <div className="space-y-1.5">
+              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Recommended Study Pathway
+              </span>
+              <div className="flex items-start gap-2 text-slate-800 dark:text-slate-100 mt-1">
+                <Award size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                    {savedResult.recommended}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    Based on your evaluation, we recommend this curriculum path at Pavilion Embassy to maximize speaking proficiency and fluency.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action controls */}
+            <div className="flex items-center gap-3 pt-2">
+              <Button
+                onClick={handleReset}
+                variant="outline"
+                className="inline-flex items-center gap-1.5 text-xs text-slate-600 border-slate-200 hover:bg-slate-50 dark:text-slate-400 dark:border-slate-800 dark:hover:bg-slate-800 px-3 py-1.5 h-8 rounded-lg"
+              >
+                <RefreshCw size={12} />
+                <span>Retake Test</span>
+              </Button>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+    </section>
   );
 }
+
+export default DiagnosticPlacementTest;

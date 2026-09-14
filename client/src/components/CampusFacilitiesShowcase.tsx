@@ -1,331 +1,330 @@
-import { Armchair, BookOpen, ChevronLeft, ChevronRight, Laptop, MonitorPlay, Sparkles } from "lucide-react";
-import { useState } from "react";
-import { Link } from "wouter";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Language } from "@/lib/translations";
+import { Building2, ChevronLeft, ChevronRight, Eye, X, MapPin } from "lucide-react";
 
 interface Facility {
-  id: string;
-  icon: typeof MonitorPlay;
-  imageUrl: string;
-  titles: Record<Language, string>;
-  subtitles: Record<Language, string>;
-  descriptions: Record<Language, string>;
-  highlights: Record<Language, string[]>;
+  id: number;
+  image: string;
+  en: { title: string; desc: string; type: string };
+  ms: { title: string; desc: string; type: string };
+  ar: { title: string; desc: string; type: string };
 }
 
-const FACILITIES: Facility[] = [
+const campusFacilities: Facility[] = [
   {
-    id: "smart-classrooms",
-    icon: Laptop,
-    imageUrl: "/media/about_classroom.webp",
-    titles: {
-      en: "Smart Interactive Classrooms",
-      ms: "Bilik Darjah Pintar Interaktif",
-      ar: "فصول دراسية ذكية وتفاعلية",
+    id: 1,
+    image: "/media/20260727_164539.webp",
+    en: {
+      title: "Pavilion Embassy Executive Lounge",
+      desc: "Our elegant reception and consultation lounge designed for a premium, distraction-free environment.",
+      type: "Executive Lounge"
     },
-    subtitles: {
-      en: "Cutting-Edge Digital Interactive Systems",
-      ms: "Sistem Digital Terkini & Interaktif",
-      ar: "أنظمة رقمية متطورة وتفاعلية بالكامل",
+    ms: {
+      title: "Ruang Rehat Eksekutif Pavilion Embassy",
+      desc: "Ruang penerimaan dan rundingan kami yang elegan, direka untuk persekitaran pembelajaran yang premium dan fokus.",
+      type: "Ruang Rehat Eksekutif"
     },
-    descriptions: {
-      en: "Every classroom is equipped with interactive digital smartboards, multimedia audio-visual learning systems, and modern collaborative spaces to transform lessons into immersive experiences.",
-      ms: "Setiap bilik darjah dilengkapi dengan papan pintar digital interaktif, sistem pembelajaran audio-visual multimedia, dan ruang kolaboratif moden untuk pengalaman pembelajaran menyeluruh.",
-      ar: "جميع الفصول مجهزة بشاشات تفاعلية ذكية، أنظمة صوتية ومرئية حديثة، ومساحات تعليمية تفاعلية تحول الدروس إلى تجربة مشوقة وعملية.",
-    },
-    highlights: {
-      en: [
-        "Interactive digital whiteboards & touchscreen systems",
-        "Ergonomic acoustic layout for crystal-clear language practice",
-        "High-speed fiber connectivity for international digital resources",
-      ],
-      ms: [
-        "Papan putih digital interaktif & sistem skrin sentuh",
-        "Susun atur akustik ergonomik untuk latihan pertuturan yang jelas",
-        "Sambungan gentian berkelajuan tinggi untuk sumber digital global",
-      ],
-      ar: [
-        "شاشات ذكية تفاعلية وأنظمة لمس متطورة",
-        "تصميم صوتي هندسي يضمن وضوحاً تاماً في تدريب النطق والمحادثة",
-        "إنترنت فائق السرعة للوصول إلى أحدث المراجع التعليمية العالمية",
-      ],
-    },
+    ar: {
+      title: "صالة كبار الشخصيات في بافيليون إمباسي",
+      desc: "منطقة استقبال واستشارات راقية ومريحة لضمان تجربة تعليمية متميزة وهادئة.",
+      type: "صالة استقبال كبار الشخصيات"
+    }
   },
   {
-    id: "executive-lounge",
-    icon: Armchair,
-    imageUrl: "/media/task_contact.webp",
-    titles: {
-      en: "Executive Lounge & Networking Hub",
-      ms: "Ruang Rehat Eksekutif & Hab Jaringan",
-      ar: "صالة كبار الشخصيات ومساحة التواصل",
+    id: 2,
+    image: "/media/20260727_170846.webp",
+    en: {
+      title: "Smart Multimedia Classroom",
+      desc: "Equipped with interactive touch-screens and premium acoustic insulation to enhance interactive group speaking.",
+      type: "Interactive Classroom"
     },
-    subtitles: {
-      en: "Elite Collaboration & Relaxation Space",
-      ms: "Ruang Kerjasama & Rehat Elit",
-      ar: "مساحة راقية للتعاون وبناء العلاقات",
+    ms: {
+      title: "Bilik Darjah Multimedia Pintar",
+      desc: "Dilengkapi dengan skrin sentuh interaktif dan penebat bunyi premium untuk meningkatkan komunikasi kumpulan.",
+      type: "Bilik Darjah Interaktif"
     },
-    descriptions: {
-      en: "More than a resting space—an executive salon designed for collaboration and networking. Students connect, exchange cultural perspectives, brainstorm, and relax in a private clubhouse atmosphere.",
-      ms: "Lebih daripada ruang rehat—salon eksekutif yang direka untuk kerjasama dan rangkaian sosial. Pelajar dapat bertukar pandangan budaya dan berehat dalam suasana kelab peribadi.",
-      ar: "أكثر من مجرد مساحة للاستراحة—صالة تنفيذية راقية مصممة للتواصل وبناء العلاقات وتبادل الثقافات في أجواء مريحة وفاخرة.",
-    },
-    highlights: {
-      en: [
-        "Private members' club ambiance for professionals & diplomats",
-        "Complimentary premium beverage bar and quiet conversation corners",
-        "Prime Pavilion Embassy views overlooking Kuala Lumpur city center",
-      ],
-      ms: [
-        "Suasana kelab eksklusif untuk profesional dan diplomat",
-        "Bar minuman premium percuma dan sudut perbincangan tenang",
-        "Pemandangan Pavilion Embassy menghadap pusat bandar Kuala Lumpur",
-      ],
-      ar: [
-        "أجواء نوادٍ خاصة تلائم المهنيين والدبلوماسيين والطلاب",
-        "ركن مشروبات مجاني وزوايا هادئة للمناقشة والدراسة",
-        "إطلالات خلابة من بافيليون إمباسي على قلب كوالالمبور",
-      ],
-    },
+    ar: {
+      title: "قاعات دراسية ذكية وتفاعلية",
+      desc: "مجهزة بأحدث الشاشات التفاعلية وعزل صوتي ممتاز لتعزيز مهارات التحدث والتفاعل الجماعي.",
+      type: "قاعة دراسية تفاعلية"
+    }
   },
   {
-    id: "library-resource",
-    icon: BookOpen,
-    imageUrl: "/media/about_method.webp",
-    titles: {
-      en: "Library & Digital Resource Center",
-      ms: "Perpustakaan & Pusat Sumber Digital",
-      ar: "المكتبة ومركز الموارد الرقمية",
+    id: 3,
+    image: "/media/20260803_142531.webp",
+    en: {
+      title: "Private Study & IELTS Coaching Suite",
+      desc: "A dedicated quiet space for intensive IELTS coaching, individual assessments, and speaking practice.",
+      type: "Private Suite"
     },
-    subtitles: {
-      en: "Global Academic & Language Archive",
-      ms: "Arkib Pembelajaran & Bahasa Global",
-      ar: "أرشيف أكاديمي ولغوي شامل",
+    ms: {
+      title: "Suite Pengajian Peribadi & Bimbingan IELTS",
+      desc: "Kawasan senyap khas untuk bimbingan IELTS intensif, penilaian individu dan latihan bertutur.",
+      type: "Suite Peribadi"
     },
-    descriptions: {
-      en: "A seamless fusion of traditional literature and modern digital learning. Access curated academic textbooks, IELTS test archives, and global linguistic databases in a serene environment.",
-      ms: "Gabungan harmoni antara bahan bacaan tradisional dan pembelajaran digital moden. Akses buku teks akademik, arkib ujian IELTS, dan pangkalan data bahasa dalam suasana tenang.",
-      ar: "مزيج متكامل بين الكتب الأكاديمية والمراجع الرقمية الحديثة. وصول مباشر لأرشيف اختبارات الآيلتس وقواعد البيانات اللغوية في بيئة هادئة.",
-    },
-    highlights: {
-      en: [
-        "Extensive collection of ESL, IELTS, HSK & foreign language materials",
-        "Dedicated quiet study zones & multimedia terminals",
-        "Direct guidance from academic research advisors",
-      ],
-      ms: [
-        "Koleksi lengkap bahan ESL, IELTS, HSK & bahasa antarabangsa",
-        "Zon belajar tenang dan terminal multimedia khusus",
-        "Bimbingan langsung daripada penasihat akademik",
-      ],
-      ar: [
-        "مجموعة غنية من مراجع اللغة الإنجليزية والآيلتس واللغات الحية",
-        "مناطق مخصصة للدراسة الهادئة ومحطات وسائط متعددة",
-        "إشراف وإرشاد مستمر من المستشارين الأكاديميين",
-      ],
-    },
+    ar: {
+      title: "أجنحة الدراسة الخاصة والتدريب على الآيلتس",
+      desc: "مساحة هادئة مخصصة للتحضير المكثف لامتحان الآيلتس، والتقييمات الفردية، والتدريب على المحادثة.",
+      type: "جناح دراسة خاص"
+    }
   },
   {
-    id: "designer-interior",
-    icon: Sparkles,
-    imageUrl: "/media/about_hero.webp",
-    titles: {
-      en: "Designer-Inspired Modern Interior",
-      ms: "Reka Bentuk Dalaman Moden Eksklusif",
-      ar: "تصميم داخلي عصري وفاخر",
+    id: 4,
+    image: "/media/20260803_142543.webp",
+    en: {
+      title: "Student Collaboration Zone",
+      desc: "Inspiring breakout spaces designed for bilingual networking, interactive debates, and cultural exchange.",
+      type: "Breakout Space"
     },
-    subtitles: {
-      en: "Where Language Meets Luxury & Focus",
-      ms: "Tempat Pertemuan Bahasa & Keanggunan",
-      ar: "حيث تجتمع فصاحة اللغة مع رفاهية التصميم",
+    ms: {
+      title: "Zon Kolaborasi Pelajar",
+      desc: "Ruang santai yang memberi inspirasi untuk jaringan dwi-bahasa, perbincangan interaktif, dan pertukaran budaya.",
+      type: "Zon Kolaborasi"
     },
-    descriptions: {
-      en: "Step into an ambiance that feels like an exclusive private academy rather than a conventional classroom. Warm ambient lighting, refined architectural finishes, and prestigious surroundings.",
-      ms: "Melangkah masuk ke suasana akademi peribadi yang eksklusif dengan pencahayaan hangat, kemasan seni bina moden, dan persekitaran yang berprestij.",
-      ar: "ادخل إلى بيئة تعليمية مصممة بأناقة تماثل الأكاديميات الدولية الكبرى. إضاءة مريحة وتشطيبات راقية تضمن أعلى درجات التركيز.",
-    },
-    highlights: {
-      en: [
-        "Prestigious Pavilion Embassy address (2–3 mins to Petronas Twin Towers)",
-        "Warm ambient architectural lighting and boutique aesthetics",
-        "Inspiring, safe, and prestigious environment for learners of all ages",
-      ],
-      ms: [
-        "Alamat berprestij di Pavilion Embassy (2–3 minit ke Menara Berkembar KLCC)",
-        "Pencahayaan arkitektur yang selesa dan estetika butik",
-        "Persekitaran yang selamat, memberi inspirasi untuk semua peringkat umur",
-      ],
-      ar: [
-        "موقع متميز في بافيليون إمباسي (دقيقتين من أبراج بتروناس)",
-        "إضاءة معمارية مريحة وجماليات راقية تعزز الدافعية",
-        "بيئة تعليمية آمنة وملهمة لجميع الفئات العمرية",
-      ],
-    },
+    ar: {
+      title: "منطقة التعاون والتبادل الطلابي",
+      desc: "مساحات حيوية مصممة للشبكات ثنائية اللغة، والمناقشات التفاعلية، والتبادل الثقافي بين الطلاب.",
+      type: "مساحة تفاعلية"
+    }
   },
+  {
+    id: 5,
+    image: "/media/20260803_142624.webp",
+    en: {
+      title: "Admissions & Counseling Wing",
+      desc: "Modern consultation offices where expert educational advisors guide student academic journeys in KL.",
+      type: "Admissions Center"
+    },
+    ms: {
+      title: "Sayap Kemasukan & Kaunseling",
+      desc: "Pejabat perundingan moden di mana penasihat pendidikan berpengalaman membimbing perjalanan akademik anda.",
+      type: "Pusat Kemasukan"
+    },
+    ar: {
+      title: "جناح القبول والتوجيه الأكاديمي",
+      desc: "مكاتب استشارية حديثة حيث يرشدك مستشارونا التعليميون ذوو الخبرة في رحلتك الأكاديمية.",
+      type: "مكتب القبول والتسجيل"
+    }
+  }
 ];
 
 export function CampusFacilitiesShowcase() {
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const selectedFacility = FACILITIES[selectedIndex];
-  const { t, isRTL, language } = useLanguage();
+  const { language, t, isRTL } = useLanguage();
+  const [activeFacility, setActiveFacility] = useState<number>(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const handlePrev = () => {
-    setSelectedIndex((prev) => (prev > 0 ? prev - 1 : FACILITIES.length - 1));
+  const localized = (fac: Facility) => {
+    if (language === "ms") return fac.ms;
+    if (language === "ar") return fac.ar;
+    return fac.en;
   };
 
-  const handleNext = () => {
-    setSelectedIndex((prev) => (prev < FACILITIES.length - 1 ? prev + 1 : 0));
+  const nextFacility = () => {
+    setActiveFacility((prev) => (prev + 1) % campusFacilities.length);
   };
 
-  const facilityTitle = selectedFacility.titles[language] || selectedFacility.titles.en;
-  const facilitySubtitle = selectedFacility.subtitles[language] || selectedFacility.subtitles.en;
-  const facilityDescription = selectedFacility.descriptions[language] || selectedFacility.descriptions.en;
-  const facilityHighlights = selectedFacility.highlights[language] || selectedFacility.highlights.en;
+  const prevFacility = () => {
+    setActiveFacility((prev) => (prev - 1 + campusFacilities.length) % campusFacilities.length);
+  };
 
   return (
-    <section className={`simple-section bilc-facilities-section ${isRTL ? "is-rtl" : ""}`} id="campus-facilities">
-      <div className="bilc-facilities-header">
-        <div className="bilc-pricing-tag">
-          <Sparkles size={16} />
-          <span>
-            {language === "ms"
-              ? "Kampus Pavilion Embassy"
-              : language === "ar"
-              ? "حرم بافيليون إمباسي"
-              : "Pavilion Embassy Campus"}
-          </span>
+    <section id="campus-facilities-section" className="relative bg-slate-50 dark:bg-slate-900/50 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
+        
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-semibold uppercase tracking-wider mb-3">
+            <Building2 size={13} />
+            <span>{t("home.facilitiesEyebrow")}</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+            {t("home.facilitiesTitle")}
+          </h2>
+          <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+            {t("home.facilitiesSubtitle")}
+          </p>
         </div>
-        <h2>{t("home.facilitiesTitle")}</h2>
-        <p>{t("home.facilitiesSubtitle")}</p>
-      </div>
 
-      {/* Mobile Swipe / Carousel Navigation Toolbar (< 1024px) */}
-      <div className="bilc-facilities-mobile-controls">
-        <span className="bilc-carousel-counter">
-          {language === "ms"
-            ? `Kemudahan ${selectedIndex + 1} drpd ${FACILITIES.length}`
-            : language === "ar"
-            ? `المرفق ${selectedIndex + 1} من ${FACILITIES.length}`
-            : `Facility ${selectedIndex + 1} of ${FACILITIES.length}`}
-        </span>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="bilc-carousel-btn"
-            onClick={isRTL ? handleNext : handlePrev}
-            aria-label={language === "ar" ? "المرفق السابق" : language === "ms" ? "Kemudahan sebelumnya" : "Previous facility"}
-          >
-            <ChevronLeft size={20} className={isRTL ? "rotate-180" : ""} />
-          </button>
-          <button
-            type="button"
-            className="bilc-carousel-btn"
-            onClick={isRTL ? handlePrev : handleNext}
-            aria-label={language === "ar" ? "المرفق التالي" : language === "ms" ? "Kemudahan seterusnya" : "Next facility"}
-          >
-            <ChevronRight size={20} className={isRTL ? "rotate-180" : ""} />
-          </button>
-        </div>
-      </div>
+        {/* Feature Layout (Split Screen Showcase) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm overflow-hidden p-4 sm:p-6 lg:p-8">
+          
+          {/* Left: Gallery Control / Tabs */}
+          <div className="lg:col-span-5 space-y-3 order-2 lg:order-1">
+            <div className="hidden lg:block space-y-2">
+              {campusFacilities.map((fac, idx) => {
+                const info = localized(fac);
+                const isActive = idx === activeFacility;
+                return (
+                  <button
+                    key={fac.id}
+                    onClick={() => setActiveFacility(idx)}
+                    className={`w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center justify-between border ${
+                      isActive
+                        ? "bg-blue-50/70 border-blue-100 dark:bg-blue-900/20 dark:border-blue-900/50 shadow-xs"
+                        : "border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                    }`}
+                  >
+                    <div>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        isActive ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                      }`}>
+                        {info.type}
+                      </span>
+                      <h3 className={`font-medium text-sm mt-1 transition-colors ${isActive ? "text-blue-900 dark:text-blue-100" : "text-slate-700 dark:text-slate-300"}`}>
+                        {info.title}
+                      </h3>
+                    </div>
+                    {isActive && (
+                      <motion.div layoutId="active-dot" className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-      <div className="bilc-facilities-layout">
-        {/* Desktop Navigation Selector (>= 1024px) */}
-        <div className="bilc-facilities-nav" role="tablist">
-          {FACILITIES.map((facility, index) => {
-            const Icon = facility.icon;
-            const isSelected = selectedIndex === index;
-            const itemTitle = facility.titles[language] || facility.titles.en;
-            const itemSub = facility.subtitles[language] || facility.subtitles.en;
-            return (
+            {/* Mobile Controls */}
+            <div className="lg:hidden flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 mt-2">
               <button
-                key={facility.id}
-                role="tab"
-                aria-selected={isSelected}
-                aria-label={itemTitle}
-                title={itemTitle}
-                className={`bilc-facility-nav-item ${isSelected ? "is-selected" : ""}`}
-                onClick={() => setSelectedIndex(index)}
+                onClick={prevFacility}
+                className="p-2.5 rounded-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                aria-label="Previous facility"
               >
-                <div className="bilc-facility-icon-circle">
-                  <Icon size={20} />
-                </div>
-                <div className="bilc-facility-nav-text">
-                  <strong>{itemTitle}</strong>
-                  <span>{itemSub}</span>
-                </div>
+                <ChevronLeft size={20} />
               </button>
-            );
-          })}
-        </div>
-
-        {/* Active Facility Display Card */}
-        <div className="bilc-facility-display-card">
-          <div className="bilc-facility-media-wrap aspect-[3/4] overflow-hidden">
-            <img
-              src={selectedFacility.imageUrl}
-              alt={facilityTitle}
-              className="bilc-facility-img aspect-[3/4] object-cover object-center w-full h-full"
-              loading="lazy"
-              decoding="async"
-            />
-            <div className="bilc-facility-overlay-badge">
-              <span>
-                {language === "ms"
-                  ? "Kampus Pavilion Embassy"
-                  : language === "ar"
-                  ? "حرم بافيليون إمباسي"
-                  : "Pavilion Embassy Campus"}
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                {activeFacility + 1} / {campusFacilities.length}
               </span>
+              <button
+                onClick={nextFacility}
+                className="p-2.5 rounded-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                aria-label="Next facility"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
           </div>
 
-          {/* Mobile Dot Indicators */}
-          <div className="bilc-carousel-dots-row" aria-hidden="true">
-            {FACILITIES.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`bilc-carousel-dot ${selectedIndex === i ? "is-active" : ""}`}
-                onClick={() => setSelectedIndex(i)}
-                aria-label={language === "ar" ? `الانتقال إلى المرفق ${i + 1}` : language === "ms" ? `Pergi ke kemudahan ${i + 1}` : `Go to facility ${i + 1}`}
-              />
-            ))}
+          {/* Right: Active Image with Information Overlay */}
+          <div className="lg:col-span-7 order-1 lg:order-2 relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] xl:aspect-[16/10] rounded-xl overflow-hidden shadow-xs group">
+            
+            {/* Image Slider animation */}
+            <div className="absolute inset-0 w-full h-full bg-slate-100 dark:bg-slate-800">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeFacility}
+                  src={campusFacilities[activeFacility]!.image}
+                  alt={localized(campusFacilities[activeFacility]!).title}
+                  referrerPolicy="no-referrer"
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="w-full h-full object-cover select-none"
+                />
+              </AnimatePresence>
+            </div>
+
+            {/* Info Overlay */}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-5 pt-16 flex flex-col justify-end text-white z-10 pointer-events-none">
+              <div className="flex items-center gap-1.5 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
+                <MapPin size={11} />
+                <span>Pavilion Embassy, KL</span>
+              </div>
+              <h3 className="text-lg font-bold tracking-tight text-white mb-2">
+                {localized(campusFacilities[activeFacility]!).title}
+              </h3>
+              <p className="text-slate-200 text-xs sm:text-sm leading-relaxed max-w-2xl">
+                {localized(campusFacilities[activeFacility]!).desc}
+              </p>
+            </div>
+
+            {/* Floating Zoom Action */}
+            <button
+              onClick={() => setLightboxIndex(activeFacility)}
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/50 hover:bg-slate-900/80 backdrop-blur-md text-white border border-white/10 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-300"
+              title="Expand image"
+            >
+              <Eye size={16} />
+            </button>
           </div>
 
-          <div className="bilc-facility-body">
-            <h3>{facilityTitle}</h3>
-            <p className="bilc-facility-desc">{facilityDescription}</p>
+        </div>
 
-            <div className="bilc-facility-highlights-list">
-              {facilityHighlights.map((highlight, idx) => (
-                <div key={idx} className="bilc-facility-highlight-row">
-                  <span className="bilc-highlight-bullet">✦</span>
-                  <span>{highlight}</span>
-                </div>
+      </div>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {lightboxIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8"
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setLightboxIndex(null)}
+              className="absolute top-6 right-6 p-2 rounded-full bg-slate-900/50 text-white hover:bg-slate-800 border border-white/10 transition-colors z-50"
+              aria-label="Close lightbox"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Navigation buttons */}
+            <button
+              onClick={() => setLightboxIndex((prev) => (prev !== null ? (prev - 1 + campusFacilities.length) % campusFacilities.length : null))}
+              className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-slate-900/50 text-white hover:bg-slate-800 border border-white/10 transition-colors z-40 hidden sm:block"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button
+              onClick={() => setLightboxIndex((prev) => (prev !== null ? (prev + 1) % campusFacilities.length : null))}
+              className="absolute right-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-slate-900/50 text-white hover:bg-slate-800 border border-white/10 transition-colors z-40 hidden sm:block"
+              aria-label="Next slide"
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            {/* Enlarged Image container */}
+            <div className="relative max-w-5xl w-full aspect-[4/3] sm:aspect-[16/10] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
+              <img
+                src={campusFacilities[lightboxIndex]!.image}
+                alt={localized(campusFacilities[lightboxIndex]!).title}
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover select-none"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-slate-950/80 p-5 border-t border-slate-800 text-white">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-300 border border-blue-900/30">
+                  {localized(campusFacilities[lightboxIndex]!).type}
+                </span>
+                <h3 className="text-lg font-bold mt-2">
+                  {localized(campusFacilities[lightboxIndex]!).title}
+                </h3>
+                <p className="text-slate-300 text-sm mt-1">
+                  {localized(campusFacilities[lightboxIndex]!).desc}
+                </p>
+              </div>
+            </div>
+
+            {/* Progress dot indicators in lightbox */}
+            <div className="flex gap-2 mt-6">
+              {campusFacilities.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setLightboxIndex(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${lightboxIndex === idx ? "bg-blue-500 scale-125" : "bg-slate-700 hover:bg-slate-600"}`}
+                />
               ))}
             </div>
 
-            <div className="bilc-facility-action-row">
-              <Link href="/about" className="simple-button simple-button-quiet min-h-[44px]">
-                {language === "ms"
-                  ? "Ketahui lebih lanjut tentang kampus"
-                  : language === "ar"
-                  ? "تعرف أكثر على الحرم الأكاديمي"
-                  : "Learn more about campus"}
-              </Link>
-              <Link href="/contact" className="simple-button min-h-[44px]">
-                {language === "ms"
-                  ? "Tempah Lawatan Kampus"
-                  : language === "ar"
-                  ? "احجز جولة في الحرم"
-                  : "Book a Campus Tour"}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </section>
   );
 }
 
+export default CampusFacilitiesShowcase;

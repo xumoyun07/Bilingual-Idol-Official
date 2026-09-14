@@ -1,12 +1,15 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Landmark, FileCheck } from "lucide-react";
 import { Link } from "wouter";
+import { useState } from "react";
+import { LeadForm } from "@/components/LeadForm";
 import { RegistrationForm } from "@/components/RegistrationForm";
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Enroll() {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
+  const [formType, setFormType] = useState<"inquiry" | "registration">("registration");
   const media = trpc.media.publicList.useQuery();
   const accountMedia = (media.data ?? []).find(item => item.slot === "home_task_account");
 
@@ -39,8 +42,38 @@ export default function Enroll() {
             </ol>
           </aside>
           <div id="enroll-form-card" className="simple-form-card">
+            {/* Form Selection Tabs */}
+            <div className="grid grid-cols-2 gap-2 p-1.5 bg-[#fcfbfa] border border-[#d9cbb8] rounded-xl mb-6">
+              <button
+                onClick={() => setFormType("registration")}
+                className={`flex items-center justify-center gap-2 px-4 py-3.5 text-xs sm:text-sm font-extrabold rounded-lg transition-all min-h-[44px] ${
+                  formType === "registration"
+                    ? "bg-[#173fad] text-white shadow-md"
+                    : "text-[#53657a] hover:text-[#10253e] hover:bg-slate-50"
+                }`}
+              >
+                <FileCheck size={16} />
+                {language === "ms" ? "Pendaftaran Rasmi" : language === "ar" ? "طلب تسجيل رسمي" : "Official Registry"}
+              </button>
+              <button
+                onClick={() => setFormType("inquiry")}
+                className={`flex items-center justify-center gap-2 px-4 py-3.5 text-xs sm:text-sm font-extrabold rounded-lg transition-all min-h-[44px] ${
+                  formType === "inquiry"
+                    ? "bg-[#173fad] text-white shadow-md"
+                    : "text-[#53657a] hover:text-[#10253e] hover:bg-slate-50"
+                }`}
+              >
+                <Landmark size={16} />
+                {language === "ms" ? "Pertanyaan Cepat" : language === "ar" ? "استفسار سريع" : "Quick Inquiry"}
+              </button>
+            </div>
+
             <div className="mt-2">
-              <RegistrationForm />
+              {formType === "registration" ? (
+                <RegistrationForm />
+              ) : (
+                <LeadForm />
+              )}
             </div>
           </div>
         </section>
