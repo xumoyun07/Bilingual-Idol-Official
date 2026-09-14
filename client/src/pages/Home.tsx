@@ -18,6 +18,15 @@ export default function Home() {
   const [bookingService, setBookingService] = useState<string>("placement_test");
   const { t, isRTL, language } = useLanguage();
 
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const activePromotionsQuery = trpc.promotions.publicList.useQuery();
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const media = trpc.media.publicList.useQuery();
   const mediaBySlot = new Map((media.data ?? []).map(item => [item.slot, item]));
@@ -176,6 +185,93 @@ export default function Home() {
           onOpenPlacementTest={() => setIsPlacementTestOpen(true)}
           onOpenBooking={handleOpenBooking}
         />
+
+        {/* Active Intake Promotions & Discounts Directory Section */}
+        {activePromotionsQuery.data && activePromotionsQuery.data.length > 0 && (
+          <section id="home-promotions-section" className="simple-section simple-home-panel bg-slate-50/50 border-t border-b border-slate-100 py-12">
+            <div className="simple-section-heading mb-8">
+              <div>
+                <p className="simple-eyebrow flex items-center gap-1.5 justify-center md:justify-start">
+                  <Sparkles size={14} className="text-indigo-600 animate-pulse" />
+                  {language === "ms" ? "Tawaran Istimewa" : language === "ar" ? "عرض خاص" : "Special Offers"}
+                </p>
+                <h2>
+                  {language === "ms"
+                    ? "Tawaran Istimewa & Promosi Kemasukan Aktif"
+                    : language === "ar"
+                    ? "العروض الخاصة والتخفيضات النشطة"
+                    : "Exclusive Offers & Active Intake Promotions"}
+                </h2>
+              </div>
+              <p className="max-w-2xl text-slate-600">
+                {language === "ms"
+                  ? "Gunakan kod promosi semasa pendaftaran untuk menikmati diskaun istimewa untuk yuran pengajian anda."
+                  : language === "ar"
+                  ? "استخدم الرموز الترويجية أثناء التسجيل للحصول على خصومات حصرية على الرسوم الدراسية الخاصة بك."
+                  : "Apply these limited-time promotional codes during registration to secure your exclusive tuition discounts."}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4">
+              {activePromotionsQuery.data.map((promo) => (
+                <div
+                  key={promo.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200 hover:scale-[1.01] relative overflow-hidden"
+                >
+                  {/* Decorative Subtle Corner Accent */}
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/40 rounded-bl-full -mr-6 -mt-6 -z-10" />
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="font-mono text-sm font-extrabold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 select-all tracking-wide">
+                        {promo.code}
+                      </span>
+                      <span className="text-lg font-black text-indigo-600">
+                        {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `RM ${promo.discountValue} OFF`}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                        {promo.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {promo.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-5 mt-auto flex items-center justify-between gap-3 border-t border-slate-100">
+                    {promo.expiresAt ? (
+                      <span className="text-[10px] text-rose-500 font-semibold bg-rose-50 px-2 py-0.5 rounded-full">
+                        {language === "ms" ? "Hingga " : language === "ar" ? "ينتهي " : "Expires "} 
+                        {new Date(promo.expiresAt).toLocaleDateString()}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+                        {language === "ms" ? "Kemasukan Aktif" : language === "ar" ? "نشط حالياً" : "Active Intake"}
+                      </span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCode(promo.code)}
+                      className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all duration-150 cursor-pointer ${
+                        copiedCode === promo.code
+                          ? "bg-emerald-600 border-emerald-600 text-white"
+                          : "bg-white hover:bg-slate-50 border-slate-200 text-slate-700 active:scale-95"
+                      }`}
+                    >
+                      {copiedCode === promo.code 
+                        ? (language === "ms" ? "Disalin!" : language === "ar" ? "تم النسخ!" : "Copied!") 
+                        : (language === "ms" ? "Salin Kod" : language === "ar" ? "نسخ الرمز" : "Copy Code")}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Start Here 3-Card Grid */}
         <section id="home-start-here-section" className="simple-section simple-home-panel simple-home-start-panel">

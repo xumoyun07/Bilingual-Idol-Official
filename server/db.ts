@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, RegistrationSubmission, RegistrationSubmissionValue } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
@@ -100,6 +100,37 @@ export const inMemoryStore = {
     },
   ] as User[],
   submissions: [] as Submission[],
+  registrationSubmissions: [] as RegistrationSubmission[],
+  registrationSubmissionValues: [] as RegistrationSubmissionValue[],
+  applications: [] as Application[],
+  placementTests: [
+    {
+      id: 1,
+      title: "General English Placement Test",
+      language: "English",
+      isActive: true,
+      questionsJson: JSON.stringify([
+        { id: 1, text: "Which sentence is correct?", options: ["I has a dog.", "I have a dog.", "I having a dog."], answer: "I have a dog.", level: "A1" },
+        { id: 2, text: "What is the opposite of 'hot'?", options: ["cold", "warm", "boiling"], answer: "cold", level: "A1" },
+        { id: 3, text: "She _____ to the gym every evening.", options: ["go", "goes", "going"], answer: "goes", level: "A2" },
+        { id: 4, text: "Yesterday, we _____ a wonderful dinner.", options: ["have", "has", "had"], answer: "had", level: "A2" },
+        { id: 5, text: "If it rains tomorrow, we _____ the picnic.", options: ["will cancel", "would cancel", "cancelled"], answer: "will cancel", level: "B1" },
+        { id: 6, text: "I have been living here _____ five years.", options: ["since", "for", "during"], answer: "for", level: "B1" },
+        { id: 7, text: "He is looking forward _____ you next week.", options: ["to meet", "to meeting", "meeting"], answer: "to meeting", level: "B2" },
+        { id: 8, text: "She succeeded _____ passing the exam.", options: ["in", "on", "at"], answer: "in", level: "B2" },
+        { id: 9, text: "Had I known about the party, I _____ attended.", options: ["would have", "will have", "had"], answer: "would have", level: "C1" },
+        { id: 10, text: "The presentation was _____ received by the board.", options: ["favorably", "favor", "favorite"], answer: "favorably", level: "C1" }
+      ]),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ] as PlacementTest[],
+  placementTestAttempts: [] as PlacementTestAttempt[],
+  promotions: [
+    { id: 1, code: "MERDEKA2026", title: "Merdeka Special Discount", description: "Get 15% off all General English programs for a limited time to celebrate Independence Month!", discountType: "percentage" as const, discountValue: 15, scope: "all", usedCount: 0, isActive: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: 2, code: "WELCOME50", title: "Welcome New Student Offer", description: "Receive a RM 50 flat discount on your registration and assessment fees for any selected course.", discountType: "fixed" as const, discountValue: 50, scope: "all", usedCount: 0, isActive: true, createdAt: new Date(), updatedAt: new Date() }
+  ] as Promotion[],
+  payments: [] as Payment[],
   programs: [
     { id: 1, slug: "general-english", title: "General English", language: "English", category: "English", ageGroup: "Teens & adults", level: "Beginner to advanced", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Build everyday confidence across speaking, listening, reading, and writing through practical, interactive learning.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
     { id: 2, slug: "kids-english", title: "Kids English", language: "English", category: "Kids", ageGroup: "Children", level: "Foundation to developing", duration: "Designed around your child's learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "A playful, supportive foundation for young learners to grow their English through communication and guided practice.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
@@ -133,8 +164,6 @@ export const inMemoryStore = {
   userFormSections: [] as any[],
   userFormFields: [] as any[],
   userProfileValues: [] as { userId: number; fieldId: number; value: string }[],
-  registrationSubmissions: [] as RegistrationSubmission[],
-  registrationSubmissionValues: [] as RegistrationSubmissionValue[],
   nextId: 100,
 };
 
@@ -384,7 +413,7 @@ export async function updateUserSystemFields(fields: UserSystemFieldInput[]) {
 }
 
 function toRuntimeField(field: typeof userFormFields.$inferSelect): RuntimeUserField {
-  return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive, collectionStage: (field.collectionStage as "atRegistration" | "atFirstLogin") ?? "atFirstLogin" };
+  return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, collectionStage: field.collectionStage, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive };
 }
 
 export async function getUserFormSchema(includeInactive = false) {
@@ -447,18 +476,17 @@ export async function deleteUserFormSection(id: number) {
   return { success: true } as const;
 }
 
-type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean; collectionStage?: "atRegistration" | "atFirstLogin" };
+type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean };
 
 export async function createUserFormField(input: FormFieldInput) {
   const database = await getDb();
   const options = normaliseOptions(input.fieldType, input.options);
-  const collectionStage = input.collectionStage ?? "atFirstLogin";
   if (!database) {
-    const field = { id: ++inMemoryStore.nextId, key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage, createdAt: new Date(), updatedAt: new Date() };
+    const field = { id: ++inMemoryStore.nextId, key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, createdAt: new Date(), updatedAt: new Date() };
     inMemoryStore.userFormFields.push(field);
     return toRuntimeField(field as any);
   }
-  const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage });
+  const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive });
   const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, Number(result[0].insertId))).limit(1))[0];
   return toRuntimeField(field);
 }
@@ -466,16 +494,15 @@ export async function createUserFormField(input: FormFieldInput) {
 export async function updateUserFormField(id: number, input: FormFieldInput) {
   const database = await getDb();
   const options = normaliseOptions(input.fieldType, input.options);
-  const collectionStage = input.collectionStage ?? "atFirstLogin";
   if (!database) {
     const idx = inMemoryStore.userFormFields.findIndex(f => f.id === id);
     if (idx !== -1) {
-      inMemoryStore.userFormFields[idx] = { ...inMemoryStore.userFormFields[idx], label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage, updatedAt: new Date() };
+      inMemoryStore.userFormFields[idx] = { ...inMemoryStore.userFormFields[idx], label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, updatedAt: new Date() };
       return toRuntimeField(inMemoryStore.userFormFields[idx] as any);
     }
     throw new Error("Field not found.");
   }
-  await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, collectionStage }).where(eq(userFormFields.id, id));
+  await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive }).where(eq(userFormFields.id, id));
   const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, id)).limit(1))[0];
   if (!field) throw new Error("Field not found.");
   return toRuntimeField(field);
@@ -693,23 +720,61 @@ export async function deleteSuperAdminManagedUser(id: number) {
   return deleteManagedUser(id);
 }
 
-export type SubmissionInput = { type: "enrollment" | "inquiry"; studentName: string; studentAge: number; parentName: string; parentEmail: string; parentPhone: string; programInterest: string; preferredSchedule: string; message?: string; source?: string; };
+export type SubmissionInput = {
+  type: "enrollment" | "inquiry";
+  studentName: string;
+  studentAge: number;
+  parentName: string;
+  parentEmail: string;
+  parentPhone: string;
+  programInterest: string;
+  preferredSchedule: string;
+  message?: string;
+  source?: string;
+  reasonType?: "general" | "consultation" | "campusTour";
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+};
 
 export async function createSubmission(input: SubmissionInput) {
   const db = await getDb();
   if (db) {
-    const result = await db.insert(submissions).values({ ...input, message: input.message?.trim() || null, source: input.source?.trim() || "website" });
+    const result = await db.insert(submissions).values({
+      ...input,
+      message: input.message?.trim() || null,
+      source: input.source?.trim() || "website",
+      reasonType: input.reasonType || "general",
+      utmSource: input.utmSource || null,
+      utmMedium: input.utmMedium || null,
+      utmCampaign: input.utmCampaign || null,
+      utmTerm: input.utmTerm || null,
+      utmContent: input.utmContent || null,
+    });
     return { id: Number(result[0].insertId) };
   }
   const id = ++inMemoryStore.nextId;
   const newSubmission: Submission = {
     id,
-    ...input,
+    type: input.type,
+    studentName: input.studentName,
+    studentAge: input.studentAge,
+    parentName: input.parentName,
+    parentEmail: input.parentEmail,
+    parentPhone: input.parentPhone,
+    programInterest: input.programInterest,
+    preferredSchedule: input.preferredSchedule,
+    reasonType: input.reasonType || "general",
     message: input.message?.trim() || null,
     source: input.source?.trim() || "website",
     status: "new",
-    reasonType: "general",
-    sourcePage: null,
+    utmSource: input.utmSource || null,
+    utmMedium: input.utmMedium || null,
+    utmCampaign: input.utmCampaign || null,
+    utmTerm: input.utmTerm || null,
+    utmContent: input.utmContent || null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -1204,260 +1269,352 @@ export async function seedDatabaseDefaultUsers() {
   }
 }
 
-export type InquiryInput = {
-  name: string;
-  email: string;
-  phone: string;
-  message?: string;
-  reasonType: "general" | "consultation" | "campusTour";
-  sourcePage?: string;
-};
+// ==========================================
+// REGISTRATION SUBMISSIONS & APPLICATIONS WRAPPERS
+// ==========================================
 
-export async function createInquiry(input: InquiryInput) {
+export async function createRegistrationSubmission(input: Omit<RegistrationSubmission, "id" | "status" | "createdAt" | "updatedAt">, fieldValues: Array<{ fieldId: number; value: string }>) {
   const db = await getDb();
-  const data = {
-    type: "inquiry" as const,
-    studentName: input.name,
-    studentAge: 0,
-    parentName: input.name,
-    parentEmail: input.email || "",
-    parentPhone: input.phone || "",
-    programInterest: "",
-    preferredSchedule: "",
-    message: input.message?.trim() || null,
-    source: "website",
-    status: "new" as const,
-    reasonType: input.reasonType,
-    sourcePage: input.sourcePage || null,
-  };
-
   if (db) {
-    const result = await db.insert(submissions).values(data);
-    return { id: Number(result[0].insertId) };
-  }
-  const id = ++inMemoryStore.nextId;
-  const newSubmission: Submission = {
-    id,
-    ...data,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-  inMemoryStore.submissions.unshift(newSubmission);
-  return { id };
-}
-
-export type RegistrationSubmissionInput = {
-  programInterest: string;
-  applicantCategory: string; // child / adult / international
-  fullName: string;
-  email: string;
-  phone: string;
-  values: Record<string, string>; // keys of active registration fields
-};
-
-export async function createRegistrationSubmission(input: RegistrationSubmissionInput) {
-  const db = await getDb();
-  // Routing rules:
-  // child -> admin (id 3)
-  // international -> founder (id 1)
-  // others -> admin (id 3)
-  let assignedToUserId: number | null = 3; // default Admin Manager
-  const lowerCat = input.applicantCategory.toLowerCase();
-  if (lowerCat.includes("international") || lowerCat.includes("иностранец") || lowerCat.includes("visa")) {
-    assignedToUserId = 1; // Founder
-  } else if (lowerCat.includes("child") || lowerCat.includes("kid") || lowerCat.includes("ребенок")) {
-    assignedToUserId = 3; // Admin Manager
-  }
-
-  const subData = {
-    programInterest: input.programInterest,
-    applicantCategory: input.applicantCategory,
-    fullName: input.fullName,
-    email: input.email,
-    phone: input.phone,
-    status: "new" as const,
-    assignedToUserId,
-  };
-
-  if (db) {
-    const result = await db.insert(registrationSubmissions).values(subData);
+    const result = await db.insert(registrationSubmissions).values(input);
     const submissionId = Number(result[0].insertId);
-
-    // Save field values (only those that correspond to active userFormFields where collectionStage = 'atRegistration')
-    const fields = await db.select().from(userFormFields).where(eq(userFormFields.collectionStage, "atRegistration"));
-    for (const field of fields) {
-      if (input.values[field.key] !== undefined) {
-        await db.insert(registrationSubmissionValues).values({
-          submissionId,
-          fieldId: field.id,
-          value: input.values[field.key],
-        });
-      }
+    if (fieldValues.length) {
+      await db.insert(registrationSubmissionValues).values(
+        fieldValues.map(v => ({ submissionId, fieldId: v.fieldId, value: v.value }))
+      );
     }
-
     return { id: submissionId };
   }
 
   const id = ++inMemoryStore.nextId;
-  const newSub: RegistrationSubmission = {
+  const newSubmission: RegistrationSubmission = {
     id,
-    ...subData,
+    ...input,
+    status: "new",
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  inMemoryStore.registrationSubmissions.unshift(newSub);
-
-  // Save values to inMemory
-  const fields = inMemoryStore.userFormFields.filter(f => f.collectionStage === "atRegistration");
-  for (const field of fields) {
-    if (input.values[field.key] !== undefined) {
-      inMemoryStore.registrationSubmissionValues.push({
-        id: ++inMemoryStore.nextId,
-        submissionId: id,
-        fieldId: field.id,
-        value: input.values[field.key],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    }
+  inMemoryStore.registrationSubmissions.unshift(newSubmission);
+  for (const v of fieldValues) {
+    inMemoryStore.registrationSubmissionValues.push({
+      id: ++inMemoryStore.nextId,
+      submissionId: id,
+      fieldId: v.fieldId,
+      value: v.value,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
   }
-
   return { id };
 }
 
-export async function listRegistrationSubmissions(assignedToUserId?: number) {
+export async function listRegistrationSubmissions() {
   const db = await getDb();
   if (db) {
-    let query = db.select().from(registrationSubmissions);
-    if (assignedToUserId) {
-      // @ts-ignore
-      query = query.where(eq(registrationSubmissions.assignedToUserId, assignedToUserId));
-    }
-    // @ts-ignore
-    const subs = await query.orderBy(desc(registrationSubmissions.createdAt));
-    const allFields = await db.select().from(userFormFields);
-    const fieldMap = new Map<number, string>();
-    for (const f of allFields) {
-      fieldMap.set(f.id, f.key);
-    }
-    const results = [];
-    for (const sub of subs) {
-      const vals = await db.select().from(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, sub.id));
-      const valObj: Record<string, string> = {};
-      for (const v of vals) {
-        const key = fieldMap.get(v.fieldId) || `field_${v.fieldId}`;
-        valObj[key] = v.value;
-      }
-      results.push({ ...sub, values: valObj });
-    }
-    return results;
+    const subs = await db.select().from(registrationSubmissions).orderBy(desc(registrationSubmissions.createdAt));
+    const vals = await db.select().from(registrationSubmissionValues);
+    return subs.map(s => ({
+      ...s,
+      values: vals.filter(v => v.submissionId === s.id),
+    }));
   }
-  let subs = inMemoryStore.registrationSubmissions;
-  if (assignedToUserId) {
-    subs = subs.filter(s => s.assignedToUserId === assignedToUserId);
-  }
-  const allFields = inMemoryStore.userFormFields;
-  const fieldMap = new Map<number, string>();
-  for (const f of allFields) {
-    fieldMap.set(f.id, f.key);
-  }
-  return subs.map(sub => {
-    const vals = inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === sub.id);
-    const valObj: Record<string, string> = {};
-    for (const v of vals) {
-      const key = fieldMap.get(v.fieldId) || `field_${v.fieldId}`;
-      valObj[key] = v.value;
-    }
-    return { ...sub, values: valObj };
-  });
+
+  return inMemoryStore.registrationSubmissions.map(s => ({
+    ...s,
+    values: inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === s.id),
+  }));
 }
 
-export async function getRegistrationSubmission(id: number) {
+export async function getUserProfileValues(userId: number) {
   const db = await getDb();
   if (db) {
-    const sub = (await db.select().from(registrationSubmissions).where(eq(registrationSubmissions.id, id)).limit(1))[0];
-    if (!sub) return null;
-    const vals = await db.select().from(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, id));
-    return { ...sub, values: vals };
+    return db.select().from(userProfileValues).where(eq(userProfileValues.userId, userId));
   }
-  const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
-  if (!sub) return null;
-  const vals = inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === id);
-  return { ...sub, values: vals };
+  return inMemoryStore.userProfileValues.filter(v => v.userId === userId);
 }
 
-export async function updateRegistrationSubmissionStatus(id: number, status: "new" | "routed" | "accountCreated" | "rejected", assignedToUserId?: number | null) {
+export async function updateRegistrationSubmissionStatus(id: number, status: RegistrationSubmission["status"], assignedToUserId?: number) {
   const db = await getDb();
-  const updateData: any = { status };
-  if (assignedToUserId !== undefined) {
-    updateData.assignedToUserId = assignedToUserId;
-  }
   if (db) {
-    await db.update(registrationSubmissions).set(updateData).where(eq(registrationSubmissions.id, id));
+    await db.update(registrationSubmissions).set({ status, assignedToUserId: assignedToUserId ?? null }).where(eq(registrationSubmissions.id, id));
     return { success: true };
   }
+
   const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
   if (sub) {
     sub.status = status;
-    if (assignedToUserId !== undefined) {
-      sub.assignedToUserId = assignedToUserId;
+    if (assignedToUserId !== undefined) sub.assignedToUserId = assignedToUserId;
+  }
+  return { success: true };
+}
+
+export async function deleteRegistrationSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(registrationSubmissions).where(eq(registrationSubmissions.id, id));
+    await db.delete(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, id));
+    return { success: true };
+  }
+
+  inMemoryStore.registrationSubmissions = inMemoryStore.registrationSubmissions.filter(s => s.id !== id);
+  inMemoryStore.registrationSubmissionValues = inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId !== id);
+  return { success: true };
+}
+
+export async function createApplication(userId: number, status: Application["status"] = "submitted") {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(applications).values({ userId, status });
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newApp: Application = {
+    id,
+    userId,
+    status,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.applications.unshift(newApp);
+  return { id };
+}
+
+export async function listApplications(userId?: number) {
+  const db = await getDb();
+  if (db) {
+    if (userId) {
+      return db.select().from(applications).where(eq(applications.userId, userId)).orderBy(desc(applications.createdAt));
     }
-    return { success: true };
-  }
-  throw new Error("Registration submission not found.");
-}
-
-export async function getRegistrationFormSchema() {
-  const { fields, sections } = await getUserFormSchema(false);
-  const filteredFields = fields.filter(f => f.collectionStage === "atRegistration");
-  return { sections, fields: filteredFields };
-}
-
-export async function getStudentOnboardingSchema(userId: number) {
-  const { fields, sections } = await getUserFormSchema(false);
-  const stageBFields = fields.filter(f => f.collectionStage === "atFirstLogin");
-  
-  // Find already filled profile values for this user
-  const db = await getDb();
-  let filledFieldIds = new Set<number>();
-  if (db) {
-    const filled = await db.select({ fieldId: userProfileValues.fieldId }).from(userProfileValues).where(eq(userProfileValues.userId, userId));
-    filledFieldIds = new Set(filled.map(f => f.fieldId));
-  } else {
-    const filled = inMemoryStore.userProfileValues.filter(v => v.userId === userId);
-    filledFieldIds = new Set(filled.map(f => f.fieldId));
+    return db.select().from(applications).orderBy(desc(applications.createdAt));
   }
 
-  // Filter out already filled fields
-  const unfilledFields = stageBFields.filter(f => !filledFieldIds.has(f.id));
-  return { sections, fields: unfilledFields };
+  if (userId) {
+    return inMemoryStore.applications.filter(a => a.userId === userId);
+  }
+  return inMemoryStore.applications;
 }
 
-export async function saveUserProfileValues(userId: number, values: Record<string, string>) {
+export async function updateApplicationStatus(id: number, status: Application["status"]) {
   const db = await getDb();
-  const { fields } = await getUserFormSchema(false);
-  const rows = Object.entries(values).map(([key, value]) => {
-    const field = fields.find(f => f.key === key);
-    if (!field) return null;
-    return { fieldId: field.id, value };
-  }).filter((r): r is { fieldId: number; value: string } => r !== null);
-
   if (db) {
-    await db.transaction(async tx => {
-      for (const row of rows) {
-        // delete existing if any
-        await tx.delete(userProfileValues).where(and(eq(userProfileValues.userId, userId), eq(userProfileValues.fieldId, row.fieldId)));
-        // insert new
-        await tx.insert(userProfileValues).values({ userId, fieldId: row.fieldId, value: row.value });
-      }
-    });
+    await db.update(applications).set({ status }).where(eq(applications.id, id));
     return { success: true };
   }
 
-  // in memory fallback
-  for (const row of rows) {
-    inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(v => !(v.userId === userId && v.fieldId === row.fieldId));
-    inMemoryStore.userProfileValues.push({ userId, fieldId: row.fieldId, value: row.value });
+  const app = inMemoryStore.applications.find(a => a.id === id);
+  if (app) app.status = status;
+  return { success: true };
+}
+
+export async function deleteApplication(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(applications).where(eq(applications.id, id));
+    return { success: true };
+  }
+
+  inMemoryStore.applications = inMemoryStore.applications.filter(a => a.id !== id);
+  return { success: true };
+}
+
+// ==========================================
+// PLACEMENT TESTS WRAPPERS
+// ==========================================
+
+export async function createPlacementTest(input: Omit<PlacementTest, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(placementTests).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newTest: PlacementTest = {
+    id,
+    ...input,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.placementTests.unshift(newTest);
+  return { id };
+}
+
+export async function listPlacementTests() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(placementTests);
+  }
+  return inMemoryStore.placementTests;
+}
+
+export async function getPlacementTest(id: number) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(placementTests).where(eq(placementTests.id, id)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.placementTests.find(t => t.id === id);
+}
+
+export async function deletePlacementTest(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(placementTests).where(eq(placementTests.id, id));
+    return { success: true };
+  }
+  inMemoryStore.placementTests = inMemoryStore.placementTests.filter(t => t.id !== id);
+  return { success: true };
+}
+
+export async function createPlacementTestAttempt(input: Omit<PlacementTestAttempt, "id" | "createdAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(placementTestAttempts).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newAttempt: PlacementTestAttempt = {
+    id,
+    ...input,
+    createdAt: new Date(),
+  };
+  inMemoryStore.placementTestAttempts.unshift(newAttempt);
+  return { id };
+}
+
+export async function listPlacementTestAttempts(userId?: number) {
+  const db = await getDb();
+  if (db) {
+    if (userId) {
+      return db.select().from(placementTestAttempts).where(eq(placementTestAttempts.userId, userId)).orderBy(desc(placementTestAttempts.createdAt));
+    }
+    return db.select().from(placementTestAttempts).orderBy(desc(placementTestAttempts.createdAt));
+  }
+
+  if (userId) {
+    return inMemoryStore.placementTestAttempts.filter(a => a.userId === userId);
+  }
+  return inMemoryStore.placementTestAttempts;
+}
+
+// ==========================================
+// PROMOTIONS WRAPPERS
+// ==========================================
+
+export async function createPromotion(input: Omit<Promotion, "id" | "usedCount" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(promotions).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newPromo: Promotion = {
+    id,
+    ...input,
+    usedCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.promotions.unshift(newPromo);
+  return { id };
+}
+
+export async function listPromotions() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(promotions).orderBy(desc(promotions.createdAt));
+  }
+  return inMemoryStore.promotions;
+}
+
+export async function getPromotionByCode(code: string) {
+  const normalised = code.trim().toUpperCase();
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(promotions).where(eq(promotions.code, normalised)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.promotions.find(p => p.code.toUpperCase() === normalised);
+}
+
+export async function deletePromotion(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(promotions).where(eq(promotions.id, id));
+    return { success: true };
+  }
+  inMemoryStore.promotions = inMemoryStore.promotions.filter(p => p.id !== id);
+  return { success: true };
+}
+
+export async function incrementPromotionUsedCount(code: string) {
+  const normalised = code.trim().toUpperCase();
+  const db = await getDb();
+  if (db) {
+    await db.update(promotions).set({ usedCount: sql`${promotions.usedCount} + 1` }).where(eq(promotions.code, normalised));
+    return { success: true };
+  }
+  const promo = inMemoryStore.promotions.find(p => p.code.toUpperCase() === normalised);
+  if (promo) promo.usedCount++;
+  return { success: true };
+}
+
+// ==========================================
+// PAYMENTS WRAPPERS
+// ==========================================
+
+export async function createPayment(input: Omit<Payment, "id" | "status" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(payments).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newPayment: Payment = {
+    id,
+    ...input,
+    status: "pending",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.payments.unshift(newPayment);
+  return { id };
+}
+
+export async function listPayments(userId?: number) {
+  const db = await getDb();
+  if (db) {
+    if (userId) {
+      return db.select().from(payments).where(eq(payments.userId, userId)).orderBy(desc(payments.createdAt));
+    }
+    return db.select().from(payments).orderBy(desc(payments.createdAt));
+  }
+
+  if (userId) {
+    return inMemoryStore.payments.filter(p => p.userId === userId);
+  }
+  return inMemoryStore.payments;
+}
+
+export async function updatePaymentStatus(id: number, status: Payment["status"], reference?: string, method?: string) {
+  const db = await getDb();
+  if (db) {
+    const setClause: Partial<Payment> = { status };
+    if (reference) setClause.transactionReference = reference;
+    if (method) setClause.paymentMethod = method;
+    await db.update(payments).set(setClause).where(eq(payments.id, id));
+    return { success: true };
+  }
+
+  const pay = inMemoryStore.payments.find(p => p.id === id);
+  if (pay) {
+    pay.status = status;
+    if (reference) pay.transactionReference = reference;
+    if (method) pay.paymentMethod = method;
   }
   return { success: true };
 }

@@ -1,543 +1,458 @@
-# Bilingual Idol Language Centre (BILC) — Отчет о текущем состоянии проекта (Master Project Handover State)
+# Полный технический аудит проекта Bilingual Idol Language Centre (BILC)
 
-Этот документ представляет собой исчерпывающую техническую спецификацию и отчет о **фактическом текущем состоянии** кодовой базы и базы данных платформы **Bilingual Idol Language Centre (Pusat Bahasa Bilingual Idol)**. Он предназначен для передачи другому ассистенту, у которого нет прямого доступа к репозиторию, чтобы он мог полностью понять систему, её логику, структуру таблиц, API-эндпоинты и микроинтерфейсные решения, не заглядывая в исходный код.
-
----
-
-## 1. Концепция и Стратегическое позиционирование бренда
-
-**Bilingual Idol Language Centre (BILC)** — премиальный языковой центр в Куала-Лумпуре, Малайзия.
-*   **Государственная аккредитация:** Действующая лицензия Министерства высшего образования Малайзии (KPT/MOHE) № **WZ10104**.
-*   **Локация:** Элитный дипломатический квартал Pavilion Embassy, Menara G-Vestor, Jalan Ampang (в 2 минутах от башен-близнецов Petronas / KLCC).
-*   **Главный девиз:** *«Where Language Meets Luxury»* (Точка пересечения языка и роскоши).
-*   **Образовательный слоган:** *«Learn Today... Lead Tomorrow»*.
-*   **Миссия:** Предоставление высококлассного языкового образования, объединяющего академическую строгость с приватной атмосферой закрытого клуба.
+Данный документ фиксирует **фактическое текущее состояние** кодовой базы и архитектуры платформы Bilingual Idol Language Centre (BILC). Он составлен на основе прямого статического анализа файлов исходного кода, структуры БД Drizzle, tRPC роутеров и клиентских компонентов. Документ служит исчерпывающим техническим руководством для продолжения разработки и интеграции.
 
 ---
 
-## 2. Хронология Разработки и Промптов (История проекта)
+## 1. Ролевая модель
 
-Платформа развивалась через серию последовательных итераций, направленных на повышение безопасности, надежности типизации, глубину локализации и утонченность микроUX:
+Поле `role` в таблице `users` определяет уровень привилегий аккаунта в системе.
 
-1.  **Первоначальное развертывание:** Была выстроена базовая архитектура full-stack монорепозитория на основе Express + Vite + React + TypeScript с обменом данными через tRPC и хранением в СУБД MySQL под управлением Drizzle ORM.
-2.  **Запуск ролевой модели (RBAC) и логов безопасности:**
-    *   Реализована строгая многоуровневая система ролей пользователей.
-    *   Интегрировано автоматическое ведение журнала аудита (`audit_logs`) для записи критических административных и пользовательских сессий.
-    *   Внедрена фоновая процедура ротации логов (`scheduledAuditRotation`), которая автоматически переносит старые логи в таблицу архива и отправляет асинхронные уведомления в случае сбоев.
-3.  **Глубокая интернационализация (RTL/LTR) и адаптивная верстка:**
-    *   Платформа полностью локализована на 3 языка: английский (`en`), малайский (`ms`), арабский (`ar`).
-    *   Реализовано полное зеркалирование интерфейса в режиме RTL, замена физических CSS-свойств на логические, оптимизация типографики для арабской письменности, а также защита однонаправленных элементов (номера телефонов, цены) с помощью тегов `<bdi>`.
-4.  **Удаление устаревших модулей (Learning Hub Clean-up):**
-    *   Устаревший модуль "Learning Hub" (не имеющий привязки к реальной структуре учебного процесса) был полностью демонтирован из публичного доступа.
-    *   Все связанные маршруты tRPC были вычищены, а эндпоинты создания программ безопасности были переименованы (`addProgram`, `addTeamProfile`), чтобы предотвратить обход защитных механизмов.
-5.  **Финальный рефакторинг и стабилизация (Последние изменения):**
-    *   **Автозаполнение форм:** Поле логина на странице `FounderLogin.tsx` приведено к стандарту `autoComplete="email"`.
-    *   **Премиальные стили личного кабинета:** Контейнеры личных страниц студентов снабжены классами `.member-page` и `.blue-member-page` в соответствии с визуальным стилем бренда.
-    *   **Типобезопасность динамических полей:** В `server/db.ts` добавлен строгий тип `UserSystemFieldInput` для бесконфликтной обработки полей `"email"` и их маппинга в `"nickname"` на уровне хранения в БД.
-    *   Тестовое покрытие успешно проходит на 100% (все 121 тест успешно пройдены), проект компилируется без предупреждений.
-
----
-
-## 3. Архитектура и Структура каталогов монорепозитория
-
-Платформа представляет собой единый монорепозиторий, разделенный на клиентскую (SPA на React) и серверную (Express-сервер) части.
-
-```
-/
-├── client/                     # Фронтенд-приложение (Single Page Application)
-│   ├── src/
-│   │   ├── _core/              # Внутреннее ядро фронтенда (хуки, утилиты)
-│   │   │   └── hooks/
-│   │   │       └── useAuth.ts  # Хук авторизации и управления сессией
-│   │   ├── components/         # Компоненты интерфейса
-│   │   │   ├── founder/        # Компоненты консоли основателя
-│   │   │   ├── ui/             # Базовые UI-примитивы (кнопки, диалоги, подсказки)
-│   │   │   ├── AIChatBox.tsx   # Интерактивный чат-ассистент
-│   │   │   ├── BiDi.tsx        # Компонент для защиты RTL/LTR строк
-│   │   │   ├── DashboardLayout.tsx # Главный макет личных кабинетов
-│   │   │   ├── LanguageSwitcher.tsx # Переключатель языков интерфейса
-│   │   │   └── OfficialPriceList2026.tsx # Калькулятор и прайс-лист курсов
-│   │   ├── contexts/           # Контексты React (Язык, Тема оформления)
-│   │   ├── locales/            # Словари локализации (en, ms, ar)
-│   │   ├── pages/              # Страницы приложения (маршруты)
-│   │   │   ├── Admin.tsx       # Панель администрирования
-│   │   │   ├── FounderLogin.tsx# Авторизация основателя
-│   │   │   ├── SuperAdmin.tsx  # Панель супер-администратора
-│   │   │   ├── TeacherDashboard.tsx # Личный кабинет преподавателя
-│   │   │   ├── UserDashboard.tsx # Личный кабинет студента
-│   │   │   └── Home.tsx, About.tsx, Programs.tsx, Contact.tsx...
-│   │   ├── App.tsx             # Конфигурация клиентской маршрутизации (wouter)
-│   │   └── main.tsx            # Точка монтирования React
-│   └── index.html              # Основной HTML-файл с метатегами аккредитации
-├── server/                     # Бэкенд-приложение (Express / Node.js)
-│   ├── _core/                  # Ядро сервера (утилиты, tRPC-контекст, прокси)
-│   │   ├── context.ts          # Контекст tRPC (заполнение ctx.user)
-│   │   ├── cookies.ts          # Настройки сессионных кук
-│   │   ├── sdk.ts              # Интеграция с системным API и сессиями
-│   │   ├── systemRouter.ts     # Базовый системный роутер (health, notifyOwner)
-│   │   └── trpc.ts             # Определение процедур и middleware tRPC
-│   ├── routers/                # Модульные роутеры tRPC
-│   │   ├── audit.ts            # Роутер аудита логов
-│   │   ├── content.ts          # Роутер публичного контента и программ
-│   │   ├── marketing.ts        # Роутер маркетинговых инструментов и лидов
-│   │   ├── media.ts            # Роутер управления медиафайлами
-│   │   ├── news.ts             # Роутер управления новостями
-│   │   ├── studentAttendance.ts # Роутер посещаемости (для студентов)
-│   │   ├── students.ts         # Роутер ведения личных дел студентов (Founder)
-│   │   ├── submissions.ts      # Роутер обработки заявок и лидов
-│   │   ├── superAdminUsers.ts  # Роутер управления учетными записями (Super Admin)
-│   │   ├── teacher.ts          # Роутер классных сессий, оценок и посещаемости
-│   │   ├── translation.ts      # Роутер автоматического и динамического перевода
-│   │   └── users.ts            # Роутер управления пользователями и полями (Founder)
-│   ├── db.ts                   # Логика ORM, inMemory-хранилище (fallback), маппинг полей
-│   ├── founderAuth.ts          # Проверка паролей основателя и дефолтные хэши
-│   ├── founderIdentity.ts      # Идентификация email основателя
-│   ├── userAuth.ts             # Хэширование паролей пользователей (scrypt), пути дашбордов
-│   └── server.ts               # Точка входа Express, Vite Dev Middleware
-├── drizzle/                    # Директория миграций СУБД
-│   └── schema.ts               # Декларативное описание схемы таблиц (Drizzle)
-├── docs/                       # Файлы документации
-├── metadata.json               # Описание приложения и разрешения фрейма
-├── package.json                # Зависимости и скрипты запуска npm
-└── vite.config.ts              # Конфигурация сборщика Vite
+### Точное определение в схеме БД
+Буквальный тип и список значений поля `role` в Drizzle ORM (`drizzle/schema.ts`):
+```typescript
+role: mysqlEnum("role", [
+  "user",
+  "student",
+  "teacher",
+  "marketing",
+  "admin",
+  "super_admin",
+  "founder"
+]).default("student").notNull()
 ```
 
-### 3.1. Архитектурный цикл выполнения запросов (Runtime Flow)
-1.  **Раздача статики:** При обращении к приложению Express в dev-режиме использует Vite middleware для HMR, а в prod-режиме отдает готовую сборку из папки `dist/`.
-2.  **Запросы tRPC:** Все взаимодействие фронтенда с бэкендом типизировано с помощью tRPC.
-3.  **Аутентификация по сессиям:** При каждом запросе Middleware на сервере перехватывает куки `COOKIE_NAME`, декодирует токен сессии через `sdk.authenticateRequest`, находит пользователя в базе данных и сохраняет объект `user` в контексте tRPC (`ctx.user`).
-4.  **Разделение прав на сервере:** Каждая процедура бэкенда защищена специфичным tRPC-процедурным гвардом (например, `founderProcedure`, `teacherProcedure`). Если роль пользователя не совпадает с требуемой, tRPC выбрасывает ошибку `FORBIDDEN` до выполнения бизнес-логики.
+### Спецификация ролей и полномочий
+1. **`founder` (Основатель)**:
+   - Абсолютный суперпользователь системы.
+   - Единственная роль, имеющая доступ к системным настройкам портала (`siteSettings`), полному просмотру журнала аудита (включая действия супер-администратора) и **полному управлению Dynamic Profile Builder** (создание секций, полей, реордеринг и изменение базовых полей).
+   - Может управлять любыми пользователями в системе, включая `super_admin` и `admin`.
+2. **`super_admin` (Супер-администратор)**:
+   - Технический администратор второго уровня.
+   - Обладает доступом к просмотру системного журнала безопасности (`auditLogs`) с ограничением: записи, действия или описания, содержащие упоминание роли `founder`, для него фильтруются (скрываются) на уровне БД.
+   - Может управлять учетными записями пользователей (создание, редактирование, удаление), но строго в ограниченных рамках: ему разрешено управлять ролями `student`, `teacher`, `marketing` и `admin`. Он **не может** просматривать, изменять или удалять учетные записи `super_admin` или `founder`.
+   - Не имеет доступа к редактированию структуры Dynamic Profile Builder (только к просмотру схемы полей при создании пользователей).
+3. **`admin` (Администратор / Менеджер портала)**:
+   - Роль, управляющая повседневной академической и операционной деятельностью (обработка заявок на обучение, управление курсами, ведение студентов).
+   - В документах используется двойное написание `"admin/super_admin"` из-за того, что они разделяют общие доменные процедуры (например, управление студенческими документами, редактирование программ обучения). Однако технически в кодовой базе это **две разные роли** с разной степенью контроля (у `super_admin` шире права по ведению учетных записей администраторов, а `admin` сфокусирован на контенте и CRM-заявках).
+4. **`marketing` (Маркетолог / Контент-менеджер)**:
+   - Специализированная роль для ведения рекламных акций и управления контентом.
+   - Имеет доступ к управлению справочником активных промокодов (`promotions`), настройкам CTA-элементов на главной странице, отслеживанию рекламных пикселей, рассылкам в WhatsApp и ведению лидов/заявок.
+5. **`teacher` (Преподаватель)**:
+   - Роль с доступом только к преподавательскому кабинету.
+   - Просмотр расписания своих занятий, заполнение посещаемости (attendance) студентов, выставление и публикация академических оценок (grades).
+6. **`student` (Студент / Ученик)**:
+   - Роль для зачисленных учащихся.
+   - Доступ к просмотру своей посещаемости, оценок, расписания занятий и загрузке необходимых документов (паспорт, виза).
+7. **`user` (Зарегистрированный пользователь)**:
+   - Начальная роль по умолчанию для пользователей, которые зарегистрировались, но еще не прошли процедуру зачисления или не получили статус студента/преподавателя. Используется для прохождения первого этапа сбора профильных данных (onboarding).
+
+### Реализация процедур авторизации (tRPC Middleware)
+Физическая проверка ролей реализована в файле `server/_core/trpc.ts`. Вот точные сигнатуры и логика ограничений из кода:
+
+```typescript
+/** Проверка авторизации (наличие сессии пользователя) */
+const requireUser = t.middleware(async opts => {
+  const { ctx, next } = opts;
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Authentication is required." });
+  }
+  return next({ ctx: { ...ctx, user: ctx.user } });
+});
+export const protectedProcedure = t.procedure.use(requireUser);
+
+/** Доступ только для студентов */
+export const studentProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== "student") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+/** Доступ только для преподавателей */
+export const teacherProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== "teacher") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+/** Доступ для административной команды (Admin, Super Admin, Founder) */
+export const adminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !['admin', 'super_admin', 'founder'].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is restricted." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+/** Доступ для контент-менеджеров и маркетологов */
+export const contentManagerProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !['admin', 'marketing', 'super_admin', 'founder'].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is restricted to content managers." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+export const marketingProcedure = contentManagerProcedure;
+
+/** Доступ только для Founder */
+export const founderProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== 'founder') {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+/** Доступ только для Super Admin */
+export const superAdminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== "super_admin") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+/** Просмотр журнала аудита (только Founder и Super Admin) */
+export const auditProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !["founder", "super_admin"].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+```
+
+### Иерархия ролей
+Строгой линейной иерархии (где любая вышестоящая роль включает 100% прав нижестоящей) нет — доступ разбит по плоскостям ответственности. Однако роли `founder` и `super_admin` являются доминирующими в технической плоскости администрирования пользователей, а `admin` и `marketing` доминируют в плоскости ведения учебного процесса и контента.
 
 ---
 
-## 4. Схема Базы Данных (Спецификация Drizzle ORM)
+## 2. Схема базы данных
 
-Все таблицы описаны на уровне Drizzle ORM в файле `/drizzle/schema.ts` и развернуты в MySQL (или эмулируются через строгое in-memory хранилище в `server/db.ts` в случае отсутствия соединения с БД).
+Проект использует **Drizzle ORM** с базой данных **MySQL** (описания таблиц используют `mysqlTable` и типы из пакета `drizzle-orm/mysql-core`). В коде предусмотрен двухрежимный драйвер: при отсутствии переменной среды `DATABASE_URL` бэкенд бесшовно переключается на встроенный реактивный объект-хранилище `inMemoryStore` (особенно полезно для бесперебойного прохождения CI/CD и демонстрации функционала во фреймах).
 
-### 4.1. Глобальная ролевая модель (User Roles)
-Роль пользователя хранится в поле `role` таблицы `users` и определяется типом `mysqlEnum`:
-*   `"user"` — Устаревший/базовый зарегистрированный пользователь.
-*   `"student"` — Студент центра (имеет доступ к `UserDashboard.tsx` с расписанием и оценками).
-*   `"teacher"` — Преподаватель центра (имеет доступ к `TeacherDashboard.tsx` для ведения журнала).
-*   `"marketing"` — Маркетолог (управляет лидами, промо-акциями, рассылками).
-*   `"admin"` — Администратор (управляет учебным процессом, программами, приемом студентов).
-*   `"super_admin"` — Супер-администратор (управляет учетными записями персонала, политиками безопасности).
-*   `"founder"` — Основатель бренда (имеет неограниченный доступ ко всем контурам, финансовой аналитике, изменению системных полей).
+### Список таблиц и их назначение
 
----
-
-### 4.2. Спецификация Таблиц
-
-#### 1. `users` — Учетные записи пользователей
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `openId`: `varchar(64)` (Unique, Not Null) — Уникальный идентификатор авторизации
-*   `name`: `text` (Nullable) — Имя пользователя
-*   `email`: `varchar(320)` (Nullable) — Электронная почта (или имя аккаунта)
-*   `passwordHash`: `text` (Nullable) — Хэш пароля (алгоритм `scrypt`)
-*   `isActive`: `boolean` (Default: `true`, Not Null) — Статус активности
-*   `loginMethod`: `varchar(64)` (Nullable) — Способ авторизации (например, `"email_password"`)
-*   `role`: `mysqlEnum` (["user", "student", "teacher", "marketing", "admin", "super_admin", "founder"], Default: `"student"`, Not Null)
-*   `createdAt`: `timestamp` (Default: `Now`, Not Null)
-*   `updatedAt`: `timestamp` (Default: `Now`, OnUpdateNow, Not Null)
-*   `lastSignedIn`: `timestamp` (Default: `Now`, Not Null)
-
-#### 2. `userFormSections` — Разделы динамического конструктора профилей
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `title`: `varchar(160)` (Not Null) — Название раздела (например, «Личные данные»)
-*   `icon`: `varchar(64)` (Default: `"ClipboardList"`, Not Null) — Имя иконки Lucide
-*   `sortOrder`: `int` (Default: `0`, Not Null) — Порядок отображения
-*   `isActive`: `boolean` (Default: `true`, Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 3. `userFormFields` — Настраиваемые поля профилей
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `key`: `varchar(80)` (Unique, Not Null) — Уникальный ключ поля (например, `"phone_number"`)
-*   `label`: `varchar(160)` (Not Null) — Лейбл для ввода на фронтенде
-*   `fieldType`: `mysqlEnum` (["text", "textarea", "number", "date", "dropdown", "checkbox"], Not Null)
-*   `isRequired`: `boolean` (Default: `false`, Not Null)
-*   `sortOrder`: `int` (Default: `0`, Not Null)
-*   `placeholder`: `varchar(255)` (Nullable)
-*   `optionsJson`: `text` (Nullable) — Варианты выбора в формате JSON для типа `dropdown`
-*   `sectionId`: `int` (Nullable, внешний ключ на `userFormSections`)
-*   `isActive`: `boolean` (Default: `true`, Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 4. `userProfileValues` — Значения полей заполненных профилей
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `userId`: `int` (Not Null)
-*   `fieldId`: `int` (Not Null)
-*   `value`: `text` (Not Null) — Текстовое значение заполненного поля
-*   `createdAt` / `updatedAt`: `timestamp`
-*   *Индексы:* Уникальный индекс `userProfileValues_user_field_unique` на связку `(userId, fieldId)`.
-
-#### 5. `programs` — Каталог образовательных программ
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `slug`: `varchar(160)` (Unique, Not Null) — URL-слаг курса
-*   `title`: `varchar(180)` (Not Null) — Название курса
-*   `language`: `varchar(80)` (Not Null) — Язык обучения
-*   `category`: `varchar(100)` (Not Null) — Категория курса
-*   `ageGroup`: `varchar(100)` (Not Null) — Возрастная группа
-*   `level`: `varchar(100)` (Not Null) — Уровень
-*   `duration`: `varchar(120)` (Not Null) — Продолжительность
-*   `schedule`: `varchar(180)` (Not Null) — Расписание
-*   `fees`: `varchar(180)` (Not Null) — Стоимость / Сетка оплат
-*   `description`: `text` (Not Null) — Текстовое описание
-*   `faqJson`: `text` (Nullable) — Массив часто задаваемых вопросов в JSON
-*   `outcomes`: `text` (Nullable) — Ожидаемые результаты обучения
-*   `imageUrl`: `varchar(1024)` (Nullable) — Ссылка на обложку
-*   `ctaLabel` / `ctaUrl`: `varchar` (Nullable) — Настройки кнопки призыва к действию
-*   `seoTitle` / `seoDescription`: `varchar` (Nullable) — Свойства поисковой оптимизации
-*   `seatsEnrolled`: `int` (Default: `0`, Not Null) — Количество зачисленных студентов
-*   `teacherId`: `int` (Nullable) — Назначенный преподаватель
-*   `isActive`: `boolean` (Default: `true`, Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 6. `submissions` — Заявки на обучение и лиды с сайта
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `type`: `mysqlEnum` (["enrollment", "inquiry"], Not Null) — Тип обращения (зачисление / общий запрос)
-*   `studentName`: `varchar(160)` (Not Null)
-*   `studentAge`: `int` (Not Null)
-*   `parentName`: `varchar(160)` (Not Null)
-*   `parentEmail`: `varchar(320)` (Not Null)
-*   `parentPhone`: `varchar(64)` (Not Null)
-*   `programInterest`: `varchar(180)` (Not Null) — Выбранная программа
-*   `preferredSchedule`: `varchar(180)` (Not Null) — Пожелания по расписанию
-*   `message`: `text` (Nullable)
-*   `source`: `varchar(100)` (Default: `"website"`, Not Null) — Источник трафика
-*   `status`: `mysqlEnum` (["new", "contacted", "interested", "enrolled", "closed"], Default: `"new"`, Not Null) — Воронка лида
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 7. `announcements` — Новости и важные уведомления
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `slug`: `varchar(180)` (Unique, Not Null)
-*   `title`: `varchar(220)` (Not Null)
-*   `excerpt`: `text` (Not Null) — Краткое описание для карточки новости
-*   `body`: `text` (Not Null) — Основной текст в разметке Markdown
-*   `category`: `mysqlEnum` (["announcement", "event", "holiday"], Default: `"announcement"`, Not Null)
-*   `imageUrl` / `imageStorageKey` / `imageAltText`: `varchar` (Nullable) — Изображение
-*   `isPublished`: `boolean` (Default: `false`, Not Null)
-*   `publishedAt`: `timestamp` (Nullable)
-*   `createdAt` / `updatedAt`: `timestamp`
-*   *Индексы:* Составной индекс `announcements_public_page_idx` на `(isPublished, publishedAt, createdAt)` для быстрой постраничной выборки.
-
-#### 8. `testimonials` — Модуль реальных отзывов
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `authorName`: `varchar(160)` (Not Null) — Имя студента
-*   `relation`: `varchar(100)` (Not Null) — Связь (например, «Студент из Узбекистана»)
-*   `quote`: `text` (Not Null) — Текст отзыва
-*   `rating`: `int` (Not Null) — Оценка (1-5)
-*   `approved`: `boolean` (Default: `false`, Not Null) — Одобрено ли для публикации на сайте
-*   `consentConfirmed`: `boolean` (Default: `false`, Not Null) — Согласие на обработку персональных данных
-*   `createdAt`: `timestamp`
-
-#### 9. `teamProfiles` — Профили преподавателей и команды
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `name`: `varchar(160)` (Not Null)
-*   `role`: `varchar(160)` (Not Null) — Должность
-*   `languages`: `varchar(320)` (Not Null) — Владение языками
-*   `bio`: `text` (Not Null) — Биография
-*   `isPublished`: `boolean` (Default: `false`, Not Null)
-*   `sortOrder`: `int` (Default: `0`, Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 10. `siteSettings` — Ключевые системные настройки (KeyValue)
-*   `key`: `varchar(80)` (Primary Key)
-*   `value`: `text` (Not Null)
-*   `updatedAt`: `timestamp`
-
-#### 11. `publicMedia` — Интерактивная медиабиблиотека
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `slot`: `varchar(80)` (Unique, Not Null) — Уникальный слот использования (например, `"home_hero_video"`)
-*   `label`: `varchar(160)` (Not Null) — Человекочитаемое название
-*   `kind`: `mysqlEnum` (["image", "video"], Not Null)
-*   `altText`: `varchar(255)` (Not Null) — Доступное описание для скринридеров
-*   `mimeType`: `varchar(100)` (Not Null)
-*   `fileSize`: `int` (Not Null)
-*   `storageKey`: `varchar(512)` (Not Null) — Ключ хранения файла в облаке
-*   `publicUrl`: `varchar(1024)` (Not Null) — Публичная ссылка
-*   `isPublished`: `boolean` (Default: `true`, Not Null)
-*   `createdByUserId`: `int` (Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-*   *Индексы:* Индексы на публикацию (`isPublished, kind`) и создателя (`createdByUserId, updatedAt`).
-
-#### 12. `auditLogs` — Журнал системного аудита
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `actorUserId`: `int` (Nullable) — Кто совершил действие
-*   `actorRole`: `varchar(32)` (Nullable) — Роль совершившего действие
-*   `action`: `varchar(100)` (Not Null) — Название операции
-*   `targetType`: `varchar(100)` (Not Null) — Тип измененной сущности
-*   `targetId`: `varchar(160)` (Nullable) — Идентификатор измененной сущности
-*   `targetRole`: `varchar(32)` (Nullable) — Роль затронутого пользователя (при изменении учетных записей)
-*   `description`: `varchar(500)` (Not Null) — Полное текстовое описание события
-*   `isSuccess`: `boolean` (Default: `true`, Not Null) — Статус успешности операции
-*   `ipAddress`: `varchar(64)` (Nullable)
-*   `browser` / `operatingSystem` / `userAgent`: (Nullable) — Данные окружения
-*   `metadataJson`: `text` (Nullable) — Дополнительные системные данные в формате JSON
-*   `createdAt`: `timestamp`
-*   *Индексы:* Полноценное индексирование по всем ключевым полям (`createdAt`, `actorUserId`, `action`, `targetType`, `isSuccess`, `ipAddress`) для ускоренной фильтрации сотен тысяч записей.
-
-#### 13. `auditLogArchives` — Архив журнала аудита
-*   Полный дубликат полей `auditLogs`, дополненный полями:
-    *   `originalLogId`: `int` (Unique, Not Null) — Исходный ID лога
-    *   `archivedAt`: `timestamp` (Default: `Now`, Not Null) — Время архивации
-    *   `archivedByUserId`: `int` (Nullable) — ID администратора или фонового процесса
-
-#### 14. `studentProfiles` — Личные дела студентов (Founder-контур)
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `userId`: `int` (Not Null, Unique) — Внешний ключ на учетную запись `users`
-*   `guardianName`: `varchar(160)` (Nullable) — Имя опекуна
-*   `guardianPhone`: `varchar(64)` (Nullable) — Телефон опекуна
-*   `contactEmail`: `varchar(320)` (Nullable) — Контактный email
-*   `dateOfBirth`: `date` (Nullable)
-*   `address`: `text` (Nullable)
-*   `notes`: `text` (Nullable)
-*   `attendedSessions`: `int` (Default: `0`, Not Null) — Посещенные занятия
-*   `totalSessions`: `int` (Default: `0`, Not Null) — Всего назначено занятий
-*   `currentLevel`: `varchar(120)` (Nullable) — Текущий языковой уровень студента
-*   `courseName` / `courseCode`: `varchar` (Nullable) — Название и код курса
-*   `courseStartDate` / `courseEndDate`: `date` (Nullable) — Границы учебного контракта
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 15. `studentDocuments` — Документы и визовые файлы студентов
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `studentId`: `int` (Not Null, ссылка на `studentProfiles`)
-*   `fileName` / `mimeType` / `fileSize` / `storageKey`: (Not Null) — Свойства файла
-*   `uploadedByUserId`: `int` (Not Null)
-*   `createdAt`: `timestamp`
-
-#### 16. `studentProfileHistory` — История изменений дел студентов
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `studentId`: `int` (Not Null)
-*   `actorUserId`: `int` (Not Null)
-*   `eventType`: `varchar(80)` (Not Null) — Тип операции (например, `"level_update"`)
-*   `changesJson`: `text` (Nullable) — JSON-слепок измененных полей
-*   `createdAt`: `timestamp`
-
-#### 17. `classSessions` — Расписание занятий и академические сессии
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `title`: `varchar(180)` (Not Null) — Тема урока
-*   `courseName`: `varchar(180)` (Not Null) — Программа
-*   `teacherId`: `int` (Not Null, внешняя ссылка на `users`) — Преподаватель
-*   `studentId`: `int` (Not Null, внешняя ссылка на `users`) — Студент
-*   `scheduledFor`: `date` (Not Null) — Дата проведения
-*   `startsAt` / `endsAt`: `varchar(8)` (Not Null) — Время начала и конца (например, `"10:00"`)
-*   `room`: `varchar(120)` (Nullable) — Номер смарт-класса
-*   `status`: `mysqlEnum` (["scheduled", "completed", "cancelled"], Default: `"scheduled"`, Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-
-#### 18. `attendanceRecords` — Посещаемость занятий
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `classSessionId`: `int` (Not Null, ссылка на `classSessions`)
-*   `studentId`: `int` (Not Null, ссылка на `users`)
-*   `status`: `mysqlEnum` (["present", "absent", "late", "excused"], Default: `"present"`, Not Null)
-*   `method`: `mysqlEnum` (["manual", "qr"], Default: `"manual"`, Not Null) — Способ отметки (вручную / по QR-коду)
-*   `note`: `text` (Nullable) — Заметка преподавателя
-*   `markedByTeacherId`: `int` (Not Null, ссылка на `users`)
-*   `markedAt` / `updatedAt`: `timestamp`
-*   *Индексы:* Уникальный индекс `attendanceRecords_session_student_unique` на `(classSessionId, studentId)`.
-
-#### 19. `grades` — Оценки и отзывы успеваемости
-*   `id`: `int` (Primary Key, Autoincrement)
-*   `classSessionId`: `int` (Not Null)
-*   `studentId`: `int` (Not Null)
-*   `title`: `varchar(160)` (Not Null) — Название задания (например, `"IELTS Mock Speaking"`)
-*   `score`: `int` (Not Null) — Набранный балл
-*   `maxScore`: `int` (Not Null) — Максимально возможный балл
-*   `feedback`: `text` (Nullable) — Развернутый фидбек преподавателя
-*   `isPublished`: `boolean` (Default: `false`, Not Null) — Опубликовано ли для студента
-*   `publishedAt`: `timestamp` (Nullable)
-*   `gradedByTeacherId`: `int` (Not Null)
-*   `createdAt` / `updatedAt`: `timestamp`
-*   *Индексы:* Уникальный индекс `grades_session_student_title_unique` на `(classSessionId, studentId, title)`.
-
-#### Дополнительные таблицы маркетингового контура:
-*   `contentBlocks` — Динамические блоки страниц
-*   `events` — Публичные мероприятия
-*   `blogPosts` — Статьи блога
-*   `galleryMedia` — Публичная галерея
-*   `contentPages` — Целевые посадочные страницы (Landing Pages)
-*   `whatsappEntryPoints` — Динамические кнопки WhatsApp
-*   `chatbotFaqEntries` — База ответов чат-бота
-*   `socialLinks` — Ссылки на соцсети
-*   `translations` — Переводы динамических сущностей базы данных
-*   `mediaAssets` — Маркетинговые баннеры
-*   `audienceSegments` — Сегменты лидов
-*   `leadSources` — Справочник источников лидов (Facebook, Instagram, Organic...)
-*   `messageTemplates` — Шаблоны уведомлений (Email, SMS, WhatsApp)
+| Имя таблицы в БД | Связанная TS-переменная схемы | Назначение / Содержимое |
+| :--- | :--- | :--- |
+| `users` | `users` | Учетные записи всех пользователей (email, passwordHash, роль, флаг активности). |
+| `userFormSections` | `userFormSections` | Секции (группы) кастомных полей профиля в Dynamic Profile Builder. |
+| `userFormFields` | `userFormFields` | Конфигурация кастомных полей профиля в Dynamic Profile Builder (тип поля, обязательность, валидация). |
+| `userProfileValues` | `userProfileValues` | Значения кастомных полей профиля, заполненные конкретными пользователями. |
+| `programs` | `programs` | Учебные курсы и программы (описания, расписание, стоимость, SEO-теги). |
+| `submissions` | `submissions` | Заявки от посетителей сайта (формы обратной связи, заказ звонка, запись на кампус-тур). |
+| `announcements` | `announcements` | Школьные объявления, новости, праздничные даты. |
+| `testimonials` | `testimonials` | Отзывы студентов и родителей (с полями модерации `approved` и подтверждения согласия). |
+| `teamProfiles` | `teamProfiles` | Профили преподавателей и администрации для вывода на странице "About". |
+| `siteSettings` | `siteSettings` | Глобальные настройки сайта (пары ключ-значение), включая конфигурацию системных полей. |
+| `publicMedia` | `publicMedia` | Соответствие медиа-ассетов конкретным слотам баннеров на сайте. |
+| `auditLogs` | `auditLogs` | Действующий (активный) журнал аудита безопасности. |
+| `auditLogArchives` | `auditLogArchives` | Архив журнала аудита для записей старше 12 месяцев. |
+| `studentProfiles` | `studentProfiles` | Дополнительные академические данные студентов. |
+| `studentDocuments` | `studentDocuments` | Студенческие документы (сканы паспортов, визовые файлы). |
+| `studentProfileHistory` | `studentProfileHistory` | Лог изменений профилей студентов. |
+| `classSessions` | `classSessions` | Академическое расписание уроков и занятий. |
+| `attendanceRecords` | `attendanceRecords` | Журнал посещаемости занятий студентами (статусы: `present`, `absent`, `late`, `excused`). |
+| `grades` | `grades` | Оценки студентов за тесты, экзамены или домашние задания. |
+| `contentBlocks` | `contentBlocks` | Настраиваемые блоки разметки на посадочных страницах. |
+| `events` | `events` | События центра (дни открытых дверей, даты новых наборов). |
+| `blogPosts` | `blogPosts` | Публикации в блоге центра. |
+| `galleryMedia` | `galleryMedia` | Галерея фотографий учебного корпуса Pavilion Embassy. |
+| `contentPages` | `contentPages` | Дополнительные статические/динамические веб-страницы. |
+| `whatsappEntryPoints` | `whatsappEntryPoints` | Конфигурация консьерж-виджетов WhatsApp с разбивкой по темам. |
+| `chatbotFaqEntries` | `chatbotFaqEntries` | База знаний для умного автоответчика. |
+| `socialLinks` | `socialLinks` | Настройки ссылок на социальные сети центра. |
+| `translations` | `translations` | Словарь кэшированных переводов для автоматического переводчика. |
+| `mediaAssets` | `mediaAssets` | Загруженные файлы в библиотеке медиафайлов. |
+| `audienceSegments` | `audienceSegments` | Рекламные и маркетинговые сегменты лидов. |
+| `leadSources` | `leadSources` | Источники трафика для заявок. |
+| `messageTemplates` | `messageTemplates` | Шаблоны маркетинговых рассылок. |
+| `registrationSubmissions` | `registrationSubmissions`| Заявки на зачисление (enrollment) через форму регистрации. |
+| `registrationSubmissionValues`| `registrationSubmissionValues` | Ответы на кастомные вопросы формы регистрации. |
+| `applications` | `applications` | Статусы рассмотрения заявок на зачисление. |
+| `placementTests` | `placementTests` | Определения онлайн-тестов на определение уровня владения языком. |
+| `placementTestAttempts` | `placementTestAttempts`| Результаты прохождения тестов пользователями (баллы, определенный уровень). |
+| `promotions` | `promotions` | Справочник скидок и рекламных предложений (промокоды, лимиты использований). |
+| `payments` | `payments` | Записи о транзакциях и оплате обучения. |
 
 ---
 
-## 5. Спецификация Backend API (tRPC роутеры и гварды)
+## 3. Маршруты и роутеры Backend (tRPC)
 
-Все роутеры регистрируются в главном файле объединения `/server/routers.ts`. Каждый метод строго типизирован и защищен соответствующей процедурой tRPC из `/server/_core/trpc.ts`.
+tRPC-роутеры находятся в `server/routers/` и регистрируются в главном роутере `server/routers.ts`.
 
-### 5.1. Карта процедурных гвардов
-*   `publicProcedure` — Общедоступный вызов. Авторизация не проверяется.
-*   `protectedProcedure` — Требует любого авторизованного пользователя (`ctx.user !== null`).
-*   `studentProcedure` — Требует пользователя с ролью `student`.
-*   `teacherProcedure` — Требует пользователя с ролью `teacher`.
-*   `adminProcedure` — Допускаются только роли: `admin`, `super_admin`, `founder`.
-*   `contentManagerProcedure` (экспортируется также как `marketingProcedure`) — Допускаются роли: `marketing`, `admin`, `super_admin`, `founder`.
-*   `superAdminProcedure` — Требует строго роль `super_admin`.
-*   `founderProcedure` — Допускается только роль `founder`.
-*   `auditProcedure` — Допускаются только роли `founder` и `super_admin`.
+### Полный реестр процедур и уровней доступа
 
----
-
-### 5.2. Сводная таблица эндпоинтов
-
-#### Роутер `auth` (Авторизация)
-*   `me`: `publicProcedure.query` — Возвращает данные текущего сессионного пользователя или `null`.
-*   `login`: `publicProcedure.input(z.object({ email: z.string(), password: z.string() })).mutation` —
-    Выполняет сопоставление логина (через nickname или email), верифицирует пароль (или супер-пароль основателя), записывает куку сессии и возвращает путь редиректа в зависимости от роли.
-*   `logout`: `publicProcedure.mutation` — Очищает куки сессии и завершает авторизацию.
-
-#### Роутер `users` (Управление пользователями — Founder)
-*   `list`: `founderProcedure.input(filters)`.query — Выборка пользователей.
-*   `byId`: `founderProcedure.input(id)`.query — Запрос конкретного пользователя.
-*   `formSchema`: `founderProcedure.query` — Загружает структуру системных и динамических полей.
-*   `updateSystemFields`: `founderProcedure.input(...)`.mutation — Модификация системных полей.
-*   `createSection` / `updateSection` / `removeSection`: `founderProcedure.mutation` — Управление разделами конструктора.
-*   `createField` / `updateField` / `removeField` / `reorderFields`: `founderProcedure.mutation` — Управление динамическими полями.
-*   `create`: `founderProcedure.input(...)`.mutation — Создание учетной записи и заполнение профиля.
-*   `update`: `founderProcedure.input(...)`.mutation — Редактирование профиля и смена пароля.
-*   `remove`: `founderProcedure.input(id)`.mutation — Удаление пользователя.
-
-#### Роутер `superAdminUsers` (Управление персоналом — Super Admin)
-*   Предоставляет аналогичные методы (`list`, `byId`, `create`, `update`, `remove`), но защищен исключительно через `superAdminProcedure` и ограничен управлением не-основательскими ролями: `["student", "teacher", "marketing", "admin"]`.
-
-#### Роутер `students` (Учебные дела студентов — Founder)
-*   `list`: `founderProcedure.input(filters)`.query — Запрос реестра дел студентов.
-*   `byId`: `founderProcedure.input(studentId)`.query — Полная информация, включая прикрепленные файлы, историю изменений и оценки.
-*   `create` / `update` / `remove`: `founderProcedure.mutation` — Ведение личного дела студента.
-*   `uploadDocument` / `removeDocument`: `founderProcedure.mutation` — Прикрепление скан-копий контрактов/виз.
-
-#### Роутер `teacher` (Контур преподавателя)
-*   `schedule`: `teacherProcedure.input(...)`.query — Загрузка расписания уроков преподавателя.
-*   `sessionDetails`: `teacherProcedure.input(...)`.query — Подробности конкретного урока.
-*   `attendance`: `teacherProcedure.input(...)`.query — Просмотр списка студентов и их статуса отметки на уроке.
-*   `saveAttendance`: `teacherProcedure.input(...)`.mutation — Сохранение посещаемости (present, absent, late, excused).
-*   `upsertGrade`: `teacherProcedure.input(...)`.mutation — Выставление оценки за выполненное задание.
-*   `publishGrade`: `teacherProcedure.input(...)`.mutation — Публикация оценки (становится видимой студенту).
-
-#### Роутер `studentAttendance` (Посещаемость студента)
-*   `summary`: `studentProcedure.query` — Загрузка статистики посещенных и пропущенных уроков, а также детализированного журнала посещаемости для текущего вошедшего студента.
-
-#### Роутер `audit` (Аудит логов безопасности)
-*   `list`: `auditProcedure.input(...)`.query — Вывод логов с фильтрами по времени, роли и успешности.
-*   `suggestions`: `auditProcedure.input(...)`.query — Автозаполнение фильтров.
-*   `exportCsv` / `exportPdf`: `auditProcedure.input(...)`.mutation — Экспорт отчетов безопасности.
-*   `archive`: `founderProcedure.mutation` — Ручной запуск архивации логов старше 90 дней.
-*   `restore`: `founderProcedure.input(...)`.mutation — Восстановление записей из архива в основной журнал логов.
-
-#### Роутер `media` (Интерактивная медиабиблиотека)
-*   `publicList`: `publicProcedure.query` — Запрос опубликованных промо-файлов.
-*   `list`: `founderProcedure.query` — Полный каталог медиатеки.
-*   `upload`: `founderProcedure.input(...)`.mutation — Загрузка файла (slot, label, altText, Base64).
-*   `update`: `founderProcedure.input(...)`.mutation — Изменение атрибутов и флагов публикации.
-*   `remove`: `founderProcedure.input(id)`.mutation — Удаление медиаресурса.
-
-#### Роутер `news` (Управление новостями)
-*   `publicPage`: `publicProcedure.input(...)`.query — Вывод публичной ленты анонсов.
-*   `list` / `create` / `update` / `remove`: `founderProcedure.mutation` — Администрирование публикаций.
-
-#### Роутер `marketing` (Маркетинговые инструменты)
-*   Более 30 методов (`listBlogPosts`, `createBlogPost`, `listWhatsappEntryPoints`, `chatbotFaq`, `audienceSegments`, `exportReportCsv`, `messageTemplates` и т.д.), защищенных `contentManagerProcedure` для повседневного редактирования контента, и метод `toggleAllowMarketingPixelManagement` под защитой `superAdminProcedure`.
-
-#### Роутер `translation` (Мультиязычный перевод)
-*   `translate` / `batchTranslate` / `registerCustomTerms` / `getLexicon`: `publicProcedure` — Обеспечивают мгновенный синхронный и асинхронный перевод динамического контента на лету.
+| Роутер (файл в `server/routers/`) | Имя процедуры | Тип | Доступ | Описание |
+| :--- | :--- | :--- | :--- | :--- |
+| **`auth`** | `me` | `query` | `publicProcedure` | Возвращает объект текущего авторизованного пользователя. |
+| | `login` | `mutation` | `publicProcedure` | Авторизация по email/nickname и паролю. Устанавливает куку `session_token`. |
+| | `logout` | `mutation` | `publicProcedure` | Очищает сессионные куки. |
+| **`content`** | `publicAnnouncements` | `query` | `publicProcedure` | Список опубликованных объявлений. |
+| | `publicPrograms` | `query` | `publicProcedure` | Список активных учебных программ. |
+| | `publicProgram` | `query` | `publicProcedure` | Получение программы по ее `slug`. |
+| | `publicTestimonials` | `query` | `publicProcedure` | Список промодерированных отзывов. |
+| | `publicTeamProfiles` | `query` | `publicProcedure` | Список профилей преподавателей. |
+| | `siteSettings` | `query` | `publicProcedure` | Получение публичных настроек сайта. |
+| | `listPrograms` | `query` | `adminProcedure` | Полный список программ (для админ-панели). |
+| | `addProgram` | `mutation` | `adminProcedure` | Добавление новой программы. |
+| | `updateProgram` | `mutation` | `adminProcedure` | Обновление программы. |
+| | `deleteProgram` | `mutation` | `adminProcedure` | Удаление программы. |
+| | `listTestimonials` | `query` | `adminProcedure` | Список всех отзывов для модерации. |
+| | `createTestimonial` | `mutation` | `adminProcedure` | Создание отзыва. |
+| | `updateTestimonial` | `mutation` | `adminProcedure` | Изменение и модерация отзыва. |
+| | `deleteTestimonial` | `mutation` | `adminProcedure` | Удаление отзыва. |
+| | `listTeamProfiles` | `query` | `adminProcedure` | Список всех профилей сотрудников. |
+| | `addTeamProfile` | `mutation` | `adminProcedure` | Добавление сотрудника. |
+| | `updateTeamProfile` | `mutation` | `adminProcedure` | Изменение профиля сотрудника. |
+| | `deleteTeamProfile` | `mutation` | `adminProcedure` | Удаление сотрудника. |
+| | `updateSiteSettings` | `mutation` | `founderProcedure` | Обновление глобальных настроек сайта. |
+| | `updateMarketingPromo` | `mutation` | `contentManagerProcedure`| Обновление данных глобального промо-баннера. |
+| **`promotions`** | `validate` | `mutation` | `publicProcedure` | Проверка и расчет скидки по промокоду. |
+| | `list` | `query` | `marketingProcedure` | Список всех промо-акций в справочнике. |
+| | `publicList` | `query` | `publicProcedure` | Список публичных активных промо-акций для главной. |
+| | `create` | `mutation` | `marketingProcedure` | Добавление новой промо-акции/скидки. |
+| | `delete` | `mutation` | `marketingProcedure` | Удаление промо-акции. |
+| **`payments`** | `create` | `mutation` | `publicProcedure` | Инициализация платежа (генерация квитанции). |
+| | `list` | `query` | `publicProcedure` | Студенты видят свои платежи, администраторы — все. |
+| | `updateStatus` | `mutation` | `adminProcedure` | Ручное изменение статуса платежа администратором. |
+| | `simulateToyyibpayWebhook` | `mutation` | `publicProcedure` | Имитация вебхука от ToyyibPay для зачисления платежей. |
+| **`audit`** | `list` | `query` | `auditProcedure` | Постраничный список логов аудита с фильтрами. |
+| | `suggestions` | `query` | `auditProcedure` | Автодополнение поисковых запросов в журнале. |
+| | `exportCsv` | `mutation` | `auditProcedure` | Экспорт отфильтрованных логов аудита в формате CSV. |
+| | `exportPdf` | `mutation` | `auditProcedure` | Экспорт отфильтрованных логов аудита в формате PDF (Base64). |
+| | `archive` | `mutation` | `founderProcedure` | Архивация логов старше 12 месяцев. |
+| | `restore` | `mutation` | `founderProcedure` | Восстановление логов из архива в активную таблицу. |
+| **`students`** | `list` | `query` | `founderProcedure` | Постраничный список профилей студентов. |
+| | `byId` | `query` | `founderProcedure` | Профиль студента по его ID. |
+| | `create` | `mutation` | `founderProcedure` | Зачисление студента и создание аккаунта. |
+| | `update` | `mutation` | `founderProcedure` | Обновление личной карточки студента. |
+| | `remove` | `mutation` | `founderProcedure` | Удаление студенческой карточки. |
+| | `uploadDocument` | `mutation` | `founderProcedure` | Загрузка студенческого документа. |
+| | `removeDocument` | `mutation` | `founderProcedure` | Удаление студенческого документа. |
+| **`superAdminUsers`** | `list` | `query` | `superAdminProcedure` | Список учетных записей, находящихся в ведении Super Admin. |
+| | `byId` | `query` | `superAdminProcedure` | Получение пользователя по ID. |
+| | `formSchema` | `query` | `superAdminProcedure` | Получение полей конструктора форм (без скрытых секций). |
+| | `create` | `mutation` | `superAdminProcedure` | Создание scoped-пользователя (student/teacher/marketing/admin). |
+| | `update` | `mutation` | `superAdminProcedure` | Обновление scoped-пользователя. |
+| | `remove` | `mutation` | `superAdminProcedure` | Удаление scoped-пользователя. |
+| **`users`** | `list` | `query` | `founderProcedure` | Полный список всех пользователей системы (включая админов). |
+| | `formSchema` | `query` | `founderProcedure` | Получение полной схемы конструктора профилей. |
+| | `updateSystemFields` | `mutation` | `founderProcedure` | Изменение настроек системных полей. |
+| | `createSection` | `mutation` | `founderProcedure` | Добавление секции кастомных полей. |
+| | `updateSection` | `mutation` | `founderProcedure` | Изменение секции кастомных полей. |
+| | `removeSection` | `mutation` | `founderProcedure` | Удаление секции кастомных полей. |
+| | `createField` | `mutation` | `founderProcedure` | Добавление кастомного поля. |
+| | `updateField` | `mutation` | `founderProcedure` | Изменение кастомного поля. |
+| | `removeField` | `mutation` | `founderProcedure` | Удаление кастомного поля. |
+| | `reorderFields` | `mutation` | `founderProcedure` | Изменение порядка сортировки полей. |
 
 ---
 
-## 6. Клиентская Маршрутизация и Безопасность страниц
+## 4. Страницы и маршруты Frontend
 
-Фронтенд спроектирован на основе легкого роутера `wouter` в `/client/src/App.tsx`.
+Маршрутизация на клиенте построена на базе библиотеки **wouter** (`client/src/App.tsx`).
 
-### 6.1. Маршруты и защищенные зоны
-Все страницы с префиксом `/admin`, `/super-admin`, `/teacher`, `/portal/marketing` и `/dashboard` проверяют авторизацию внутри самого компонента страницы, используя хук `useAuth()`.
+### Таблица маршрутов и ролей
 
-*   **Публичная зона:**
-    *   `/` — Главная страница (`Home.tsx`)
-    *   `/programs`, `/programs/:slug` — Каталог курсов и детальная карточка курса
-    *   `/about`, `/contact`, `/news`, `/enroll` — Информационные разделы и форма зачисления
-    *   `/login` — Страница авторизации сотрудников и основателя (`FounderLogin.tsx`)
-*   **Контур Основателя и Администраторов (`Admin.tsx`):**
-    *   `/admin` — Общий дашборд администратора.
-    *   `/admin/users` — Динамический конструктор профилей и справочник пользователей.
-    *   `/admin/students`, `/admin/students/:studentId` — Управление личными делами и визовыми документами студентов.
-    *   `/admin/news`, `/admin/media` — Контент-менеджмент новостей и медиатеки.
-    *   `/admin/audit-logs` — Просмотр действий персонала.
-    *   *Проверка прав:* Если пользователь не вошел, он перенаправляется на `/login`. Если роль не `"founder"` и не `"admin"`, срабатывает редирект в соответствии с его реальной ролью.
-*   **Контур Супер-Администратора (`SuperAdmin.tsx`):**
-    *   `/super-admin`, `/super-admin/users`, `/super-admin/audit-logs` — Панель контроля доступа и политик безопасности.
-    *   *Проверка прав:* Допускается только роль `"super_admin"`.
-*   **Контур Преподавателя (`TeacherDashboard.tsx`):**
-    *   `/teacher` — Сетка занятий, журналы успеваемости и посещаемости.
-    *   *Проверка прав:* Допускается только роль `"teacher"`.
-*   **Контур Маркетолога (`MarketingDashboard.tsx`):**
-    *   `/marketing`, `/portal/marketing` — Работа с лидами, сегментами, посадочными страницами и чат-ботом.
-    *   *Проверка прав:* Требует роль из списка content-менеджеров.
-*   **Контур Студента (`UserDashboard.tsx`):**
-    *   `/dashboard` — Личный кабинет студента с отображением расписания, посещаемости и полученных оценок с обратной связью.
-    *   *Проверка прав:* Допускается только роль `"student"`.
+| URL | Компонент страницы | Уровень доступа | Описание |
+| :--- | :--- | :--- | :--- |
+| `/` | `Home` | `public` | Главная страница языкового центра. |
+| `/programs` | `Programs` | `public` | Каталог учебных программ и курсов. |
+| `/programs/:slug`| `ProgramDetail` | `public` | Детальная карточка программы (описание, FAQ, результаты). |
+| `/about` | `About` | `public` | Страница "О нас" (миссия, преподавательский состав). |
+| `/news` | `News` | `public` | Раздел новостей, событий и объявлений. |
+| `/contact` | `Contact` | `public` | Контакты, интерактивная карта кампуса, отправка запросов. |
+| `/enroll` | `Enroll` | `public` | Интерактивная многошаговая форма онлайн-зачисления. |
+| `/login` | `FounderLogin` | `public` | Универсальная защищенная страница входа в систему. |
+| `/dashboard` | `UserDashboard` | `protected` | Личный кабинет пользователя (заполнение анкеты онбординга). |
+| `/teacher` | `TeacherDashboard` | `teacher` | Кабинет преподавателя (посещаемость, ведомости успеваемости). |
+| `/marketing` | `MarketingDashboard` | `marketing` / `admin` | Панель маркетолога (лиды, WhatsApp, промокоды, CTA, пиксели). |
+| `/admin` | `Admin` | `admin` / `founder` | Панель академического директора (студенты, медиа, новости). |
+| `/super-admin` | `SuperAdmin` | `super_admin` | Панель системного администратора (управление персоналом). |
 
----
+### Механизм защиты маршрутов на фронтенде
+Защита клиентских путей выполняется внутри самих страниц при помощи кастомного хука авторизации `useAuth()` (`client/src/_core/hooks/useAuth.ts`).
 
-## 7. «Маленькие Пиксели»: UX/UI Стандарты и Визуальная Эстетика
+Пример реализации ролевого гарда в `Admin.tsx` и `SuperAdmin.tsx`:
+```typescript
+const { user, loading } = useAuth();
 
-В соответствии с философией бренда **«Where Language Meets Luxury»**, в интерфейс встроены строгие математические и оптические правила, исключающие визуальный дискомфорт:
+useEffect(() => {
+  if (loading) return;
+  if (!user) {
+    window.location.replace("/login");
+  } else if (user.role !== "founder" && user.role !== "admin") {
+    // Редирект в зависимости от роли при несовпадении прав
+    window.location.replace(user.role === "super_admin" ? "/super-admin" : "/dashboard");
+  }
+}, [loading, user]);
+```
 
-### 7.1. Типографика и Оптимальная высота строк
-*   **Шрифтовые пары:** На латинице используется благородный антиквенный шрифт `DM Serif Display` для крупных заголовков и технологичный `Manrope` для интерфейсного текста. Для арабской локализации подключен премиальный шрифт `Cairo` в паре с `IBM Plex Sans Arabic`.
-*   **Оптический хак для арабской вязи:** Из-за обилия надстрочных и подстрочных знаков (огласовок/ташкиля) арабские слова сливаются по вертикали при стандартном межстрочном интервале. Платформа решает это автоматически: при выборе арабского языка базовая высота строки `line-height` динамически увеличивается на **+14%** (с `1.6` до `1.824`), а кегль слегка уменьшается, сохраняя идеальную сетку вертикального ритма.
-
-### 7.2. Изоляция Двунаправленного Текста (`<bdi>`)
-В арабской локализации (RTL) алгоритм двунаправленного текста Unicode (UBA) некорректно отображает «слабые» символы направления: номера телефонов, цены и латинские имена ломаются (например, плюс улетает вправо, а цифры меняются местами).
-*   **Решение:** Все номера телефонов (например, `+60 3-6731 0449`), цены (`RM 2,950`) и название бренда `Bilingual Idol` жестко обернуты в тег `<bdi dir="ltr">`. Это полностью изолирует направление отрисовки этих элементов от глобального RTL-контекста.
-
-### 7.3. Логическая верстка CSS
-Для бесшовного зеркалирования интерфейса при смене языков (LTR ↔ RTL) кодовая база полностью очищена от физических стилей (`margin-left`, `padding-right`, `border-left`). Вместо них внедрены логические CSS-свойства Tailwind:
-*   `ms-*` (margin-inline-start) вместо `ml-*`
-*   `pe-*` (padding-inline-end) вместо `pr-*`
-*   `border-s-*` (border-inline-start) вместо `border-l-*`
-*   `rounded-s-*` (rounded-inline-start) вместо `rounded-l-*`
-Благодаря этому смена направления интерфейса происходит мгновенно при переключении атрибута `dir="rtl"` на теге `<html>` без написания дополнительного CSS.
-
-### 7.4. Математика Скруглений (Nested Border Radii)
-Чтобы вложенные элементы не выглядели деформированными и не создавали оптического эффекта «заломанных углов», внутренние скругления карточек рассчитываются строго по формуле:
-$$\text{Inner Radius} = \text{Outer Radius} - \text{Padding}$$
-Если у внешнего контейнера скругление `16px` (класс `rounded-2xl`), а внутренний отступ (`padding`) равен `12px` (класс `p-3`), то скругление вложенного элемента обязано быть точно `4px` (класс `rounded-sm`).
-
-### 7.5. Цвета и Legibility
-*   **Цветовой контраст:** Платформа использует мягкую, не утомляющую глаза платиново-сапфировую гамму.
-*   **Ограничение яркости контейнеров:** Разница в яркости между фоном страницы и карточкой не превышает **7%** в светлой теме и **12%** в темной теме. Исключены ядовитые неоновые градиенты и абсолютно черные цвета (`#000`), уступая место глубокому серо-синему сапфиру.
+### Ключевые переиспользуемые интерфейсные модули
+1. `DashboardLayout.tsx`: Универсальная боковая панель навигации, адаптирующаяся под роли и поддерживающая темную/светлую тему, локализацию интерфейса и адаптивное меню на мобильных.
+2. `DynamicUserProfileFields.tsx`: Рендерер полей профиля. Получает с бэкенда схему полей и автоматически отрисовывает нужные типы инпутов (`text`, `dropdown`, `checkbox`, `file` и др.) с проверкой валидации.
+3. `UserFieldBuilder.tsx`: Визуальный интерфейс конструктора форм для роли `founder`, позволяющий перетаскивать, отключать и добавлять новые поля анкеты.
 
 ---
 
-## 8. Памятка по расширению проекта (Инструкции для будущего разработчика)
+## 5. Контент и бизнес-данные
 
-### 8.1. Добавление новой страницы
-1.  Создайте файл страницы в `client/src/pages/` (например, `Billing.tsx`).
-2.  Используйте исключительно логические свойства Tailwind для разметки.
-3.  Зарегистрируйте маршрут в `client/src/App.tsx`.
-4.  Если страница находится в личном кабинете, оберните её в макет `<DashboardLayout role="student" | "teacher" | ...>` для автоматического применения премиального оформления, проверки прав и вывода сайдбара.
+### Учебные программы и тарифная сетка 2026
+Все 10 основных учебных программ BILC полностью перенесены в структурированный вид в базу данных (включая переводы и поля метаданных):
+- **General English** (slug: `general-english`): Общий английский для подростков и взрослых.
+- **Kids English** (slug: `kids-english`): Игровой английский для детей.
+- **Speaking & Conversation** (slug: `speaking-conversation`): Разговорный курс.
+- **IELTS Preparation** (slug: `ielts-preparation`): Академическая подготовка к экзаменам.
+- **Bahasa Melayu** (slug: `bahasa-melayu`): Программа государственного языка Малайзии.
+- **Mandarin**, **Arabic**, **Japanese**, **Korean**: Программы мировых языков (рубрика "World Languages").
+- **Business English** (slug: `business-english`): Деловой английский для корпоративных клиентов.
 
-### 8.2. Добавление нового API-эндпоинта tRPC
-1.  Определите схему ввода-вывода с помощью библиотеки `zod`.
-2.  Создайте или обновите соответствующий файл роутера в `server/routers/`.
-3.  Обязательно выберите правильную защитную процедуру (например, `teacherProcedure` для оценок, `founderProcedure` для системных настроек).
-4.  Импортируйте и зарегистрируйте роутер в главном файле `/server/routers.ts`.
+*Что осталось статическим текстом*: Специфические сезонные "Летние лагеря" (Summer Camps) и "Индивидуальные уроки" (Private Lessons) описаны в интерфейсе и табах тарифной сетки на главной странице в виде локализованных текстовых блоков, но не имеют выделенных записей в таблице `programs` БД, так как их ценообразование и расписание строго индивидуальны и строятся на базе прямых консультаций Admissions Office.
 
-### 8.3. Локализация интерфейса
-1.  При добавлении статических текстовых строк обязательно оборачивайте их в хук локализации:
-    ```tsx
-    const { td } = useLanguage();
-    // Использование: <p>{td("Welcome back to your dashboard")}</p>
-    ```
-2.  Добавьте переводы для новых ключей в словари `client/src/locales/en.json`, `ms.json` и `ar.json`.
+### Отзывы (Testimonials)
+Отзывы полностью переведены на базу данных (таблица `testimonials`). Для обеспечения безопасности и защиты персональных данных отзывы выводятся на главной странице только при наличии флагов:
+- `approved = true` (прошел модерацию маркетологом/администратором).
+- `consentConfirmed = true` (подтверждено согласие автора на публикацию).
 
-### 8.4. Проверка и сборка проекта
-Перед отправкой изменений в коммит или продакшн сборку выполните валидацию:
-*   Запуск линтера и проверка типов TypeScript: `npm run lint` (запускает `tsc --noEmit`).
-*   Проверка локальной сборки: `npm run build`.
-*   Убедитесь, что все 121 тест проходят успешно.
+### Поддержка медиафайлов
+Медиатека поддерживает загрузку изображений и документов (PDF, PNG, JPG, JPEG). Загрузка файлов выполняется на бэкенде. Для картинок в статьях и аватарок поддерживается ограничение размера до 10 МБ. В базе данных хранится `imageUrl` / `imageStorageKey` для корректной раздачи ассетов.
+
+---
+
+## 6. Локализация (i18n)
+
+### Поддерживаемые языки
+Платформа на 100% поддерживает три языка с мгновенным переключением без перезагрузки страницы:
+- **`en`** (English) — язык по умолчанию (LTR).
+- **`ms`** (Bahasa Melayu) — малайский язык (LTR).
+- **`ar`** (العربية) — арабский язык (с полной поддержкой **RTL** направления текста на уровне разметки, стилей Tailwind и разворота интерфейса).
+
+### Хранение переводов
+Переводы хранятся статически в файле `/client/src/lib/translations.ts` в виде типизированного словаря `TranslationDictionary` для высокой скорости работы. 
+
+Для динамического контента (программы, новости) локализация поддерживается за счет хранения мультиязычных описаний или автоматического переключения полей, запрашиваемых через tRPC (таблица `translations` кэширует переводы, запрашиваемые у встроенных переводчиков при необходимости).
+
+---
+
+## 7. Динамический конструктор профилей (Dynamic Profile Builder)
+
+Dynamic Profile Builder позволяет изменять структуру собираемых данных пользователей "на лету" без внесения изменений в код или миграций базы данных.
+
+### Структура `RuntimeUserSystemField`
+Описывает базовые поля учетной записи, которые всегда необходимы системе:
+```typescript
+export type RuntimeUserSystemField = {
+  id: "name" | "nickname" | "role" | "password" | "isActive";
+  label: string;
+  inputType: "text" | "role" | "password" | "checkbox";
+  isRequired: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  sectionId: number | null;
+};
+```
+*Миграция*: В системе реализована автомиграция устаревшего системного идентификатора поля `email` в современный `nickname` для соответствия уникальным именам входа BILC (например, `user@bilc.my`).
+
+### Конфигурация кастомных полей
+Для кастомных полей поддерживаются следующие типы (`fieldType`):
+- `text` — однострочный текст.
+- `textarea` — многострочный текст.
+- `number` — числовые данные.
+- `date` — дата (календарь).
+- `dropdown` — выпадающий список (опции хранятся в `optionsJson`).
+- `checkbox` — логический флаг (да/нет).
+- `file` — загрузка документов.
+
+Каждое кастомное поле может быть привязано к этапу сбора данных (`collectionStage`):
+- `atRegistration` — заполняется при подаче заявки гостем.
+- `atFirstLogin` — запрашивается при первом входе пользователя в систему.
+
+---
+
+## 8. Платежи
+
+В системе реализована интеграция с популярным малайзийским платежным шлюзом **ToyyibPay** (FPX Bank Transfer / карточные переводы).
+
+### Статусы транзакций
+Платежи сохраняются в таблице `payments` со следующими статусами:
+- `pending` — платеж ожидает оплаты пользователем.
+- `completed` — оплата успешно проведена шлюзом.
+- `failed` — транзакция отклонена или произошел сбой.
+- `refunded` — средства возвращены студенту администратором.
+
+### Интеграция с учебным процессом
+При вызове вебхука шлюза (`simulateToyyibpayWebhook`), в случае статуса `completed` бэкенд находит связанного по `userId` пользователя, проверяет наличие активных учебных заявок (`applications`) в статусе рассмотрения (`submitted`, `underReview`, `offerIssued`) и автоматически переводит их в статус **`paymentCompleted`** (Оплата зачисления подтверждена).
+
+---
+
+## 9. Аудит и безопасность
+
+### Журнал событий (Audit Logs)
+Таблица `auditLogs` хранит полную историю значимых событий в системе безопасности центра. Каждая запись содержит:
+- Идентификатор инициатора (`actorUserId`) и его роль (`actorRole`).
+- Детали сетевого окружения (`ipAddress`, `userAgent`, `browser`, `operatingSystem`).
+- Название действия (`action`, например, `user.create`, `student_document.upload`).
+- Сущность-цель (`targetType`, `targetId`, `targetRole`).
+- Флаг успешности (`isSuccess`).
+- Поле `metadataJson` — расширенные контекстные данные действия.
+
+### Безопасность метаданных и паролей
+1. **Маскирование логов**: При сохранении `metadataJson` перед записью в БД данные прогоняются через санитайзер, который находит и полностью вырезает (`[redacted]`) любые чувствительные ключи по регулярному выражению:
+   ```typescript
+   const sensitiveKey = /(password|secret|token|cookie|authorization|hash|profile.?values?|raw.?body|credential)/i;
+   ```
+2. **Безопасность паролей**: Пароли пользователей никогда не хранятся в открытом виде. Хеширование выполняется с использованием криптостойкого алгоритма **scrypt** (`node:crypto`) со случайной 16-байтовой солью:
+   ```typescript
+   export function createUserPasswordHash(password: string) {
+     const salt = randomBytes(16).toString("hex");
+     return `scrypt:${salt}:${scryptSync(password, salt, 64).toString("hex")}`;
+   }
+   ```
+   Проверка хеша защищена от атак по времени благодаря использованию `crypto.timingSafeEqual()`.
+
+### Периодическая ротация и архивация логов (`scheduledAuditRotation`)
+В бэкенд встроена функция автоматической архивации логов безопасности:
+- Выполняется транзакционно через метод `archiveExpiredAuditLogs()`.
+- Записи старше **12 месяцев** автоматически вырезаются из таблицы `auditLogs` и переносятся в архивную таблицу `auditLogArchives`.
+- Записи архива сохраняют ссылку на ID пользователя-инициатора ротации (`archivedByUserId`).
+- Из интерфейса панели Founders доступна операция восстановления (`restore`) архивных записей обратно в активный лог.
+
+---
+
+## 10. Инфраструктура и деплой
+
+### Хостинг и Среда выполнения
+- **Хостинг**: Платформа развернута в контейнеризованной среде **Google Cloud Run** в регионе `asia-east1`.
+- **База данных**: Управляемый инстанс MySQL. Соединение конфигурируется через переменную `DATABASE_URL`. При локальной разработке или в песочнице бэкенд автоматически переходит на стабильную инкрементальную in-memory имитацию СУБД.
+
+### Поддержка PWA / Offline режима
+Платформа полностью соответствует спецификациям Progressive Web Apps:
+- Настроен файл манифеста `./client/public/manifest.webmanifest` с иконками, цветами темы (`#10253E`) и типом отображения `standalone`.
+- Подключен собственный сервис-воркер (`sw.js`), кэширующий ключевые статические ассеты, шрифты и основные страницы портала для бесперебойного отображения заглушки "Offline Indicator" при обрыве интернет-соединения.
+
+---
+
+## 11. Известные ограничения и технический долг
+
+1. **Токены во фреймах**: Из-за ограничений безопасности браузеров в отношении сторонних файлов cookie (Safari ITP / Chrome Sandbox) при работе в iframe AI Studio, бэкенд дублирует валидацию сессий через `Authorization: Bearer <token>` заголовки, а фронтенд зеркалирует куку в `sessionStorage` и `localStorage` под ключами `manus-cookie` и `manus-session-token`. При переносе на مستقل-домен куки будут работать стандартным образом.
+2. **Сезонные программы**: Такие курсы, как "Summer Camp" (Летний лагерь) и "Private Lessons", не имеют карточек в БД `programs`. Это сделано намеренно для упрощения контент-менеджмента, но при необходимости масштабирования сетки тарифов их можно добавить в справочник.
+3. **Webhook ToyyibPay**: Симуляция вебхука полностью покрывает бизнес-логику зачисления. Для перевода в продакшн-режим ToyyibPay потребуется заменить симуляционный эндпоинт на реальный парсер секретной подписи ToyyibPay Signature Key.

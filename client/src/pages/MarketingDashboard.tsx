@@ -169,6 +169,81 @@ export default function MarketingDashboard() {
     onError: (err) => toast.error(err.message),
   });
 
+  // Active Promotions Directory states
+  const [newPromoCode, setNewPromoCode] = useState("");
+  const [newPromoTitle, setNewPromoTitle] = useState("");
+  const [newPromoDescription, setNewPromoDescription] = useState("");
+  const [newPromoDiscountType, setNewPromoDiscountType] = useState<"percentage" | "fixed">("percentage");
+  const [newPromoDiscountValue, setNewPromoDiscountValue] = useState<number>(10);
+  const [newPromoMaxUses, setNewPromoMaxUses] = useState<string>("");
+  const [newPromoStartsAt, setNewPromoStartsAt] = useState<string>("");
+  const [newPromoExpiresAt, setNewPromoExpiresAt] = useState<string>("");
+
+  const promotionsListQuery = trpc.promotions.list.useQuery();
+
+  const createPromotionMutation = trpc.promotions.create.useMutation({
+    onSuccess: () => {
+      toast.success("Promotion created successfully");
+      setNewPromoCode("");
+      setNewPromoTitle("");
+      setNewPromoDescription("");
+      setNewPromoDiscountValue(10);
+      setNewPromoMaxUses("");
+      setNewPromoStartsAt("");
+      setNewPromoExpiresAt("");
+      promotionsListQuery.refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    }
+  });
+
+  const deletePromotionMutation = trpc.promotions.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Promotion deleted successfully");
+      promotionsListQuery.refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    }
+  });
+
+  const handleCreatePromotion = () => {
+    if (!newPromoCode) {
+      toast.error("Promotion code is required");
+      return;
+    }
+    if (!newPromoTitle) {
+      toast.error("Promotion title is required");
+      return;
+    }
+    if (!newPromoDescription) {
+      toast.error("Promotion description is required");
+      return;
+    }
+    if (newPromoDiscountValue <= 0) {
+      toast.error("Discount value must be greater than zero");
+      return;
+    }
+
+    const startsAtDate = newPromoStartsAt ? new Date(newPromoStartsAt) : null;
+    const expiresAtDate = newPromoExpiresAt ? new Date(newPromoExpiresAt) : null;
+    const maxUsesNum = newPromoMaxUses ? parseInt(newPromoMaxUses, 10) : null;
+
+    createPromotionMutation.mutate({
+      code: newPromoCode.trim().toUpperCase(),
+      title: newPromoTitle.trim(),
+      description: newPromoDescription.trim(),
+      discountType: newPromoDiscountType,
+      discountValue: newPromoDiscountValue,
+      scope: "all",
+      maxUses: maxUsesNum,
+      startsAt: startsAtDate,
+      expiresAt: expiresAtDate,
+      isActive: true,
+    });
+  };
+
   const [ctaApplyText, setCtaApplyText] = useState("");
   const [ctaApplyLink, setCtaApplyLink] = useState("");
   const [ctaConsultText, setCtaConsultText] = useState("");
@@ -1154,6 +1229,198 @@ export default function MarketingDashboard() {
                     <div className="p-3 bg-slate-50 rounded border border-slate-200">
                       <p className="text-xs font-semibold text-slate-700">Meta Pixel</p>
                       <p className="text-xs font-mono text-slate-600 mt-1">{trackingQuery.data?.pixels?.META_PIXEL_ID || "Not Configured"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Active Promotions & Discounts Directory */}
+              <Card className="bg-white border-slate-200 shadow-sm lg:col-span-2">
+                <CardHeader className="border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                      <Tag size={18} />
+                    </span>
+                    <div>
+                      <CardTitle className="text-base font-bold text-slate-900">Active Promotions & Discounts Directory</CardTitle>
+                      <CardDescription className="text-xs">
+                        Create multiple promotions and discounts that will be displayed on the home page for prospective students.
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
+                    {/* Column 1: Add Promotion Form (2/5 span) */}
+                    <div className="p-6 space-y-4 lg:col-span-2">
+                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Create New Promotion</h4>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">Promo Code (Unique)</label>
+                          <Input
+                            placeholder="e.g. FLASH25"
+                            value={newPromoCode}
+                            onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
+                            className="font-mono text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Title</label>
+                          <Input
+                            placeholder="e.g. Year-End Holiday Campaign"
+                            value={newPromoTitle}
+                            onChange={(e) => setNewPromoTitle(e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Description</label>
+                          <Textarea
+                            placeholder="Describe what this promotion offers (e.g. RM 100 off on IELTS exam prep package)..."
+                            value={newPromoDescription}
+                            onChange={(e) => setNewPromoDescription(e.target.value)}
+                            className="text-xs min-h-[70px]"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-semibold text-slate-700 block mb-1">Type</label>
+                            <select
+                              value={newPromoDiscountType}
+                              onChange={(e) => setNewPromoDiscountType(e.target.value as "percentage" | "fixed")}
+                              className="w-full bg-white border border-slate-200 rounded-md p-2 text-xs font-semibold text-slate-700 focus:outline-hidden"
+                            >
+                              <option value="percentage">Percentage (%)</option>
+                              <option value="fixed">Fixed Flat (RM)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-semibold text-slate-700 block mb-1">
+                              Value {newPromoDiscountType === "percentage" ? "(%)" : "(RM)"}
+                            </label>
+                            <Input
+                              type="number"
+                              min={1}
+                              value={newPromoDiscountValue}
+                              onChange={(e) => setNewPromoDiscountValue(parseInt(e.target.value, 10) || 0)}
+                              className="text-xs font-semibold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="col-span-1">
+                            <label className="text-xs font-semibold text-slate-700 block mb-1">Max Uses</label>
+                            <Input
+                              type="number"
+                              placeholder="No limit"
+                              value={newPromoMaxUses}
+                              onChange={(e) => setNewPromoMaxUses(e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <label className="text-xs font-semibold text-slate-700 block mb-1">Starts At</label>
+                            <Input
+                              type="date"
+                              value={newPromoStartsAt}
+                              onChange={(e) => setNewPromoStartsAt(e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <label className="text-xs font-semibold text-slate-700 block mb-1">Expires At</label>
+                            <Input
+                              type="date"
+                              value={newPromoExpiresAt}
+                              onChange={(e) => setNewPromoExpiresAt(e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                        </div>
+
+                        <Button
+                          onClick={handleCreatePromotion}
+                          disabled={createPromotionMutation.isPending}
+                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 mt-2 transition-all cursor-pointer"
+                        >
+                          {createPromotionMutation.isPending ? "Creating..." : "Add Active Promotion"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Column 2: Current Active Promotions List (3/5 span) */}
+                    <div className="p-6 lg:col-span-3 flex flex-col space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Current Active Promotions</h4>
+                        <Badge variant="outline" className="bg-slate-50 font-semibold text-slate-600">
+                          {promotionsListQuery.data?.length || 0} Total
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-3 overflow-y-auto max-h-[380px] pr-1">
+                        {promotionsListQuery.isLoading ? (
+                          <p className="text-xs text-slate-500 py-6 text-center">Loading promotions list...</p>
+                        ) : promotionsListQuery.data && promotionsListQuery.data.length > 0 ? (
+                          promotionsListQuery.data.map((promo) => (
+                            <div
+                              key={promo.id}
+                              className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-start justify-between gap-3 text-xs hover:border-slate-200 transition-all"
+                            >
+                              <div className="space-y-1.5 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge className="bg-indigo-600 text-white font-mono font-bold text-[10px]">
+                                    {promo.code}
+                                  </Badge>
+                                  <span className="font-bold text-slate-800 text-xs">
+                                    {promo.title}
+                                  </span>
+                                </div>
+                                <p className="text-slate-600 text-xs leading-relaxed">
+                                  {promo.description}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-medium pt-0.5">
+                                  <span className="bg-slate-200/60 text-slate-700 px-1.5 py-0.5 rounded font-bold">
+                                    Value: {promo.discountType === "percentage" ? `${promo.discountValue}%` : `RM ${promo.discountValue}`}
+                                  </span>
+                                  {promo.maxUses && (
+                                    <span>
+                                      Uses: {promo.usedCount} / {promo.maxUses}
+                                    </span>
+                                  )}
+                                  {promo.expiresAt && (
+                                    <span className="text-rose-600">
+                                      Expires: {new Date(promo.expiresAt).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={deletePromotionMutation.isPending}
+                                onClick={() => {
+                                  if (confirm(`Are you sure you want to delete promotion code ${promo.code}?`)) {
+                                    deletePromotionMutation.mutate({ id: promo.id });
+                                  }
+                                }}
+                                className="h-8 w-8 p-0 text-rose-500 hover:bg-rose-50 shrink-0 cursor-pointer"
+                              >
+                                <Trash2 size={14} />
+                              </Button>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                            <Tag className="mx-auto text-slate-300 w-8 h-8 mb-2" />
+                            <p className="text-xs text-slate-500 font-medium">No active promotions in database.</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">Create your first promotion using the form on the left.</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>

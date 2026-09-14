@@ -8,7 +8,9 @@ import { ArrowRight, BookOpen, ShieldCheck } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
-import { StudentOnboardingForm } from "@/components/StudentOnboardingForm";
+import { ApplicationTracker } from "@/components/dashboard/ApplicationTracker";
+import { DiagnosticPlacementTest } from "@/components/dashboard/DiagnosticPlacementTest";
+import { TuitionPaymentModule } from "@/components/dashboard/TuitionPaymentModule";
 
 const OPERATIONS_ROLES = ["founder", "super_admin", "admin"];
 
@@ -47,7 +49,7 @@ export default function UserDashboard() {
 
   return (
     <DashboardLayout role="student">
-      <div id="user-dashboard-container" data-page="user-dashboard" className={`member-page blue-member-page workspace-page founder-command founder-workspace page-student mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10 ${isRTL ? "dir-rtl" : ""}`}>
+      <div id="user-dashboard-container" data-page="user-dashboard" className={`member-page blue-member-page workspace-page founder-command founder-workspace page-student mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10 space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
         <OfflineIndicator />
         <div className="member-content space-y-6">
           <header className="founder-command-header">
@@ -61,11 +63,17 @@ export default function UserDashboard() {
             </div>
           </header>
 
-          {/* Student Portal Onboarding Setup Form (Stage B) */}
-          <StudentOnboardingForm />
-
           {/* PWA Prompt Card */}
           <PWAInstallButton variant="card" />
+
+          {/* Real-time CRM Admission Application Tracker */}
+          <ApplicationTracker />
+
+          {/* Tuition Bursar Fees, Deposit & Active Promotions Module */}
+          <TuitionPaymentModule />
+
+          {/* Diagnostics Placement Test */}
+          <DiagnosticPlacementTest />
 
           <section className="member-next-step" aria-label={t("userDashboard.nextStepTitle")}>
             <div>

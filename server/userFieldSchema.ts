@@ -6,6 +6,7 @@ export type RuntimeUserField = {
   key: string;
   label: string;
   fieldType: UserFieldType;
+  collectionStage: "atRegistration" | "atFirstLogin";
   isRequired: boolean;
   placeholder: string | null;
   options: string[];

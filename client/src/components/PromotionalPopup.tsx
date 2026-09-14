@@ -135,14 +135,25 @@ const safeSessionStorage = {
 
 export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
   const { t } = useLanguage();
-  const { data: settings, isLoading } = trpc.content.siteSettings.useQuery();
+  const { data: settings, isLoading: isSettingsLoading } = trpc.content.siteSettings.useQuery();
+  const { data: publicPromos, isLoading: isPromosLoading } = trpc.promotions.publicList.useQuery();
 
   const [showFloatingButton, setShowFloatingButton] = useState(false);
 
-  const isActive = settings?.promo_active === "true";
-  const title = settings?.promo_title || "";
-  const discount = settings?.promo_discount || "";
-  const promoColor = settings?.promo_color || "red";
+  const isLoading = isSettingsLoading || isPromosLoading;
+
+  let isActive = settings?.promo_active === "true";
+  let title = settings?.promo_title || "";
+  let discount = settings?.promo_discount || "";
+  let promoColor = settings?.promo_color || "red";
+
+  if (!isActive && publicPromos && publicPromos.length > 0) {
+    const latestPromo = publicPromos[0];
+    isActive = true;
+    title = latestPromo.title || "";
+    discount = latestPromo.discountType === "percentage" ? `${latestPromo.discountValue}% OFF` : `RM ${latestPromo.discountValue} OFF`;
+    promoColor = "blue";
+  }
 
   const theme = getColorTheme(promoColor);
 
@@ -196,16 +207,31 @@ export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
 
 export function PromotionalPopupModal({ isOpen, setIsOpen }: PromoProps) {
   const { t, isRTL } = useLanguage();
-  const { data: settings, isLoading } = trpc.content.siteSettings.useQuery();
+  const { data: settings, isLoading: isSettingsLoading } = trpc.content.siteSettings.useQuery();
+  const { data: publicPromos, isLoading: isPromosLoading } = trpc.promotions.publicList.useQuery();
 
-  const isActive = settings?.promo_active === "true";
-  const title = settings?.promo_title || "";
-  const text = settings?.promo_text || "";
-  const discount = settings?.promo_discount || "";
-  const code = settings?.promo_code || "";
-  const ctaText = settings?.promo_cta_text || "";
-  const ctaUrl = settings?.promo_cta_url || "";
-  const promoColor = settings?.promo_color || "red";
+  const isLoading = isSettingsLoading || isPromosLoading;
+
+  let isActive = settings?.promo_active === "true";
+  let title = settings?.promo_title || "";
+  let text = settings?.promo_text || "";
+  let discount = settings?.promo_discount || "";
+  let code = settings?.promo_code || "";
+  let ctaText = settings?.promo_cta_text || "";
+  let ctaUrl = settings?.promo_cta_url || "";
+  let promoColor = settings?.promo_color || "red";
+
+  if (!isActive && publicPromos && publicPromos.length > 0) {
+    const latestPromo = publicPromos[0];
+    isActive = true;
+    title = latestPromo.title || "";
+    text = latestPromo.description || "";
+    discount = latestPromo.discountType === "percentage" ? `${latestPromo.discountValue}% OFF` : `RM ${latestPromo.discountValue} OFF`;
+    code = latestPromo.code;
+    ctaText = "Claim Offer";
+    ctaUrl = "/enroll";
+    promoColor = "blue";
+  }
 
   const theme = getColorTheme(promoColor);
 

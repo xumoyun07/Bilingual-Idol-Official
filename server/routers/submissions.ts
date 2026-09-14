@@ -15,9 +15,30 @@ export const submissionInput = z.object({
   source: z.string().trim().max(100).optional(),
 });
 
+export const createInquiryInput = z.object({
+  studentName: z.string().trim().min(2, "Enter the student's full name.").max(160),
+  studentAge: z.number().int().min(3, "Enter an age of 3 or above.").max(100, "Enter a valid age."),
+  parentName: z.string().trim().min(2, "Enter the parent or guardian's name.").max(160),
+  parentEmail: z.string().trim().email("Enter a valid email address.").max(320),
+  parentPhone: z.string().trim().min(7, "Enter a valid phone number.").max(64),
+  programInterest: z.string().trim().min(2, "Choose a programme.").max(180),
+  preferredSchedule: z.string().trim().min(2, "Choose a preferred schedule.").max(180),
+  message: z.string().trim().max(1500).optional(),
+  source: z.string().trim().max(100).optional(),
+  reasonType: z.enum(["general", "consultation", "campusTour"]).optional().default("general"),
+  utmSource: z.string().trim().max(100).optional(),
+  utmMedium: z.string().trim().max(100).optional(),
+  utmCampaign: z.string().trim().max(100).optional(),
+  utmTerm: z.string().trim().max(100).optional(),
+  utmContent: z.string().trim().max(100).optional(),
+});
+
 export const submissionsRouter = router({
   list: adminProcedure.query(() => db.listSubmissions()),
   create: publicProcedure.input(submissionInput).mutation(({ input }) => db.createSubmission(input)),
+  createInquiry: publicProcedure
+    .input(createInquiryInput)
+    .mutation(({ input }) => db.createSubmission({ ...input, type: "inquiry" })),
   updateStatus: adminProcedure
     .input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "contacted", "interested", "enrolled", "closed"]) }))
     .mutation(({ input }) => db.updateSubmissionStatus(input.id, input.status)),

@@ -298,8 +298,8 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                   : "💬 WhatsApp Results to Admissions"}
               </a>
 
-              <Link href="/enroll" className="simple-button simple-button-quiet" onClick={onClose}>
-                {t("nav.enrollNow")}
+              <Link href={`/enroll?programInterest=${encodeURIComponent(evalResult.recommendedCourse)}`} className="simple-button simple-button-quiet" onClick={onClose}>
+                {language === "ms" ? "Tempah Kelas Anda" : language === "ar" ? "احجز صفك الدراسي" : "Book Your Class"}
               </Link>
             </div>
 

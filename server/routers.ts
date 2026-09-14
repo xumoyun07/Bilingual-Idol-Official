@@ -20,6 +20,11 @@ import { teacherRouter } from "./routers/teacher";
 import { studentAttendanceRouter } from "./routers/studentAttendance";
 import { marketingRouter } from "./routers/marketing";
 import { translationRouter } from "./routers/translation";
+import { registrationSubmissionsRouter } from "./routers/registrationSubmissions";
+import { registrationRouter } from "./routers/registration";
+import { placementTestsRouter } from "./routers/placementTests";
+import { promotionsRouter } from "./routers/promotions";
+import { paymentsRouter } from "./routers/payments";
 import { createUserPasswordHash, dashboardPathForRole, verifyUserPasswordHash } from "./userAuth";
 import { isFounderEmail } from "./founderIdentity";
 import { resolveLoginIdentifier } from "../shared/nickname";
@@ -81,6 +86,11 @@ export const appRouter = router({
   studentAttendance: studentAttendanceRouter,
   marketing: marketingRouter,
   translation: translationRouter,
+  registrationSubmissions: registrationSubmissionsRouter,
+  registration: registrationRouter,
+  placementTests: placementTestsRouter,
+  promotions: promotionsRouter,
+  payments: paymentsRouter,
 });
 
 export type AppRouter = typeof appRouter;
