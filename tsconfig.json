@@ -19,5 +19,9 @@
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"]
     }
+  },
+  "watchOptions": {
+    "excludeDirectories": ["node_modules", "dist", "client", "client/src", "client/public"],
+    "excludeFiles": ["client/**/*", "client/src/**/*"]
   }
 }

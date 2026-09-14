@@ -66,6 +66,7 @@ export default function DashboardLayout({
   const isRoleAuthorized = () => {
     if (!user) return false;
     if (user.role === role) return true;
+    if (role === "founder" && user.role === "admin") return true;
     if (role === "marketing" && ["founder", "super_admin", "admin"].includes(user.role)) return true;
     return false;
   };
@@ -75,7 +76,7 @@ export default function DashboardLayout({
       window.location.replace(
         user.role === "super_admin"
           ? "/super-admin"
-          : user.role === "founder"
+          : (user.role === "founder" || user.role === "admin")
           ? "/admin"
           : user.role === "teacher"
           ? "/teacher"

@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { Link } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 
-const OPERATIONS_ROLES = ["founder", "super_admin"];
+const OPERATIONS_ROLES = ["founder", "super_admin", "admin"];
 
 export default function UserDashboard() {
   const { user, loading } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });

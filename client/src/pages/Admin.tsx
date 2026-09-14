@@ -94,12 +94,12 @@ export default function Admin() {
     if (loading) return;
     if (!user) {
       window.location.replace("/login");
-    } else if (user.role !== "founder") {
+    } else if (user.role !== "founder" && user.role !== "admin") {
       window.location.replace(user.role === "super_admin" ? "/super-admin" : "/dashboard");
     }
   }, [loading, user]);
   if (loading) return <div className="grid min-h-screen place-items-center bg-[#fbf8f2]"><Loader2 className="animate-spin text-[#173fad]" /></div>;
-  if (!user || user.role !== "founder") return null;
+  if (!user || (user.role !== "founder" && user.role !== "admin")) return null;
   return <DashboardLayout><FounderConsole /></DashboardLayout>;
 }
 

@@ -52,17 +52,21 @@
             text.indexOf('Invalid hook call') !== -1 ||
             text.indexOf('Outdated Optimize Dep') !== -1
           ) {
-            if (!sessionStorage.getItem('__hook_fix_reload')) {
-              sessionStorage.setItem('__hook_fix_reload', '1');
-              if ('caches' in window) {
-                caches.keys().then(function(keys) {
-                  Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
-                    window.location.reload();
+            try {
+              if (!sessionStorage.getItem('__hook_fix_reload')) {
+                sessionStorage.setItem('__hook_fix_reload', '1');
+                if ('caches' in window) {
+                  caches.keys().then(function(keys) {
+                    Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+                      window.location.reload();
+                    });
                   });
-                });
-              } else {
-                window.location.reload();
+                } else {
+                  window.location.reload();
+                }
               }
+            } catch (e) {
+              window.location.reload();
             }
           }
         });

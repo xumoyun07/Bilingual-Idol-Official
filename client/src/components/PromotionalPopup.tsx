@@ -114,6 +114,25 @@ function getColorTheme(colorName?: string): ColorTheme {
   }
 }
 
+// Memory fallback for sessionStorage in case cross-origin iframe blocks access.
+// This comment is added to test that tsx watch ignores changes inside client files.
+const safeSessionStorage = {
+  getItem(key: string): string | null {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (e) {
+      return (window as any)[`__mem_storage_${key}`] || null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      sessionStorage.setItem(key, value);
+    } catch (e) {
+      (window as any)[`__mem_storage_${key}`] = value;
+    }
+  }
+};
+
 export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
   const { t } = useLanguage();
   const { data: settings, isLoading } = trpc.content.siteSettings.useQuery();
@@ -130,12 +149,12 @@ export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
   useEffect(() => {
     if (!isLoading && isActive) {
       // Check if already auto-shown in this session
-      const hasBeenShown = sessionStorage.getItem("bilc_promo_session_shown");
+      const hasBeenShown = safeSessionStorage.getItem("bilc_promo_session_shown");
       
       if (!hasBeenShown) {
         // First entry - auto open the modal
         setIsOpen(true);
-        sessionStorage.setItem("bilc_promo_session_shown", "true");
+        safeSessionStorage.setItem("bilc_promo_session_shown", "true");
         setShowFloatingButton(true);
       } else {
         // Not first entry, but campaign is active, so keep floating button available
