@@ -24,7 +24,7 @@ export default function Enroll() {
           </div>
           {accountMedia ? (
             <div className="enroll-hero-media">
-              <img src={accountMedia.publicUrl} alt={accountMedia.altText} fetchPriority="high" decoding="async" />
+              <img src={accountMedia.publicUrl} alt={accountMedia.altText} decoding="async" />
             </div>
           ) : null}
         </header>

@@ -29,7 +29,7 @@ export default function Contact() {
           </div>
           {contactMedia ? (
             <div className="contact-hero-media">
-              <img src={contactMedia.publicUrl} alt={contactMedia.altText} fetchPriority="high" decoding="async" />
+              <img src={contactMedia.publicUrl} alt={contactMedia.altText} decoding="async" />
             </div>
           ) : null}
         </header>

@@ -56,7 +56,7 @@ export const appRouter = router({
       }
 
       if (!user?.isActive || !verifyUserPasswordHash(input.password, user.passwordHash)) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid nickname@bilc.my login or password." });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: `Invalid ${raw} login or password.` });
       }
 
       await db.recordUserSignIn(user.openId);
