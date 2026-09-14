@@ -35,19 +35,8 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  // Intercept requests to Vite deps to prevent stale browser caches and 504 Outdated Dep errors
+  // In dev mode, prevent Vite from sending immutable / long-lived cache headers
   app.use((req, res, next) => {
-    const currentHash = getCurrentBrowserHash();
-    if (currentHash && typeof req.url === "string" && (req.url.includes("/.vite/deps/") || req.url.includes("react-dom") || req.url.includes("@trpc"))) {
-      const vMatch = req.url.match(/[?&]v=([^&]+)/);
-      if (vMatch && vMatch[1] !== currentHash) {
-        req.url = req.url.replace(/[?&]v=[^&]+/, (match) =>
-          match.startsWith("?") ? `?v=${currentHash}` : `&v=${currentHash}`
-        );
-      }
-    }
-
-    // In dev mode, prevent Vite from sending immutable / long-lived cache headers
     const originalSetHeader = res.setHeader.bind(res);
     res.setHeader = function (name: string, value: any) {
       if (typeof name === "string" && name.toLowerCase() === "cache-control") {

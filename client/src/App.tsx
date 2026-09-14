@@ -13,6 +13,7 @@ import Enroll from "./pages/Enroll";
 import FounderLogin from "./pages/FounderLogin";
 import Programs from "./pages/Programs";
 import ProgramDetail from "./pages/ProgramDetail";
+import News from "./pages/News";
 import UserDashboard from "./pages/UserDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import Admin from "./pages/Admin";
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/login" component={FounderLogin} />
       <Route path="/programs" component={Programs} />
       <Route path="/programs/:slug" component={ProgramDetail} />
+      <Route path="/news" component={News} />
 
       {/* Portals & Dashboards */}
       <Route path="/dashboard" component={UserDashboard} />
