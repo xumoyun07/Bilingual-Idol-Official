@@ -12,6 +12,7 @@ import {
   mediaAssets,
   messageTemplates,
   programs,
+  siteSettings,
   socialLinks,
   testimonials,
   translations,
@@ -124,8 +125,10 @@ export const ALLOWED_CTA_KEYS = [
 
 export const TRACKING_KEYS = [
   "GA_MEASUREMENT_ID",
+  "GOOGLE_SEARCH_CONSOLE_ID",
   "META_PIXEL_ID",
   "TIKTOK_PIXEL_ID",
+  "GTM_CONTAINER_ID",
 ] as const;
 
 // -----------------------------------------------------------------------------
@@ -1070,12 +1073,35 @@ export async function updateCtaSettings(
   return getCtaSettings();
 }
 
-export async function getTrackingSettings() {
+export async function getTrackingSettings(callerRole?: string) {
   const allowPixelManagement = marketingStore.systemSettings["allowMarketingPixelManagement"] === "true";
+  const shouldHidePixels = callerRole === "marketing" && !allowPixelManagement;
   const pixels: Record<string, string> = {};
-  for (const key of TRACKING_KEYS) {
-    pixels[key] = marketingStore.systemSettings[key] ?? "";
+  
+  // Try to load from database first
+  const dbInstance = await getDb();
+  if (dbInstance) {
+    try {
+      const rows = await dbInstance.select().from(siteSettings);
+      const dbSettings = Object.fromEntries(rows.map(row => [row.key, row.value]));
+      for (const key of TRACKING_KEYS) {
+        const val = dbSettings[key] || marketingStore.systemSettings[key] || "";
+        pixels[key] = shouldHidePixels ? (val ? "[Restricted - Requires Super Admin Approval]" : "") : val;
+      }
+    } catch (err) {
+      console.error("Error reading siteSettings from db:", err);
+      for (const key of TRACKING_KEYS) {
+        const val = marketingStore.systemSettings[key] ?? "";
+        pixels[key] = shouldHidePixels ? (val ? "[Restricted - Requires Super Admin Approval]" : "") : val;
+      }
+    }
+  } else {
+    for (const key of TRACKING_KEYS) {
+      const val = inMemoryStore.siteSettings[key] || marketingStore.systemSettings[key] || "";
+      pixels[key] = shouldHidePixels ? (val ? "[Restricted - Requires Super Admin Approval]" : "") : val;
+    }
   }
+
   return {
     allowMarketingPixelManagement: allowPixelManagement,
     pixels,
@@ -1089,10 +1115,11 @@ export async function updateTrackingSettings(
   const isSuperOrFounder = ["founder", "super_admin"].includes(callerRole);
   const allowMarketing = marketingStore.systemSettings["allowMarketingPixelManagement"] === "true";
 
-  if (callerRole === "marketing" && !allowMarketing) {
+  // Restricted to Super Admin or Founder, or Marketing when allowed
+  if (!isSuperOrFounder && !(callerRole === "marketing" && allowMarketing)) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: "Pixel management is currently restricted by Super Admin policy.",
+      message: "Pixel management modification is restricted to Super Admin role or when permitted.",
     });
   }
 
@@ -1105,10 +1132,23 @@ export async function updateTrackingSettings(
     }
   }
 
-  for (const [key, val] of Object.entries(pixels)) {
-    marketingStore.systemSettings[key] = val;
+  const dbInstance = await getDb();
+  if (dbInstance) {
+    for (const [key, val] of Object.entries(pixels)) {
+      await dbInstance
+        .insert(siteSettings)
+        .values({ key, value: val })
+        .onDuplicateKeyUpdate({ set: { value: val } });
+      marketingStore.systemSettings[key] = val; // keep in-sync
+    }
+  } else {
+    for (const [key, val] of Object.entries(pixels)) {
+      inMemoryStore.siteSettings[key] = val;
+      marketingStore.systemSettings[key] = val; // keep in-sync
+    }
   }
-  return getTrackingSettings();
+
+  return getTrackingSettings(callerRole);
 }
 
 export async function setAllowMarketingPixelManagement(allowed: boolean, callerRole: string) {

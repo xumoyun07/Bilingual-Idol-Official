@@ -44,30 +44,50 @@
             for (var k of keys) { caches.delete(k); }
           });
         }
-        // Auto-recover once if stale chunk / React hook mismatch occurs in browser memory
+        // Auto-recover once if stale chunk / React hook mismatch / chunk loading error occurs
+        function triggerSelfHealing() {
+          try {
+            if (!sessionStorage.getItem('__hook_fix_reload')) {
+              sessionStorage.setItem('__hook_fix_reload', '1');
+              if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                  Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+                    window.location.reload();
+                  });
+                });
+              } else {
+                window.location.reload();
+              }
+            }
+          } catch (e) {
+            window.location.reload();
+          }
+        }
+
         window.addEventListener('error', function(event) {
           var text = (event && (event.message || (event.error && event.error.message))) || '';
           if (
             text.indexOf('useState') !== -1 ||
             text.indexOf('Invalid hook call') !== -1 ||
-            text.indexOf('Outdated Optimize Dep') !== -1
+            text.indexOf('Outdated Optimize Dep') !== -1 ||
+            text.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+            text.indexOf('ChunkLoadError') !== -1 ||
+            text.indexOf('loading chunk') !== -1
           ) {
-            try {
-              if (!sessionStorage.getItem('__hook_fix_reload')) {
-                sessionStorage.setItem('__hook_fix_reload', '1');
-                if ('caches' in window) {
-                  caches.keys().then(function(keys) {
-                    Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
-                      window.location.reload();
-                    });
-                  });
-                } else {
-                  window.location.reload();
-                }
-              }
-            } catch (e) {
-              window.location.reload();
-            }
+            triggerSelfHealing();
+          }
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event && event.reason;
+          var text = (reason && (reason.message || reason)) || '';
+          if (
+            typeof text === 'string' &&
+            (text.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+             text.indexOf('ChunkLoadError') !== -1 ||
+             text.indexOf('loading chunk') !== -1)
+          ) {
+            triggerSelfHealing();
           }
         });
       })();

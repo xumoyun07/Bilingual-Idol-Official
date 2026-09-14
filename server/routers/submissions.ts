@@ -1,6 +1,7 @@
 import { z } from "zod";
 import * as db from "../db";
 import { adminProcedure, publicProcedure, studentProcedure, router } from "../_core/trpc";
+import { notificationEventBus } from "../notificationTriggerEngine";
 
 export const submissionInput = z.object({
   type: z.enum(["enrollment", "inquiry"]),
@@ -52,6 +53,9 @@ export const submissionsRouter = router({
       message: z.string().trim().max(1500).optional(),
       reasonType: z.enum(["general", "consultation", "campusTour"]),
       sourcePage: z.string().trim().max(255).optional().default(""),
+      utmSource: z.string().trim().optional(),
+      utmMedium: z.string().trim().optional(),
+      utmCampaign: z.string().trim().optional(),
     }).refine(data => data.email.length > 0 || data.phone.length > 0, {
       message: "Please provide at least an email or phone number.",
       path: ["email"],
@@ -68,6 +72,9 @@ export const submissionsRouter = router({
       message: input.message || "",
       source: input.sourcePage || "website",
       reasonType: input.reasonType,
+      utmSource: input.utmSource || null,
+      utmMedium: input.utmMedium || null,
+      utmCampaign: input.utmCampaign || null,
     })),
 
   // Form 2 Schema & Submission

@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, studentProfiles, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment, StudentProfile, messageTemplates, notificationLogs, MessageTemplate, NotificationLog } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
@@ -103,6 +103,7 @@ export const inMemoryStore = {
   registrationSubmissions: [] as RegistrationSubmission[],
   registrationSubmissionValues: [] as RegistrationSubmissionValue[],
   applications: [] as Application[],
+  studentProfiles: [] as StudentProfile[],
   placementTests: [
     {
       id: 1,
@@ -127,8 +128,8 @@ export const inMemoryStore = {
   ] as PlacementTest[],
   placementTestAttempts: [] as PlacementTestAttempt[],
   promotions: [
-    { id: 1, code: "MERDEKA2026", title: "Merdeka Special Discount", description: "Get 15% off all General English programs for a limited time to celebrate Independence Month!", discountType: "percentage" as const, discountValue: 15, scope: "all", usedCount: 0, isActive: true, createdAt: new Date(), updatedAt: new Date() },
-    { id: 2, code: "WELCOME50", title: "Welcome New Student Offer", description: "Receive a RM 50 flat discount on your registration and assessment fees for any selected course.", discountType: "fixed" as const, discountValue: 50, scope: "all", usedCount: 0, isActive: true, createdAt: new Date(), updatedAt: new Date() }
+    { id: 1, code: "MERDEKA2026", title: "Merdeka Special Discount", description: "Get 15% off all General English programs for a limited time to celebrate Independence Month!", discountType: "percentage" as const, discountValue: 15, scope: "all", usedCount: 0, bannerUrl: null, isActive: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: 2, code: "WELCOME50", title: "Welcome New Student Offer", description: "Receive a RM 50 flat discount on your registration and assessment fees for any selected course.", discountType: "fixed" as const, discountValue: 50, scope: "all", usedCount: 0, bannerUrl: null, isActive: true, createdAt: new Date(), updatedAt: new Date() }
   ] as Promotion[],
   payments: [] as Payment[],
   programs: [
@@ -164,6 +165,45 @@ export const inMemoryStore = {
   userFormSections: [] as any[],
   userFormFields: [] as any[],
   userProfileValues: [] as { userId: number; fieldId: number; value: string }[],
+  messageTemplates: [
+    {
+      id: 1,
+      name: "enquiry received",
+      channel: "email" as const,
+      subject: "We received your inquiry!",
+      body: "Hello {{studentName}},\n\nThank you for reaching out to Bilingual Idol! We have received your inquiry about '{{courseInterest}}'. Our agent will contact you shortly.\n\nBest regards,\nBilingual Idol Team",
+      variables: "studentName,courseInterest",
+      createdAt: new Date("2026-01-01"),
+    },
+    {
+      id: 2,
+      name: "booking/registration confirmed",
+      channel: "email" as const,
+      subject: "Registration Confirmed!",
+      body: "Hello {{studentName}},\n\nYour registration for the program '{{programName}}' has been successfully confirmed (Ref: #{{registrationId}}).\n\nWe look forward to seeing you in class!\n\nBest regards,\nBilingual Idol Team",
+      variables: "studentName,programName,registrationId",
+      createdAt: new Date("2026-01-01"),
+    },
+    {
+      id: 3,
+      name: "payment received",
+      channel: "email" as const,
+      subject: "Payment Received - Thank You!",
+      body: "Hello,\n\nWe have successfully received your payment of {{amount}} for invoice #{{transactionId}} via {{paymentMethod}}.\n\nYou can access your invoice details here: {{invoiceUrl}}\n\nThank you for choosing Bilingual Idol!\n\nBest regards,\nBilingual Idol Team",
+      variables: "amount,transactionId,paymentMethod,invoiceUrl",
+      createdAt: new Date("2026-01-01"),
+    },
+    {
+      id: 4,
+      name: "promo expiring",
+      channel: "whatsapp" as const,
+      subject: "Your Promo Code is Expiring!",
+      body: "Hurry up! Your promo code '{{promoCode}}' with discount of {{discountValue}} is expiring on {{endDate}} ({{daysRemaining}} days remaining).\n\nUse it now before it's gone!",
+      variables: "promoCode,discountValue,endDate,daysRemaining",
+      createdAt: new Date("2026-01-01"),
+    },
+  ] as MessageTemplate[],
+  notificationLogs: [] as NotificationLog[],
   nextId: 100,
 };
 
@@ -226,6 +266,15 @@ export async function getUserByEmail(email: string) {
     return result[0];
   }
   return inMemoryStore.users.find(u => u.email?.trim().toLowerCase() === normalised);
+}
+
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.users.find(u => u.id === id);
 }
 
 export async function recordUserSignIn(openId: string) {
@@ -1336,7 +1385,58 @@ export async function getUserProfileValues(userId: number) {
 export async function updateRegistrationSubmissionStatus(id: number, status: RegistrationSubmission["status"], assignedToUserId?: number | null) {
   const db = await getDb();
   if (db) {
+    // 1. Update status
     await db.update(registrationSubmissions).set({ status, assignedToUserId: assignedToUserId ?? null }).where(eq(registrationSubmissions.id, id));
+
+    // 2. Trigger automatic user and application creation on 'accountCreated'
+    if (status === "accountCreated") {
+      const [sub] = await db.select().from(registrationSubmissions).where(eq(registrationSubmissions.id, id)).limit(1);
+      if (sub) {
+        let [user] = await db.select().from(users).where(eq(users.email, sub.email)).limit(1);
+        if (!user) {
+          const openId = `student-profile:${randomUUID()}`;
+          const passwordHash = createUserPasswordHash("lektor07xumoyun");
+          const insertedUser = await db.insert(users).values({
+            openId,
+            name: sub.fullName,
+            email: sub.email,
+            passwordHash,
+            role: "student",
+            isActive: true,
+            loginMethod: "student-profile",
+          });
+          const userId = Number(insertedUser[0].insertId);
+
+          // Insert into studentProfiles
+          await db.insert(studentProfiles).values({
+            userId,
+            guardianName: null,
+            guardianPhone: null,
+            contactEmail: sub.email,
+            dateOfBirth: null,
+            address: null,
+            notes: null,
+            attendedSessions: 0,
+            totalSessions: 0,
+            currentLevel: null,
+            courseName: sub.programInterest,
+            courseCode: null,
+            courseStartDate: null,
+            courseEndDate: null,
+          });
+
+          user = { id: userId, openId, name: sub.fullName, email: sub.email, passwordHash, role: "student", isActive: true, loginMethod: "student-profile", createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() };
+        }
+
+        const [existingApp] = await db.select().from(applications).where(eq(applications.userId, user.id)).limit(1);
+        if (!existingApp) {
+          await db.insert(applications).values({
+            userId: user.id,
+            status: "submitted",
+          });
+        }
+      }
+    }
     return { success: true };
   }
 
@@ -1344,6 +1444,59 @@ export async function updateRegistrationSubmissionStatus(id: number, status: Reg
   if (sub) {
     sub.status = status;
     if (assignedToUserId !== undefined) sub.assignedToUserId = assignedToUserId;
+
+    if (status === "accountCreated") {
+      let user = inMemoryStore.users.find(u => u.email === sub.email);
+      if (!user) {
+        const userId = ++inMemoryStore.nextId;
+        user = {
+          id: userId,
+          openId: `student-profile:${randomUUID()}`,
+          name: sub.fullName,
+          email: sub.email,
+          passwordHash: createUserPasswordHash("lektor07xumoyun"),
+          role: "student" as const,
+          isActive: true,
+          loginMethod: "student-profile",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastSignedIn: new Date(),
+        };
+        inMemoryStore.users.push(user);
+
+        inMemoryStore.studentProfiles = inMemoryStore.studentProfiles || [];
+        inMemoryStore.studentProfiles.push({
+          id: ++inMemoryStore.nextId,
+          userId,
+          guardianName: "",
+          guardianPhone: "",
+          contactEmail: sub.email,
+          dateOfBirth: null,
+          address: "",
+          notes: "",
+          attendedSessions: 0,
+          totalSessions: 0,
+          currentLevel: "",
+          courseName: sub.programInterest,
+          courseCode: "",
+          courseStartDate: null,
+          courseEndDate: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+
+      const existingApp = inMemoryStore.applications.find(a => a.userId === user.id);
+      if (!existingApp) {
+        inMemoryStore.applications.unshift({
+          id: ++inMemoryStore.nextId,
+          userId: user.id,
+          status: "submitted",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    }
   }
   return { success: true };
 }
@@ -1520,6 +1673,21 @@ export async function createPromotion(input: Omit<Promotion, "id" | "usedCount" 
   };
   inMemoryStore.promotions.unshift(newPromo);
   return { id };
+}
+
+export async function updatePromotion(id: number, input: Partial<Omit<Promotion, "id" | "usedCount" | "createdAt" | "updatedAt">>) {
+  const db = await getDb();
+  if (db) {
+    await db.update(promotions).set({ ...input, updatedAt: new Date() }).where(eq(promotions.id, id));
+    return { success: true };
+  }
+
+  const promo = inMemoryStore.promotions.find(p => p.id === id);
+  if (promo) {
+    Object.assign(promo, input);
+    promo.updatedAt = new Date();
+  }
+  return { success: true };
 }
 
 export async function listPromotions() {
@@ -1701,4 +1869,38 @@ export async function getRegistrationSubmission(id: number) {
     values: inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === id),
   };
 }
+
+export async function getMessageTemplateByName(name: string) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(messageTemplates).where(eq(messageTemplates.name, name)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.messageTemplates.find(t => t.name === name);
+}
+
+export async function createNotificationLog(input: Omit<NotificationLog, "id" | "createdAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(notificationLogs).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+  const id = ++inMemoryStore.nextId;
+  const newLog: NotificationLog = {
+    id,
+    ...input,
+    createdAt: new Date(),
+  };
+  inMemoryStore.notificationLogs.unshift(newLog);
+  return { id };
+}
+
+export async function listNotificationLogs() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(notificationLogs).orderBy(desc(notificationLogs.createdAt));
+  }
+  return inMemoryStore.notificationLogs;
+}
+
 

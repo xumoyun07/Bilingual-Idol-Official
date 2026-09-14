@@ -33,6 +33,7 @@ import {
   Tag,
   Trash2,
   Users,
+  Pencil,
 } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -178,6 +179,19 @@ export default function MarketingDashboard() {
   const [newPromoMaxUses, setNewPromoMaxUses] = useState<string>("");
   const [newPromoStartsAt, setNewPromoStartsAt] = useState<string>("");
   const [newPromoExpiresAt, setNewPromoExpiresAt] = useState<string>("");
+  const [newPromoBannerUrl, setNewPromoBannerUrl] = useState("");
+
+  // Edit Promotion States
+  const [editingPromoId, setEditingPromoId] = useState<number | null>(null);
+  const [editPromoCode, setEditPromoCode] = useState("");
+  const [editPromoTitle, setEditPromoTitle] = useState("");
+  const [editPromoDescription, setEditPromoDescription] = useState("");
+  const [editPromoDiscountType, setEditPromoDiscountType] = useState<"percentage" | "fixed">("percentage");
+  const [editPromoDiscountValue, setEditPromoDiscountValue] = useState<number>(10);
+  const [editPromoMaxUses, setEditPromoMaxUses] = useState<string>("");
+  const [editPromoStartsAt, setEditPromoStartsAt] = useState<string>("");
+  const [editPromoExpiresAt, setEditPromoExpiresAt] = useState<string>("");
+  const [editPromoBannerUrl, setEditPromoBannerUrl] = useState("");
 
   const promotionsListQuery = trpc.promotions.list.useQuery();
 
@@ -191,6 +205,18 @@ export default function MarketingDashboard() {
       setNewPromoMaxUses("");
       setNewPromoStartsAt("");
       setNewPromoExpiresAt("");
+      setNewPromoBannerUrl("");
+      promotionsListQuery.refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    }
+  });
+
+  const updatePromotionMutation = trpc.promotions.update.useMutation({
+    onSuccess: () => {
+      toast.success("Promotion updated successfully");
+      setEditingPromoId(null);
       promotionsListQuery.refetch();
     },
     onError: (err) => {
@@ -207,6 +233,56 @@ export default function MarketingDashboard() {
       toast.error(err.message);
     }
   });
+
+  const startEditPromotion = (promo: any) => {
+    setEditingPromoId(promo.id);
+    setEditPromoCode(promo.code);
+    setEditPromoTitle(promo.title || "");
+    setEditPromoDescription(promo.description || "");
+    setEditPromoDiscountType(promo.discountType);
+    setEditPromoDiscountValue(promo.discountValue);
+    setEditPromoMaxUses(promo.maxUses ? String(promo.maxUses) : "");
+    setEditPromoStartsAt(promo.startsAt ? new Date(promo.startsAt).toISOString().split("T")[0] : "");
+    setEditPromoExpiresAt(promo.expiresAt ? new Date(promo.expiresAt).toISOString().split("T")[0] : "");
+    setEditPromoBannerUrl(promo.bannerUrl || "");
+  };
+
+  const handleUpdatePromotion = () => {
+    if (!editingPromoId) return;
+    if (!editPromoCode) {
+      toast.error("Promotion code is required");
+      return;
+    }
+    if (!editPromoTitle) {
+      toast.error("Promotion title is required");
+      return;
+    }
+    if (!editPromoDescription) {
+      toast.error("Promotion description is required");
+      return;
+    }
+    if (editPromoDiscountValue <= 0) {
+      toast.error("Discount value must be greater than zero");
+      return;
+    }
+
+    const startsAtDate = editPromoStartsAt ? new Date(editPromoStartsAt) : null;
+    const expiresAtDate = editPromoExpiresAt ? new Date(editPromoExpiresAt) : null;
+    const maxUsesNum = editPromoMaxUses ? parseInt(editPromoMaxUses, 10) : null;
+
+    updatePromotionMutation.mutate({
+      id: editingPromoId,
+      code: editPromoCode.trim().toUpperCase(),
+      title: editPromoTitle.trim(),
+      description: editPromoDescription.trim(),
+      discountType: editPromoDiscountType,
+      discountValue: editPromoDiscountValue,
+      maxUses: maxUsesNum,
+      startsAt: startsAtDate,
+      expiresAt: expiresAtDate,
+      bannerUrl: editPromoBannerUrl.trim() || null,
+    });
+  };
 
   const handleCreatePromotion = () => {
     if (!newPromoCode) {
@@ -240,6 +316,7 @@ export default function MarketingDashboard() {
       maxUses: maxUsesNum,
       startsAt: startsAtDate,
       expiresAt: expiresAtDate,
+      bannerUrl: newPromoBannerUrl.trim() || null,
       isActive: true,
     });
   };
@@ -1251,105 +1328,239 @@ export default function MarketingDashboard() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
-                    {/* Column 1: Add Promotion Form (2/5 span) */}
+                    {/* Column 1: Add or Edit Promotion Form (2/5 span) */}
                     <div className="p-6 space-y-4 lg:col-span-2">
-                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Create New Promotion</h4>
-                      
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-xs font-semibold text-slate-700 block mb-1">Promo Code (Unique)</label>
-                          <Input
-                            placeholder="e.g. FLASH25"
-                            value={newPromoCode}
-                            onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
-                            className="font-mono text-xs"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Title</label>
-                          <Input
-                            placeholder="e.g. Year-End Holiday Campaign"
-                            value={newPromoTitle}
-                            onChange={(e) => setNewPromoTitle(e.target.value)}
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Description</label>
-                          <Textarea
-                            placeholder="Describe what this promotion offers (e.g. RM 100 off on IELTS exam prep package)..."
-                            value={newPromoDescription}
-                            onChange={(e) => setNewPromoDescription(e.target.value)}
-                            className="text-xs min-h-[70px]"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="text-xs font-semibold text-slate-700 block mb-1">Type</label>
-                            <select
-                              value={newPromoDiscountType}
-                              onChange={(e) => setNewPromoDiscountType(e.target.value as "percentage" | "fixed")}
-                              className="w-full bg-white border border-slate-200 rounded-md p-2 text-xs font-semibold text-slate-700 focus:outline-hidden"
+                      {editingPromoId ? (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Edit Promotion</h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingPromoId(null)}
+                              className="text-xs h-7 text-slate-500 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
                             >
-                              <option value="percentage">Percentage (%)</option>
-                              <option value="fixed">Fixed Flat (RM)</option>
-                            </select>
+                              Cancel
+                            </Button>
                           </div>
-                          <div>
-                            <label className="text-xs font-semibold text-slate-700 block mb-1">
-                              Value {newPromoDiscountType === "percentage" ? "(%)" : "(RM)"}
-                            </label>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={newPromoDiscountValue}
-                              onChange={(e) => setNewPromoDiscountValue(parseInt(e.target.value, 10) || 0)}
-                              className="text-xs font-semibold"
-                            />
-                          </div>
-                        </div>
+                          
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Promo Code (Unique)</label>
+                              <Input
+                                placeholder="e.g. FLASH25"
+                                value={editPromoCode}
+                                onChange={(e) => setEditPromoCode(e.target.value.toUpperCase())}
+                                className="font-mono text-xs"
+                              />
+                            </div>
 
-                        <div className="grid grid-cols-3 gap-2">
-                          <div className="col-span-1">
-                            <label className="text-xs font-semibold text-slate-700 block mb-1">Max Uses</label>
-                            <Input
-                              type="number"
-                              placeholder="No limit"
-                              value={newPromoMaxUses}
-                              onChange={(e) => setNewPromoMaxUses(e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                          <div className="col-span-1">
-                            <label className="text-xs font-semibold text-slate-700 block mb-1">Starts At</label>
-                            <Input
-                              type="date"
-                              value={newPromoStartsAt}
-                              onChange={(e) => setNewPromoStartsAt(e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                          <div className="col-span-1">
-                            <label className="text-xs font-semibold text-slate-700 block mb-1">Expires At</label>
-                            <Input
-                              type="date"
-                              value={newPromoExpiresAt}
-                              onChange={(e) => setNewPromoExpiresAt(e.target.value)}
-                              className="text-xs"
-                            />
-                          </div>
-                        </div>
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Title</label>
+                              <Input
+                                placeholder="e.g. Year-End Holiday Campaign"
+                                value={editPromoTitle}
+                                onChange={(e) => setEditPromoTitle(e.target.value)}
+                              />
+                            </div>
 
-                        <Button
-                          onClick={handleCreatePromotion}
-                          disabled={createPromotionMutation.isPending}
-                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 mt-2 transition-all cursor-pointer"
-                        >
-                          {createPromotionMutation.isPending ? "Creating..." : "Add Active Promotion"}
-                        </Button>
-                      </div>
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Description</label>
+                              <Textarea
+                                placeholder="Describe what this promotion offers (e.g. RM 100 off on IELTS exam prep package)..."
+                                value={editPromoDescription}
+                                onChange={(e) => setEditPromoDescription(e.target.value)}
+                                className="text-xs min-h-[70px]"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Banner Image URL</label>
+                              <Input
+                                placeholder="https://example.com/images/banner.jpg"
+                                value={editPromoBannerUrl}
+                                onChange={(e) => setEditPromoBannerUrl(e.target.value)}
+                                className="text-xs"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Type</label>
+                                <select
+                                  value={editPromoDiscountType}
+                                  onChange={(e) => setEditPromoDiscountType(e.target.value as "percentage" | "fixed")}
+                                  className="w-full bg-white border border-slate-200 rounded-md p-2 text-xs font-semibold text-slate-700 focus:outline-hidden"
+                                >
+                                  <option value="percentage">Percentage (%)</option>
+                                  <option value="fixed">Fixed Flat (RM)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                                  Value {editPromoDiscountType === "percentage" ? "(%)" : "(RM)"}
+                                </label>
+                                <Input
+                                  type="number"
+                                  min={1}
+                                  value={editPromoDiscountValue}
+                                  onChange={(e) => setEditPromoDiscountValue(parseInt(e.target.value, 10) || 0)}
+                                  className="text-xs font-semibold"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="col-span-1">
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Max Uses</label>
+                                <Input
+                                  type="number"
+                                  placeholder="No limit"
+                                  value={editPromoMaxUses}
+                                  onChange={(e) => setEditPromoMaxUses(e.target.value)}
+                                  className="text-xs"
+                                />
+                              </div>
+                              <div className="col-span-1">
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Starts At</label>
+                                <Input
+                                  type="date"
+                                  value={editPromoStartsAt}
+                                  onChange={(e) => setEditPromoStartsAt(e.target.value)}
+                                  className="text-xs"
+                                />
+                              </div>
+                              <div className="col-span-1">
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Expires At</label>
+                                <Input
+                                  type="date"
+                                  value={editPromoExpiresAt}
+                                  onChange={(e) => setEditPromoExpiresAt(e.target.value)}
+                                  className="text-xs"
+                                />
+                              </div>
+                            </div>
+
+                            <Button
+                              onClick={handleUpdatePromotion}
+                              disabled={updatePromotionMutation.isPending}
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 mt-2 transition-all cursor-pointer"
+                            >
+                              {updatePromotionMutation.isPending ? "Updating..." : "Save Changes"}
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Create New Promotion</h4>
+                          
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Promo Code (Unique)</label>
+                              <Input
+                                placeholder="e.g. FLASH25"
+                                value={newPromoCode}
+                                onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
+                                className="font-mono text-xs"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Title</label>
+                              <Input
+                                placeholder="e.g. Year-End Holiday Campaign"
+                                value={newPromoTitle}
+                                onChange={(e) => setNewPromoTitle(e.target.value)}
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Promotion Description</label>
+                              <Textarea
+                                placeholder="Describe what this promotion offers (e.g. RM 100 off on IELTS exam prep package)..."
+                                value={newPromoDescription}
+                                onChange={(e) => setNewPromoDescription(e.target.value)}
+                                className="text-xs min-h-[70px]"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-semibold text-slate-700 block mb-1">Banner Image URL</label>
+                              <Input
+                                placeholder="https://example.com/images/banner.jpg"
+                                value={newPromoBannerUrl}
+                                onChange={(e) => setNewPromoBannerUrl(e.target.value)}
+                                className="text-xs"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Type</label>
+                                <select
+                                  value={newPromoDiscountType}
+                                  onChange={(e) => setNewPromoDiscountType(e.target.value as "percentage" | "fixed")}
+                                  className="w-full bg-white border border-slate-200 rounded-md p-2 text-xs font-semibold text-slate-700 focus:outline-hidden"
+                                >
+                                  <option value="percentage">Percentage (%)</option>
+                                  <option value="fixed">Fixed Flat (RM)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                                  Value {newPromoDiscountType === "percentage" ? "(%)" : "(RM)"}
+                                </label>
+                                <Input
+                                  type="number"
+                                  min={1}
+                                  value={newPromoDiscountValue}
+                                  onChange={(e) => setNewPromoDiscountValue(parseInt(e.target.value, 10) || 0)}
+                                  className="text-xs font-semibold"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="col-span-1">
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Max Uses</label>
+                                <Input
+                                  type="number"
+                                  placeholder="No limit"
+                                  value={newPromoMaxUses}
+                                  onChange={(e) => setNewPromoMaxUses(e.target.value)}
+                                  className="text-xs"
+                                />
+                              </div>
+                              <div className="col-span-1">
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Starts At</label>
+                                <Input
+                                  type="date"
+                                  value={newPromoStartsAt}
+                                  onChange={(e) => setNewPromoStartsAt(e.target.value)}
+                                  className="text-xs"
+                                />
+                              </div>
+                              <div className="col-span-1">
+                                <label className="text-xs font-semibold text-slate-700 block mb-1">Expires At</label>
+                                <Input
+                                  type="date"
+                                  value={newPromoExpiresAt}
+                                  onChange={(e) => setNewPromoExpiresAt(e.target.value)}
+                                  className="text-xs"
+                                />
+                              </div>
+                            </div>
+
+                            <Button
+                              onClick={handleCreatePromotion}
+                              disabled={createPromotionMutation.isPending}
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 mt-2 transition-all cursor-pointer"
+                            >
+                              {createPromotionMutation.isPending ? "Creating..." : "Add Active Promotion"}
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {/* Column 2: Current Active Promotions List (3/5 span) */}
@@ -1398,19 +1609,31 @@ export default function MarketingDashboard() {
                                   )}
                                 </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                disabled={deletePromotionMutation.isPending}
-                                onClick={() => {
-                                  if (confirm(`Are you sure you want to delete promotion code ${promo.code}?`)) {
-                                    deletePromotionMutation.mutate({ id: promo.id });
-                                  }
-                                }}
-                                className="h-8 w-8 p-0 text-rose-500 hover:bg-rose-50 shrink-0 cursor-pointer"
-                              >
-                                <Trash2 size={14} />
-                              </Button>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => startEditPromotion(promo)}
+                                  className="h-8 w-8 p-0 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
+                                  title="Edit Promotion"
+                                >
+                                  <Pencil size={14} />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  disabled={deletePromotionMutation.isPending}
+                                  onClick={() => {
+                                    if (confirm(`Are you sure you want to delete promotion code ${promo.code}?`)) {
+                                      deletePromotionMutation.mutate({ id: promo.id });
+                                    }
+                                  }}
+                                  className="h-8 w-8 p-0 text-rose-500 hover:bg-rose-50 cursor-pointer"
+                                  title="Delete Promotion"
+                                >
+                                  <Trash2 size={14} />
+                                </Button>
+                              </div>
                             </div>
                           ))
                         ) : (

@@ -38,6 +38,31 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
+
+  // Self-destroying service worker to force-unregister any stale service workers
+  app.get("/sw.js", (req, res) => {
+    res.setHeader("Content-Type", "application/javascript");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    res.send(`
+      self.addEventListener('install', function(e) {
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', function(e) {
+        self.registration.unregister()
+          .then(function() {
+            return self.clients.matchAll();
+          })
+          .then(function(clients) {
+            clients.forEach(function(client) {
+              if (client.navigate) {
+                client.navigate(client.url);
+              }
+            });
+          });
+      });
+    `);
+  });
+
   app.post(auditRotationSchedulePath, handleScheduledAuditRotation);
   app.get(teacherClassSessionsPath, handleTeacherClassSessions);
   app.get(`${teacherClassSessionsPath}/:id`, handleTeacherClassSessionDetails);

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import * as db from "../db";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import * as audit from "../audit";
 
 export const paymentsRouter = router({
   create: publicProcedure
@@ -75,6 +76,25 @@ export const paymentsRouter = router({
           const activeApp = apps.find(a => a.status === "submitted" || a.status === "offerIssued" || a.status === "underReview");
           if (activeApp) {
             await db.updateApplicationStatus(activeApp.id, "paymentCompleted");
+            
+            // Log this status change audit event!
+            try {
+              await audit.writeAuditEvent({
+                actor: { id: foundPayment.userId, role: "student" },
+                action: "user.update" as any,
+                targetType: "application" as any,
+                targetId: activeApp.id,
+                description: `Payment simulation auto-transitioned application status from "${activeApp.status}" to "paymentCompleted" via webhook.`,
+                metadata: {
+                  fromStatus: activeApp.status,
+                  toStatus: "paymentCompleted",
+                  paymentId: foundPayment.id,
+                  transactionReference,
+                },
+              });
+            } catch (err) {
+              console.error("Failed to write audit event for webhook transition:", err);
+            }
           }
         }
       }

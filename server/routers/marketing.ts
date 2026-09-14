@@ -496,7 +496,7 @@ export const marketingRouter = router({
     .input(z.record(z.string(), z.string()))
     .mutation(({ ctx, input }) => marketing.updateCtaSettings(input, ctx.user.role)),
 
-  getTrackingSettings: contentManagerProcedure.query(() => marketing.getTrackingSettings()),
+  getTrackingSettings: contentManagerProcedure.query(({ ctx }) => marketing.getTrackingSettings(ctx.user.role)),
 
   updateTrackingSettings: contentManagerProcedure
     .input(z.record(z.string(), z.string()))
