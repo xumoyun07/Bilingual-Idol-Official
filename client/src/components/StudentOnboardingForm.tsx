@@ -80,7 +80,7 @@ export function StudentOnboardingForm({ onComplete }: { onComplete?: () => void 
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
-          {fields.map((field) => {
+          {fields.map((field: any) => {
             const isErr = !!form.formState.errors[field.key];
             const errMsg = form.formState.errors[field.key]?.message;
 
@@ -129,7 +129,7 @@ export function StudentOnboardingForm({ onComplete }: { onComplete?: () => void 
                       {...form.register(field.key)}
                     >
                       <option value="">{field.placeholder || "Select option..."}</option>
-                      {field.options?.map((opt) => (
+                      {field.options?.map((opt: string) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>

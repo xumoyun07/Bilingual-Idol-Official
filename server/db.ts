@@ -1333,7 +1333,7 @@ export async function getUserProfileValues(userId: number) {
   return inMemoryStore.userProfileValues.filter(v => v.userId === userId);
 }
 
-export async function updateRegistrationSubmissionStatus(id: number, status: RegistrationSubmission["status"], assignedToUserId?: number) {
+export async function updateRegistrationSubmissionStatus(id: number, status: RegistrationSubmission["status"], assignedToUserId?: number | null) {
   const db = await getDb();
   if (db) {
     await db.update(registrationSubmissions).set({ status, assignedToUserId: assignedToUserId ?? null }).where(eq(registrationSubmissions.id, id));
@@ -1617,5 +1617,88 @@ export async function updatePaymentStatus(id: number, status: Payment["status"],
     if (method) pay.paymentMethod = method;
   }
   return { success: true };
+}
+
+// Dynamic CRM Form schemas and user profile value saving
+export async function getRegistrationFormSchema() {
+  const { sections, fields } = await getUserFormSchema(false);
+  const registrationFields = fields.filter(f => f.collectionStage === "atRegistration");
+  const activeSectionIds = new Set(registrationFields.map(f => f.sectionId).filter(Boolean));
+  const filteredSections = sections.filter(s => activeSectionIds.has(s.id));
+  return { sections: filteredSections, fields: registrationFields };
+}
+
+export async function getStudentOnboardingSchema(userId: number) {
+  const { sections, fields } = await getUserFormSchema(false);
+  const onboardingFields = fields.filter(f => f.collectionStage === "atFirstLogin");
+
+  const filledValues = await getUserProfileValues(userId);
+  const filledFieldIds = new Set(filledValues.map(v => v.fieldId));
+
+  const remainingFields = onboardingFields.filter(f => !filledFieldIds.has(f.id));
+  const remainingSectionIds = new Set(remainingFields.map(f => f.sectionId).filter(Boolean));
+  const filteredSections = sections.filter(s => remainingSectionIds.has(s.id));
+
+  return { sections: filteredSections, fields: remainingFields };
+}
+
+export async function saveUserProfileValues(userId: number, values: Record<string, string>) {
+  const database = await getDb();
+  const { fields } = await getUserFormSchema(false);
+  
+  const validated = validateProfileValues(fields, values);
+  const rows = Object.entries(validated).map(([fieldId, value]) => ({
+    userId,
+    fieldId: Number(fieldId),
+    value,
+  }));
+
+  if (rows.length === 0) return { success: true };
+
+  if (database) {
+    for (const row of rows) {
+      await database.insert(userProfileValues)
+        .values(row)
+        .onDuplicateKeyUpdate({ set: { value: row.value } });
+    }
+    return { success: true };
+  }
+
+  for (const row of rows) {
+    const existingIdx = inMemoryStore.userProfileValues.findIndex(
+      v => v.userId === row.userId && v.fieldId === row.fieldId
+    );
+    if (existingIdx !== -1) {
+      inMemoryStore.userProfileValues[existingIdx].value = row.value;
+    } else {
+      inMemoryStore.userProfileValues.push({
+        userId: row.userId,
+        fieldId: row.fieldId,
+        value: row.value,
+      });
+    }
+  }
+  return { success: true };
+}
+
+export async function getRegistrationSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    const subs = await db.select().from(registrationSubmissions).where(eq(registrationSubmissions.id, id)).limit(1);
+    if (!subs.length) return undefined;
+    const sub = subs[0];
+    const vals = await db.select().from(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, id));
+    return {
+      ...sub,
+      values: vals,
+    };
+  }
+
+  const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
+  if (!sub) return undefined;
+  return {
+    ...sub,
+    values: inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === id),
+  };
 }
 

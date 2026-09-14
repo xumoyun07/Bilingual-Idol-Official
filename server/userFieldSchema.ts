@@ -13,7 +13,6 @@ export type RuntimeUserField = {
   sectionId: number | null;
   sortOrder: number;
   isActive: boolean;
-  collectionStage: "atRegistration" | "atFirstLogin";
 };
 
 export function parseFieldOptions(value: string | null): string[] {

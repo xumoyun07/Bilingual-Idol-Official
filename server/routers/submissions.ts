@@ -36,9 +36,6 @@ export const createInquiryInput = z.object({
 export const submissionsRouter = router({
   list: adminProcedure.query(() => db.listSubmissions()),
   create: publicProcedure.input(submissionInput).mutation(({ input }) => db.createSubmission(input)),
-  createInquiry: publicProcedure
-    .input(createInquiryInput)
-    .mutation(({ input }) => db.createSubmission({ ...input, type: "inquiry" })),
   updateStatus: adminProcedure
     .input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "contacted", "interested", "enrolled", "closed"]) }))
     .mutation(({ input }) => db.updateSubmissionStatus(input.id, input.status)),
@@ -46,7 +43,7 @@ export const submissionsRouter = router({
     .input(z.object({ id: z.number().int().positive() }))
     .mutation(({ input }) => db.deleteSubmission(input.id)),
 
-  // Form 1: Inquiry Submission
+  // Form 1: Inquiry Submission (from General Contact / LeadForm)
   createInquiry: publicProcedure
     .input(z.object({
       name: z.string().trim().min(2, "Name is too short.").max(160),
@@ -59,7 +56,19 @@ export const submissionsRouter = router({
       message: "Please provide at least an email or phone number.",
       path: ["email"],
     }))
-    .mutation(({ input }) => db.createInquiry(input)),
+    .mutation(({ input }) => db.createSubmission({
+      type: "inquiry",
+      studentName: input.name,
+      studentAge: 18, // Default fallback age
+      parentName: input.name,
+      parentEmail: input.email || "no-email@bilc.my",
+      parentPhone: input.phone || "no-phone",
+      programInterest: "General Inquiry",
+      preferredSchedule: "Any",
+      message: input.message || "",
+      source: input.sourcePage || "website",
+      reasonType: input.reasonType,
+    })),
 
   // Form 2 Schema & Submission
   getRegistrationSchema: publicProcedure.query(() => db.getRegistrationFormSchema()),
@@ -72,12 +81,48 @@ export const submissionsRouter = router({
       phone: z.string().trim().min(7, "Please enter a valid phone number."),
       values: z.record(z.string(), z.string()).default({}),
     }))
-    .mutation(({ input }) => db.createRegistrationSubmission(input)),
+    .mutation(async ({ input }) => {
+      const { fields } = await db.getUserFormSchema(false);
+      const registrationFields = fields.filter(f => f.collectionStage === "atRegistration");
+      
+      const fieldValues: Array<{ fieldId: number; value: string }> = [];
+      for (const field of registrationFields) {
+        const val = input.values[field.key];
+        if (val !== undefined) {
+          fieldValues.push({
+            fieldId: field.id,
+            value: val,
+          });
+        }
+      }
+
+      const submissionInput = {
+        programInterest: input.programInterest,
+        applicantCategory: input.applicantCategory,
+        fullName: input.fullName,
+        email: input.email,
+        phone: input.phone,
+        assignedToUserId: null,
+        utmSource: null,
+        utmMedium: null,
+        utmCampaign: null,
+        utmTerm: null,
+        utmContent: null,
+      };
+
+      return db.createRegistrationSubmission(submissionInput, fieldValues);
+    }),
 
   // CRM & Admin controls for Registration Submissions
   listRegistrations: adminProcedure
     .input(z.object({ assignedToUserId: z.number().optional() }).optional())
-    .query(({ input }) => db.listRegistrationSubmissions(input?.assignedToUserId)),
+    .query(async ({ input }) => {
+      const all = await db.listRegistrationSubmissions();
+      if (input?.assignedToUserId !== undefined) {
+        return all.filter(s => s.assignedToUserId === input.assignedToUserId);
+      }
+      return all;
+    }),
   getRegistration: adminProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .query(({ input }) => db.getRegistrationSubmission(input.id)),
