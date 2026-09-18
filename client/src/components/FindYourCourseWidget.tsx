@@ -498,9 +498,17 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                 </div>
 
                 <div className="bilc-result-actions">
-                  <Link href={`/enroll?programInterest=${encodeURIComponent(rec.title)}`} className="simple-button bg-[#173fad] hover:bg-[#102c7e] text-white">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent("open-registry-modal", {
+                        detail: { programInterest: rec.title }
+                      }));
+                    }}
+                    className="simple-button bg-[#173fad] hover:bg-[#102c7e] text-white cursor-pointer"
+                  >
                     {language === "ms" ? "Tempah Kelas Anda (Daftar)" : language === "ar" ? "احجز صفك الدراسي (تسجيل)" : "Book Your Class (Register)"} <ArrowRight size={16} className={isRTL ? "rotate-180" : ""} />
-                  </Link>
+                  </button>
 
                   <Link href={`/programs/${rec.slug}`} className="simple-button simple-button-quiet">
                     {language === "ms" ? "Lihat Butiran Kursus" : language === "ar" ? "تفاصيل البرنامج" : "View Course Details"}

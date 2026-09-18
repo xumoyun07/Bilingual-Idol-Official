@@ -1,6 +1,6 @@
 import { ArrowRight, Award, BookOpen, Building2, Calendar, Globe, GraduationCap, MapPin, MessageCircle, Phone, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
 import { OfficialPriceList2026 } from "@/components/OfficialPriceList2026";
@@ -9,13 +9,11 @@ import { StudentJourneyRoadmap } from "@/components/StudentJourneyRoadmap";
 import { VerifiedTestimonials } from "@/components/VerifiedTestimonials";
 import { FindYourCourseWidget } from "@/components/FindYourCourseWidget";
 import { OnlinePlacementTestModal } from "@/components/OnlinePlacementTestModal";
-import { BookingSystemModal } from "@/components/BookingSystemModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
+  const [_, setLocation] = useLocation();
   const [isPlacementTestOpen, setIsPlacementTestOpen] = useState(false);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [bookingService, setBookingService] = useState<string>("placement_test");
   const { t, isRTL, language } = useLanguage();
 
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -70,15 +68,15 @@ export default function Home() {
   }, [heroVideoUrl]);
 
   const handleOpenBooking = (service?: string) => {
-    if (service) setBookingService(service);
-    setIsBookingOpen(true);
+    const reason = service === "campus_tour" ? "campusTour" : "consultation";
+    setLocation(`/contact?reason=${reason}`);
   };
 
   return (
     <PublicLayout>
       <div id="home-page-container" data-page="home" className={`simple-public-page home-page page-home ${isRTL ? "is-rtl" : ""} max-md:!mt-[10px]`}>
         {/* Luxury Hero Section with Seamless Loop Video */}
-        <section id="home-hero-section" className="simple-home-intro simple-home-intro-media simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580 max-md:!mt-[10px]">
+        <section id="home-hero-section" className="simple-home-intro simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580 max-md:!mt-[10px]">
           <video
             ref={heroVideoRef}
             className="simple-home-hero-media"
@@ -137,13 +135,12 @@ export default function Home() {
               <a href="#course-pricing" className="simple-button simple-button-quiet">
                 {t("home.pricingEyebrow")} <ArrowRight size={17} className={isRTL ? "rotate-180" : ""} />
               </a>
-              <button
-                type="button"
-                onClick={() => handleOpenBooking("campus_tour")}
-                className="simple-button simple-button-quiet"
+              <Link
+                href="/contact?reason=campusTour"
+                className="simple-button simple-button-quiet cursor-pointer"
               >
                 <Calendar size={17} /> {t("home.ctaBooking")}
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -306,11 +303,9 @@ export default function Home() {
               </div>
             </a>
 
-            <button 
-              type="button" 
-              onClick={() => handleOpenBooking("consultation")} 
+            <Link 
+              href="/contact?reason=consultation" 
               className={`simple-task-card ${isRTL ? "text-right" : "text-left"}`}
-              style={{ background: "none", border: "none", padding: 0 }}
             >
               <div className="simple-task-card-media-wrap">
                 {contactMedia ? (
@@ -331,7 +326,7 @@ export default function Home() {
                   <ArrowRight size={16} className={`simple-task-arrow ${isRTL ? "rotate-180" : ""}`} />
                 </div>
               </div>
-            </button>
+            </Link>
 
             <Link href="/login" className="simple-task-card">
               <div className="simple-task-card-media-wrap">
@@ -380,13 +375,12 @@ export default function Home() {
             <a href="tel:+60367310449" className="simple-button simple-button-quiet">
               <Phone size={16} /> +60 3-6731 0449
             </a>
-            <button
-              type="button"
-              onClick={() => handleOpenBooking("campus_tour")}
-              className="simple-button"
+            <Link
+              href="/contact?reason=campusTour"
+              className="simple-button cursor-pointer"
             >
               {t("home.ctaBooking")} <ArrowRight size={17} className={isRTL ? "rotate-180" : ""} />
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -394,12 +388,6 @@ export default function Home() {
         <OnlinePlacementTestModal
           isOpen={isPlacementTestOpen}
           onClose={() => setIsPlacementTestOpen(false)}
-        />
-
-        <BookingSystemModal
-          isOpen={isBookingOpen}
-          onClose={() => setIsBookingOpen(false)}
-          initialService={bookingService}
         />
       </div>
     </PublicLayout>

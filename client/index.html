@@ -19,8 +19,117 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/src/index.css" />
     <title>Bilingual Idol Language Centre</title>
+    <script>
+      (function() {
+        try {
+          if (typeof window === 'undefined') return;
+
+          // Exception-safe Service Worker and Cache Storage removal
+          try {
+            if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(regs) {
+                if (regs && regs.length > 0) {
+                  for (var i = 0; i < regs.length; i++) {
+                    try {
+                      regs[i].unregister();
+                    } catch (err) {}
+                  }
+                }
+              }).catch(function() {});
+            }
+          } catch (e) {
+            console.warn('[SW Cleanup Error]', e);
+          }
+
+          try {
+            if (typeof window !== 'undefined' && 'caches' in window) {
+              caches.keys().then(function(keys) {
+                if (keys && keys.length > 0) {
+                  Promise.all(keys.map(function(k) { 
+                    try { return caches.delete(k); } catch (err) { return Promise.resolve(false); }
+                  })).catch(function() {});
+                }
+              }).catch(function() {});
+            }
+          } catch (e) {
+            console.warn('[Cache Cleanup Error]', e);
+          }
+
+          // Exception-safe sessionStorage access
+          var sessionStore = null;
+          try {
+            if (typeof sessionStorage !== 'undefined') {
+              sessionStore = sessionStorage;
+            }
+          } catch (e) {}
+
+          // Exception-safe self-healing reload trigger
+          function triggerSelfHealing() {
+            try {
+              if (sessionStore) {
+                if (!sessionStore.getItem('__hook_fix_reload')) {
+                  sessionStore.setItem('__hook_fix_reload', '1');
+                  if ('caches' in window) {
+                    caches.keys().then(function(keys) {
+                      Promise.all(keys.map(function(k) { 
+                        try { return caches.delete(k); } catch (err) { return Promise.resolve(false); }
+                      })).then(function() {
+                        window.location.reload();
+                      }).catch(function() {
+                        window.location.reload();
+                      });
+                    }).catch(function() {
+                      window.location.reload();
+                    });
+                  } else {
+                    window.location.reload();
+                  }
+                }
+              } else {
+                window.location.reload();
+              }
+            } catch (e) {
+              try { window.location.reload(); } catch (err) {}
+            }
+          }
+
+          window.addEventListener('error', function(event) {
+            try {
+              var text = (event && (event.message || (event.error && event.error.message))) || '';
+              if (
+                text.indexOf('useState') !== -1 ||
+                text.indexOf('Invalid hook call') !== -1 ||
+                text.indexOf('Outdated Optimize Dep') !== -1 ||
+                text.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+                text.indexOf('ChunkLoadError') !== -1 ||
+                text.indexOf('loading chunk') !== -1
+              ) {
+                triggerSelfHealing();
+              }
+            } catch (err) {}
+          });
+
+          window.addEventListener('unhandledrejection', function(event) {
+            try {
+              var reason = event && event.reason;
+              var text = (reason && (reason.message || reason)) || '';
+              if (
+                typeof text === 'string' &&
+                (text.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+                 text.indexOf('ChunkLoadError') !== -1 ||
+                 text.indexOf('loading chunk') !== -1)
+              ) {
+                triggerSelfHealing();
+              }
+            } catch (err) {}
+          });
+
+        } catch (globalErr) {
+          console.error('[Global Healing Error]', globalErr);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

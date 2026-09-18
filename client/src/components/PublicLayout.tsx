@@ -9,6 +9,7 @@ import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
 import { PromotionalPopupModal, PromotionalFloatingBadge } from "@/components/PromotionalPopup";
+import { OfficialRegistryModal } from "@/components/OfficialRegistryModal";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [promoOpen, setPromoOpen] = useState(false);
@@ -16,6 +17,13 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [location] = useLocation();
   const { t, isRTL, language } = useLanguage();
+  const [isRegistryOpen, setIsRegistryOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = () => setIsRegistryOpen(true);
+    window.addEventListener("open-registry-modal", handleOpen);
+    return () => window.removeEventListener("open-registry-modal", handleOpen);
+  }, []);
 
   const defaultNav = [
     { label: "Home", href: "/" },
@@ -258,9 +266,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <Link href="/login" className="simple-button simple-button-quiet">
               {t("nav.signIn")}
             </Link>
-            <Link href="/enroll" className="simple-button">
+            <button
+              onClick={() => setIsRegistryOpen(true)}
+              className="simple-button cursor-pointer"
+            >
               {t("nav.makeEnquiry", undefined, "Make an enquiry")}
-            </Link>
+            </button>
           </div>
           <div className="flex items-center gap-2 md:hidden">
             <PWAInstallButton variant="header" className="!px-2.5 !py-1 text-[11px]" />
@@ -291,9 +302,15 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <Link href="/login" className="simple-button simple-button-quiet mt-2" onClick={close}>
               {t("nav.signIn")}
             </Link>
-            <Link href="/enroll" className="simple-button" onClick={close}>
+            <button
+              onClick={() => {
+                close();
+                setIsRegistryOpen(true);
+              }}
+              className="simple-button cursor-pointer text-center"
+            >
               {t("nav.makeEnquiry", undefined, "Make an enquiry")}
-            </Link>
+            </button>
           </nav>
         )}
       </header>
@@ -353,6 +370,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
         </button>
       </div>
+
+      {/* Official Registry Modal */}
+      <OfficialRegistryModal isOpen={isRegistryOpen} onClose={() => setIsRegistryOpen(false)} />
     </div>
   );
 }

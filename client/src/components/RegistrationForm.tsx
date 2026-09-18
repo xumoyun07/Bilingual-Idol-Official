@@ -55,6 +55,29 @@ export function RegistrationForm({ title }: { title?: string }) {
     if (catPrefill) {
       form.setValue("applicantCategory", catPrefill);
     }
+
+    const handlePrefill = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.programInterest) {
+        const pInterest = customEvent.detail.programInterest;
+        const match = programsQuery.data?.find(
+          p => p.title.toLowerCase() === pInterest.toLowerCase() || p.slug === pInterest.toLowerCase()
+        );
+        if (match) {
+          form.setValue("programInterest", match.title);
+        } else {
+          form.setValue("programInterest", pInterest);
+        }
+      }
+      if (customEvent.detail?.applicantCategory) {
+        form.setValue("applicantCategory", customEvent.detail.applicantCategory);
+      }
+    };
+
+    window.addEventListener("open-registry-modal", handlePrefill);
+    return () => {
+      window.removeEventListener("open-registry-modal", handlePrefill);
+    };
   }, [programsQuery.data, form]);
 
   const handleCustomFieldChange = (fieldId: number, value: string) => {

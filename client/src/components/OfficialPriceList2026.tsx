@@ -275,6 +275,12 @@ export function OfficialPriceList2026() {
   const [activeTab, setActiveTab] = useState<CourseCategory>("general");
   const { t, isRTL, language } = useLanguage();
 
+  const handleEnquireClick = (courseName: string) => {
+    window.dispatchEvent(new CustomEvent("open-registry-modal", {
+      detail: { programInterest: courseName }
+    }));
+  };
+
   return (
     <section className={`simple-section bilc-pricing-section ${isRTL ? "is-rtl" : ""}`} id="course-pricing">
       <div className="bilc-pricing-header" style={{ marginLeft: 0 }}>
@@ -386,9 +392,13 @@ export function OfficialPriceList2026() {
                           <td><bdi dir="ltr">{visaText}</bdi></td>
                           <td className="bilc-price-cell"><bdi dir="ltr">{course.tuitionFee}</bdi></td>
                           <td>
-                            <Link href={`/enroll?course=General+English+${encodeURIComponent(course.rawDuration)}`} className="bilc-enroll-inline-btn">
+                            <button
+                              type="button"
+                              onClick={() => handleEnquireClick(`General English (${course.rawDuration})`)}
+                              className="bilc-enroll-inline-btn cursor-pointer"
+                            >
                               {language === "ms" ? "Daftar" : language === "ar" ? "استفسار" : "Enquire"}
-                            </Link>
+                            </button>
                           </td>
                         </tr>
                       );
@@ -446,15 +456,16 @@ export function OfficialPriceList2026() {
                       </div>
                     </div>
 
-                    <Link 
-                      href={`/enroll?course=General+English+${encodeURIComponent(course.rawDuration)}`} 
-                      className="bilc-mobile-card-cta"
+                    <button 
+                      type="button"
+                      onClick={() => handleEnquireClick(`General English (${course.rawDuration})`)}
+                      className="bilc-mobile-card-cta cursor-pointer text-left w-full flex justify-between items-center"
                     >
                       <span>
                         {language === "ms" ? `Tanya mengenai ${durText}` : language === "ar" ? `استفسر عن مدة ${durText}` : `Enquire for ${durText}`}
                       </span>
                       <ChevronRight size={18} />
-                    </Link>
+                    </button>
                   </div>
                 );
               })}
@@ -509,9 +520,13 @@ export function OfficialPriceList2026() {
                         <li><CheckCircle2 size={14} /> {language === "ms" ? "Sijil Tamat Kursus Rasmi" : language === "ar" ? "شهادة إتمام معتمدة رسمياً" : "Official Certificate of Completion"}</li>
                       </ul>
                     </div>
-                    <Link href={`/enroll?course=${encodeURIComponent(course.rawName)}`} className="simple-button w-full">
+                    <button
+                      type="button"
+                      onClick={() => handleEnquireClick(`IELTS: ${course.rawName}`)}
+                      className="simple-button w-full cursor-pointer"
+                    >
                       {language === "ms" ? `Tanya mengenai ${nameText}` : language === "ar" ? `استفسر عن ${nameText}` : `Enquire for ${nameText}`}
-                    </Link>
+                    </button>
                   </div>
                 );
               })}
@@ -552,9 +567,13 @@ export function OfficialPriceList2026() {
                         <li><CheckCircle2 size={14} /> {language === "ms" ? "Sijil Rasmi & Majlis Graduasi" : language === "ar" ? "شهادات رسمية وحفل تخرج" : "Official Certificates & Graduation"}</li>
                       </ul>
                     </div>
-                    <Link href={`/enroll?course=${encodeURIComponent(course.rawName)}`} className="simple-button w-full">
+                    <button
+                      type="button"
+                      onClick={() => handleEnquireClick(`Summer Camp: ${course.rawName}`)}
+                      className="simple-button w-full cursor-pointer"
+                    >
                       {language === "ms" ? "Tanya mengenai Kem" : language === "ar" ? "استفسر عن المخيم" : "Enquire for Camp"}
-                    </Link>
+                    </button>
                   </div>
                 );
               })}
@@ -592,9 +611,13 @@ export function OfficialPriceList2026() {
                       <li><CheckCircle2 size={14} /> {language === "ms" ? "Kemajuan pembelajaran yang pantas & berfokus" : language === "ar" ? "تسريع وتيرة التعلم وتحقيق نتائج سريعة" : "Accelerated learning progress"}</li>
                     </ul>
                   </div>
-                  <Link href={`/enroll?course=${encodeURIComponent(course.rawPackage)}`} className="simple-button w-full">
+                  <button
+                    type="button"
+                    onClick={() => handleEnquireClick(`Private Lessons: ${course.rawPackage}`)}
+                    className="simple-button w-full cursor-pointer"
+                  >
                     {language === "ms" ? `Tempah ${pkgText}` : language === "ar" ? `حجز ${pkgText}` : `Book ${pkgText}`}
-                  </Link>
+                  </button>
                 </div>
               );
             })}
@@ -634,9 +657,13 @@ export function OfficialPriceList2026() {
                       <li><CheckCircle2 size={14} /> {language === "ms" ? "Tenaga pengajar bertauliah antarabangsa" : language === "ar" ? "مدربون حاصلون على اعتمادات دولية" : "Internationally certified instructors"}</li>
                     </ul>
                   </div>
-                  <Link href={`/enroll?course=${encodeURIComponent(course.rawProgramme)}`} className="simple-button w-full">
+                  <button
+                    type="button"
+                    onClick={() => handleEnquireClick(`Executive Program: ${course.rawProgramme}`)}
+                    className="simple-button w-full cursor-pointer"
+                  >
                     {language === "ms" ? `Tanya mengenai ${progText}` : language === "ar" ? `استفسر عن ${progText}` : `Enquire for ${progText}`}
-                  </Link>
+                  </button>
                 </div>
               );
             })}
@@ -663,10 +690,14 @@ export function OfficialPriceList2026() {
                     <span className="bilc-lang-avail">
                       {language === "ms" ? "Tersedia: Permulaan hingga Lanjutan" : language === "ar" ? "متاح: من المبتدئ إلى المتقدم" : "Available: Beginner to Advanced"}
                     </span>
-                    <Link href={`/enroll?language=${encodeURIComponent(lang.rawName)}`} className="bilc-lang-link">
+                    <button
+                      type="button"
+                      onClick={() => handleEnquireClick(`World Language: ${lang.rawName}`)}
+                      className="bilc-lang-link cursor-pointer flex items-center justify-between"
+                    >
                       <span>{language === "ms" ? "Tanya Sekarang" : language === "ar" ? "استفسار" : "Enquire"}</span>
                       <ChevronRight size={15} />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               );

@@ -298,9 +298,18 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                   : "💬 WhatsApp Results to Admissions"}
               </a>
 
-              <Link href={`/enroll?programInterest=${encodeURIComponent(evalResult.recommendedCourse)}`} className="simple-button simple-button-quiet" onClick={onClose}>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  window.dispatchEvent(new CustomEvent("open-registry-modal", {
+                    detail: { programInterest: evalResult.recommendedCourse }
+                  }));
+                }}
+                className="simple-button simple-button-quiet cursor-pointer"
+              >
                 {language === "ms" ? "Tempah Kelas Anda" : language === "ar" ? "احجز صفك الدراسي" : "Book Your Class"}
-              </Link>
+              </button>
             </div>
 
             <p className="bilc-disclaimer-text">

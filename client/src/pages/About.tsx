@@ -49,10 +49,10 @@ export default function About() {
     <PublicLayout>
       <div id="about-page-container" data-page="about" className={`simple-route-page about-page page-about about-page--compact-spacing ${isRTL ? "is-rtl" : ""}`}>
         <header id="about-hero-header" className="simple-route-header about-hero-header">
-          <div className="about-hero-copy">
-            <p className="simple-eyebrow">{t("about.eyebrow")}</p>
-            <h1>{t("about.heroTitle")}</h1>
-            <p>{t("about.heroSubtitle")}</p>
+          <div className="about-hero-copy py-8 sm:py-12 md:py-16 pr-6 sm:pr-8 md:pr-12">
+            <p className="simple-eyebrow text-indigo-600/90 font-semibold tracking-wide uppercase">{t("about.eyebrow")}</p>
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 mt-2 mb-4 leading-tight">{t("about.heroTitle")}</h1>
+            <p className="text-slate-600 text-base md:text-lg leading-relaxed">{t("about.heroSubtitle")}</p>
           </div>
           <div className="about-hero-media">
             <AboutImage media={heroMedia} loading="eager" />
@@ -61,11 +61,11 @@ export default function About() {
 
         <section id="about-story-section" className="simple-route-section about-story-section about-section--compact-spacing">
           <div className="about-story-grid about-story-grid--surface md:!ml-0">
-            <div className="about-story-copy">
-              <p className="simple-eyebrow">{t("about.storyEyebrow")}</p>
-              <h2>{t("about.storyTitle")}</h2>
-              <p className="simple-body-copy">{t("about.storyBody")}</p>
-              <Link href="/programs" className="simple-text-link">
+            <div className="about-story-copy bg-white border border-slate-200/60 rounded-2xl p-6 sm:p-8 md:p-10 shadow-sm transition-all hover:shadow-md hover:border-slate-300/80">
+              <p className="simple-eyebrow text-indigo-600/90 font-semibold tracking-wide uppercase">{t("about.storyEyebrow")}</p>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 mb-4">{t("about.storyTitle")}</h2>
+              <p className="simple-body-copy text-slate-600 leading-relaxed text-base mb-6">{t("about.storyBody")}</p>
+              <Link href="/programs" className="simple-text-link inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
                 {t("about.explorePrograms")}
               </Link>
             </div>
@@ -76,14 +76,14 @@ export default function About() {
         </section>
 
         <section id="about-approach-section" className="simple-route-section about-approach-section about-section--compact-spacing">
-          <div className="about-approach-intro about-approach-intro--surface">
-            <div>
-              <p className="simple-eyebrow">{t("about.approachEyebrow")}</p>
-              <h2>{t("about.approachTitle")}</h2>
+          <div className="about-approach-intro about-approach-intro--surface flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-12">
+            <div className="flex flex-col gap-1.5 md:gap-2">
+              <p className="simple-eyebrow text-indigo-600/90 font-semibold tracking-wide uppercase">{t("about.approachEyebrow")}</p>
+              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-slate-900">{t("about.approachTitle")}</h2>
             </div>
-            <p className="about-approach-intro-copy">{t("about.approachSubtitle")}</p>
+            <p className="about-approach-intro-copy text-slate-500 text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-indigo-500/30 pl-4 py-1">{t("about.approachSubtitle")}</p>
           </div>
-          <div className="about-method-layout">
+          <div className="about-method-layout mt-8">
             <div className="simple-approach-list about-approach-list about-approach-list--surface">
               {approach.map(({ icon: Icon, title, body }) => (
                 <article key={title}>
@@ -107,24 +107,24 @@ export default function About() {
               <AboutImage media={communityMedia} />
               <figcaption>{t("about.communityCaption")}</figcaption>
             </figure>
-            <div className="about-community-copy">
-              <p className="simple-eyebrow">{t("about.communityEyebrow")}</p>
-              <h2>{t("about.communityTitle")}</h2>
-              <p className="simple-body-copy">
+            <div className="about-community-copy bg-white border border-slate-200/60 rounded-2xl p-6 sm:p-8 md:p-10 shadow-sm transition-all hover:shadow-md hover:border-slate-300/80">
+              <p className="simple-eyebrow text-indigo-600/90 font-semibold tracking-wide uppercase">{t("about.communityEyebrow")}</p>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 mb-4">{t("about.communityTitle")}</h2>
+              <p className="simple-body-copy text-slate-600 leading-relaxed text-base mb-6">
                 {language === "ms"
                   ? "Persekitaran pembelajaran pusat ini menggabungkan komunikasi praktikal, kesedaran budaya dan sokongan untuk laluan pembelajaran berbeza."
                   : language === "ar"
                   ? "تجمع بيئة التعلم في المركز بين التواصل العملي، الوعي الثقافي والدعم المستمر لمختلف المسارات التعليمية."
                   : "The centre’s learning environment brings together practical communication, cultural awareness and support for different learning routes."}
               </p>
-              <Link href="/contact" className="simple-text-link">
+              <Link href="/contact" className="simple-text-link inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
                 {t("nav.contact")}
               </Link>
             </div>
           </div>
         </section>
 
-        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing">
+        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing bg-gradient-to-b from-slate-50/50 to-white border border-slate-100 rounded-3xl p-6 sm:p-8 md:p-12 shadow-xs">
           <div className="simple-section-heading about-team-heading--surface">
             <div>
               <p className="simple-eyebrow">{t("about.teamEyebrow")}</p>

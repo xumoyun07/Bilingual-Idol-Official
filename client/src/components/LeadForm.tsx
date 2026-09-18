@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -30,6 +31,14 @@ export function LeadForm({ title }: { type?: "enrollment" | "inquiry"; title?: s
       reasonType: "general",
     },
   });
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const reason = searchParams.get("reason");
+    if (reason && ["general", "consultation", "campusTour"].includes(reason)) {
+      form.setValue("reasonType", reason as "general" | "consultation" | "campusTour");
+    }
+  }, [form]);
 
   const mutation = trpc.submissions.createInquiry.useMutation();
 
