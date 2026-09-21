@@ -56,23 +56,17 @@ export default function FounderLogin() {
           <span aria-hidden="true">BI</span>
           <div>
             <strong>Bilingual Idol</strong>
-            <small>{t("footer.brandSubtitle")}</small>
+            <small className="hidden xs:block">{t("footer.brandSubtitle")}</small>
           </div>
         </Link>
-        <Link href="/" className="auth-back flex items-center gap-1">
+        <Link href="/" className="auth-back flex items-center gap-1 text-xs xs:text-sm">
           <ArrowLeft size={16} className={isRTL ? "rotate-180" : ""} />
-          {t("common.backToHome")}
+          <span className="hidden xs:inline">{t("common.backToHome")}</span>
+          <span className="xs:hidden inline">{language === "ar" ? "الرئيسية" : language === "ms" ? "Utama" : "Home"}</span>
         </Link>
       </header>
 
       <section id="login-content-section" className="auth-content max-md:pt-0" aria-labelledby="sign-in-title">
-        {/* Mobile-only Header texts */}
-        <div className="md:hidden text-center max-w-md mx-auto mb-2 px-4 bg-white border border-[#edf2f5] rounded-2xl py-5 shadow-xs max-md:-mt-[10px] max-md:-mb-[20px]">
-          <p className="simple-eyebrow text-[10px] uppercase tracking-wider text-[#526d9c]">{t("login.eyebrow")}</p>
-          <h1 className="text-xl font-bold text-[#10253e] mt-1 leading-tight">{t("login.heroTitle")}</h1>
-          <p className="text-xs text-[#566983] mt-1 leading-normal">{t("login.heroSubtitle")}</p>
-        </div>
-
         <div className="auth-intro auth-intro--surface order-2 md:order-1 max-md:!border-0 max-md:!bg-transparent max-md:!shadow-none max-md:!p-0 max-md:-mt-5">
           {/* Desktop-only Header texts */}
           <div className="hidden md:block">
@@ -90,8 +84,8 @@ export default function FounderLogin() {
           </div>
         </div>
 
-        <div className="custom-login-card w-full max-w-md mx-auto bg-white border border-slate-100 rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(16,37,62,0.04)] order-1 md:order-2 relative overflow-hidden">
-          <div className="text-center mb-8">
+        <div className="custom-login-card w-full max-w-md mx-auto bg-white border border-slate-100 rounded-3xl p-5 xs:p-6 sm:p-10 shadow-[0_20px_50px_rgba(16,37,62,0.04)] order-1 md:order-2 relative overflow-hidden">
+          <div className="text-center mb-6 sm:mb-8">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#eef4ff] text-[#173fad] text-[10px] sm:text-xs font-extrabold uppercase tracking-widest rounded-full mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[#173fad] animate-pulse"></span>
               {t("login.eyebrow")}

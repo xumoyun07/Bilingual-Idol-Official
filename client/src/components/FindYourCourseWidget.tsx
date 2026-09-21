@@ -393,11 +393,8 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
         {/* Step 2: What is your primary goal? */}
         {step === 2 && (
           <div className="bilc-finder-step-body">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <h3>{language === "ms" ? "Langkah 2: Apakah matlamat utama anda?" : language === "ar" ? "الخطوة 2: ما هو هدفك الأساسي؟" : "Step 2: What is your primary objective?"}</h3>
-              <button type="button" className="bilc-back-btn" onClick={() => setStep(1)}>
-                {language === "ms" ? "← Kembali" : language === "ar" ? "→ السابق" : "← Back"}
-              </button>
             </div>
             <p className="bilc-step-subtitle">
               {language === "ms"
@@ -413,8 +410,8 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                   type="button"
                   className={`bilc-option-card ${goal === opt.id ? "is-selected" : ""}`}
                   onClick={() => {
-                    setGoal(opt.id);
-                    setStep(3);
+                     setGoal(opt.id);
+                     setStep(3);
                   }}
                 >
                   <span className="bilc-opt-icon">{opt.icon}</span>
@@ -426,17 +423,19 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                 </button>
               ))}
             </div>
+            <div className="bilc-finder-footer-actions">
+              <button type="button" className="bilc-back-btn-bottom" onClick={() => setStep(1)}>
+                {language === "ms" ? "← Kembali" : language === "ar" ? "→ السابق" : "← Back"}
+              </button>
+            </div>
           </div>
         )}
 
         {/* Step 3: What is your estimated level? */}
         {step === 3 && (
           <div className="bilc-finder-step-body">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <h3>{language === "ms" ? "Langkah 3: Apakah tahap Bahasa Inggeris anda sekarang?" : language === "ar" ? "الخطوة 3: ما هو مستواك الحالي في اللغة الإنجليزية؟" : "Step 3: What is your current English level?"}</h3>
-              <button type="button" className="bilc-back-btn" onClick={() => setStep(2)}>
-                {language === "ms" ? "← Kembali" : language === "ar" ? "→ السابق" : "← Back"}
-              </button>
             </div>
             <p className="bilc-step-subtitle">
               {language === "ms"
@@ -464,6 +463,11 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                   <ArrowRight size={16} className={`bilc-opt-arrow ${isRTL ? "rotate-180" : ""}`} />
                 </button>
               ))}
+            </div>
+            <div className="bilc-finder-footer-actions">
+              <button type="button" className="bilc-back-btn-bottom" onClick={() => setStep(2)}>
+                {language === "ms" ? "← Kembali" : language === "ar" ? "→ السابق" : "← Back"}
+              </button>
             </div>
           </div>
         )}
