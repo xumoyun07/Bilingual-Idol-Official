@@ -343,16 +343,16 @@ export default function Programs() {
               ))}
             </div>
           ) : matches.length ? (
-            <div className="simple-programme-list">
+            <div className="simple-programme-list @container">
               {matches.map(programme => (
-                <Link key={programme.slug} href={`/programs/${programme.slug}`} className="simple-programme-row">
+                <Link key={programme.slug} href={`/programs/${programme.slug}`} className="simple-programme-row flex flex-col @[480px]:flex-row @[480px]:items-center @[480px]:justify-between gap-4">
                   <div>
-                    <strong>{programme.title}</strong>
-                    <span>
+                    <strong className="block text-slate-900 dark:text-white font-bold">{programme.title}</strong>
+                    <span className="block mt-1 text-xs text-slate-500 dark:text-slate-400">
                       {programme.language} · {programme.level} · {programme.ageGroup}
                     </span>
                   </div>
-                  <span>{t("programs.viewDetails")}</span>
+                  <span className="shrink-0 text-xs font-bold text-[#173fad] bg-[#eef4ff] px-3 py-1.5 rounded-lg border border-[#c0d4ff] text-center max-[480px]:w-full">{t("programs.viewDetails")}</span>
                 </Link>
               ))}
             </div>

@@ -63,7 +63,7 @@ export default function ProgramDetail() {
 
   return (
     <PublicLayout>
-      <div id="program-detail-page-container" data-page="program-detail" className={`simple-route-page program-detail-page page-program-detail ${isRTL ? "is-rtl" : ""}`}>
+      <div id="program-detail-page-container" data-page="program-detail" className={`simple-route-page program-detail-page page-program-detail pb-20 md:pb-0 ${isRTL ? "is-rtl" : ""}`}>
         <header id="program-detail-hero-header" className="simple-route-header simple-route-header--programmes simple-route-header--program-detail">
           <div className="simple-route-header-copy">
             <Link href="/programs" className="simple-text-link">
@@ -115,6 +115,22 @@ export default function ProgramDetail() {
             </div>
           </div>
         </section>
+
+        {/* Elegant Mobile Sticky CTA Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 h-16 border-t border-[#edf2f5]/90 bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] md:hidden flex items-center justify-between px-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase font-bold text-[#708098] tracking-wider leading-none">
+              {language === "ms" ? "Yuran Program" : language === "ar" ? "رسوم البرنامج" : "Course Fees"}
+            </span>
+            <span className="text-sm font-bold text-[#10253e] mt-1 leading-tight">
+              <bdi dir="ltr">{programme.fees}</bdi>
+            </span>
+          </div>
+          <Link href="/contact" className="simple-button bg-[#173fad] text-white text-xs px-4 py-2 rounded-lg font-semibold flex items-center gap-1.5 hover:bg-[#173fad]/90 transition-colors">
+            <span>{language === "ms" ? "Daftar Sekarang" : language === "ar" ? "سجل الآن" : "Apply Now"}</span>
+            <ArrowRight size={14} className={isRTL ? "rotate-180" : ""} />
+          </Link>
+        </div>
       </div>
     </PublicLayout>
   );

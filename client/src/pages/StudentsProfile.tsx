@@ -126,18 +126,18 @@ export function StudentsProfileList() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
           {/* Main Search Input */}
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
+            <Search className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
             <input
               value={search}
               onChange={event => changeFilter(() => setSearch(event.target.value))}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-10 pr-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-10 pe-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
               placeholder="Name, email, level or course…"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => changeFilter(() => setSearch(""))}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
+                className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
                 title="Clear search"
               >
                 <X size={14} />
@@ -189,18 +189,18 @@ export function StudentsProfileList() {
                   Learning Level
                 </label>
                 <div className="relative">
-                  <Layers className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
+                  <Layers className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
                   <input
                     value={level}
                     onChange={event => changeFilter(() => setLevel(event.target.value))}
-                    className="w-full h-11 pl-8 pr-7 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] placeholder:text-[#8c9ba8] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+                    className="w-full h-11 ps-8 pe-7 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] placeholder:text-[#8c9ba8] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
                     placeholder="e.g. A1, B2, Advanced"
                   />
                   {level && (
                     <button
                       type="button"
                       onClick={() => changeFilter(() => setLevel(""))}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
+                      className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
                     >
                       <X size={12} />
                     </button>
@@ -214,18 +214,18 @@ export function StudentsProfileList() {
                   Course Name
                 </label>
                 <div className="relative">
-                  <BookOpen className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
+                  <BookOpen className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
                   <input
                     value={course}
                     onChange={event => changeFilter(() => setCourse(event.target.value))}
-                    className="w-full h-11 pl-8 pr-7 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] placeholder:text-[#8c9ba8] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+                    className="w-full h-11 ps-8 pe-7 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] placeholder:text-[#8c9ba8] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
                     placeholder="e.g. English, IELTS"
                   />
                   {course && (
                     <button
                       type="button"
                       onClick={() => changeFilter(() => setCourse(""))}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
+                      className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
                     >
                       <X size={12} />
                     </button>
@@ -450,7 +450,7 @@ function StudentRow({ student, onOpen }: { student: StudentSummary; onOpen: () =
       <button
         type="button"
         onClick={onOpen}
-        className="hidden sm:grid w-full grid-cols-[minmax(0,1fr)_minmax(10rem,.7fr)_auto] gap-3 bg-white px-5 py-4 text-left transition-colors hover:bg-[#faf6ef] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"
+        className="hidden sm:grid w-full grid-cols-[minmax(0,1fr)_minmax(10rem,.7fr)_auto] gap-3 bg-white px-5 py-4 text-start transition-colors hover:bg-[#faf6ef] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"
       >
         <span className="min-w-0">
           <span className="block truncate font-extrabold text-[#10253e]">{student.name || "Unnamed student"}</span>
@@ -460,7 +460,7 @@ function StudentRow({ student, onOpen }: { student: StudentSummary; onOpen: () =
           <span className="block font-semibold text-[#29415b]">{student.currentLevel || "Level not recorded"}</span>
           <span className="mt-1 block truncate text-xs">{student.courseName || "Course not recorded"}</span>
         </span>
-        <span className="text-right text-xs">
+        <span className="text-end text-xs">
           <span
             className={`inline-flex rounded-full px-2.5 py-1 font-extrabold ${
               student.isActive ? "bg-[#e8eeff] text-[#173fad]" : "bg-[#fff0ed] text-[#a34732]"
@@ -476,7 +476,7 @@ function StudentRow({ student, onOpen }: { student: StudentSummary; onOpen: () =
     </div>
   );
 }
-function StudentForm({ title, description, draft, setDraft, pending, error, submitLabel, onSubmit, onClose }: { title: string; description: string; draft: StudentDraft; setDraft: (value: StudentDraft) => void; pending: boolean; error?: string; submitLabel: string; onSubmit: () => void; onClose: () => void }) { return <form onSubmit={event => { event.preventDefault(); onSubmit(); }}><DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-left"><p className="founder-command-eyebrow">Students Profile</p><DialogTitle className="font-display text-4xl text-[#10253e]">{title}</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">{description}</DialogDescription></DialogHeader><div className="space-y-6 px-6 py-6">{error ? <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>Student profile action needs attention</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<FormSection title="Information about student"><FormGrid><Input label="Student name" value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required /><Input label="Student e-mail" type="email" value={draft.email} onChange={value => setDraft({ ...draft, email: value })} /><Input label="Date of birth" type="date" value={draft.dateOfBirth} onChange={value => setDraft({ ...draft, dateOfBirth: value })} /><Input label="Guardian name" value={draft.guardianName} onChange={value => setDraft({ ...draft, guardianName: value })} /><Input label="Guardian phone" value={draft.guardianPhone} onChange={value => setDraft({ ...draft, guardianPhone: value })} /><Input label="Guardian e-mail" type="email" value={draft.contactEmail} onChange={value => setDraft({ ...draft, contactEmail: value })} /></FormGrid><Textarea label="Address" value={draft.address} onChange={value => setDraft({ ...draft, address: value })} /><Textarea label="Private notes" value={draft.notes} onChange={value => setDraft({ ...draft, notes: value })} /></FormSection><FormSection title="Attendance"><FormGrid><NumberInput label="Attended sessions" value={draft.attendedSessions} onChange={value => setDraft({ ...draft, attendedSessions: value })} /><NumberInput label="Total sessions" value={draft.totalSessions} onChange={value => setDraft({ ...draft, totalSessions: value })} /></FormGrid></FormSection><FormSection title="Level and course"><FormGrid><Input label="Current level" value={draft.currentLevel} onChange={value => setDraft({ ...draft, currentLevel: value })} /><Input label="Course name" value={draft.courseName} onChange={value => setDraft({ ...draft, courseName: value })} /><Input label="Course code" value={draft.courseCode} onChange={value => setDraft({ ...draft, courseCode: value })} /><Input label="Course start" type="date" value={draft.courseStartDate} onChange={value => setDraft({ ...draft, courseStartDate: value })} /><Input label="Course end" type="date" value={draft.courseEndDate} onChange={value => setDraft({ ...draft, courseEndDate: value })} /></FormGrid></FormSection><label className="flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">Student record active</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">Inactive student records remain private but are excluded by the active filter.</span></span><input type="checkbox" aria-label="Student record active" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label></div><DialogFooter className="border-t border-[#e6dccd] bg-white px-6 py-5"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a]">Cancel</Button><Button type="submit" disabled={pending} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{submitLabel}</Button></DialogFooter></form>; }
+function StudentForm({ title, description, draft, setDraft, pending, error, submitLabel, onSubmit, onClose }: { title: string; description: string; draft: StudentDraft; setDraft: (value: StudentDraft) => void; pending: boolean; error?: string; submitLabel: string; onSubmit: () => void; onClose: () => void }) { return <form onSubmit={event => { event.preventDefault(); onSubmit(); }}><DialogHeader className="border-b border-[#e6dccd] bg-white px-6 py-6 text-start"><p className="founder-command-eyebrow">Students Profile</p><DialogTitle className="font-display text-4xl text-[#10253e]">{title}</DialogTitle><DialogDescription className="max-w-xl text-[#53657a]">{description}</DialogDescription></DialogHeader><div className="space-y-6 px-6 py-6">{error ? <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>Student profile action needs attention</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<FormSection title="Information about student"><FormGrid><Input label="Student name" value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required /><Input label="Student e-mail" type="email" value={draft.email} onChange={value => setDraft({ ...draft, email: value })} /><Input label="Date of birth" type="date" value={draft.dateOfBirth} onChange={value => setDraft({ ...draft, dateOfBirth: value })} /><Input label="Guardian name" value={draft.guardianName} onChange={value => setDraft({ ...draft, guardianName: value })} /><Input label="Guardian phone" value={draft.guardianPhone} onChange={value => setDraft({ ...draft, guardianPhone: value })} /><Input label="Guardian e-mail" type="email" value={draft.contactEmail} onChange={value => setDraft({ ...draft, contactEmail: value })} /></FormGrid><Textarea label="Address" value={draft.address} onChange={value => setDraft({ ...draft, address: value })} /><Textarea label="Private notes" value={draft.notes} onChange={value => setDraft({ ...draft, notes: value })} /></FormSection><FormSection title="Attendance"><FormGrid><NumberInput label="Attended sessions" value={draft.attendedSessions} onChange={value => setDraft({ ...draft, attendedSessions: value })} /><NumberInput label="Total sessions" value={draft.totalSessions} onChange={value => setDraft({ ...draft, totalSessions: value })} /></FormGrid></FormSection><FormSection title="Level and course"><FormGrid><Input label="Current level" value={draft.currentLevel} onChange={value => setDraft({ ...draft, currentLevel: value })} /><Input label="Course name" value={draft.courseName} onChange={value => setDraft({ ...draft, courseName: value })} /><Input label="Course code" value={draft.courseCode} onChange={value => setDraft({ ...draft, courseCode: value })} /><Input label="Course start" type="date" value={draft.courseStartDate} onChange={value => setDraft({ ...draft, courseStartDate: value })} /><Input label="Course end" type="date" value={draft.courseEndDate} onChange={value => setDraft({ ...draft, courseEndDate: value })} /></FormGrid></FormSection><label className="flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">Student record active</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">Inactive student records remain private but are excluded by the active filter.</span></span><input type="checkbox" aria-label="Student record active" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label></div><DialogFooter className="border-t border-[#e6dccd] bg-white px-6 py-5"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a]">Cancel</Button><Button type="submit" disabled={pending} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{submitLabel}</Button></DialogFooter></form>; }
 function ProfileCard({ icon: Icon, eyebrow, title, children }: { icon: typeof UserRound; eyebrow: string; title: string; children: React.ReactNode }) { return <section className="founder-panel founder-panel-paper"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#eef4ff] text-[#173fad]"><Icon size={19} /></span><p className="mt-5 founder-command-eyebrow">{eyebrow}</p><h2 className="mt-1 font-display text-3xl text-[#10253e]">{title}</h2><div className="mt-5">{children}</div></section>; }
 function InfoGrid({ values }: { values: [string, string][] }) { return <dl className="grid gap-4 sm:grid-cols-2">{values.map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{label}</dt><dd className="mt-1 break-words text-sm font-semibold text-[#29415b]">{value}</dd></div>)}</dl>; }
 function InfoText({ label, value }: { label: string; value: string | null | undefined }) { return <div className="mt-5 border-t border-[#eee4d7] pt-4"><p className="text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{label}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#53657a]">{value || "Not recorded"}</p></div>; }

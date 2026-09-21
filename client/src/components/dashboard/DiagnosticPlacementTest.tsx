@@ -281,7 +281,7 @@ export function DiagnosticPlacementTest() {
                   <button
                     key={idx}
                     onClick={() => handleSelectOption(idx)}
-                    className={`text-left p-4 rounded-xl border transition-all duration-200 text-sm flex items-center justify-between ${
+                    className={`text-start p-4 rounded-xl border transition-all duration-200 text-sm flex items-center justify-between ${
                       isSelected
                         ? "bg-blue-50/50 border-blue-600 text-blue-900 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-100"
                         : "border-slate-200/80 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300"
@@ -311,7 +311,7 @@ export function DiagnosticPlacementTest() {
               className="bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-6 rounded-lg transition-colors text-sm disabled:opacity-50"
             >
               <span>{currentIdx === PLACEMENT_QUESTIONS.length - 1 ? "Finish Test" : "Next Question"}</span>
-              <ChevronRight size={14} className={`ml-1.5 ${isRTL ? "rotate-180" : ""}`} />
+              <ChevronRight size={14} className={`ms-1.5 ${isRTL ? "rotate-180" : ""}`} />
             </Button>
           </div>
         </div>
@@ -319,10 +319,10 @@ export function DiagnosticPlacementTest() {
 
       {/* Result State */}
       {testState === "result" && savedResult && (
-        <div className="p-6 sm:p-8 flex flex-col md:flex-row md:items-stretch justify-between gap-6 divide-y md:divide-y-0 md:divide-x dark:divide-slate-800/60 divide-slate-100">
+        <div className="p-6 sm:p-8 flex flex-col md:flex-row md:items-stretch justify-between gap-6 divide-y md:divide-y-0 md:divide-x rtl:md:divide-x-reverse dark:divide-slate-800/60 divide-slate-100">
           
           {/* Level Assessment Card Left */}
-          <div className="flex-1 space-y-4 md:pr-6">
+          <div className="flex-1 space-y-4 md:pe-6">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
               <CheckCircle2 size={12} />
               <span>Assessment Completed</span>
@@ -339,14 +339,14 @@ export function DiagnosticPlacementTest() {
                   {savedResult.level}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Diagnostic Score: {savedResult.score}/{savedResult.total} ({Math.round((savedResult.score / savedResult.total) * 100)}%) · Tested on {savedResult.date}
+                  Diagnostic Score: <bdi dir="ltr">{savedResult.score}/{savedResult.total}</bdi> <bdi dir="ltr">({Math.round((savedResult.score / savedResult.total) * 100)}%)</bdi> · Tested on <bdi dir="ltr">{savedResult.date}</bdi>
                 </p>
               </div>
             </div>
           </div>
 
           {/* Recommended Track Card Right */}
-          <div className="flex-1 pt-6 md:pt-0 md:pl-6 flex flex-col justify-between gap-4">
+          <div className="flex-1 pt-6 md:pt-0 md:ps-6 flex flex-col justify-between gap-4">
             <div className="space-y-1.5">
               <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                 Recommended Study Pathway

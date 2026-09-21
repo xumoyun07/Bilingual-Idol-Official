@@ -567,7 +567,7 @@ function UsersModule() {
 
   return <>
     <ModuleHeader eyebrow="Control centre · Users" title="People, organised by responsibility." description="Choose a role to work with its dedicated directory. Each group has its own local search and filters; account actions stay in focused modal windows." action={<div className="flex flex-wrap gap-2"><Button type="button" variant="outline" onClick={() => setBuilderOpen(true)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><Settings2 size={16} />{td("Configure create form")}</Button><Button type="button" onClick={openCreate} className="compass-btn-primary gap-2"><Plus size={17} />{td("New user")}</Button></div>} />
-    <nav className="founder-panel founder-panel-paper mt-6 p-3" aria-label="User type modules"><div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">{categoryItems.map(({ role, icon: Icon }) => <button key={role} type="button" aria-pressed={category === role} onClick={() => chooseCategory(role)} className={`flex min-h-16 items-center gap-3 rounded-xl px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${category === role ? "bg-[#10253e] text-white" : "bg-[#faf6ef] text-[#29415b] hover:bg-[#eef4ff]"}`}><span className={`grid h-8 w-8 place-items-center rounded-lg ${category === role ? "bg-white/15 text-[#f3b59f]" : roleTone[role]}`}><Icon size={16} /></span><span><span className="block text-[11px] font-extrabold tracking-[.08em] uppercase opacity-70">{td("Type")}</span><span className="block text-sm font-extrabold">{td(roleLabels[role])}</span></span></button>)}</div></nav>
+    <nav className="founder-panel founder-panel-paper mt-6 p-3" aria-label="User type modules"><div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">{categoryItems.map(({ role, icon: Icon }) => <button key={role} type="button" aria-pressed={category === role} onClick={() => chooseCategory(role)} className={`flex min-h-16 items-center gap-3 rounded-xl px-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${category === role ? "bg-[#10253e] text-white" : "bg-[#faf6ef] text-[#29415b] hover:bg-[#eef4ff]"}`}><span className={`grid h-8 w-8 place-items-center rounded-lg ${category === role ? "bg-white/15 text-[#f3b59f]" : roleTone[role]}`}><Icon size={16} /></span><span><span className="block text-[11px] font-extrabold tracking-[.08em] uppercase opacity-70">{td("Type")}</span><span className="block text-sm font-extrabold">{td(roleLabels[role])}</span></span></button>)}</div></nav>
     {/* UPGRADED MODERN FILTER SECTION */}
     <section className="founder-panel founder-panel-paper mt-6 rounded-2xl border border-[#dce4e7] bg-white p-5 sm:p-6 shadow-sm transition-all hover:border-[#cfd9de]" aria-label={`${roleLabels[category]} filters`}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf2f4] pb-4 mb-4">
@@ -607,18 +607,18 @@ function UsersModule() {
             {td("Search account")}
           </label>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
+            <Search className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
             <input
               value={search}
               onChange={event => setSearch(event.target.value)}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-10 pr-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-10 pe-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
               placeholder={`${td("Search")} ${td(roleLabels[category])}…`}
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
+                className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
                 title="Clear search"
               >
                 <X size={14} />
@@ -636,13 +636,13 @@ function UsersModule() {
             <select
               value={status}
               onChange={event => setStatus(event.target.value as FilterStatus)}
-              className="h-11 w-full appearance-none rounded-xl border border-[#dce4e7] bg-[#f8fafb] px-3.5 pr-8 text-sm font-medium text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full appearance-none rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-3.5 pe-8 text-sm font-medium text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
             >
               <option value="all">{td("All statuses")}</option>
               <option value="active">{td("Active accounts")}</option>
               <option value="inactive">{td("Paused / inactive")}</option>
             </select>
-            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#708098]">
+            <div className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-[#708098]">
               <ChevronRight size={14} className="rotate-90" />
             </div>
           </div>
@@ -654,18 +654,18 @@ function UsersModule() {
             {td("Created From")}
           </label>
           <div className="relative">
-            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
+            <CalendarDays className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
             <input
               type="date"
               value={createdFrom}
               onChange={event => setCreatedFrom(event.target.value)}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-8 pr-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-8 pe-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
             />
             {createdFrom && (
               <button
                 type="button"
                 onClick={() => setCreatedFrom("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
               >
                 <X size={12} />
               </button>
@@ -679,18 +679,18 @@ function UsersModule() {
             {td("Created To")}
           </label>
           <div className="relative">
-            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
+            <CalendarDays className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[#708098]" size={14} />
             <input
               type="date"
               value={createdTo}
               onChange={event => setCreatedTo(event.target.value)}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-8 pr-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-8 pe-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
             />
             {createdTo && (
               <button
                 type="button"
                 onClick={() => setCreatedTo("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
               >
                 <X size={12} />
               </button>
@@ -738,7 +738,7 @@ function UsersModule() {
 }
 
 function FilterSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: [string, string][] }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<select value={value} onChange={event => onChange(event.target.value)} className="mt-1 block h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{options.map(([key, copy]) => <option key={key} value={key}>{td(copy)}</option>)}</select></label>; }
-function DateFilter({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<span className="relative mt-1 block"><CalendarDays className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#708098]" size={15} /><input type="date" value={value} onChange={event => onChange(event.target.value)} className="h-12 w-full rounded-xl border border-[#dfd1bf] bg-white pl-9 pr-2 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></span></label>; }
+function DateFilter({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<span className="relative mt-1 block"><CalendarDays className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[#708098]" size={15} /><input type="date" value={value} onChange={event => onChange(event.target.value)} className="h-12 w-full rounded-xl border border-[#dfd1bf] bg-white ps-9 pe-2 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></span></label>; }
 function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: () => void }) {
   const { td } = useLanguage();
   const [expanded, setExpanded] = useState(false);
@@ -832,7 +832,7 @@ function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: ()
       <button
         type="button"
         onClick={onClick}
-        className="hidden sm:grid w-full grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-3 sm:px-5 sm:py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"
+        className="hidden sm:grid w-full grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-3 sm:px-5 sm:py-4 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173fad]"
       >
         <span className="min-w-0">
           <span className="block truncate font-bold text-[#10253e]">{account.name || td("Unnamed account")}</span>
@@ -855,7 +855,7 @@ function UserModal({ mode, selected, loading, draft, setDraft, profileFields, pr
   if (mode === "detail" && loading) return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div>;
   const createMode = mode === "create";
   if (createMode) return <ConfigurableCreateUserModal draft={draft} setDraft={setDraft} profileValues={profileValues} setProfileValues={setProfileValues} pending={pending} error={error} onSubmit={onSubmit} onClose={onClose} />;
-  return <form data-testid="users-modal-form" onSubmit={onSubmit}><DialogHeader className="border-b border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-6 text-left"><p className="founder-command-eyebrow">{createMode ? td("Issue new access") : td("Account profile")}</p><DialogTitle className="font-display text-2xl sm:text-4xl text-[#10253e]">{createMode ? td("Create user") : td("Edit user")}</DialogTitle><DialogDescription className="max-w-xl text-xs sm:text-sm text-[#53657a]">{createMode ? td("Assign protected access details, then complete any Founder-configured profile fields.") : td("Update profile, type, password or active status from this focused account window.")}</DialogDescription></DialogHeader><div className="px-4 py-4 sm:px-6 sm:py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Account action needs attention")}</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<div className="grid gap-4 sm:grid-cols-2"><TextField label={td("Full name")} value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required autoComplete="name" /><TextField label={td("E-mail")} value={draft.email ?? ""} onChange={value => setDraft({ ...draft, email: value })} required type="email" autoComplete="email" /><label className="block text-xs font-extrabold text-[#53657a]">{td("User type")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as ManagedRole })} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{managedRoles.map(role => <option key={role} value={role}>{td(singularRoleLabels[role])}</option>)}</select></label><TextField label={createMode ? td("Initial password") : td("New password (optional)")} value={draft.password} onChange={value => setDraft({ ...draft, password: value })} required={createMode} type="password" autoComplete="new-password" hint={td("Minimum 10 characters. Stored only as a salted hash.")} /></div>{createMode ? <DynamicUserProfileFields fields={profileFields} sections={profileSections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /> : null}<label className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">{td("Account active")}</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">{td("Inactive accounts cannot sign in with their password.")}</span></span><input aria-label="Account active" type="checkbox" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label>{!createMode && selected ? <div className="mt-5 rounded-xl bg-[#f7f2e9] p-4 text-xs leading-5 text-[#53657a]"><p><span className="font-bold text-[#29415b]">{td("Account ID:")}</span> {selected.openId}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Issued:")}</span> {new Date(selected.createdAt).toLocaleString()}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Last sign-in:")}</span> {new Date(selected.lastSignedIn).toLocaleString()}</p></div> : null}</div><DialogFooter className="border-t border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-5"><div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type="button" variant="outline" disabled={pending} className="min-h-12 border-[#efc4b8] text-[#b4563c] hover:bg-[#fff0ed] w-full sm:w-auto"><Trash2 size={15} />{td("Delete account")}</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{td("Delete this account?")}</AlertDialogTitle><AlertDialogDescription>{td("This permanently removes the selected account. Centre content is not attached to user records and will remain unchanged.")}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{td("Keep account")}</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-[#b4563c] hover:bg-[#923e2a]">{td("Delete account")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog> : null}</div><div className="flex flex-col gap-2 sm:flex-row"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">{td("Cancel")}</Button><Button type="submit" disabled={pending || (!createMode && !selected)} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{createMode ? td("Create user") : td("Save changes")}</Button></div></div></DialogFooter></form>;
+  return <form data-testid="users-modal-form" onSubmit={onSubmit}><DialogHeader className="border-b border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-6 text-start"><p className="founder-command-eyebrow">{createMode ? td("Issue new access") : td("Account profile")}</p><DialogTitle className="font-display text-2xl sm:text-4xl text-[#10253e]">{createMode ? td("Create user") : td("Edit user")}</DialogTitle><DialogDescription className="max-w-xl text-xs sm:text-sm text-[#53657a]">{createMode ? td("Assign protected access details, then complete any Founder-configured profile fields.") : td("Update profile, type, password or active status from this focused account window.")}</DialogDescription></DialogHeader><div className="px-4 py-4 sm:px-6 sm:py-6">{error ? <Alert variant="destructive" className="mb-5"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Account action needs attention")}</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}<div className="grid gap-4 sm:grid-cols-2"><TextField label={td("Full name")} value={draft.name} onChange={value => setDraft({ ...draft, name: value })} required autoComplete="name" /><TextField label={td("E-mail")} value={draft.email ?? ""} onChange={value => setDraft({ ...draft, email: value })} required type="email" autoComplete="email" /><label className="block text-xs font-extrabold text-[#53657a]">{td("User type")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as ManagedRole })} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{managedRoles.map(role => <option key={role} value={role}>{td(singularRoleLabels[role])}</option>)}</select></label><TextField label={createMode ? td("Initial password") : td("New password (optional)")} value={draft.password} onChange={value => setDraft({ ...draft, password: value })} required={createMode} type="password" autoComplete="new-password" hint={td("Minimum 10 characters. Stored only as a salted hash.")} /></div>{createMode ? <DynamicUserProfileFields fields={profileFields} sections={profileSections} values={profileValues} onChange={(key, value) => setProfileValues({ ...profileValues, [key]: value })} /> : null}<label className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-xl border border-[#e1d5c4] bg-[#faf6ef] px-4 text-sm font-bold text-[#29415b]"><span><span className="block">{td("Account active")}</span><span className="mt-0.5 block text-xs font-normal text-[#708098]">{td("Inactive accounts cannot sign in with their password.")}</span></span><input aria-label="Account active" type="checkbox" checked={draft.isActive} onChange={event => setDraft({ ...draft, isActive: event.target.checked })} className="h-5 w-5 accent-[#173fad]" /></label>{!createMode && selected ? <div className="mt-5 rounded-xl bg-[#f7f2e9] p-4 text-xs leading-5 text-[#53657a]"><p><span className="font-bold text-[#29415b]">{td("Account ID:")}</span> {selected.openId}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Issued:")}</span> {new Date(selected.createdAt).toLocaleString()}</p><p className="mt-1"><span className="font-bold text-[#29415b]">{td("Last sign-in:")}</span> {new Date(selected.lastSignedIn).toLocaleString()}</p></div> : null}</div><DialogFooter className="border-t border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-5"><div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type="button" variant="outline" disabled={pending} className="min-h-12 border-[#efc4b8] text-[#b4563c] hover:bg-[#fff0ed] w-full sm:w-auto"><Trash2 size={15} />{td("Delete account")}</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{td("Delete this account?")}</AlertDialogTitle><AlertDialogDescription>{td("This permanently removes the selected account. Centre content is not attached to user records and will remain unchanged.")}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{td("Keep account")}</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-[#b4563c] hover:bg-[#923e2a]">{td("Delete account")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog> : null}</div><div className="flex flex-col gap-2 sm:flex-row"><Button type="button" variant="outline" onClick={onClose} disabled={pending} className="min-h-12 border-[#d8cfbf] text-[#53657a] hover:bg-[#faf6ef]">{td("Cancel")}</Button><Button type="submit" disabled={pending || (!createMode && !selected)} className="compass-btn-primary min-h-12">{pending ? <Loader2 className="animate-spin" size={16} /> : null}{createMode ? td("Create user") : td("Save changes")}</Button></div></div></DialogFooter></form>;
 }
 
 function TextField({ label, value, onChange, type = "text", required, hint, autoComplete }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; hint?: string; autoComplete?: string }) { return <label className="block text-xs font-extrabold text-[#53657a]">{label}<input required={required} type={type} autoComplete={autoComplete} value={value} onChange={event => onChange(event.target.value)} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" />{hint ? <span className="mt-1.5 block text-[11px] font-normal leading-4 text-[#708098]">{hint}</span> : null}</label>; }

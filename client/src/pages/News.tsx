@@ -127,7 +127,7 @@ export default function News() {
                               <Icon size={14} />
                               {item.category}
                             </span>
-                            <time dateTime={item.publishedAt?.toISOString()}>{dateLabel(item.publishedAt, language)}</time>
+                            <time dateTime={item.publishedAt?.toISOString()}><bdi dir="ltr">{dateLabel(item.publishedAt, language)}</bdi></time>
                           </span>
                           <strong>{item.title}</strong>
                           <span className="news-card-excerpt">{item.excerpt}</span>
@@ -233,7 +233,7 @@ function NewsDialogHeader({ post, language }: { post: NewsPost; language: string
           <Icon size={14} />
           {post.category}
         </span>
-        <time dateTime={post.publishedAt?.toISOString()}>{dateLabel(post.publishedAt, language)}</time>
+        <time dateTime={post.publishedAt?.toISOString()}><bdi dir="ltr">{dateLabel(post.publishedAt, language)}</bdi></time>
       </div>
       <DialogTitle>{post.title}</DialogTitle>
       <DialogDescription>{post.excerpt}</DialogDescription>

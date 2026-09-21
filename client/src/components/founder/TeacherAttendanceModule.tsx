@@ -237,12 +237,12 @@ export function TeacherAttendanceModule() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
+          <Search size={15} className="absolute start-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by student name, email, or course..."
-            className="pl-9 h-9 text-sm"
+            className="ps-9 h-9 text-sm"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ export function TeacherAttendanceModule() {
             <option value="excused">Excused</option>
           </select>
           <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">
-            {filteredRecords.length} records
+            <bdi dir="ltr">{filteredRecords.length}</bdi> records
           </span>
         </div>
       </div>
@@ -285,10 +285,10 @@ export function TeacherAttendanceModule() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-bold text-base text-[#10253e]">{rec.studentName}</h4>
-                      <p className="text-xs text-[#53657a]">{rec.studentEmail}</p>
+                      <p className="text-xs text-[#53657a]"><bdi dir="ltr">{rec.studentEmail}</bdi></p>
                     </div>
                     <span className="text-[11px] font-semibold text-[#53657a] flex items-center gap-1 bg-[#f8fafc] px-2 py-1 rounded-md border border-[#edf2f5]">
-                      <CalendarDays size={12} /> {rec.sessionDate}
+                      <CalendarDays size={12} /> <bdi dir="ltr">{rec.sessionDate}</bdi>
                     </span>
                   </div>
 
@@ -349,14 +349,14 @@ export function TeacherAttendanceModule() {
           {/* Desktop View: Multi-Column Table (>= md) */}
           <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-start text-xs">
                 <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
                   <tr>
                     <th className="p-3.5">Student</th>
                     <th className="p-3.5">Course / Date</th>
                     <th className="p-3.5">Attendance Status</th>
                     <th className="p-3.5">Observation Notes</th>
-                    <th className="p-3.5 text-right">Actions</th>
+                    <th className="p-3.5 text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#edf2f5]">
@@ -366,12 +366,12 @@ export function TeacherAttendanceModule() {
                       <tr key={rec.id} className="hover:bg-[#fbfcfe] transition-colors">
                         <td className="p-3.5">
                           <div className="font-bold text-sm text-[#10253e]">{rec.studentName}</div>
-                          <div className="text-[#53657a] text-[11px] mt-0.5">{rec.studentEmail}</div>
+                          <div className="text-[#53657a] text-[11px] mt-0.5"><bdi dir="ltr">{rec.studentEmail}</bdi></div>
                         </td>
                         <td className="p-3.5">
                           <div className="font-semibold text-[#10253e]">{rec.courseTitle}</div>
                           <div className="text-[#53657a] text-[11px] flex items-center gap-1 mt-0.5">
-                            <CalendarDays size={11} /> {rec.sessionDate}
+                            <CalendarDays size={11} /> <bdi dir="ltr">{rec.sessionDate}</bdi>
                           </div>
                         </td>
                         <td className="p-3.5">
@@ -393,7 +393,7 @@ export function TeacherAttendanceModule() {
                           <p className="line-clamp-2">{rec.note || "No note recorded."}</p>
                           <span className="text-[10px] text-[#8292a1] block mt-0.5">Marked by {rec.markedBy}</span>
                         </td>
-                        <td className="p-3.5 text-right">
+                        <td className="p-3.5 text-end">
                           <div className="flex items-center justify-end gap-1">
                             <Button
                               variant="ghost"

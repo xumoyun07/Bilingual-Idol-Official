@@ -241,12 +241,12 @@ export function TeacherGradesModule() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
+          <Search size={15} className="absolute start-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by student name, assessment title, or course..."
-            className="pl-9 h-9 text-sm"
+            className="ps-9 h-9 text-sm"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ export function TeacherGradesModule() {
           {/* Desktop View: Multi-Column Table (>= md) */}
           <div className="hidden md:block bg-white rounded-xl border border-[#dce4e7] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-start text-xs">
                 <thead className="bg-[#f8fafc] border-b border-[#dce4e7] text-[#53657a] uppercase font-semibold">
                   <tr>
                     <th className="p-3.5">Student</th>
@@ -388,7 +388,7 @@ export function TeacherGradesModule() {
                     <th className="p-3.5">Score / Max</th>
                     <th className="p-3.5">Teacher Feedback</th>
                     <th className="p-3.5">Status</th>
-                    <th className="p-3.5 text-right">Actions</th>
+                    <th className="p-3.5 text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#edf2f5]">
@@ -408,7 +408,7 @@ export function TeacherGradesModule() {
                         </td>
                         <td className="p-3.5">
                           <div className="font-bold text-sm text-[#10253e]">
-                            {g.score} <span className="text-[#53657a] font-normal text-xs">/ {g.maxScore}</span>
+                            <bdi dir="ltr">{g.score}</bdi> <span className="text-[#53657a] font-normal text-xs">/ <bdi dir="ltr">{g.maxScore}</bdi></span>
                           </div>
                           <span
                             className={`text-[10px] font-semibold ${
@@ -419,7 +419,7 @@ export function TeacherGradesModule() {
                                 : "text-amber-600"
                             }`}
                           >
-                            {percentage}% Grade
+                            <bdi dir="ltr">{percentage}%</bdi> Grade
                           </span>
                         </td>
                         <td className="p-3.5 text-[#53657a] max-w-xs">
@@ -438,7 +438,7 @@ export function TeacherGradesModule() {
                             {g.isPublished ? "Published" : "Draft"}
                           </button>
                         </td>
-                        <td className="p-3.5 text-right">
+                        <td className="p-3.5 text-end">
                           <div className="flex items-center justify-end gap-1">
                             <Button
                               variant="ghost"

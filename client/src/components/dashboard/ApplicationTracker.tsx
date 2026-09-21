@@ -71,7 +71,7 @@ export function ApplicationTracker() {
           </h2>
         </div>
         <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-extrabold rounded-full border border-amber-200">
-          {activeApp.status}
+          <bdi dir="ltr">{activeApp.status}</bdi>
         </span>
       </div>
 

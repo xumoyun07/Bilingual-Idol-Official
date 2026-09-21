@@ -143,7 +143,23 @@ export const inMemoryStore = {
     { id: 9, slug: "korean", title: "Korean", language: "Korean", category: "World Languages", ageGroup: "Teens & adults", level: "Beginner to developing", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Learn Korean in a supportive environment that makes new vocabulary and expressions feel achievable.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
     { id: 10, slug: "business-english", title: "Business English", language: "English", category: "Professional", ageGroup: "Professionals", level: "Intermediate to advanced", duration: "Designed around workplace needs", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Refine professional communication for meetings, presentations, correspondence, and international workplace settings.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
   ] as Program[],
-  announcements: [] as Announcement[],
+  announcements: [
+    {
+      id: 1,
+      slug: "bilc-grand-redesign-transforming-language-learning",
+      title: "Bilingual Idol Language Centre Redesign: Transforming Language Learning",
+      excerpt: "Explore our newly designed spaces, interactive programmes, and the modern learning framework that redefines bilingual fluency.",
+      body: "We are absolutely thrilled to officially unveil the new, highly-polished experience of Bilingual Idol Language Centre! As a leading institution dedicated to nurturing language fluency across English, Bahasa Melayu, Mandarin, Arabic, Japanese, Korean, and more, our redesign brings a breath of fresh air to our campus, our digital presence, and our interactive classrooms.\n\n### What is New at Bilingual Idol?\n\n* **Premium Learning Spaces**: Our classrooms have been entirely redesigned with flexible seating, modern learning technology, and inspiring visual aids to keep you engaged.\n* **Interactive Programmes**: We have enhanced our curriculum to feature interactive dialogue-first methods, speaking circles, and real-life scenarios.\n* **Digital Hub & Live Student Portals**: Introducing advanced digital integrations for students and teachers to coordinate schedules, submit assignments, and track progress seamlessly.\n\n### Elevating Your Bilingual Journey\nWhether you are a beginner looking to take your first steps in Japanese or Arabic, or a professional aiming to perfect your IELTS score, Bilingual Idol offers tailored support and small-group environments to ensure you make rapid, steady progress.\n\nWe warmly invite you to explore our new website, get in touch with our friendly advisory team, or visit our physical centre for a personal tour. Your journey toward ultimate confidence and global fluency begins today!",
+      category: "announcement" as const,
+      imageUrl: "/media/about_hero.webp",
+      imageStorageKey: null,
+      imageAltText: "Modern classroom interior and engaging environment at Bilingual Idol Language Centre",
+      isPublished: true,
+      publishedAt: new Date("2026-09-20T12:00:00Z"),
+      createdAt: new Date("2026-09-20T12:00:00Z"),
+      updatedAt: new Date("2026-09-20T12:00:00Z"),
+    }
+  ] as Announcement[],
   testimonials: [] as Testimonial[],
   teamProfiles: [] as TeamProfile[],
   publicMedia: [
@@ -1105,11 +1121,37 @@ export async function listPublicAnnouncementsPage(input: { page?: number } = {})
   const page = Math.max(input.page ?? 0, 0);
   if (db) {
     const where = eq(announcements.isPublished, true);
-    const [rows, countRows] = await Promise.all([
+    let [rows, countRows] = await Promise.all([
       db.select().from(announcements).where(where).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)).limit(pageSize).offset(page * pageSize),
       db.select({ count: sql<number>`count(*)` }).from(announcements).where(where),
     ]);
-    const total = Number(countRows[0]?.count ?? 0);
+    let total = Number(countRows[0]?.count ?? 0);
+    
+    if (total === 0 && rows.length === 0) {
+      try {
+        const demo = {
+          slug: "bilc-grand-redesign-transforming-language-learning",
+          title: "Bilingual Idol Language Centre Redesign: Transforming Language Learning",
+          excerpt: "Explore our newly designed spaces, interactive programmes, and the modern learning framework that redefines bilingual fluency.",
+          body: "We are absolutely thrilled to officially unveil the new, highly-polished experience of Bilingual Idol Language Centre! As a leading institution dedicated to nurturing language fluency across English, Bahasa Melayu, Mandarin, Arabic, Japanese, Korean, and more, our redesign brings a breath of fresh air to our campus, our digital presence, and our interactive classrooms.\n\n### What is New at Bilingual Idol?\n\n* **Premium Learning Spaces**: Our classrooms have been entirely redesigned with flexible seating, modern learning technology, and inspiring visual aids to keep you engaged.\n* **Interactive Programmes**: We have enhanced our curriculum to feature interactive dialogue-first methods, speaking circles, and real-life scenarios.\n* **Digital Hub & Live Student Portals**: Introducing advanced digital integrations for students and teachers to coordinate schedules, submit assignments, and track progress seamlessly.\n\n### Elevating Your Bilingual Journey\nWhether you are a beginner looking to take your first steps in Japanese or Arabic, or a professional aiming to perfect your IELTS score, Bilingual Idol offers tailored support and small-group environments to ensure you make rapid, steady progress.\n\nWe warmly invite you to explore our new website, get in touch with our friendly advisory team, or visit our physical centre for a personal tour. Your journey toward ultimate confidence and global fluency begins today!",
+          category: "announcement" as const,
+          imageUrl: "/media/about_hero.webp",
+          imageStorageKey: null,
+          imageAltText: "Modern classroom interior and engaging environment at Bilingual Idol Language Centre",
+          isPublished: true,
+          publishedAt: new Date(),
+        };
+        await db.insert(announcements).values(demo);
+        [rows, countRows] = await Promise.all([
+          db.select().from(announcements).where(where).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)).limit(pageSize).offset(page * pageSize),
+          db.select({ count: sql<number>`count(*)` }).from(announcements).where(where),
+        ]);
+        total = Number(countRows[0]?.count ?? 0);
+      } catch (err) {
+        console.error("Failed to auto-seed announcements:", err);
+      }
+    }
+
     if (total > 0 || rows.length > 0) {
       return { rows, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
     }

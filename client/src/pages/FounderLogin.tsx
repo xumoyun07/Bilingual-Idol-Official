@@ -90,37 +90,49 @@ export default function FounderLogin() {
           </div>
         </div>
 
-        <div className="auth-form-panel order-1 md:order-2 max-md:bg-white max-md:border-0">
-          <div>
-            <p className="simple-eyebrow">{t("login.eyebrow")}</p>
-            <h2>{t("login.submitButton")}</h2>
-            <p>{t("login.heroSubtitle")}</p>
+        <div className="custom-login-card w-full max-w-md mx-auto bg-white border border-slate-100 rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(16,37,62,0.04)] order-1 md:order-2 relative overflow-hidden">
+          <div className="text-center mb-8">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#eef4ff] text-[#173fad] text-[10px] sm:text-xs font-extrabold uppercase tracking-widest rounded-full mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#173fad] animate-pulse"></span>
+              {t("login.eyebrow")}
+            </span>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#10253e] tracking-tight">
+              {t("login.submitButton")}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-2">
+              {t("login.heroSubtitle")}
+            </p>
           </div>
 
-          <form key={`login-form-${language}`} onSubmit={submit} className="auth-form" noValidate={false}>
-            <div className="auth-field">
-              <Label htmlFor="sign-in-email">{t("login.emailLabel")}</Label>
-              <div className="auth-input-wrap">
-                <Mail aria-hidden="true" size={17} />
-                <Input
+          <form key={`login-form-${language}`} onSubmit={submit} className="space-y-5" noValidate={false}>
+            <div className="space-y-2">
+              <Label htmlFor="sign-in-email" className="text-[11px] font-extrabold text-[#10253e] tracking-widest uppercase">
+                {t("login.emailLabel")}
+              </Label>
+              <div className="relative flex items-center group">
+                <Mail className="absolute left-4 text-slate-400 group-focus-within:text-[#173fad] transition-colors pointer-events-none" size={18} />
+                <input
                   id="sign-in-email"
                   key={`sign-in-email-${language}`}
-                  type="text"
+                  type="email"
                   autoComplete="email"
                   placeholder={t("login.emailPlaceholder")}
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  className="w-full h-12 pl-12 pr-4 bg-slate-50/50 border border-slate-200 focus:border-[#173fad] focus:bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#173fad]/10 transition-all duration-200"
                   dir={isRTL ? "rtl" : "ltr"}
                 />
               </div>
             </div>
 
-            <div className="auth-field">
-              <Label htmlFor="sign-in-password">{t("login.passwordLabel")}</Label>
-              <div className="auth-input-wrap">
-                <LockKeyhole aria-hidden="true" size={17} />
-                <Input
+            <div className="space-y-2">
+              <Label htmlFor="sign-in-password" className="text-[11px] font-extrabold text-[#10253e] tracking-widest uppercase">
+                {t("login.passwordLabel")}
+              </Label>
+              <div className="relative flex items-center group">
+                <LockKeyhole className="absolute left-4 text-slate-400 group-focus-within:text-[#173fad] transition-colors pointer-events-none" size={18} />
+                <input
                   id="sign-in-password"
                   key={`sign-in-password-${language}`}
                   type={visible ? "text" : "password"}
@@ -130,13 +142,13 @@ export default function FounderLogin() {
                   minLength={1}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
+                  className="w-full h-12 pl-12 pr-12 bg-slate-50/50 border border-slate-200 focus:border-[#173fad] focus:bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#173fad]/10 transition-all duration-200"
                   dir={isRTL ? "rtl" : "ltr"}
                 />
                 <button
                   type="button"
-                  className="auth-password-toggle"
-                  aria-label={visible ? t("login.hidePassword") : t("login.showPassword")}
-                  onClick={() => setVisible((current) => !current)}
+                  onClick={() => setVisible((prev) => !prev)}
+                  className="absolute right-4 text-slate-400 hover:text-[#173fad] focus:outline-none transition-colors"
                 >
                   {visible ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -144,14 +156,18 @@ export default function FounderLogin() {
             </div>
 
             {login.error ? (
-              <p className="auth-error" role="alert">
+              <p className="text-xs font-semibold text-rose-500 bg-rose-50 border border-rose-100 rounded-lg p-3 text-center" role="alert">
                 {t("login.invalidCredentials", undefined, "Invalid e-mail or password.")}
               </p>
             ) : null}
 
-            <Button type="submit" className="auth-submit" disabled={login.isPending}>
+            <button
+              type="submit"
+              disabled={login.isPending}
+              className="w-full h-12 flex items-center justify-center bg-[#173fad] hover:bg-[#10253e] active:bg-[#0c1c2e] text-white font-semibold text-sm rounded-xl shadow-lg shadow-[#173fad]/15 hover:shadow-xl hover:shadow-[#173fad]/25 active:shadow-md active:translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none"
+            >
               {login.isPending ? t("login.signingIn") : t("login.submitButton")}
-            </Button>
+            </button>
           </form>
         </div>
       </section>

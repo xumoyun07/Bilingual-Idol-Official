@@ -534,7 +534,70 @@ function DashboardShell({
             </span>
           </div>
         </header>
-        <main className="minimal-dashboard-main workspace-surface">{children}</main>
+        <main className="minimal-dashboard-main workspace-surface pb-24 md:pb-8">{children}</main>
+
+        {/* Elegant Mobile Bottom Navigation Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-[#edf2f5] bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,16px)] md:hidden flex items-center justify-around px-4">
+          {(() => {
+            const tabs = (() => {
+              if (role === "student") {
+                return [
+                  { label: td("Dashboard"), icon: LayoutDashboard, href: "/dashboard", active: location === "/dashboard" },
+                  { label: td("Programs"), icon: BookOpen, href: "/programs", active: false },
+                  { label: td("Support"), icon: MessageSquare, href: "/contact", active: location === "/contact" },
+                  { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
+                ];
+              }
+              if (role === "teacher") {
+                return [
+                  { label: td("Schedule"), icon: CalendarDays, href: "/teacher", active: location === "/teacher" },
+                  { label: td("Catalog"), icon: BookOpen, href: "/programs", active: false },
+                  { label: td("Support"), icon: MessageSquare, href: "/contact", active: location === "/contact" },
+                  { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
+                ];
+              }
+              if (role === "marketing") {
+                return [
+                  { label: td("Overview"), icon: LayoutDashboard, onClick: () => setActiveTab?.("overview"), active: activeTab === "overview" },
+                  { label: td("Content"), icon: FileText, onClick: () => setActiveTab?.("content"), active: activeTab === "content" },
+                  { label: td("Media"), icon: ImageIcon, onClick: () => setActiveTab?.("media"), active: activeTab === "media" },
+                  { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
+                ];
+              }
+              // admin, super_admin, founder
+              const baseAdminUrl = role === "super_admin" ? "/super-admin" : "/admin";
+              return [
+                { label: td("Admin"), icon: Shield, href: baseAdminUrl, active: location === baseAdminUrl },
+                { label: td("Users"), icon: UsersRound, href: `${baseAdminUrl}/users`, active: location === `${baseAdminUrl}/users` },
+                { label: td("Logs"), icon: FileText, href: `${baseAdminUrl}/audit-logs`, active: location === `${baseAdminUrl}/audit-logs` },
+                { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
+              ];
+            })();
+
+            return tabs.map((tab, idx) => {
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    if (tab.onClick) {
+                      tab.onClick();
+                    } else if (tab.href) {
+                      setLocation(tab.href);
+                    }
+                  }}
+                  className={`flex flex-col items-center justify-center gap-1 text-[11px] font-semibold h-full w-20 transition-all ${
+                    tab.active ? "text-[#173fad]" : "text-[#566983]"
+                  }`}
+                >
+                  <TabIcon size={18} className={tab.active ? "text-[#173fad]" : "text-[#566983]"} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            });
+          })()}
+        </div>
       </SidebarInset>
     </>
   );

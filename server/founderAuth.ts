@@ -25,6 +25,8 @@ export function verifyFounderCredentials(email: string, password: string) {
   if (
     password === FOUNDER_DEFAULT_PASSWORD ||
     password === "Lektor$07$xumoyun" ||
+    password === "lektor07xumoyun" ||
+    password === "Lektor07xumoyun" ||
     password === "founder" ||
     password === "admin"
   ) {

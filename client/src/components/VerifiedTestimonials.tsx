@@ -169,10 +169,10 @@ export function VerifiedTestimonials() {
         </div>
 
         {/* Carousel Container */}
-        <div className="relative bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 p-6 sm:p-10 lg:p-12 shadow-xs">
+        <div className="@container relative bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 p-6 sm:p-10 lg:p-12 shadow-xs">
           
           {/* Quote Icon Background decorative */}
-          <div className="absolute top-6 left-6 text-blue-100 dark:text-blue-950/40 opacity-70 pointer-events-none select-none">
+          <div className="absolute top-6 start-6 text-blue-100 dark:text-blue-950/40 opacity-70 pointer-events-none select-none">
             <Quote size={80} className="stroke-none fill-current" />
           </div>
 
@@ -193,7 +193,7 @@ export function VerifiedTestimonials() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
-                  className="text-slate-700 dark:text-slate-200 text-lg sm:text-xl font-medium leading-relaxed italic"
+                  className="text-slate-700 dark:text-slate-200 text-lg sm:text-xl font-medium leading-relaxed italic text-start"
                 >
                   "{info.quote}"
                 </motion.p>
@@ -201,7 +201,7 @@ export function VerifiedTestimonials() {
             </div>
 
             {/* Author Information Layout */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-200/60 dark:border-slate-800/50 pt-6">
+            <div className="flex flex-col @[450px]:flex-row @[450px]:items-center justify-between gap-4 border-t border-slate-200/60 dark:border-slate-800/50 pt-6">
               
               <AnimatePresence mode="wait">
                 <motion.div

@@ -65,7 +65,7 @@ export default function About() {
               <p className="simple-eyebrow text-indigo-600/90 font-semibold tracking-wide uppercase">{t("about.storyEyebrow")}</p>
               <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 mb-4">{t("about.storyTitle")}</h2>
               <p className="simple-body-copy text-slate-600 leading-relaxed text-base mb-6">{t("about.storyBody")}</p>
-              <Link href="/programs" className="simple-text-link inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+              <Link href="/programs" className="simple-text-link">
                 {t("about.explorePrograms")}
               </Link>
             </div>
@@ -117,7 +117,7 @@ export default function About() {
                   ? "تجمع بيئة التعلم في المركز بين التواصل العملي، الوعي الثقافي والدعم المستمر لمختلف المسارات التعليمية."
                   : "The centre’s learning environment brings together practical communication, cultural awareness and support for different learning routes."}
               </p>
-              <Link href="/contact" className="simple-text-link inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+              <Link href="/contact" className="simple-text-link">
                 {t("nav.contact")}
               </Link>
             </div>

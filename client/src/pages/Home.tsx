@@ -373,7 +373,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-3">
             <a href="tel:+60367310449" className="simple-button simple-button-quiet">
-              <Phone size={16} /> +60 3-6731 0449
+              <Phone size={16} /> <bdi dir="ltr">+60 3-6731 0449</bdi>
             </a>
             <Link
               href="/contact?reason=campusTour"

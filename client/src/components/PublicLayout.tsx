@@ -117,6 +117,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const scrollAnimRef = useRef<number | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const getScrollY = () =>
@@ -128,7 +130,22 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       );
 
     const handleScroll = () => {
-      setShowScrollTop(getScrollY() > 180);
+      const currentScrollY = getScrollY();
+      setShowScrollTop(currentScrollY > 180);
+
+      if (currentScrollY > 120) {
+        if (currentScrollY > lastScrollY.current) {
+          // Scrolling down - hide header
+          setHeaderVisible(false);
+        } else {
+          // Scrolling up - show header
+          setHeaderVisible(true);
+        }
+      } else {
+        // At top - show header
+        setHeaderVisible(true);
+      }
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -169,13 +186,19 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     const startY = getScrollTop();
     if (startY <= 0) return;
 
-    // Accessibility check: instant reset if user prefers reduced motion
+    // Accessibility and viewport checks: instant reset if user prefers reduced motion or on mobile screens (<768px/user-agent)
     const prefersReducedMotion =
       typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (prefersReducedMotion) {
+    const isMobileDevice =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 ||
+        (typeof navigator !== "undefined" &&
+          /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)));
+
+    if (prefersReducedMotion || isMobileDevice) {
       window.scrollTo(0, 0);
       if (html) html.scrollTop = 0;
       if (body) body.scrollTop = 0;
@@ -245,7 +268,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <a className="simple-skip-link" href="#main-content">
         {t("nav.skipToContent")}
       </a>
-      <header className="simple-public-header simple-public-header--refined">
+      <header className={`simple-public-header simple-public-header--refined transition-all duration-300 ${headerVisible ? "translate-y-0 opacity-100" : "-translate-y-24 opacity-0 pointer-events-none"}`}>
         <div className="simple-public-bar">
           <Link href="/" className="simple-brand" aria-label={t("footer.centreName")} onClick={close}>
             <span aria-hidden="true">BI</span>
@@ -338,7 +361,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       {/* Floating Actions Dock */}
       <div
-        className={`floating-actions-dock ${isRTL ? "is-rtl" : ""}`}
+        className={`floating-actions-dock ${isRTL ? "is-rtl" : ""} ${location.startsWith("/programs/") && location !== "/programs" ? "is-on-detail" : ""}`}
         aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
       >
         {/* Promotional Campaign Floating Badge rendered directly in the flex dock */}

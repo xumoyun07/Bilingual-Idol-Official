@@ -131,18 +131,18 @@ export function TuitionPaymentModule() {
           {language === "ms" ? "Pembayaran Tuition Berjaya!" : language === "ar" ? "اكتملت عملية الدفع بنجاح!" : "Tuition Payment Confirmed!"}
         </h2>
         
-        <div className="my-6 max-w-sm mx-auto p-4 bg-slate-50 border border-dashed border-[#d9cbb8] rounded-xl text-left" style={{ textAlign: isRTL ? "right" : "left" }}>
+        <div className="my-6 max-w-sm mx-auto p-4 bg-slate-50 border border-dashed border-[#d9cbb8] rounded-xl text-start">
           <div className="flex justify-between text-xs text-[#708098] mb-1.5">
             <span>{language === "ms" ? "No. Bil / Resit" : language === "ar" ? "رقم الفاتورة" : "Receipt No."}</span>
-            <span className="font-bold text-[#10253e]">BILC-REC-0226</span>
+            <span className="font-bold text-[#10253e]"><bdi dir="ltr">BILC-REC-0226</bdi></span>
           </div>
           <div className="flex justify-between text-xs text-[#708098] mb-1.5">
             <span>{language === "ms" ? "Jumlah Dibayar" : language === "ar" ? "المبلغ المدفوع" : "Amount Paid"}</span>
-            <span className="font-bold text-emerald-600">{formatCurrency(feeAmount)}</span>
+            <span className="font-bold text-emerald-600"><bdi dir="ltr">{formatCurrency(feeAmount)}</bdi></span>
           </div>
           <div className="flex justify-between text-xs text-[#708098] mb-1.5">
             <span>{language === "ms" ? "Kaedah Pembayaran" : language === "ar" ? "وسيلة الدفع" : "Method"}</span>
-            <span className="font-bold text-[#10253e]">ToyyibPay FPX Bank</span>
+            <span className="font-bold text-[#10253e]"><bdi dir="ltr">ToyyibPay FPX Bank</bdi></span>
           </div>
           <div className="flex justify-between text-xs text-[#708098]">
             <span>{language === "ms" ? "Status Akun" : language === "ar" ? "الحالة" : "Status"}</span>
@@ -201,21 +201,21 @@ export function TuitionPaymentModule() {
             <div className="space-y-2.5">
               <div className="flex justify-between text-xs text-[#53657a]">
                 <span>{language === "ms" ? "Deposit Kemasukan Akademik" : language === "ar" ? "وديعة التسجيل والالتحاق" : "Registration Admission Deposit"}</span>
-                <span>RM 250.00</span>
+                <span><bdi dir="ltr">RM 250.00</bdi></span>
               </div>
               <div className="flex justify-between text-xs text-[#53657a]">
                 <span>{language === "ms" ? "Yuran Buku Teks & Diagnostik" : language === "ar" ? "كتب دراسية ومواد تشخيصية" : "Course Materials & Diagnostics Book"}</span>
-                <span>RM 100.00</span>
+                <span><bdi dir="ltr">RM 100.00</bdi></span>
               </div>
               <div className="flex justify-between text-xs text-[#53657a]">
                 <span>{language === "ms" ? "Yuran Pengajian Bulan Pertama (Level 1)" : language === "ar" ? "رسوم دراسية (الشهر الأول)" : "Level 1 Tuition Fee (Month 1)"}</span>
-                <span>RM 400.00</span>
+                <span><bdi dir="ltr">RM 400.00</bdi></span>
               </div>
               
               {appliedPromo && (
                 <div className="flex justify-between text-xs text-emerald-600 font-extrabold">
                   <span>{language === "ms" ? "Diskaun Kempen Pintar" : language === "ar" ? "خصم العرض الترويجي" : "Promotional Discount"} ({appliedPromo.code})</span>
-                  <span>-{formatCurrency(originalFee - feeAmount)}</span>
+                  <span><bdi dir="ltr">-{formatCurrency(originalFee - feeAmount)}</bdi></span>
                 </div>
               )}
             </div>
@@ -228,7 +228,7 @@ export function TuitionPaymentModule() {
                 {language === "ms" ? "Jumlah Perlu Dibayar:" : language === "ar" ? "الإجمالي المستحق الدفع:" : "Total Amount Due:"}
               </span>
               <span className="text-2xl font-black text-[#173fad]">
-                {formatCurrency(feeAmount)}
+                <bdi dir="ltr">{formatCurrency(feeAmount)}</bdi>
               </span>
             </div>
           </div>
