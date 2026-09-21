@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronRight, Clock, FileText, Globe, GraduationCap, Sparkles, UserCheck, Users } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, Clock, FileText, Globe, GraduationCap, Sparkles, UserCheck, Users } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -271,6 +271,39 @@ const WORLD_LANGUAGES = [
   },
 ];
 
+const LANGUAGE_HIGHLIGHTS: Record<string, { en: string[]; ms: string[]; ar: string[] }> = {
+  EN: {
+    en: ["General & Academic English", "IELTS preparation pathways", "Executive business fluency", "Certified native trainers"],
+    ms: ["Bahasa Inggeris Umum & Akademik", "Laluan persediaan IELTS", "Kefasihan perniagaan eksekutif", "Pengajar bertauliah"],
+    ar: ["الإنجليزية العامة والأكاديمية", "مسارات التحضير لاختبار آيلتس", "الطلاقة في لغة الأعمال التنفيذية", "مدربون معتمدون ذوو كفاءة"],
+  },
+  ZH: {
+    en: ["HSK preparation courses", "Conversational fluency focus", "Corporate business Mandarin", "Culturally immersive lessons"],
+    ms: ["Kursus persediaan HSK", "Fokus kefasihan perbualan", "Mandarin perniagaan korporat", "Pembelajaran interaktif budaya"],
+    ar: ["دورات التحضير لاختبار HSK", "التركيز على طلاقة المحادثة", "لغة الماندرين للأعمال والشركات", "دروس تفاعلية غنية بالثقافة"],
+  },
+  MS: {
+    en: ["Essential local grammar skills", "Practical interactive dialogue", "Living & working integration", "Experienced local tutors"],
+    ms: ["Kemahiran tatabahasa tempatan asas", "Dialog interaktif praktikal", "Integrasi kerjaya & kehidupan", "Tutor tempatan berpengalaman"],
+    ar: ["قواعد ومفردات اللغة المحلية الأساسية", "حوارات وتدريبات تفاعلية عملية", "سهولة العيش والعمل في ماليزيا", "معلمون محليون ذوو خبرة"],
+  },
+  AR: {
+    en: ["Modern Standard Arabic (MSA)", "Business & academic writing", "Diplomatic language protocols", "Highly structured modules"],
+    ms: ["Bahasa Arab Standard Moden", "Penulisan akademik & perniagaan", "Protokol bahasa diplomatik", "Modul sangat tersusun"],
+    ar: ["العربية الفصحى الحديثة (Fusha)", "الكتابة الأكاديمية والتجارية للأعمال", "بروتوكولات اللغة الدبلوماسية", "وحدات دراسية منظمة للغاية"],
+  },
+  KO: {
+    en: ["TOPIK preparation tracks", "Modern daily conversation", "Korean culture & etiquette", "Bilingual certified instructors"],
+    ms: ["Laluan persediaan TOPIK", "Perbualan harian moden", "Budaya & etika Korea", "Pengajar dwi-bahasa bertauliah"],
+    ar: ["مسارات التحضير لاختبار TOPIK", "محادثات يومية معاصرة تفاعلية", "فهم الثقافة والآداب الكورية", "معلمون معتمدون ثنائيو اللغة"],
+  },
+  JA: {
+    en: ["JLPT pathways (N5 to N1)", "Corporate Japanese manners", "Business etiquette lessons", "Oral communication fluency"],
+    ms: ["Laluan JLPT (N5 hingga N1)", "Bahasa Jepun korporat", "Etika & adab perniagaan", "Kefasihan komunikasi lisan"],
+    ar: ["مسارات التحضير لاختبار JLPT", "اليابانية لقطاع الشركات والأعمال", "آداب وقواعد التعامل المهنية", "طلاقة التحدث والتواصل الشفهي"],
+  },
+};
+
 export function OfficialPriceList2026() {
   const [activeTab, setActiveTab] = useState<CourseCategory>("general");
   const { t, isRTL, language } = useLanguage();
@@ -298,61 +331,88 @@ export function OfficialPriceList2026() {
         <p>{t("home.pricingSubtitle")}</p>
       </div>
 
-      {/* Category Navigation */}
-      <div
-        className="bilc-pricing-tabs"
-        role="tablist"
-        aria-label={language === "ar" ? "فئات الدورات الدراسية" : language === "ms" ? "Kategori kursus" : "Course categories"}
-        style={{ marginLeft: 0 }}
-      >
-        <button
-          role="tab"
-          aria-selected={activeTab === "general"}
-          className={`bilc-tab-btn ${activeTab === "general" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("general")}
+      {/* Category Navigation Wrapper */}
+      <div className="bilc-pricing-nav-wrapper" style={{ marginLeft: 0 }}>
+        {/* Category Navigation */}
+        <div
+          className="bilc-pricing-tabs"
+          role="tablist"
+          aria-label={language === "ar" ? "فئات الدورات الدراسية" : language === "ms" ? "Kategori kursus" : "Course categories"}
+          style={{ marginLeft: 0 }}
         >
-          {t("home.pricingTabGeneral")}
-        </button>
-        <button
-          role="tab"
-          aria-selected={activeTab === "ielts"}
-          className={`bilc-tab-btn ${activeTab === "ielts" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("ielts")}
-        >
-          {t("home.pricingTabIelts")}
-        </button>
-        <button
-          role="tab"
-          aria-selected={activeTab === "camps"}
-          className={`bilc-tab-btn ${activeTab === "camps" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("camps")}
-        >
-          {t("home.pricingTabCamps")}
-        </button>
-        <button
-          role="tab"
-          aria-selected={activeTab === "private"}
-          className={`bilc-tab-btn ${activeTab === "private" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("private")}
-        >
-          {t("home.pricingTabPrivate")}
-        </button>
-        <button
-          role="tab"
-          aria-selected={activeTab === "executive"}
-          className={`bilc-tab-btn ${activeTab === "executive" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("executive")}
-        >
-          {t("home.pricingTabExecutive")}
-        </button>
-        <button
-          role="tab"
-          aria-selected={activeTab === "languages"}
-          className={`bilc-tab-btn ${activeTab === "languages" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("languages")}
-        >
-          {t("home.pricingTabWorld")}
-        </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "general"}
+            className={`bilc-tab-btn ${activeTab === "general" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("general")}
+          >
+            {t("home.pricingTabGeneral")}
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "ielts"}
+            className={`bilc-tab-btn ${activeTab === "ielts" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("ielts")}
+          >
+            {t("home.pricingTabIelts")}
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "camps"}
+            className={`bilc-tab-btn ${activeTab === "camps" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("camps")}
+          >
+            {t("home.pricingTabCamps")}
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "private"}
+            className={`bilc-tab-btn ${activeTab === "private" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("private")}
+          >
+            {t("home.pricingTabPrivate")}
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "executive"}
+            className={`bilc-tab-btn ${activeTab === "executive" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("executive")}
+          >
+            {t("home.pricingTabExecutive")}
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "languages"}
+            className={`bilc-tab-btn ${activeTab === "languages" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("languages")}
+          >
+            {t("home.pricingTabWorld")}
+          </button>
+        </div>
+
+        {/* Mobile Category Navigation Dropdown */}
+        <div className="bilc-pricing-mobile-select-container">
+          <label htmlFor="course-category-select" className="sr-only">
+            {language === "ar" ? "فئات الدورات الدراسية" : language === "ms" ? "Kategori kursus" : "Course categories"}
+          </label>
+          <div className="relative w-full">
+            <select
+              id="course-category-select"
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as CourseCategory)}
+            >
+              <option value="general">{t("home.pricingTabGeneral")}</option>
+              <option value="ielts">{t("home.pricingTabIelts")}</option>
+              <option value="camps">{t("home.pricingTabCamps")}</option>
+              <option value="private">{t("home.pricingTabPrivate")}</option>
+              <option value="executive">{t("home.pricingTabExecutive")}</option>
+              <option value="languages">{t("home.pricingTabWorld")}</option>
+            </select>
+            <div className="bilc-select-chevron">
+              <ChevronDown size={18} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tab Panels */}
@@ -643,7 +703,9 @@ export function OfficialPriceList2026() {
                   </div>
                   <p className="bilc-camp-highlight">{descText}</p>
                   <div className="bilc-course-price">
-                    <span className="bilc-price-val"><bdi dir="ltr">{feeText}</bdi></span>
+                    <span className={`bilc-price-val ${feeText.includes("Request") || feeText.includes("Permintaan") || feeText.includes("الطلب") ? "is-text" : ""}`}>
+                      <bdi dir="ltr">{feeText}</bdi>
+                    </span>
                     <span className="bilc-price-sub">{language === "ms" ? "Yuran Eksekutif" : language === "ar" ? "الرسوم التنفيذية" : "Executive Tuition"}</span>
                   </div>
                   <div className="bilc-course-inclusions">
@@ -672,33 +734,59 @@ export function OfficialPriceList2026() {
 
         {/* 6. World Languages */}
         {activeTab === "languages" && (
-          <div className="bilc-languages-grid">
+          <div className="bilc-cards-grid">
             {WORLD_LANGUAGES.map((lang) => {
               const nameText = lang.name[language] || lang.name.en;
               const descText = lang.desc[language] || lang.desc.en;
+              const highlights = LANGUAGE_HIGHLIGHTS[lang.code]?.[language] || LANGUAGE_HIGHLIGHTS[lang.code]?.en || [];
               return (
-                <div key={lang.rawName} className="bilc-lang-card">
-                  <div className="bilc-lang-card-header">
-                    <span className="bilc-lang-badge">{lang.code}</span>
-                    <div>
-                      <h3>{nameText}</h3>
-                      <p className="bilc-lang-native">{lang.native}</p>
+                <div key={lang.rawName} className="bilc-course-card">
+                  <div className="bilc-course-card-top">
+                    <div className="flex items-center justify-between w-full">
+                      <h3 className="text-xl font-extrabold text-slate-900">{nameText}</h3>
+                      <span className="bilc-lang-badge" style={{ margin: 0 }}>{lang.code}</span>
+                    </div>
+                    <div className="bilc-duration-badge mt-2">
+                      <Globe size={14} />
+                      <span>{lang.native}</span>
                     </div>
                   </div>
-                  <p className="bilc-lang-desc">{descText}</p>
-                  <div className="bilc-lang-card-footer">
-                    <span className="bilc-lang-avail">
-                      {language === "ms" ? "Tersedia: Permulaan hingga Lanjutan" : language === "ar" ? "متاح: من المبتدئ إلى المتقدم" : "Available: Beginner to Advanced"}
+
+                  <p className="bilc-camp-highlight mt-2">{descText}</p>
+
+                  <div className="bilc-course-price">
+                    <span className="bilc-price-val is-text">
+                      {language === "ms" ? "Berdasarkan Permintaan" : language === "ar" ? "عند الطلب" : "Upon Request"}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleEnquireClick(`World Language: ${lang.rawName}`)}
-                      className="bilc-lang-link cursor-pointer flex items-center justify-between"
-                    >
-                      <span>{language === "ms" ? "Tanya Sekarang" : language === "ar" ? "استفسار" : "Enquire"}</span>
-                      <ChevronRight size={15} />
-                    </button>
+                    <span className="bilc-price-sub">
+                      {language === "ms" ? "LALUAN PEMBELAJARAN TERSUAI" : language === "ar" ? "مسارات تعليمية مخصصة" : "TAILORED LEARNING PATHWAYS"}
+                    </span>
                   </div>
+
+                  <div className="bilc-course-inclusions">
+                    <p className="bilc-inclusions-title">
+                      {language === "ms" ? "Fokus Program:" : language === "ar" ? "تركيز البرنامج:" : "Program Focus:"}
+                    </p>
+                    <ul>
+                      {highlights.map((highlight, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <CheckCircle2 size={14} className="text-blue-600 flex-shrink-0" />
+                          <span>{highlight}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleEnquireClick(`World Language: ${lang.rawName}`)}
+                    className="simple-button w-full cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>
+                      {language === "ms" ? `Tanya mengenai ${nameText}` : language === "ar" ? `استفسر عن ${nameText}` : `Enquire for ${nameText}`}
+                    </span>
+                    <ChevronRight size={16} />
+                  </button>
                 </div>
               );
             })}

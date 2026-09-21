@@ -155,7 +155,7 @@ export function VerifiedTestimonials() {
       <div className="max-w-5xl mx-auto relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="text-center max-w-[1024px] mx-auto mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <Star size={13} className="fill-amber-400 text-amber-400" />
             <span>{t("home.testimonialsEyebrow")}</span>

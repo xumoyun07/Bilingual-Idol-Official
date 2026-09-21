@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Building2, ChevronLeft, ChevronRight, Eye, X, MapPin } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight, Eye, X, MapPin, Sofa, Monitor, BookOpen, Users, MessageSquare } from "lucide-react";
 
 interface Facility {
   id: number;
@@ -109,6 +109,23 @@ const campusFacilities: Facility[] = [
   }
 ];
 
+const getFacilityIcon = (id: number) => {
+  switch (id) {
+    case 1:
+      return <Sofa size={22} className="text-blue-600 dark:text-blue-400" />;
+    case 2:
+      return <Monitor size={22} className="text-blue-600 dark:text-blue-400" />;
+    case 3:
+      return <BookOpen size={22} className="text-blue-600 dark:text-blue-400" />;
+    case 4:
+      return <Users size={22} className="text-blue-600 dark:text-blue-400" />;
+    case 5:
+      return <MessageSquare size={22} className="text-blue-600 dark:text-blue-400" />;
+    default:
+      return <Building2 size={22} className="text-blue-600 dark:text-blue-400" />;
+  }
+};
+
 export function CampusFacilitiesShowcase() {
   const { language, t, isRTL } = useLanguage();
   const [activeFacility, setActiveFacility] = useState<number>(0);
@@ -127,6 +144,8 @@ export function CampusFacilitiesShowcase() {
   const prevFacility = () => {
     setActiveFacility((prev) => (prev - 1 + campusFacilities.length) % campusFacilities.length);
   };
+
+  const activeInfo = localized(campusFacilities[activeFacility]!);
 
   return (
     <section id="campus-facilities-section" className="relative bg-slate-50 dark:bg-slate-900/50 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -184,24 +203,95 @@ export function CampusFacilitiesShowcase() {
             </div>
 
             {/* Mobile Controls */}
-            <div className="lg:hidden flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 mt-2">
-              <button
-                onClick={prevFacility}
-                className="p-2.5 rounded-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
-                aria-label="Previous facility"
+            <div className="lg:hidden space-y-4">
+              {/* Header and counter for Mobile */}
+              <div className="flex items-center justify-between mt-6 mb-2">
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                  {language === "ms" ? "Terokai Lebih Banyak Kemudahan" : language === "ar" ? "استكشف المزيد من المرافق" : "Explore More Facilities"}
+                </h4>
+                <div className="text-sm">
+                  <span className="font-bold text-blue-600 dark:text-blue-400">{String(activeFacility + 1).padStart(2, '0')}</span>
+                  <span className="text-slate-400"> / {String(campusFacilities.length).padStart(2, '0')}</span>
+                </div>
+              </div>
+
+              {/* Horizontal Scroll bar of facility cards */}
+              <div 
+                className="flex overflow-x-auto gap-4 pb-4 pt-1 -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
-                <ChevronLeft size={20} />
-              </button>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                {activeFacility + 1} / {campusFacilities.length}
-              </span>
-              <button
-                onClick={nextFacility}
-                className="p-2.5 rounded-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
-                aria-label="Next facility"
-              >
-                <ChevronRight size={20} />
-              </button>
+                {campusFacilities.map((fac, idx) => {
+                  const info = localized(fac);
+                  const isActive = idx === activeFacility;
+                  return (
+                    <button
+                      key={fac.id}
+                      onClick={() => setActiveFacility(idx)}
+                      className={`flex-none snap-center w-[185px] p-5 rounded-2xl border text-center bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col items-center justify-between h-[210px] ${
+                        isActive
+                          ? "border-blue-600 dark:border-blue-500 shadow-md ring-1 ring-blue-600/20"
+                          : "border-slate-200/60 dark:border-slate-800/60 shadow-xs hover:border-slate-300 dark:hover:border-slate-700"
+                      }`}
+                    >
+                      {/* Top: Icon Container */}
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100/30">
+                        {getFacilityIcon(fac.id)}
+                      </div>
+
+                      {/* Middle: Info text */}
+                      <div className="flex-1 flex flex-col items-center justify-center mt-3">
+                        <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 text-center block">
+                          {info.type}
+                        </span>
+                        <h3 className="text-xs font-extrabold text-slate-800 dark:text-slate-200 line-clamp-2 leading-snug text-center">
+                          {info.title}
+                        </h3>
+                      </div>
+
+                      {/* Bottom: Dot Indicator */}
+                      <div className="w-full flex justify-center mt-2">
+                        <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isActive ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-300 dark:bg-slate-700'}`} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Enhanced Prev/Next buttons with smooth segmented scroll bar */}
+              <div className="flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800/60 mt-1">
+                <button
+                  onClick={prevFacility}
+                  className="p-3 rounded-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all border border-slate-200/50 dark:border-slate-800/50 active:scale-95 shadow-2xs"
+                  aria-label="Previous facility"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                
+                {/* Visual Pagination Indicator Segments */}
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    {language === "ms" ? "Sapu untuk meneroka semua kemudahan" : language === "ar" ? "اسحب لاستكشاف جميع المرافق" : "Swipe to explore all facilities"}
+                  </span>
+                  <div className="flex gap-1 h-1 w-28 items-center mt-0.5">
+                    {campusFacilities.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                          idx === activeFacility ? "bg-blue-600 dark:bg-blue-400" : "bg-slate-200 dark:bg-slate-750"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={nextFacility}
+                  className="p-3 rounded-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all border border-slate-200/50 dark:border-slate-800/50 active:scale-95 shadow-2xs"
+                  aria-label="Next facility"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -226,23 +316,26 @@ export function CampusFacilitiesShowcase() {
             </div>
 
             {/* Info Overlay */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-5 pt-16 flex flex-col justify-end text-white z-10 pointer-events-none">
-              <div className="flex items-center gap-1.5 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                <MapPin size={11} />
-                <span>Pavilion Embassy, KL</span>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent p-5 sm:p-6 pt-20 flex flex-col justify-end text-white z-10 pointer-events-none">
+              <div className="flex items-center gap-1.5 text-blue-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-2">
+                <MapPin size={12} className="text-blue-400" />
+                <span>PAVILION EMBASSY, KL</span>
               </div>
-              <h3 className="text-lg font-bold tracking-tight text-white mb-2">
-                {localized(campusFacilities[activeFacility]!).title}
+              <div className="inline-block self-start bg-blue-600/90 text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md mb-2">
+                {activeInfo.type}
+              </div>
+              <h3 className="text-base sm:text-xl font-bold tracking-tight text-white mb-2">
+                {activeInfo.title}
               </h3>
-              <p className="text-slate-200 text-xs sm:text-sm leading-relaxed max-w-2xl">
-                {localized(campusFacilities[activeFacility]!).desc}
+              <p className="text-slate-200 text-xs sm:text-sm leading-relaxed max-w-2xl opacity-90">
+                {activeInfo.desc}
               </p>
             </div>
 
             {/* Floating Zoom Action */}
             <button
               onClick={() => setLightboxIndex(activeFacility)}
-              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/50 hover:bg-slate-900/80 backdrop-blur-md text-white border border-white/10 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-300"
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/60 hover:bg-slate-900/80 backdrop-blur-md text-white border border-white/10 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity duration-300"
               title="Expand image"
             >
               <Eye size={16} />
