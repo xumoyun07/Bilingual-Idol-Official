@@ -124,7 +124,7 @@ export default function About() {
           </div>
         </section>
 
-        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing bg-gradient-to-b from-slate-50/50 to-white border border-slate-100 rounded-3xl p-6 sm:p-8 md:p-12 shadow-xs">
+        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing bg-gradient-to-b from-slate-50 to-white border border-slate-100 rounded-3xl p-6 sm:p-8 md:p-12 shadow-xs">
           <div className="simple-section-heading about-team-heading--surface">
             <div>
               <p className="simple-eyebrow">{t("about.teamEyebrow")}</p>

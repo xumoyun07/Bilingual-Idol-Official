@@ -30,9 +30,9 @@ function ScrollToTop() {
   return null;
 }
 
-function Router() {
+function Router({ location }: { location?: string }) {
   return (
-    <Switch>
+    <Switch location={location}>
       {/* Public Pages */}
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
@@ -69,6 +69,31 @@ function Router() {
 }
 
 function App() {
+  const [location] = useLocation();
+  const [displayLocation, setDisplayLocation] = React.useState(location);
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [opacity, setOpacity] = React.useState(0);
+
+  React.useEffect(() => {
+    if (location !== displayLocation) {
+      setIsTransitioning(true);
+      setOpacity(1);
+
+      const timer1 = setTimeout(() => {
+        setDisplayLocation(location);
+        setOpacity(0);
+
+        const timer2 = setTimeout(() => {
+          setIsTransitioning(false);
+        }, 150);
+
+        return () => clearTimeout(timer2);
+      }, 150);
+
+      return () => clearTimeout(timer1);
+    }
+  }, [location, displayLocation]);
+
   return (
     <ErrorBoundary>
       <LanguageProvider>
@@ -76,7 +101,20 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <ScrollToTop />
-            <Router />
+            {(isTransitioning || opacity > 0) && (
+              <div
+                style={{
+                  position: "fixed",
+                  inset: 0,
+                  backgroundColor: "#ffffff",
+                  zIndex: 999999,
+                  opacity: opacity,
+                  transition: "opacity 150ms ease-in-out",
+                  pointerEvents: "all",
+                }}
+              />
+            )}
+            <Router location={displayLocation} />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>

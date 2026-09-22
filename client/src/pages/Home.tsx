@@ -185,7 +185,7 @@ export default function Home() {
 
         {/* Active Intake Promotions & Discounts Directory Section */}
         {activePromotionsQuery.data && activePromotionsQuery.data.length > 0 && (
-          <section id="home-promotions-section" className="simple-section simple-home-panel bg-slate-50/50 border-t border-b border-slate-100 py-12">
+          <section id="home-promotions-section" className="simple-section simple-home-panel bg-slate-50 border-t border-b border-slate-100 py-12">
             <div className="simple-section-heading mb-8">
               <div>
                 <p className="simple-eyebrow flex items-center gap-1.5 justify-center md:justify-start">

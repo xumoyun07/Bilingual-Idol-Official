@@ -3,12 +3,12 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export function CentreMap() {
   const { language, isRTL } = useLanguage();
-  const address = "B-25-07, Pavilion Embassy, Menara G-Vestor, 200, Jln Ampang, 50450 Kuala Lumpur";
+  const address = "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur";
   const encodedAddress = encodeURIComponent(address);
 
   return (
     <div className={`centre-map-shell overflow-hidden rounded-[1rem] border border-[#e1d5c4] bg-white shadow-[0_16px_45px_rgba(16,37,62,.09)] ${isRTL ? "is-rtl" : ""}`}>
-      <div className="relative h-[330px] overflow-hidden bg-[#eef4ff]">
+      <div className="relative h-[250px] sm:h-[330px] overflow-hidden bg-[#eef4ff]">
         <iframe
           className="h-full w-full border-0"
           title={
@@ -23,22 +23,22 @@ export function CentreMap() {
           src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
         />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(16,37,62,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(16,37,62,.09)_1px,transparent_1px)] bg-[size:28px_28px] opacity-35" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 w-[min(88%,25rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/70 bg-[#fbf8f2]/90 p-5 text-center shadow-[0_15px_35px_rgba(16,37,62,.14)] backdrop-blur-sm">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 w-[min(88%,25rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/70 bg-[#fbf8f2]/90 p-5 text-center shadow-[0_15px_35px_rgba(16,37,62,.14)] backdrop-blur-sm hidden sm:block">
           <span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-[#173fad] text-white">
             <MapPin size={18} />
           </span>
           <p className="mt-3 text-sm font-extrabold text-[#10253e]">Bilingual Idol Language Centre</p>
-          <p className="mt-1 text-xs leading-5 text-[#5b6d80]">B-25-07, Pavilion Embassy, Jalan Ampang, Kuala Lumpur</p>
+          <p className="mt-1 text-xs leading-5 text-[#5b6d80]">B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kuala Lumpur</p>
         </div>
       </div>
-      <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="inline-flex items-start gap-2 text-sm font-semibold leading-6 text-[#29415b]">
-          <MapPin className="mt-0.5 shrink-0 text-[#173fad]" size={18} />
-          B-25-07, Pavilion Embassy, Menara G-Vestor, 200, Jln Ampang, Kuala Lumpur
+      <div className="flex flex-col gap-3.5 p-4 sm:p-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="inline-flex items-start gap-2 text-xs sm:text-sm font-semibold leading-5 sm:leading-6 text-[#29415b]">
+          <MapPin className="mt-0.5 shrink-0 text-[#173fad]" size={16} />
+          B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kuala Lumpur
         </p>
         <a
-          className="inline-flex shrink-0 items-center gap-2 text-sm font-extrabold text-[#173fad] hover:text-[#10253e]"
-          href={`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`}
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#173fad] px-4 py-2.5 text-center text-sm font-extrabold text-white hover:bg-[#10253e] sm:bg-transparent sm:p-0 sm:text-[#173fad] sm:hover:text-[#10253e]"
+          href="https://maps.app.goo.gl/S2EKFGbiWFKPxVJA7"
           target="_blank"
           rel="noreferrer"
         >

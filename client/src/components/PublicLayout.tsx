@@ -133,18 +133,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       const currentScrollY = getScrollY();
       setShowScrollTop(currentScrollY > 180);
 
-      if (currentScrollY > 120) {
-        if (currentScrollY > lastScrollY.current) {
-          // Scrolling down - hide header
-          setHeaderVisible(false);
-        } else {
-          // Scrolling up - show header
-          setHeaderVisible(true);
-        }
-      } else {
-        // At top - show header
-        setHeaderVisible(true);
-      }
+      // Keep header always visible and locked in place
+      setHeaderVisible(true);
       lastScrollY.current = currentScrollY;
     };
 

@@ -228,7 +228,7 @@ export function DynamicUserProfileFields({
         return (
           <div
             key={sec.id}
-            className="p-5 rounded-xl border border-slate-200/60 bg-slate-50/50 dark:border-slate-800/60 dark:bg-slate-900/30 space-y-4"
+            className="p-5 rounded-xl border border-slate-200/60 bg-slate-50 dark:border-slate-800/60 dark:bg-slate-900 space-y-4"
           >
             <div className="border-b border-slate-200/50 dark:border-slate-800/50 pb-2">
               <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">

@@ -97,6 +97,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Arabic & RTL Language Support */
@@ -134,6 +136,8 @@ body {
   font-family: var(--locale-font-family);
   font-size: var(--locale-font-size-base);
   line-height: var(--locale-line-height-base);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
@@ -182,10 +186,75 @@ body {
   50% { transform: scale(1.15); opacity: 0; }
 }
 
+/* ==========================================================================
+   Smooth Transitions & Interactive Elements Overrides (2026 UX standard)
+   ========================================================================== */
+/* Apply global, smooth, ease-in-out transitions for all standard interactive tags and layout layers */
+a,
+button,
+input,
+select,
+textarea,
+label,
+.simple-button,
+.floating-call-button,
+.floating-scroll-top-button,
+.bilc-wa-trigger-btn,
+.language-switcher-dropdown,
+.simple-menu-button,
+.simple-mobile-nav a,
+.navigation-tab,
+.card-item,
+.interactive-card,
+[role="button"],
+[tabindex="0"] {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Faster response time on focus and hover to feel immediate yet exceptionally soft */
+a:hover,
+button:hover,
+[role="button"]:hover,
+a:focus-visible,
+button:focus-visible {
+  transition-duration: 220ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Smooth transitions for dialog-like widgets and active modals utilizing hardware-accelerated transforms and opacity */
+.bilc-wa-popup,
+.promotional-campaign-modal,
+.official-registry-modal,
+.dialog-content,
+[role="dialog"] {
+  transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1), transform 350ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform, opacity;
+}
+
+/* Smooth fade and entry animations for loading elements and dynamic widgets */
+.fade-in-entry {
+  animation: bilc-fade-in-smooth 380ms cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  will-change: transform, opacity;
+}
+
+@keyframes bilc-fade-in-smooth {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* WCAG 2.1 accessibility support for users with motion sensitivity */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
-    transition-duration: 0.01ms !important;
+    transition: none !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -208,7 +277,7 @@ body {
 }
 
 /* Desktop Hero size and content position from visual editor */
-.simple-public-header--refined { position: sticky; top: 1rem; z-index: 1000;
+.simple-public-header--refined { position: fixed !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 1000;
   top: .75rem; width: calc(100% - 2rem);
   max-width: 1216px;
   margin-left: auto;
@@ -411,6 +480,7 @@ body {
 .simple-public-main {
   flex: 1 0 auto;
   width: 100%;
+  padding-top: 5.5rem;
 }
 
 .simple-public-footer {
@@ -1904,8 +1974,9 @@ body {
   align-items: center;
 }
 
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#home-contact-strip-section:nth-of-type(8) > div:nth-of-type(1) > p:nth-of-type(1),
 .simple-contact-strip .simple-eyebrow {
-  color: #93c5fd;
+  color: #ffffff !important;
 }
 
 .simple-contact-strip .simple-button {
@@ -5601,6 +5672,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   padding-left: 0px !important;
   padding-right: 0px !important;
   padding-bottom: 0px !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
 }
 
 /* Programs Page Focus-Mode Styles */
@@ -6213,6 +6286,12 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   margin-bottom: 3.5rem;
 }
 
+@media (min-width: 1024px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) .simple-contact-item {
   background: #f8fafc;
   border: 1px solid rgba(16, 37, 62, 0.05);
@@ -6306,8 +6385,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   margin: 0;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(1) h1 {
-  font-family: var(--font-display, "DM Serif Display", serif);
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(1) > h1:nth-of-type(1) {
+  font-family: Manrope, var(--locale-font-family), sans-serif !important;
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 400;
   color: var(--bilc-navy, #10253e);
@@ -6620,8 +6699,6 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#verified-testimonials-section:nth-of-type(7) > div:nth-of-type(3) > div:nth-of-type(1),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#verified-testimonials-section:nth-of-type(7) > div:nth-of-type(3) > div:nth-of-type(2),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#home-contact-strip-section:nth-of-type(8),
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(1),
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(2),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-story-section:nth-of-type(1) > div:nth-of-type(1) > figure:nth-of-type(1),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-story-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-approach-section:nth-of-type(2) > div:nth-of-type(1),
@@ -6664,8 +6741,6 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#verified-testimonials-section:nth-of-type(7) > div:nth-of-type(3) > div:nth-of-type(1):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#verified-testimonials-section:nth-of-type(7) > div:nth-of-type(3) > div:nth-of-type(2):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#home-contact-strip-section:nth-of-type(8):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(2):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-story-section:nth-of-type(1) > div:nth-of-type(1) > figure:nth-of-type(1):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-story-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-approach-section:nth-of-type(2) > div:nth-of-type(1):hover,
@@ -6811,11 +6886,26 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     width: 100% !important;
     box-shadow: none !important;
   }
+
+  /* Mobile-only hover overrides for About, Programs, News, and Contact page hero header elements */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(1):hover {
+    transform: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(2):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(2):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(2):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(2):hover {
+    border-color: #ffffff !important;
+  }
 }
 
 /* Transitions for selected Programs page elements */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(1),
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(2),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section#programs-guide-section:nth-of-type(1) > div:nth-of-type(1),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section#programs-guide-section:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(1),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section#programs-guide-section:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(2),
@@ -6837,15 +6927,9 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Transitions for selected News page elements to prevent inner img distortion */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(1),
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(2) {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
+/* Transitions for selected News page elements to prevent inner img distortion - removed */
 
 /* Hover effects for selected Programs page elements */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(2):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section#programs-guide-section:nth-of-type(1) > div:nth-of-type(1):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section#programs-guide-section:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(1):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > section#programs-guide-section:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(2):hover,
@@ -6869,17 +6953,9 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   box-shadow: 0 10px 25px rgba(23, 63, 173, 0.08) !important;
 }
 
-/* Hover effects for selected News page elements (preventing direct img scaling) */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(2):hover {
-  transform: translateY(-4px) !important;
-  border-color: #173fad !important;
-  box-shadow: 0 10px 25px rgba(23, 63, 173, 0.08) !important;
-}
+/* Hover effects for selected News page elements (preventing direct img scaling) - removed */
 
 /* Transitions for selected Contact page elements */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(1),
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(2),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(2),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(3),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-enquiry-section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
@@ -6888,8 +6964,6 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 }
 
 /* Hover effects for selected Contact page elements */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(1):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(2):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(2):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(3):hover,
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-enquiry-section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1):hover,
@@ -7181,6 +7255,7 @@ div#root:nth-of-type(1) > main#login-page-container:nth-of-type(1) > section#log
   .simple-public-main {
     padding-left: 10px !important;
     padding-right: 10px !important;
+    padding-top: 4.75rem !important;
     box-sizing: border-box !important;
   }
 
@@ -8828,12 +8903,177 @@ div#root > div > main#main-content > div#home-page-container > section#verified-
   transform: scale(0.9) !important;
 }
 
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-approach-section:nth-of-type(2) > div:nth-of-type(1) {
+  padding-left: 20px !important;
+  padding-top: 20px !important;
+  padding-right: 20px !important;
+  padding-bottom: 20px !important;
+}
 
+/* Mobile responsive style overrides for Hero headers on About, Programmes, News, and Contact pages */
+@media (max-width: 767px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) {
+    padding-top: 38px !important;
+    padding-left: 26px !important;
+    padding-bottom: 32px !important;
+  }
 
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > header#about-hero-header:nth-of-type(1) > div:nth-of-type(2) {
+    width: 300px !important;
+    height: 230px !important;
+  }
 
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#programs-page-container:nth-of-type(1) > header#programs-hero-header:nth-of-type(1) > div:nth-of-type(2),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#news-page-container:nth-of-type(1) > header#news-hero-header:nth-of-type(1) > div:nth-of-type(2) {
+    width: 285px !important;
+    height: 230px !important;
+  }
 
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > header#contact-hero-header:nth-of-type(1) > div:nth-of-type(2) {
+    width: 286px !important;
+    height: 221px !important;
+  }
 
+  /* Scale individual buttons down slightly (0.8 scale is perfect "slightly, just a little bit" reduction) */
+  .floating-call-button,
+  .floating-scroll-top-button,
+  .bilc-wa-trigger-btn,
+  .floating-actions-dock > button {
+    transform: scale(0.8) !important;
+    transform-origin: center !important;
+  }
 
+  /* Make sure floating-actions-dock and its modals display perfectly at full size, without inherit scales */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
+  .floating-actions-dock {
+    transform: none !important;
+    gap: 0.5rem !important;
+  }
 
+  /* Ensure the WhatsApp popup modal displays perfectly at its designed scale and position on mobile */
+  .bilc-wa-popup,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+    position: fixed !important;
+    bottom: 84px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    transform: none !important;
+  }
+}
 
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) {
+  /* Kept for element tracking, original style and floating behavior is untouched */
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) {
+  background-color: #ffffff !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > svg:nth-of-type(1) {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(16, 37, 62, 0.08) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+  background-color: #ffffff !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > svg:nth-of-type(1) {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(16, 37, 62, 0.08) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) {
+  background-color: #ffffff !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > svg:nth-of-type(1) {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(16, 37, 62, 0.08) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) {
+  background-color: #ffffff !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > svg:nth-of-type(1) {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(16, 37, 62, 0.08) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-team-section:nth-of-type(4) {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Ensure the refined header keeps its centering transform on hover and is never overridden by generic hover rules */
+.simple-public-header--refined,
+.simple-public-header--refined:hover,
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1),
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1):hover {
+  transform: translateX(-50%) !important;
+}
+
+/* Complete removal of hover effects inside the header/navbar */
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .simple-brand:hover {
+  opacity: 1 !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .simple-public-nav a:hover {
+  color: var(--bilc-muted) !important;
+  background: transparent !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .simple-public-nav a[aria-current="page"]:hover {
+  color: var(--bilc-blue) !important;
+  background: var(--bilc-blue-light) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .simple-menu-button:hover {
+  background-color: transparent !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) .simple-mobile-nav a:hover {
+  color: var(--bilc-text) !important;
+  background: transparent !important;
+  font-weight: 600 !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) .simple-mobile-nav a[aria-current="page"]:hover {
+  color: var(--bilc-blue) !important;
+  background: var(--bilc-blue-light) !important;
+  font-weight: 700 !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .simple-button-quiet:hover {
+  background: transparent !important;
+  color: var(--bilc-navy) !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .simple-button:not(.simple-button-quiet):hover {
+  background-color: var(--bilc-blue) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) .language-switcher-dropdown-trigger:hover,
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) button:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > nav:nth-of-type(1) {
+  height: 510px !important;
+}
 

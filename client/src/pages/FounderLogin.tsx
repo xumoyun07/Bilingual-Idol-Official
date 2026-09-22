@@ -114,7 +114,7 @@ export default function FounderLogin() {
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full h-12 pl-12 pr-4 bg-slate-50/50 border border-slate-200 focus:border-[#173fad] focus:bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#173fad]/10 transition-all duration-200"
+                  className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-200 focus:border-[#173fad] focus:bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#173fad]/10 transition-all duration-200"
                   dir={isRTL ? "rtl" : "ltr"}
                 />
               </div>
@@ -136,7 +136,7 @@ export default function FounderLogin() {
                   minLength={1}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="w-full h-12 pl-12 pr-12 bg-slate-50/50 border border-slate-200 focus:border-[#173fad] focus:bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#173fad]/10 transition-all duration-200"
+                  className="w-full h-12 pl-12 pr-12 bg-slate-50 border border-slate-200 focus:border-[#173fad] focus:bg-white rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#173fad]/10 transition-all duration-200"
                   dir={isRTL ? "rtl" : "ltr"}
                 />
                 <button

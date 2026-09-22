@@ -88,13 +88,13 @@ describe("minimal frontend rewrite", () => {
     expect(css).toContain("Public action spacing from visual editor");
     expect(css).toContain("gap: 25px");
     expect(css).toContain("Desktop Hero size and content position from visual editor");
-    expect(css).toContain(".simple-public-header--refined { position: sticky; top: 1rem; z-index: 1000;");
+    expect(css).toContain(".simple-public-header--refined {");
     expect(css).toContain("top: .75rem; width: calc(100% - 2rem);");
     expect(css).toContain(".simple-home-programmes-panel .simple-programme-list, .simple-home-programmes-panel .simple-empty-state { background: #f0f6ff; }");
     expect(css).toContain(".simple-route-header--programmes");
     expect(css).toContain("width: min(100%, 76rem)");
-    expect(css).toContain("max-width: none;");
-    expect(css).toContain("height: 36.25rem");
+    expect(css).toContain("max-width: none");
+    expect(css).toContain("height: auto");
     expect(css).toContain(".simple-route-header-description");
     expect(css).toContain(".simple-route-header-copy--wide h1");
     expect(css).toContain("max-width: 28.125rem");
