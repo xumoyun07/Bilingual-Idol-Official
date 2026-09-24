@@ -146,7 +146,7 @@ export function VerifiedTestimonials() {
   };
 
   return (
-    <section id="verified-testimonials-section" className="relative bg-white dark:bg-slate-950 py-16 px-4 sm:px-6 lg:px-8 border-y border-slate-100 dark:border-slate-900 overflow-hidden">
+    <section id="verified-testimonials-section" className="relative bg-white dark:bg-slate-950 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-y border-slate-100 dark:border-slate-900 overflow-hidden">
       
       {/* Decorative Blur Accent */}
       <div className="absolute right-0 top-0 w-80 h-80 bg-blue-50/50 dark:bg-blue-900/10 rounded-full blur-3xl pointer-events-none z-0" />
@@ -155,34 +155,34 @@ export function VerifiedTestimonials() {
       <div className="max-w-5xl mx-auto relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-[1024px] mx-auto mb-14">
+        <div className="text-center max-w-[1024px] mx-auto mb-8 sm:mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <Star size={13} className="fill-amber-400 text-amber-400" />
             <span>{t("home.testimonialsEyebrow")}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-3 sm:mb-4">
             {t("home.testimonialsTitle")}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed">
+          <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
             {t("home.testimonialsSubtitle")}
           </p>
         </div>
 
         {/* Carousel Container */}
-        <div className="@container relative bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 p-6 sm:p-10 lg:p-12 shadow-xs">
+        <div className="@container relative bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 p-5 sm:p-10 lg:p-12 shadow-xs">
           
-          {/* Quote Icon Background decorative */}
-          <div className="absolute top-6 start-6 text-blue-100 dark:text-blue-950/40 opacity-70 pointer-events-none select-none">
+          {/* Quote Icon Background decorative (Hidden on mobile for maximum clean space) */}
+          <div className="absolute top-6 start-6 text-blue-100 dark:text-blue-950/40 opacity-70 pointer-events-none select-none hidden sm:block">
             <Quote size={80} className="stroke-none fill-current" />
           </div>
 
-          <div className="relative min-h-[220px] flex flex-col justify-between">
+          <div className="relative min-h-[180px] sm:min-h-[220px] flex flex-col justify-between">
             
             {/* Animated Quote */}
-            <div className="mb-6 relative z-10">
-              <div className="flex gap-1 mb-4">
+            <div className="mb-4 sm:mb-6 relative z-10">
+              <div className="flex gap-1 mb-3">
                 {[...Array(activeTestimonial.rating)].map((_, i) => (
-                  <Star key={i} size={16} className="fill-amber-400 text-amber-400" />
+                  <Star key={i} size={15} className="fill-amber-400 text-amber-400" />
                 ))}
               </div>
               
@@ -193,15 +193,15 @@ export function VerifiedTestimonials() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
-                  className="text-slate-700 dark:text-slate-200 text-lg sm:text-xl font-medium leading-relaxed italic text-start"
+                  className="text-slate-700 dark:text-slate-200 text-base sm:text-lg lg:text-xl font-medium leading-relaxed italic text-start"
                 >
                   "{info.quote}"
                 </motion.p>
               </AnimatePresence>
             </div>
 
-            {/* Author Information Layout */}
-            <div className="flex flex-col @[450px]:flex-row @[450px]:items-center justify-between gap-4 border-t border-slate-200/60 dark:border-slate-800/50 pt-6">
+            {/* Author Information Layout (Optimized & Merged for Mobile) */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-slate-200/60 dark:border-slate-800/50 pt-5">
               
               <AnimatePresence mode="wait">
                 <motion.div
@@ -210,49 +210,57 @@ export function VerifiedTestimonials() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
                   transition={{ duration: 0.3 }}
-                  className="flex items-center gap-4"
+                  className="flex items-center gap-3 sm:gap-4"
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm ${activeTestimonial.avatarBg}`}>
+                  <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-sm shrink-0 ${activeTestimonial.avatarBg}`}>
                     {activeTestimonial.avatarInitial}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white text-base">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
                       {activeTestimonial.author}
                     </h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1.5 mt-0.5">
+                    <div className="text-slate-500 dark:text-slate-400 text-xs flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
                       <span>{info.role}</span>
-                    </p>
+                      <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+                      <span className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-md">
+                        <GraduationCap size={12} />
+                        {info.program}
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               </AnimatePresence>
 
-              {/* Program pill & Navigation controls */}
-              <div className="flex items-center justify-between sm:justify-end gap-4 mt-2 sm:mt-0">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100/30 text-blue-700 dark:text-blue-300 text-xs font-semibold"
-                  >
-                    <GraduationCap size={13} />
-                    <span>{info.program}</span>
-                  </motion.div>
-                </AnimatePresence>
+              {/* Navigation Controls & Dots Indicators */}
+              <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 border-slate-200/40 dark:border-slate-800/30 pt-4 md:pt-0 mt-2 md:mt-0">
+                {/* Dots indicator */}
+                <div className="flex gap-1.5">
+                  {testimonialsData.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        idx === currentIndex
+                          ? "bg-blue-600 w-5 dark:bg-blue-400"
+                          : "bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
+                      }`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
 
                 {/* Arrow Controls */}
                 <div className="flex gap-2">
                   <button
                     onClick={handlePrev}
-                    className="p-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 transition-colors shadow-xs"
+                    className="p-2 sm:p-2.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 transition-colors shadow-xs"
                     aria-label="Previous testimonial"
                   >
                     <ChevronLeft size={16} />
                   </button>
                   <button
                     onClick={handleNext}
-                    className="p-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 transition-colors shadow-xs"
+                    className="p-2 sm:p-2.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 transition-colors shadow-xs"
                     aria-label="Next testimonial"
                   >
                     <ChevronRight size={16} />

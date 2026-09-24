@@ -260,96 +260,169 @@ export function StudentJourneyRoadmap() {
         <p>{t("home.journeySubtitle")}</p>
       </div>
 
-      {/* Steps Navigation */}
-      <div
-        className="bilc-journey-stepper"
-        role="tablist"
-        aria-label={language === "ar" ? "خطوات رحلة الطالب" : language === "ms" ? "Langkah perjalanan pelajar" : "Student journey steps"}
-      >
-        {JOURNEY_STEPS.map((s, idx) => {
-          const itemTitle = s.titles[language] || s.titles.en;
-          const itemSub = s.subtitles[language] || s.subtitles.en;
-          return (
-            <button
-              key={s.number}
-              role="tab"
-              aria-selected={activeStep === idx}
-              className={`bilc-journey-step-btn ${activeStep === idx ? "is-active" : ""}`}
-              onClick={() => setActiveStep(idx)}
-            >
-              <span className="bilc-step-num">{s.number}</span>
-              <span className="bilc-step-name">{itemTitle}</span>
-              <span className="bilc-step-zh">{itemSub}</span>
-            </button>
-          );
-        })}
+      {/* =========================================================================
+          DESKTOP-ONLY HORIZONTAL STEPPER VIEW
+         ========================================================================= */}
+      <div className="hidden lg:block w-full">
+        {/* Steps Navigation */}
+        <div
+          className="bilc-journey-stepper"
+          role="tablist"
+          aria-label={language === "ar" ? "خطوات رحلة الطالب" : language === "ms" ? "Langkah perjalanan pelajar" : "Student journey steps"}
+        >
+          {JOURNEY_STEPS.map((s, idx) => {
+            const itemTitle = s.titles[language] || s.titles.en;
+            const itemSub = s.subtitles[language] || s.subtitles.en;
+            return (
+              <button
+                key={s.number}
+                role="tab"
+                aria-selected={activeStep === idx}
+                className={`bilc-journey-step-btn ${activeStep === idx ? "is-active" : ""}`}
+                onClick={() => setActiveStep(idx)}
+              >
+                <span className="bilc-step-num">{s.number}</span>
+                <span className="bilc-step-name">{itemTitle}</span>
+                <span className="bilc-step-zh">{itemSub}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Active Step Card */}
+        <div className="bilc-journey-detail-card">
+          <div className="bilc-journey-detail-header">
+            <div className="bilc-journey-icon-wrap">
+              <StepIcon size={26} />
+            </div>
+            <div>
+              <div className="bilc-journey-badge-row">
+                <span className="bilc-journey-step-tag">
+                  {language === "ms"
+                    ? `Langkah ${step.number} drpd 06`
+                    : language === "ar"
+                    ? `الخطوة ${step.number} من 06`
+                    : `Step ${step.number} of 06`}
+                </span>
+                <span className="bilc-journey-zh-tag">{stepSubtitle}</span>
+              </div>
+              <h3>{stepTitle}</h3>
+            </div>
+          </div>
+
+          <p className="bilc-journey-summary">{stepSummary}</p>
+
+          <div className="bilc-journey-checklist">
+            <p className="bilc-checklist-title">
+              {language === "ms"
+                ? "Jaminan Utama & Perkhidmatan:"
+                : language === "ar"
+                ? "أبرز المزايا والضمانات الأكاديمية:"
+                : "Key Guarantees & Support:"}
+            </p>
+            <div className="bilc-checklist-grid">
+              {stepDetails.map((detail, dIdx) => (
+                <div key={dIdx} className="bilc-checklist-item">
+                  <div className="bilc-check-icon">
+                    <Check size={14} />
+                  </div>
+                  <span>{detail}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bilc-journey-footer">
+            <div className="bilc-journey-nav-buttons">
+              <button
+                type="button"
+                className="bilc-stepper-nav-btn"
+                disabled={activeStep === 0}
+                onClick={() => setActiveStep((prev) => Math.max(0, prev - 1))}
+              >
+                {language === "ms" ? "Langkah Sebelumnya" : language === "ar" ? "الخطوة السابقة" : "Previous Step"}
+              </button>
+              <button
+                type="button"
+                className="bilc-stepper-nav-btn is-primary"
+                disabled={activeStep === JOURNEY_STEPS.length - 1}
+                onClick={() => setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1))}
+              >
+                {language === "ms" ? "Langkah Seterusnya" : language === "ar" ? "الخطوة التالية" : "Next Step"}
+              </button>
+            </div>
+
+            <Link href="/enroll" className="simple-button">
+              {t("nav.makeEnquiry")} <Sparkles size={16} />
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {/* Active Step Card */}
-      <div className="bilc-journey-detail-card">
-        <div className="bilc-journey-detail-header">
-          <div className="bilc-journey-icon-wrap">
-            <StepIcon size={26} />
-          </div>
-          <div>
-            <div className="bilc-journey-badge-row">
-              <span className="bilc-journey-step-tag">
-                {language === "ms"
-                  ? `Langkah ${step.number} drpd 06`
-                  : language === "ar"
-                  ? `الخطوة ${step.number} من 06`
-                  : `Step ${step.number} of 06`}
-              </span>
-              <span className="bilc-journey-zh-tag">{stepSubtitle}</span>
-            </div>
-            <h3>{stepTitle}</h3>
-          </div>
-        </div>
+      {/* =========================================================================
+          MOBILE-ONLY INTUITIVE CHRONOLOGICAL TIMELINE ROADMAP VIEW
+         ========================================================================= */}
+      <div className="block lg:hidden w-full px-4 sm:px-6">
+        <div className={`relative flex flex-col gap-6 ${isRTL ? "pr-8 pl-0 border-r-2 border-slate-200" : "pl-8 pr-0 border-l-2 border-slate-200"}`}>
+          {JOURNEY_STEPS.map((s) => {
+            const SIcon = s.icon;
+            const title = s.titles[language] || s.titles.en;
+            const subtitle = s.subtitles[language] || s.subtitles.en;
+            const summary = s.summaries[language] || s.summaries.en;
+            const details = s.details[language] || s.details.en;
 
-        <p className="bilc-journey-summary">{stepSummary}</p>
-
-        <div className="bilc-journey-checklist">
-          <p className="bilc-checklist-title">
-            {language === "ms"
-              ? "Jaminan Utama & Perkhidmatan:"
-              : language === "ar"
-              ? "أبرز المزايا والضمانات الأكاديمية:"
-              : "Key Guarantees & Support:"}
-          </p>
-          <div className="bilc-checklist-grid">
-            {stepDetails.map((detail, dIdx) => (
-              <div key={dIdx} className="bilc-checklist-item">
-                <div className="bilc-check-icon">
-                  <Check size={14} />
+            return (
+              <div key={s.number} className="relative flex flex-col text-left">
+                {/* Timeline dot/marker circle */}
+                <div className={`absolute top-0 w-7 h-7 rounded-full bg-white border-2 border-[#173fad] flex items-center justify-center shadow-xs z-10 ${
+                  isRTL ? "-right-[15px]" : "-left-[15px]"
+                }`}>
+                  <span className="text-[10px] font-bold text-[#173fad]">{s.number}</span>
                 </div>
-                <span>{detail}</span>
+
+                {/* Content Card with high-end border and shadows */}
+                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all duration-300 hover:border-[#173fad] hover:shadow-xs">
+                  {/* Category Pill and Step Icon */}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="bg-blue-50 text-[#173fad] text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
+                      {subtitle}
+                    </span>
+                    <div className="w-7 h-7 rounded-lg bg-blue-50/50 border border-blue-100 flex items-center justify-center text-[#173fad]">
+                      <SIcon size={14} className="stroke-[2.5]" />
+                    </div>
+                  </div>
+
+                  {/* Step Title */}
+                  <h3 className="text-sm font-extrabold text-slate-900 tracking-tight leading-snug mb-1.5">
+                    {title}
+                  </h3>
+
+                  {/* Summary */}
+                  <p className="text-slate-500 text-[11px] leading-relaxed mb-3.5">
+                    {summary}
+                  </p>
+
+                  {/* Compact list of guarantees */}
+                  <div className="flex flex-col gap-2 border-t border-slate-100/70 pt-3">
+                    {details.map((detail, dIdx) => (
+                      <div key={dIdx} className="flex items-start gap-1.5 text-[10px] leading-relaxed text-slate-600 font-semibold">
+                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-50 border border-emerald-100/50 flex items-center justify-center text-emerald-600 mt-0.5 flex-shrink-0">
+                          <Check size={9} className="stroke-[3]" />
+                        </div>
+                        <span className="flex-1">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        <div className="bilc-journey-footer">
-          <div className="bilc-journey-nav-buttons">
-            <button
-              type="button"
-              className="bilc-stepper-nav-btn"
-              disabled={activeStep === 0}
-              onClick={() => setActiveStep((prev) => Math.max(0, prev - 1))}
-            >
-              {language === "ms" ? "Langkah Sebelumnya" : language === "ar" ? "الخطوة السابقة" : "Previous Step"}
-            </button>
-            <button
-              type="button"
-              className="bilc-stepper-nav-btn is-primary"
-              disabled={activeStep === JOURNEY_STEPS.length - 1}
-              onClick={() => setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1))}
-            >
-              {language === "ms" ? "Langkah Seterusnya" : language === "ar" ? "الخطوة التالية" : "Next Step"}
-            </button>
-          </div>
-
-          <Link href="/enroll" className="simple-button">
-            {t("nav.makeEnquiry")} <Sparkles size={16} />
+        {/* Central Call to Action after reading the whole journey */}
+        <div className="mt-8 px-1">
+          <Link href="/enroll" className="w-full h-12 bg-[#173fad] active:bg-[#001edd] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold shadow-md active:scale-[0.97] transition-all">
+            {t("nav.makeEnquiry")} <Sparkles size={14} className="stroke-[2.5]" />
           </Link>
         </div>
       </div>

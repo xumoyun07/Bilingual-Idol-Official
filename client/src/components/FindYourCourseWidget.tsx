@@ -333,25 +333,33 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
       <div className="bilc-finder-card">
         {/* Progress Bar */}
         <div className="bilc-finder-progress-bar">
+          {/* Mobile Current Step Heading */}
+          <div className="block md:hidden text-center text-xs font-extrabold text-[#173fad] mb-2">
+            {language === "ms" 
+              ? `Langkah ${step} daripada 4: ${step === 1 ? "Profil Pelajar" : step === 2 ? "Matlamat Utama" : step === 3 ? "Tahap Semasa" : "Cadangan Kursus"}`
+              : language === "ar"
+              ? `الخطوة ${step} من 4: ${step === 1 ? "ملف المتعلم" : step === 2 ? "الهدف الأساسي" : step === 3 ? "المستوى الحالي" : "التوصية المخصصة"}`
+              : `Step ${step} of 4: ${step === 1 ? "Learner Profile" : step === 2 ? "Target Goal" : step === 3 ? "Current Level" : "Recommendation"}`}
+          </div>
           <div className="bilc-progress-track">
             <div className="bilc-progress-fill" style={{ width: `${(step / 4) * 100}%` }} />
           </div>
           <div className="bilc-progress-labels">
             <span className={step >= 1 ? "is-active" : ""}>
               <span className="bilc-step-num">1</span>
-              <span className="bilc-step-dot-text">{language === "ms" ? ". Profil Pelajar" : language === "ar" ? ". ملف المتعلم" : ". Learner Profile"}</span>
+              <span className="bilc-step-dot-text hidden md:inline">{language === "ms" ? ". Profil Pelajar" : language === "ar" ? ". ملف المتعلم" : ". Learner Profile"}</span>
             </span>
             <span className={step >= 2 ? "is-active" : ""}>
               <span className="bilc-step-num">2</span>
-              <span className="bilc-step-dot-text">{language === "ms" ? ". Matlamat Utama" : language === "ar" ? ". الهدف الأساسي" : ". Target Goal"}</span>
+              <span className="bilc-step-dot-text hidden md:inline">{language === "ms" ? ". Matlamat Utama" : language === "ar" ? ". الهدف الأساسي" : ". Target Goal"}</span>
             </span>
             <span className={step >= 3 ? "is-active" : ""}>
               <span className="bilc-step-num">3</span>
-              <span className="bilc-step-dot-text">{language === "ms" ? ". Tahap Semasa" : language === "ar" ? ". المستوى الحالي" : ". Current Level"}</span>
+              <span className="bilc-step-dot-text hidden md:inline">{language === "ms" ? ". Tahap Semasa" : language === "ar" ? ". المستوى الحالي" : ". Current Level"}</span>
             </span>
             <span className={step === 4 ? "is-active" : ""}>
               <span className="bilc-step-num">4</span>
-              <span className="bilc-step-dot-text">{language === "ms" ? ". Cadangan Kursus" : language === "ar" ? ". التوصية المخصصة" : ". Recommendation"}</span>
+              <span className="bilc-step-dot-text hidden md:inline">{language === "ms" ? ". Cadangan Kursus" : language === "ar" ? ". التوصية المخصصة" : ". Recommendation"}</span>
             </span>
           </div>
         </div>
@@ -475,6 +483,31 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
         {/* Step 4: Result / Recommendation */}
         {step === 4 && (
           <div className="bilc-finder-result-body">
+            {/* Selections recap capsule on mobile (hidden on desktop) */}
+            <div className="flex lg:hidden flex-wrap gap-3 items-center justify-between bg-slate-50 border border-slate-100 rounded-xl p-3 mb-4">
+              <div className="flex flex-wrap gap-2 items-center text-xs font-semibold text-slate-500">
+                <span className="bg-white border border-slate-200/60 px-2.5 py-1 rounded-md text-[#173fad] shadow-2xs">
+                  {whoOptions.find(o => o.id === who)?.icon} {whoOptions.find(o => o.id === who)?.label[language] || whoOptions.find(o => o.id === who)?.label.en}
+                </span>
+                <span className="text-slate-300">/</span>
+                <span className="bg-white border border-slate-200/60 px-2.5 py-1 rounded-md text-[#173fad] shadow-2xs">
+                  {goalOptions.find(o => o.id === goal)?.icon} {goalOptions.find(o => o.id === goal)?.label[language] || goalOptions.find(o => o.id === goal)?.label.en}
+                </span>
+                <span className="text-slate-300">/</span>
+                <span className="bg-white border border-slate-200/60 px-2.5 py-1 rounded-md text-[#173fad] shadow-2xs">
+                  {levelOptions.find(o => o.id === level)?.icon} {levelOptions.find(o => o.id === level)?.label[language] || levelOptions.find(o => o.id === level)?.label.en}
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onClick={handleReset} 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#eef4ff] border border-[#173fad]/10 text-xs font-bold text-[#173fad] hover:bg-[#e0ecff] hover:border-[#173fad]/25 active:scale-95 transition-all shadow-sm cursor-pointer shrink-0"
+              >
+                <RefreshCw size={12} className="text-[#173fad]" />
+                <span>{language === "ms" ? "Semula" : language === "ar" ? "إعادة" : "Reset"}</span>
+              </button>
+            </div>
+
             <div className="bilc-result-badge-row">
               <span className="bilc-rec-tag">{language === "ms" ? "Disyorkan untuk anda" : language === "ar" ? "موصى به لك خصيصاً" : "Recommended for you"}</span>
               <span className="bilc-intake-tag">{language === "ms" ? "Kemasukan Ogos / September 2026 Dibuka" : language === "ar" ? "القبول مفتوح لدفعة أغسطس / سبتمبر 2026" : "August / September 2026 Intake Open"}</span>
@@ -486,7 +519,8 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                 <h2>{rec.title}</h2>
                 <p className="bilc-result-desc">{rec.description}</p>
 
-                <div className="bilc-result-meta-grid">
+                {/* Desktop Grid (Hidden on Mobile) */}
+                <div className="hidden sm:grid grid-cols-3 gap-4 mb-6 bilc-result-meta-grid">
                   <div className="bilc-meta-box">
                     <span>{language === "ms" ? "Tempoh Pengajian" : language === "ar" ? "مدة الدراسة" : "Duration"}</span>
                     <strong>{rec.duration}</strong>
@@ -501,7 +535,31 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                   </div>
                 </div>
 
-                <div className="bilc-result-actions">
+                {/* Mobile-only space-efficient meta list */}
+                <div className="flex sm:hidden flex-col gap-2.5 bg-[#173fad]/[0.03] border border-[#173fad]/10 rounded-xl p-3.5 mb-5 text-left">
+                  <div className="flex items-start gap-2 text-xs">
+                    <span className="text-slate-400 font-bold w-20 shrink-0">
+                      {language === "ms" ? "⏳ Tempoh:" : language === "ar" ? "⏳ المدة:" : "⏳ Duration:"}
+                    </span>
+                    <strong className="text-[#0f172a] font-extrabold">{rec.duration}</strong>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs border-t border-slate-100 pt-2.5">
+                    <span className="text-slate-400 font-bold w-20 shrink-0">
+                      {language === "ms" ? "💵 Yuran:" : language === "ar" ? "💵 الرسوم:" : "💵 Tuition:"}
+                    </span>
+                    <strong className="text-[#173fad] font-extrabold">{rec.tuition}</strong>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs border-t border-slate-100 pt-2.5">
+                    <span className="text-slate-400 font-bold w-20 shrink-0">
+                      {language === "ms" ? "✨ Kelebihan:" : language === "ar" ? "✨ المزايا:" : "✨ Highlight:"}
+                    </span>
+                    <strong className="text-[#0f172a] font-extrabold">{rec.highlight}</strong>
+                  </div>
+                </div>
+
+                {/* Optimized Buttons Layout for Desktop & Mobile */}
+                <div className="flex flex-col gap-3">
+                  {/* Primary Complete Action */}
                   <button 
                     type="button"
                     onClick={() => {
@@ -509,52 +567,57 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                         detail: { programInterest: rec.title }
                       }));
                     }}
-                    className="simple-button bg-[#173fad] hover:bg-[#102c7e] text-white cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-extrabold text-white bg-[#173fad] hover:bg-[#102c7e] active:scale-98 transition-all shadow-xs cursor-pointer min-h-[44px]"
                   >
-                    {language === "ms" ? "Tempah Kelas Anda (Daftar)" : language === "ar" ? "احجز صفك الدراسي (تسجيل)" : "Book Your Class (Register)"} <ArrowRight size={16} className={isRTL ? "rotate-180" : ""} />
+                    <span>{language === "ms" ? "Tempah Kelas (Daftar)" : language === "ar" ? "احجز صفك الدراسي (تسجيل)" : "Book Your Class (Register)"}</span>
+                    <ArrowRight size={15} className={isRTL ? "rotate-180" : ""} />
                   </button>
 
-                  <Link href={`/programs/${rec.slug}`} className="simple-button simple-button-quiet">
-                    {language === "ms" ? "Lihat Butiran Kursus" : language === "ar" ? "تفاصيل البرنامج" : "View Course Details"}
-                  </Link>
-
-                  {onOpenPlacementTest && (
-                    <button
-                      type="button"
-                      className="simple-button simple-button-quiet"
-                      onClick={onOpenPlacementTest}
+                  {/* Compact Grid of Secondary Actions */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link 
+                      href={`/programs/${rec.slug}`} 
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all text-center min-h-[40px]"
                     >
-                      <Sparkles size={16} /> {language === "ms" ? "Ambil Ujian Penempatan Percuma" : language === "ar" ? "اختبار تحديد المستوى المجاني" : "Take Free Placement Test"}
-                    </button>
-                  )}
+                      <span>{language === "ms" ? "Butiran Kursus" : language === "ar" ? "تفاصيل البرنامج" : "Course Details"}</span>
+                    </Link>
 
-                  {onOpenBooking && (
-                    <button
-                      type="button"
-                      className="simple-button simple-button-quiet whitespace-nowrap"
-                      onClick={() => onOpenBooking(rec.title)}
+                    {onOpenPlacementTest && (
+                      <button
+                        type="button"
+                        onClick={onOpenPlacementTest}
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all text-center cursor-pointer min-h-[40px]"
+                      >
+                        <Sparkles size={13} className="text-[#173fad]" />
+                        <span>{language === "ms" ? "Ujian Percuma" : language === "ar" ? "تقييم مجاني" : "Free Assessment"}</span>
+                      </button>
+                    )}
+
+                    {onOpenBooking && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenBooking(rec.title)}
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all text-center cursor-pointer min-h-[40px]"
+                      >
+                        <BookOpen size={13} className="text-[#173fad]" />
+                        <span>{language === "ms" ? "Tempah Lawatan" : language === "ar" ? "جولة الحرم" : "Book Tour"}</span>
+                      </button>
+                    )}
+
+                    <a
+                      href={`https://wa.me/60367310449?text=${encodeURIComponent(`Hello Bilingual Idol, I used your Course Finder and would like information about: ${rec.title} (${rec.tuition}).`)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-300 transition-all text-center min-h-[40px]"
                     >
-                      <BookOpen size={16} />{" "}
-                      {language === "ms"
-                        ? "Tempah Lawatan Kampus"
-                        : language === "ar"
-                        ? "حجز جولة في الحرم الجامعي"
-                        : t("nav.bookTour", undefined, "Book Campus Tour")}
-                    </button>
-                  )}
-
-                  <a
-                    href={`https://wa.me/60367310449?text=${encodeURIComponent(`Hello Bilingual Idol, I used your Course Finder and would like information about: ${rec.title} (${rec.tuition}).`)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bilc-wa-direct-btn"
-                  >
-                    💬 {language === "ms" ? "WhatsApp Penasihat" : language === "ar" ? "مستشار واتساب" : "WhatsApp Advisor"}
-                  </a>
+                      <span>💬 {language === "ms" ? "WhatsApp" : language === "ar" ? "واتساب" : "WhatsApp"}</span>
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <div className="bilc-result-sidebar">
+              {/* Desktop Selections Recap Sidebar (Hidden on Mobile) */}
+              <div className="bilc-result-sidebar lg:block hidden">
                 <div className="bilc-recap-box">
                   <h4>{language === "ms" ? "Pilihan Anda:" : language === "ar" ? "خياراتك المحددة:" : "Your Selections:"}</h4>
                   <ul>

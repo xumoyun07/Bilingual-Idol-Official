@@ -59,6 +59,15 @@ async function startServer() {
     })
   );
 
+  // Health-check endpoint
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({
+      status: "ok",
+      uptime: process.uptime(),
+      timestamp: Date.now(),
+    });
+  });
+
   // Return JSON 404 for any unhandled API or portal routes rather than HTML SPA fallback
   app.all(["/api", "/api/*", "/portal/*", "/storage/*"], (req, res) => {
     if (req.originalUrl.startsWith("/api/trpc")) {

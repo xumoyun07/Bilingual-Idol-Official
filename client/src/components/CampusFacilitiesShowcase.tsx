@@ -6,8 +6,6 @@ import {
   Building2, 
   ChevronLeft, 
   ChevronRight, 
-  Eye, 
-  X, 
   MapPin, 
   Sofa, 
   Monitor, 
@@ -142,7 +140,6 @@ const getFacilityIcon = (id: number) => {
 export function CampusFacilitiesShowcase() {
   const { language, t, isRTL } = useLanguage();
   const [activeFacility, setActiveFacility] = useState<number>(0);
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Swipe state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -210,24 +207,68 @@ export function CampusFacilitiesShowcase() {
     }
   }[language === "ms" ? "ms" : language === "ar" ? "ar" : "en"];
 
-  const tView = language === "ms" ? "Lihat" : language === "ar" ? "عرض" : "View";
-
   return (
-    <section id="campus-facilities-section" className="relative bg-transparent py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-none">
+    <section id="campus-facilities-section" className="relative bg-transparent py-12 sm:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-none">
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Applied to all versions including mobile */
+        div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section > div:nth-of-type(1) > div:nth-of-type(1),
+        #campus-facilities-section > div > div:first-child,
+        .campus-intro-desktop-card {
+          background-color: #ffffff !important;
+          border-width: 1px !important;
+          border-style: solid !important;
+          border-color: #cbd5e1 !important;
+          border-radius: 16px !important;
+          padding-left: 20px !important;
+          padding-top: 20px !important;
+          padding-right: 20px !important;
+          padding-bottom: 20px !important;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        #campus-facilities-section > div > div:first-child:hover,
+        .campus-intro-desktop-card:hover {
+          background-color: #ffffff !important;
+          border-color: #001edd !important;
+          transform: scale(1.01) !important;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Active on both desktop and mobile version for the 5 tab buttons */
+        .campus-tab-btn {
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .campus-tab-btn:hover {
+          transform: scale(1.01) !important;
+          border-color: #001edd !important;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Remove any scrollbars on the quick select tab bar for sleekness */
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}} />
       <div className="max-w-7xl mx-auto relative z-10">
         
          {/* =========================================================================
             1. Section Introduction (Unified Heading & Context)
            ========================================================================= */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10 campus-intro-desktop-card">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#173fad] text-xs font-extrabold uppercase tracking-widest mb-3 border border-blue-100/30">
             <Building2 size={13} className="stroke-[2.5]" />
             <span>{t("home.facilitiesEyebrow", undefined, "CAMPUS FACILITIES")}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f172a] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0f172a] tracking-tight mb-3 sm:mb-4">
             {t("home.facilitiesTitle", undefined, "Modern Learning Spaces at Pavilion Embassy")}
           </h2>
-          <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+          <p className="text-slate-500 text-xs sm:text-base leading-relaxed">
             {t("home.facilitiesSubtitle", undefined, "Experience our state-of-the-art multimedia classrooms, executive lounges, private study suites, and student breakout zones.")}
           </p>
         </div>
@@ -235,7 +276,7 @@ export function CampusFacilitiesShowcase() {
         {/* =========================================================================
             2. Split Screen / Responsive Showcase Grid
            ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch bg-transparent overflow-hidden p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch bg-transparent overflow-hidden px-1 sm:px-6 lg:p-8">
           
           {/* =========================================================================
               DESKTOP LEFT SIDEBAR: Interactive Facility Selector Tabs (Hidden on mobile)
@@ -316,16 +357,6 @@ export function CampusFacilitiesShowcase() {
                 </AnimatePresence>
               </div>
 
-              {/* Floating View Lightbox Action */}
-              <button
-                onClick={() => setLightboxIndex(activeFacility)}
-                className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white backdrop-blur-md text-[#173fad] text-xs font-bold border border-slate-200/50 transition-all active:scale-95 shadow-sm"
-                title="Expand image"
-              >
-                <Eye size={13} className="text-[#173fad]" />
-                <span>{tView}</span>
-              </button>
-
               {/* Overlay Interactive Text (Styled for Desktop overlay) */}
               <div id="campus-facilities-overlay-text" className="absolute bottom-0 z-10 flex flex-col items-start">
                 <div className="flex items-center gap-1.5 text-[#173fad] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1.5">
@@ -388,12 +419,37 @@ export function CampusFacilitiesShowcase() {
           </div>
 
           {/* =========================================================================
-              MOBILE/TABLET ULTRA-SIMPLIFIED CARD VIEW (Visible on Mobile Only)
+              MOBILE/TABLET ULTRA-SIMPLIFIED FLUID CARD VIEW (Visible on Mobile Only)
              ========================================================================= */}
-          <div className="flex lg:hidden flex-col w-full">
-            {/* Aspect frame with clean Swipeable Area */}
+          <div className="flex lg:hidden flex-col w-full bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm transition-all duration-350">
+            
+            {/* Horizontal Scrolling Quick Facility Selector Tabs */}
+            <div className="flex gap-1.5 overflow-x-auto pb-3.5 mb-3.5 no-scrollbar w-full border-b border-slate-100" style={{ WebkitOverflowScrolling: 'touch' }}>
+              {campusFacilities.map((fac, idx) => {
+                const isSelected = idx === activeFacility;
+                const info = localized(fac);
+                const emoji = fac.id === 1 ? "🛋️" : fac.id === 2 ? "💻" : fac.id === 3 ? "🎓" : fac.id === 4 ? "👥" : "🏢";
+                return (
+                  <button
+                    key={fac.id}
+                    type="button"
+                    onClick={() => setActiveFacility(idx)}
+                    className={`flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold transition-all duration-200 ${
+                      isSelected 
+                        ? "bg-[#173fad] text-white shadow-xs scale-[1.03]" 
+                        : "bg-slate-50 text-slate-600 border border-slate-100"
+                    }`}
+                  >
+                    <span>{emoji}</span>
+                    <span>{info.type}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Immersive Image with clean Swipeable Area */}
             <div 
-              className="relative w-full aspect-[1.5] rounded-2xl overflow-hidden shadow-xs bg-slate-50 cursor-grab active:cursor-grabbing"
+              className="relative w-full aspect-[1.6] rounded-xl overflow-hidden bg-slate-50 cursor-grab active:cursor-grabbing shadow-2xs"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -412,42 +468,39 @@ export function CampusFacilitiesShowcase() {
                 />
               </AnimatePresence>
 
-              {/* Instant Zoom trigger button */}
-              <button
-                onClick={() => setLightboxIndex(activeFacility)}
-                className="absolute top-3 right-3 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-white/95 backdrop-blur-md text-[#173fad] border border-slate-200/50 transition-all active:scale-90 shadow-xs"
-                aria-label="Zoom facility"
-              >
-                <Eye size={14} />
-              </button>
-
-              {/* Compact page/index indicator pill */}
-              <div className="absolute top-3 left-3 z-20 bg-[#173fad]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-xs">
+              {/* Compact badge style index indicator */}
+              <div className="absolute top-3 left-3 z-20 bg-slate-900/85 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full backdrop-blur-xs">
                 {activeFacility + 1} / {campusFacilities.length}
               </div>
             </div>
 
             {/* Clean, comfortable text info block below the image */}
-            <div className="mt-4 flex flex-col items-start text-left">
-              <div className="flex items-center gap-1 text-[#173fad] text-[10px] font-semibold uppercase tracking-wider mb-1">
-                <MapPin size={10} className="text-[#173fad] stroke-[2.5]" />
-                <span>PAVILION EMBASSY, KL</span>
+            <div className="mt-4.5 flex flex-col items-start text-left">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="bg-blue-50 text-[#173fad] text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
+                  {activeInfo.type}
+                </span>
+                <span className="text-slate-300 text-xs">•</span>
+                <div className="flex items-center gap-1 text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+                  <MapPin size={10} className="text-slate-400 stroke-[2.5]" />
+                  <span>PAVILION EMBASSY, KL</span>
+                </div>
               </div>
               
-              <h3 className="text-base font-extrabold text-[#0f172a] tracking-tight leading-tight mb-1">
+              <h3 className="text-base font-extrabold text-[#0f172a] tracking-tight leading-tight mb-1.5">
                 {activeInfo.title}
               </h3>
 
-              <p className="text-slate-600 text-xs leading-relaxed font-medium">
+              <p className="text-slate-500 text-xs leading-relaxed font-normal">
                 {activeInfo.desc}
               </p>
             </div>
 
-            {/* Pagination dots & clean left/right buttons below text */}
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 w-full">
+            {/* Navigation Progress Dots & Toggles */}
+            <div className="flex items-center justify-between mt-4.5 pt-4 border-t border-slate-100 w-full">
               <button
                 onClick={prevFacility}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 border border-slate-200/50 text-slate-700 active:scale-90 transition-all"
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-600 active:scale-95 transition-all"
                 aria-label="Previous Facility"
               >
                 <ChevronLeft size={16} className="stroke-[2.5]" />
@@ -471,7 +524,7 @@ export function CampusFacilitiesShowcase() {
 
               <button
                 onClick={nextFacility}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 border border-slate-200/50 text-slate-700 active:scale-90 transition-all"
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-600 active:scale-95 transition-all"
                 aria-label="Next Facility"
               >
                 <ChevronRight size={16} className="stroke-[2.5]" />
@@ -482,96 +535,6 @@ export function CampusFacilitiesShowcase() {
         </div>
 
       </div>
-
-      {/* =========================================================================
-          6. FULL SCREEN IMMERSIVE LIGHTBOX MODAL (Cinematic Picture View)
-         ========================================================================= */}
-      <AnimatePresence>
-        {lightboxIndex !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setLightboxIndex(null)}
-            className="fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 cursor-pointer"
-          >
-            {/* Top Bar with type and Close Action (Always visible, clean, and unclipped) */}
-            <div 
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-4xl flex items-center justify-between mb-4 px-1 text-white z-50"
-            >
-              <span className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-wider">
-                {localized(campusFacilities[lightboxIndex]!).type}
-              </span>
-              <button
-                onClick={() => setLightboxIndex(null)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs font-bold transition-all border border-white/10 active:scale-95 cursor-pointer"
-                aria-label="Close lightbox"
-              >
-                <X size={14} />
-                <span>{language === "ms" ? "Tutup" : language === "ar" ? "إغلاق" : "Close"}</span>
-              </button>
-            </div>
-
-            {/* Navigation buttons */}
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev !== null ? (prev - 1 + campusFacilities.length) % campusFacilities.length : null)) }}
-              className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-slate-900/50 text-white hover:bg-slate-800 border border-white/10 transition-colors z-45 hidden sm:block active:scale-90"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev !== null ? (prev + 1) % campusFacilities.length : null)) }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-slate-900/50 text-white hover:bg-slate-800 border border-white/10 transition-colors z-45 hidden sm:block active:scale-90"
-              aria-label="Next slide"
-            >
-              <ChevronRight size={24} />
-            </button>
-
-            {/* Enlarged Image Container with Full Info Bar */}
-            <div 
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-w-4xl w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl cursor-default"
-            >
-              <img
-                src={campusFacilities[lightboxIndex]!.image}
-                alt={localized(campusFacilities[lightboxIndex]!).title}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover select-none"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-slate-950/85 p-5 border-t border-slate-800 text-white">
-                <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-blue-900/50 text-blue-300 border border-blue-900/30">
-                  {localized(campusFacilities[lightboxIndex]!).type}
-                </span>
-                <h3 className="text-base sm:text-lg font-extrabold mt-2.5">
-                  {localized(campusFacilities[lightboxIndex]!).title}
-                </h3>
-                <p className="text-slate-300 text-xs sm:text-sm mt-1 leading-relaxed">
-                  {localized(campusFacilities[lightboxIndex]!).desc}
-                </p>
-              </div>
-            </div>
-
-            {/* Progress dots in modal */}
-            <div 
-              onClick={(e) => e.stopPropagation()}
-              className="flex gap-2.5 mt-6 z-50"
-            >
-              {campusFacilities.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setLightboxIndex(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    lightboxIndex === idx ? "bg-blue-500 scale-125" : "bg-slate-700 hover:bg-slate-600"
-                  }`}
-                />
-              ))}
-            </div>
-
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </section>
   );

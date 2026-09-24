@@ -1,4 +1,4 @@
-import { ArrowUp, Menu, Phone, X } from "lucide-react";
+import { ArrowLeft, ArrowUp, Menu, Phone, X } from "lucide-react";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -18,6 +18,178 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { t, isRTL, language } = useLanguage();
   const [isRegistryOpen, setIsRegistryOpen] = useState(false);
+
+  // Vertical dragging, sorting, and evasion states for quick action buttons
+  const [order, setOrder] = useState<string[]>(() => {
+    const saved = localStorage.getItem("bilc_buttons_order");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 3) return parsed;
+      } catch (e) {}
+    }
+    return ["promo", "phone", "whatsapp"];
+  });
+  const [draggedKey, setDraggedKey] = useState<string | null>(null);
+  const [dragStartY, setDragStartY] = useState<number>(0);
+  const [dragOffset, setDragOffset] = useState<number>(0);
+  const [evasions, setEvasions] = useState<Record<string, boolean>>({});
+  const hasDraggedRef = useRef(false);
+
+  const getInitialIndex = (key: string) => {
+    if (key === "promo") return 0;
+    if (key === "phone") return 1;
+    return 2;
+  };
+
+  // Synchronous refs to prevent React state update lag during rapid pointermove events
+  const orderSyncRef = useRef(order);
+  orderSyncRef.current = order;
+
+  const dragStartYSyncRef = useRef(dragStartY);
+  dragStartYSyncRef.current = dragStartY;
+
+  const dragOffsetSyncRef = useRef(dragOffset);
+  dragOffsetSyncRef.current = dragOffset;
+
+  const updateOrderSync = (newOrder: string[]) => {
+    orderSyncRef.current = newOrder;
+    setOrder(newOrder);
+    localStorage.setItem("bilc_buttons_order", JSON.stringify(newOrder));
+  };
+
+  const updateDragStartYSync = (y: number) => {
+    dragStartYSyncRef.current = y;
+    setDragStartY(y);
+  };
+
+  const updateDragOffsetSync = (offset: number) => {
+    dragOffsetSyncRef.current = offset;
+    setDragOffset(offset);
+  };
+
+  // Global pointer move and up handlers to avoid capture/bubbling issues across elements
+  useEffect(() => {
+    if (!draggedKey) return;
+
+    const handleGlobalPointerMove = (e: PointerEvent) => {
+      const currentStartY = dragStartYSyncRef.current;
+      const currentOrder = orderSyncRef.current;
+      const currentIndex = currentOrder.indexOf(draggedKey);
+
+      let deltaY = e.clientY - currentStartY;
+
+      // Bound deltaY strictly between Slot 0 (top-most) and Slot 2 (bottom-most)
+      const minDeltaY = -currentIndex * 68;
+      const maxDeltaY = 136 - currentIndex * 68;
+      if (deltaY < minDeltaY) {
+        deltaY = minDeltaY;
+      } else if (deltaY > maxDeltaY) {
+        deltaY = maxDeltaY;
+      }
+
+      if (Math.abs(deltaY) > 5) {
+        hasDraggedRef.current = true;
+      }
+
+      updateDragOffsetSync(deltaY);
+
+      // Calculate virtual Y position relative to the slot start (index * 68)
+      const currentY = currentIndex * 68 + deltaY;
+
+      // Track evasion and swap
+      const newEvasions: Record<string, boolean> = {};
+      let targetIndex = currentIndex;
+
+      currentOrder.forEach((key, idx) => {
+        if (key === draggedKey) return;
+        const slotCenter = idx * 68;
+        const distance = currentY - slotCenter;
+
+        // If dragged button is close to this slot, trigger evasion
+        if (Math.abs(distance) < 40) {
+          newEvasions[key] = true;
+        }
+
+        // If dragged button is extremely close to this slot, trigger real-time swap!
+        if (Math.abs(distance) < 22) {
+          targetIndex = idx;
+        }
+      });
+
+      setEvasions(newEvasions);
+
+      if (targetIndex !== currentIndex) {
+        // Perform real-time swap synchronously
+        const nextOrder = [...currentOrder];
+        nextOrder[currentIndex] = currentOrder[targetIndex];
+        nextOrder[targetIndex] = draggedKey;
+        
+        updateOrderSync(nextOrder);
+
+        // Adjust dragStartY by the distance between slots to prevent any jump!
+        const slotDiff = (targetIndex - currentIndex) * 68;
+        updateDragStartYSync(currentStartY + slotDiff);
+        updateDragOffsetSync(deltaY - slotDiff);
+      }
+    };
+
+    const handleGlobalPointerUp = () => {
+      setDraggedKey(null);
+      setDragOffset(0);
+      setEvasions({});
+      
+      setTimeout(() => {
+        hasDraggedRef.current = false;
+      }, 100);
+    };
+
+    window.addEventListener("pointermove", handleGlobalPointerMove);
+    window.addEventListener("pointerup", handleGlobalPointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handleGlobalPointerMove);
+      window.removeEventListener("pointerup", handleGlobalPointerUp);
+    };
+  }, [draggedKey]);
+
+  const handlePointerDown = (key: string, e: React.PointerEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest(".bilc-wa-popup") || target.closest(".bilc-wa-backdrop") || target.closest(".bilc-wa-close-btn")) {
+      return;
+    }
+    if (e.button !== 0) return;
+
+    e.preventDefault();
+    setDraggedKey(key);
+    updateDragStartYSync(e.clientY);
+    updateDragOffsetSync(0);
+    hasDraggedRef.current = false;
+  };
+
+  const getButtonStyle = (key: string) => {
+    const currentIndex = order.indexOf(key);
+    const initialIndex = getInitialIndex(key);
+    const slotOffset = (currentIndex - initialIndex) * 68;
+
+    const isDragged = key === draggedKey;
+    const y = slotOffset + (isDragged ? dragOffset : 0);
+    const evadeDir = isRTL ? 64 : -64;
+    const x = evasions[key] ? evadeDir : 0;
+
+    return {
+      transform: `translate3d(${x}px, ${y}px, 0)`,
+      transition: isDragged ? "transform 0.05s linear, opacity 0.3s ease" : "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+      touchAction: "none" as const,
+      zIndex: isDragged ? 1000 : 999,
+      cursor: isDragged ? "grabbing" : "grab",
+      position: "relative" as const,
+      userSelect: "none" as const,
+      height: "56px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    };
+  };
 
   useEffect(() => {
     const handleOpen = () => setIsRegistryOpen(true);
@@ -352,37 +524,121 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       {/* Floating Actions Dock */}
       <div
         className={`floating-actions-dock ${isRTL ? "is-rtl" : ""} ${location.startsWith("/programs/") && location !== "/programs" ? "is-on-detail" : ""}`}
-        aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
+        aria-label={language === "ar" ? "إجراءат сриعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
       >
-        {/* Promotional Campaign Floating Badge rendered directly in the flex dock */}
-        <PromotionalFloatingBadge isOpen={promoOpen} setIsOpen={setPromoOpen} />
+        {order.map((key) => {
+          if (key === "promo") {
+            return (
+              <div
+                key="promo"
+                style={getButtonStyle("promo")}
+                onPointerDown={(e) => handlePointerDown("promo", e)}
+                onClickCapture={(e) => {
+                  if (hasDraggedRef.current) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }
+                }}
+              >
+                <PromotionalFloatingBadge isOpen={promoOpen} setIsOpen={setPromoOpen} key="promo-badge" />
+              </div>
+            );
+          }
 
-        <a
-          href="tel:+60367310449"
-          className="floating-call-button"
-          aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-          title={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-        >
-          <Phone size={22} className="floating-call-icon" aria-hidden="true" />
-          <span className="floating-call-ping" aria-hidden="true" />
-        </a>
+          if (key === "phone") {
+            return (
+              <div
+                key="phone"
+                style={getButtonStyle("phone")}
+                onPointerDown={(e) => handlePointerDown("phone", e)}
+                onClickCapture={(e) => {
+                  if (hasDraggedRef.current) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }
+                }}
+              >
+                <a
+                  href="tel:+60367310449"
+                  className="floating-call-button"
+                  key="phone-btn"
+                  aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+                  title={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+                >
+                  <Phone size={22} className="floating-call-icon" aria-hidden="true" />
+                  <span className="floating-call-ping" aria-hidden="true" />
+                </a>
+              </div>
+            );
+          }
 
-        {/* Smart Multi-Topic WhatsApp Concierge */}
-        <SmartWhatsAppWidget />
+          if (key === "whatsapp") {
+            return (
+              <div
+                key="whatsapp"
+                style={getButtonStyle("whatsapp")}
+                onPointerDown={(e) => handlePointerDown("whatsapp", e)}
+                onClickCapture={(e) => {
+                  if (hasDraggedRef.current) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }
+                }}
+              >
+                <SmartWhatsAppWidget key="whatsapp-widget" />
+              </div>
+            );
+          }
 
-        <button
-          type="button"
-          id="floating-scroll-top"
-          className={`floating-scroll-top-button ${showScrollTop ? "is-visible" : ""} ${isScrolling ? "is-scrolling" : ""}`}
-          onClick={scrollToTop}
-          aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
-          title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
-          aria-hidden={!showScrollTop}
-          tabIndex={showScrollTop ? 0 : -1}
-        >
-          <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
-        </button>
+          return null;
+        })}
+
+        {/* Static Fixed Page Back Button - now seamlessly part of the dock flow at the bottom */}
+        {location !== "/" && (
+          <button
+            type="button"
+            className="floating-page-back-button"
+            style={{
+              position: "relative",
+              bottom: "auto",
+              right: "auto",
+              left: "auto",
+              margin: "0",
+              width: "52px",
+              height: "52px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+            }}
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                window.location.href = "/";
+              }
+            }}
+            aria-label={language === "ar" ? "رجوع" : language === "ms" ? "Kembali" : "Back"}
+            title={language === "ar" ? "رجوع" : language === "ms" ? "Kembali" : "Back"}
+          >
+            <ArrowLeft size={22} className="floating-page-back-icon" aria-hidden="true" />
+          </button>
+        )}
       </div>
+
+      {/* Static Fixed Scroll to Top Button (Cannot be dragged, matches RTL/LTR dynamically) */}
+      <button
+        type="button"
+        id="floating-scroll-top"
+        className={`floating-scroll-top-button ${isRTL ? "is-rtl" : ""} ${location !== "/" ? "has-back-button" : ""} ${showScrollTop ? "is-visible" : ""} ${isScrolling ? "is-scrolling" : ""}`}
+        onClick={scrollToTop}
+        aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
+        title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
+        aria-hidden={!showScrollTop}
+        tabIndex={showScrollTop ? 0 : -1}
+      >
+        <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
+      </button>
 
       {/* Official Registry Modal */}
       <OfficialRegistryModal isOpen={isRegistryOpen} onClose={() => setIsRegistryOpen(false)} />
