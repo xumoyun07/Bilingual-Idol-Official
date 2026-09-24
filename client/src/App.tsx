@@ -16,6 +16,7 @@ import ProgramDetail from "./pages/ProgramDetail";
 import News from "./pages/News";
 import UserDashboard from "./pages/UserDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import MarketingDashboard from "./pages/MarketingDashboard";
 import Admin from "./pages/Admin";
 import SuperAdmin from "./pages/SuperAdmin";
 import NotFound from "./pages/NotFound";
@@ -46,6 +47,7 @@ function Router({ location }: { location?: string }) {
       {/* Portals & Dashboards */}
       <Route path="/dashboard" component={UserDashboard} />
       <Route path="/teacher" component={TeacherDashboard} />
+      <Route path="/marketing" component={MarketingDashboard} />
 
       {/* Admin Canonical Paths */}
       <Route path="/admin" component={Admin} />

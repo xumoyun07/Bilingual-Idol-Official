@@ -213,10 +213,10 @@ export function CampusFacilitiesShowcase() {
   const tView = language === "ms" ? "Lihat" : language === "ar" ? "عرض" : "View";
 
   return (
-    <section id="campus-facilities-section" className="relative bg-white py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border border-[#e2e8f0] rounded-2xl">
+    <section id="campus-facilities-section" className="relative bg-transparent py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-none">
       <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* =========================================================================
+         {/* =========================================================================
             1. Section Introduction (Unified Heading & Context)
            ========================================================================= */}
         <div className="text-center max-w-3xl mx-auto mb-10">
@@ -235,7 +235,7 @@ export function CampusFacilitiesShowcase() {
         {/* =========================================================================
             2. Split Screen / Responsive Showcase Grid
            ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch bg-white rounded-[24px] border border-slate-200/50 shadow-sm overflow-hidden p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch bg-transparent overflow-hidden p-4 sm:p-6 lg:p-8">
           
           {/* =========================================================================
               DESKTOP LEFT SIDEBAR: Interactive Facility Selector Tabs (Hidden on mobile)
@@ -251,7 +251,7 @@ export function CampusFacilitiesShowcase() {
                   className={`w-full text-left p-4.5 rounded-xl transition-all duration-350 flex items-center justify-between border ${
                     isActive
                       ? "bg-blue-50/70 border-blue-200 shadow-xs"
-                      : "border-transparent bg-white/50 hover:bg-slate-50"
+                      : "border-transparent bg-white/50"
                   }`}
                 >
                   <div className="flex items-center gap-4">
@@ -289,18 +289,18 @@ export function CampusFacilitiesShowcase() {
           </div>
 
           {/* =========================================================================
-              RESPONSIVE FEATURED CONTENT CARD (Visually Dominant Component)
+              DESKTOP FEATURED CONTENT CARD (Visible on Desktop Only)
              ========================================================================= */}
-          <div className="lg:col-span-7 flex flex-col justify-between">
+          <div className="hidden lg:flex lg:col-span-7 flex-col justify-between">
             <div 
               id="campus-facilities-main-card"
-              className="relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[1.4] rounded-[20px] overflow-hidden shadow-xs group cursor-grab active:cursor-grabbing"
+              className="relative aspect-[1.4] rounded-[24px] overflow-hidden shadow-xs group cursor-grab active:cursor-grabbing"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               {/* Active Slide Image */}
-              <div className="relative sm:absolute sm:inset-0 w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-slate-50 flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 w-full h-full bg-slate-50 flex items-center justify-center overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={activeFacility}
@@ -311,22 +311,22 @@ export function CampusFacilitiesShowcase() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full h-full object-contain sm:object-cover select-none"
+                    className="w-full h-full object-cover select-none"
                   />
                 </AnimatePresence>
               </div>
 
-              {/* Floating View Lightbox Action (Active on Hover/Focus) */}
+              {/* Floating View Lightbox Action */}
               <button
                 onClick={() => setLightboxIndex(activeFacility)}
-                className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 hover:bg-white backdrop-blur-md text-[#173fad] text-xs font-bold border border-slate-200/50 transition-all active:scale-95 shadow-sm"
+                className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white backdrop-blur-md text-[#173fad] text-xs font-bold border border-slate-200/50 transition-all active:scale-95 shadow-sm"
                 title="Expand image"
               >
                 <Eye size={13} className="text-[#173fad]" />
                 <span>{tView}</span>
               </button>
 
-              {/* Overlay Interactive Text (Location + Badges + Title + Description - Styled as a beautiful light floating card) */}
+              {/* Overlay Interactive Text (Styled for Desktop overlay) */}
               <div id="campus-facilities-overlay-text" className="absolute bottom-0 z-10 flex flex-col items-start">
                 <div className="flex items-center gap-1.5 text-[#173fad] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1.5">
                   <MapPin size={11} className="text-[#173fad] stroke-[2.5]" />
@@ -344,12 +344,8 @@ export function CampusFacilitiesShowcase() {
               </div>
             </div>
 
-            {/* =========================================================================
-                3. Segmented Progress & Carousel Navigation (Under Image)
-               ========================================================================= */}
+            {/* Desktop Carousel Indicators and Navigation */}
             <div className="flex flex-col items-center mt-5">
-              
-              {/* Segmented Indicator Line bar */}
               <div className="flex gap-1.5 justify-center items-center h-2 w-36 mb-2">
                 {campusFacilities.map((_, idx) => {
                   const isIndicatorActive = idx === activeFacility;
@@ -366,11 +362,10 @@ export function CampusFacilitiesShowcase() {
                 })}
               </div>
 
-              {/* Counts & Chevron Navigation Bar */}
               <div className="flex items-center justify-between w-full max-w-sm px-4">
                 <button
                   onClick={prevFacility}
-                  className="campus-facilities-nav-btn w-10 h-10 rounded-full flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition-all duration-150 active:scale-90 shadow-2xs"
+                  className="campus-facilities-nav-btn w-10 h-10 rounded-full flex items-center justify-center bg-white border border-slate-200 text-slate-700 transition-all duration-150 active:scale-90 shadow-2xs"
                   aria-label="Previous Facility"
                 >
                   <ChevronLeft size={18} className="stroke-[2.5]" />
@@ -383,82 +378,108 @@ export function CampusFacilitiesShowcase() {
 
                 <button
                   onClick={nextFacility}
-                  className="campus-facilities-nav-btn w-10 h-10 rounded-full flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition-all duration-150 active:scale-90 shadow-2xs"
+                  className="campus-facilities-nav-btn w-10 h-10 rounded-full flex items-center justify-center bg-white border border-slate-200 text-slate-700 transition-all duration-150 active:scale-90 shadow-2xs"
                   aria-label="Next Facility"
                 >
                   <ChevronRight size={18} className="stroke-[2.5]" />
                 </button>
               </div>
+            </div>
+          </div>
 
+          {/* =========================================================================
+              MOBILE/TABLET ULTRA-SIMPLIFIED CARD VIEW (Visible on Mobile Only)
+             ========================================================================= */}
+          <div className="flex lg:hidden flex-col w-full">
+            {/* Aspect frame with clean Swipeable Area */}
+            <div 
+              className="relative w-full aspect-[1.5] rounded-2xl overflow-hidden shadow-xs bg-slate-50 cursor-grab active:cursor-grabbing"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeFacility}
+                  src={campusFacilities[activeFacility]!.image}
+                  alt={localized(campusFacilities[activeFacility]!).title}
+                  referrerPolicy="no-referrer"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full h-full object-cover select-none"
+                />
+              </AnimatePresence>
+
+              {/* Instant Zoom trigger button */}
+              <button
+                onClick={() => setLightboxIndex(activeFacility)}
+                className="absolute top-3 right-3 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-white/95 backdrop-blur-md text-[#173fad] border border-slate-200/50 transition-all active:scale-90 shadow-xs"
+                aria-label="Zoom facility"
+              >
+                <Eye size={14} />
+              </button>
+
+              {/* Compact page/index indicator pill */}
+              <div className="absolute top-3 left-3 z-20 bg-[#173fad]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-xs">
+                {activeFacility + 1} / {campusFacilities.length}
+              </div>
             </div>
 
-          </div>
+            {/* Clean, comfortable text info block below the image */}
+            <div className="mt-4 flex flex-col items-start text-left">
+              <div className="flex items-center gap-1 text-[#173fad] text-[10px] font-semibold uppercase tracking-wider mb-1">
+                <MapPin size={10} className="text-[#173fad] stroke-[2.5]" />
+                <span>PAVILION EMBASSY, KL</span>
+              </div>
+              
+              <h3 className="text-base font-extrabold text-[#0f172a] tracking-tight leading-tight mb-1">
+                {activeInfo.title}
+              </h3>
 
-        </div>
+              <p className="text-slate-600 text-xs leading-relaxed font-medium">
+                {activeInfo.desc}
+              </p>
+            </div>
 
-        {/* =========================================================================
-            Mobile Only: All Facility Preview Cards (Matches Main Card Layout)
-           ========================================================================= */}
-        <div className="grid grid-cols-1 gap-6 mt-8 lg:hidden">
-          <div className="border-b border-slate-100 pb-3 mb-1">
-            <h4 className="text-xs font-extrabold text-[#173fad] uppercase tracking-wider">
-              {language === "ms" ? "Semua Kemudahan (Pilih untuk Lihat)" : language === "ar" ? "جميع المرافق (اختر للعرض)" : "All Facilities (Tap to Select)"}
-            </h4>
-          </div>
-          {campusFacilities.map((fac, idx) => {
-            const info = localized(fac);
-            const isActive = idx === activeFacility;
-            return (
+            {/* Pagination dots & clean left/right buttons below text */}
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 w-full">
               <button
-                key={fac.id}
-                onClick={() => {
-                  setActiveFacility(idx);
-                  const mainCard = document.getElementById("campus-facilities-main-card");
-                  if (mainCard) {
-                    mainCard.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }
-                }}
-                className={`campus-facility-mobile-preview-card text-left w-full flex flex-col bg-white border rounded-[20px] overflow-hidden transition-all duration-300 ${
-                  isActive 
-                    ? "border-[#173fad] ring-1 ring-blue-600/10 shadow-md" 
-                    : "border-slate-200/60 shadow-2xs hover:border-slate-300"
-                }`}
+                onClick={prevFacility}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 border border-slate-200/50 text-slate-700 active:scale-90 transition-all"
+                aria-label="Previous Facility"
               >
-                {/* Image Wrapper */}
-                <div className="relative w-full aspect-[4/3] sm:aspect-auto bg-slate-50 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={fac.image}
-                    alt={info.title}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-contain select-none"
-                  />
-                </div>
-
-                {/* Info Area below Image */}
-                <div className="p-5 flex flex-col items-start bg-white w-full border-t border-slate-100/80">
-                  <div className="flex items-center gap-1.5 text-[#173fad] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1.5">
-                    <MapPin size={11} className="text-[#173fad] stroke-[2.5]" />
-                    <span>PAVILION EMBASSY, KL</span>
-                  </div>
-                  <div className="bg-[#173fad]/10 text-[#173fad] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md mb-2 shadow-2xs">
-                    {info.type}
-                  </div>
-                  <h3 className="text-sm font-extrabold tracking-tight text-[#0f172a] mb-1.5 leading-tight">
-                    {info.title}
-                  </h3>
-                  <p className="text-slate-600 text-xs leading-relaxed font-medium">
-                    {info.desc}
-                  </p>
-                </div>
+                <ChevronLeft size={16} className="stroke-[2.5]" />
               </button>
-            );
-          })}
+
+              <div className="flex gap-1.5 justify-center items-center">
+                {campusFacilities.map((_, idx) => {
+                  const isDotActive = idx === activeFacility;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveFacility(idx)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        isDotActive ? "w-6 bg-[#173fad]" : "w-1.5 bg-slate-200"
+                      }`}
+                      aria-label={`Go to facility slide ${idx + 1}`}
+                    />
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={nextFacility}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 border border-slate-200/50 text-slate-700 active:scale-90 transition-all"
+                aria-label="Next Facility"
+              >
+                <ChevronRight size={16} className="stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+
         </div>
-
-
-
-
-        {/* Removed CTA Banner per user request */}
 
       </div>
 

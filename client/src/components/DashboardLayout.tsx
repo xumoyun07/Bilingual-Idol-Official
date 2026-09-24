@@ -236,13 +236,19 @@ function DashboardShell({
                   {td("Platform User Types & Modules")}
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad]">
-                  {td("Founder Access")}
+                  {user?.role === "founder" ? td("Founder Access") : td("Admin Access")}
                 </span>
               </div>
 
               {/* Render User Types Main Menu (Student Excluded) */}
               <div className="space-y-1.5">
-                {FOUNDER_NAVIGATION_SECTIONS.map((section) => {
+                {FOUNDER_NAVIGATION_SECTIONS.filter((section) => {
+                  if (user?.role === "founder") return true;
+                  if (user?.role === "admin") {
+                    return ["admin", "teacher", "marketing"].includes(section.type);
+                  }
+                  return section.type === user?.role;
+                }).map((section) => {
                   const isOpen = openSections[section.type];
                   const SectionIcon = section.icon;
                   const hasActiveModule = section.modules.some((m) => m.id === activeTab);
@@ -558,9 +564,9 @@ function DashboardShell({
               }
               if (role === "marketing") {
                 return [
-                  { label: td("Overview"), icon: LayoutDashboard, onClick: () => setActiveTab?.("overview"), active: activeTab === "overview" },
-                  { label: td("Content"), icon: FileText, onClick: () => setActiveTab?.("content"), active: activeTab === "content" },
-                  { label: td("Media"), icon: ImageIcon, onClick: () => setActiveTab?.("media"), active: activeTab === "media" },
+                  { label: td("Overview"), icon: LayoutDashboard, onClick: () => externalSetActiveTab?.("overview"), active: externalActiveTab === "overview" },
+                  { label: td("Content"), icon: FileText, onClick: () => externalSetActiveTab?.("content"), active: externalActiveTab === "content" },
+                  { label: td("Media"), icon: ImageIcon, onClick: () => externalSetActiveTab?.("media"), active: externalActiveTab === "media" },
                   { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
                 ];
               }

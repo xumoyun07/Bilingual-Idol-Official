@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { PlatformUserType, FOUNDER_NAVIGATION_SECTIONS } from "./FounderNavTypes";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 interface FounderNavState {
   role: PlatformUserType;
   tab: string;
 }
 
-function parseCurrentNav(): FounderNavState {
+function parseCurrentNav(userRole?: string): FounderNavState {
   if (typeof window === "undefined") {
     return { role: "founder", tab: "founder-overview" };
   }
@@ -34,11 +35,27 @@ function parseCurrentNav(): FounderNavState {
     return { role: roleParam, tab: tabParam || (section?.modules[0]?.id ?? "founder-overview") };
   }
 
+  // Fallback defaults based on authenticated user's role
+  if (userRole === "admin") {
+    return { role: "admin", tab: tabParam || "admin-overview" };
+  }
+  if (userRole === "super_admin") {
+    return { role: "super_admin", tab: tabParam || "superadmin-overview" };
+  }
+  if (userRole === "marketing") {
+    return { role: "marketing", tab: tabParam || "marketing-overview" };
+  }
+  if (userRole === "teacher") {
+    return { role: "teacher", tab: tabParam || "teacher-schedule" };
+  }
+
   return { role: "founder", tab: tabParam || "founder-overview" };
 }
 
 export function useFounderNav() {
-  const [navState, setNavState] = useState<FounderNavState>(parseCurrentNav);
+  const { user } = useAuth();
+  const userRole = user?.role;
+  const [navState, setNavState] = useState<FounderNavState>(() => parseCurrentNav(userRole));
 
   const [openSections, setOpenSections] = useState<Record<PlatformUserType, boolean>>({
     founder: true,
@@ -47,6 +64,22 @@ export function useFounderNav() {
     teacher: false,
     marketing: false,
   });
+
+  // Align when user object is loaded
+  useEffect(() => {
+    if (userRole) {
+      setNavState(parseCurrentNav(userRole));
+      
+      // Auto-open sections based on user role permission set
+      setOpenSections({
+        founder: userRole === "founder",
+        super_admin: userRole === "founder" || userRole === "super_admin",
+        admin: userRole === "founder" || userRole === "admin",
+        teacher: userRole === "founder" || userRole === "admin" || userRole === "teacher",
+        marketing: userRole === "founder" || userRole === "admin" || userRole === "marketing",
+      });
+    }
+  }, [userRole]);
 
   // Keep open section aligned with current active role
   useEffect(() => {
@@ -59,7 +92,7 @@ export function useFounderNav() {
   // Listen to popstate (back/forward buttons) and custom founder-nav events
   useEffect(() => {
     const handlePopState = () => {
-      setNavState(parseCurrentNav());
+      setNavState(parseCurrentNav(userRole));
     };
 
     const handleCustomNav = (e: Event) => {
@@ -67,7 +100,7 @@ export function useFounderNav() {
       if (customEvent.detail) {
         setNavState(customEvent.detail);
       } else {
-        setNavState(parseCurrentNav());
+        setNavState(parseCurrentNav(userRole));
       }
     };
 
@@ -78,7 +111,7 @@ export function useFounderNav() {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("founder-nav", handleCustomNav);
     };
-  }, []);
+  }, [userRole]);
 
   const navigateTo = useCallback((role: PlatformUserType, tab: string) => {
     const targetUrl = `/admin?role=${role}&tab=${tab}`;

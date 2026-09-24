@@ -4712,32 +4712,43 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
   /* Focus Mode: Section-level clean positioning and layout */
   /* CSS selector 10: Campus facilities section */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5),
+  #campus-facilities-section {
     background-color: transparent !important;
     background: transparent !important;
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+  }
+  
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) {
     padding-top: 50px !important;
     padding-bottom: 5.5rem !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+    margin-left: 0px !important;
   }
+  
   /* Selector 6: Campus facilities header container card box */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1) {
-    background-color: #ffffff !important;
-    border-width: 1px !important;
-    border-style: solid !important;
-    border-color: var(--bilc-line, #cbd5e1) !important;
-    border-radius: 16px !important;
-    padding-left: 20px !important;
-    padding-top: 20px !important;
-    padding-right: 20px !important;
-    padding-bottom: 20px !important;
-    margin-top: -20px !important;
-    margin-bottom: 45px !important;
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1),
+  #campus-facilities-section > div:nth-of-type(1) > div:nth-of-type(1) {
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding-left: 0 !important;
+    padding-top: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 30px !important;
   }
   /* Selector 7: Campus facilities wrapper outer container */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1),
+  #campus-facilities-section > div:nth-of-type(1) {
     width: 1216px !important;
     max-width: 1216px !important;
   }
@@ -4760,10 +4771,10 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     color: #475569 !important;
   }
   #campus-facilities-section .grid {
-    background-color: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
     padding: 2.5rem !important;
     backdrop-filter: none !important;
   }
@@ -4792,13 +4803,13 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     box-shadow: 0 4px 12px rgba(23, 63, 173, 0.1) !important; /* Shadow from journey */
   }
   #campus-facilities-section .lg\:col-span-5 button:not(.bg-blue-50\/70):hover {
-    background-color: #f3f6fc !important; /* Hover background from journey */
-    background: #f3f6fc !important;
-    border-color: var(--bilc-blue, #173fad) !important; /* Hover border from journey */
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
   }
   #campus-facilities-section .lg\:col-span-5 button.bg-blue-50\/70:hover {
-    background-color: #e4ecf6 !important; /* Selected hover background from journey */
-    background: #e4ecf6 !important;
+    background-color: #ecf0f8 !important;
+    background: #ecf0f8 !important;
   }
   #campus-facilities-section .lg\:col-span-5 button:active {
     background-color: #dce2f3 !important; /* Press background from journey */
@@ -4870,6 +4881,40 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     color: #334155 !important;
     font-size: 0.875rem !important;
     line-height: 1.6 !important;
+  }
+
+  /* Disable any hover states inside Selector 1 (Campus facilities header block) */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1) *:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    transition: none !important;
+  }
+
+  /* Disable any hover states inside Selector 2 (Campus facilities interactive layout) */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2):hover,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) *:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+  }
+
+  /* Explicitly lock buttons inside Selector 2 to match normal states, even when hovered or interacted with */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) button:not(.bg-blue-50\/70):hover {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+  }
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) button.bg-blue-50\/70:hover {
+    background-color: #ecf0f8 !important;
+    background: #ecf0f8 !important;
+    border-color: var(--bilc-blue, #173fad) !important;
   }
 
   /* CSS selector 11: Verified testimonials section */
@@ -8636,14 +8681,82 @@ div#root > div > main#main-content > div#home-page-container > section#campus-fa
     gap: 1.5rem !important;
   }
 
-  /* Style the active image container standalone card on mobile */
+  /* Make the outer .lg:col-span-7 container transparent on mobile/tablet */
   #campus-facilities-section .lg\:col-span-7 {
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    margin-top: 0px !important;
+    margin-left: 0px !important;
+    padding: 0 !important;
+  }
+
+  /* Style the main active card itself as a unified single card on mobile/tablet (up to 1024px) */
+  #campus-facilities-main-card {
+    aspect-ratio: auto !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
     background-color: #ffffff !important;
+    background: #ffffff !important;
     border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-radius: 1.25rem !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
-    margin-top: 0 !important;
+    border-radius: 20px !important;
     overflow: hidden !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
+    margin: 0 !important;
+    width: 100% !important;
+    padding-left: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+  }
+
+  /* Image container inside the main card on mobile/tablet */
+  #campus-facilities-main-card > div:nth-of-type(1) {
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 16/9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+  }
+
+  /* Image inside the main card on mobile/tablet */
+  #campus-facilities-main-card img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  /* Text content box sitting below the image inside the main card on mobile/tablet */
+  #campus-facilities-overlay-text {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 !important;
+    margin-left: -16px !important;
+    margin-right: 0px !important;
+    margin-top: 0px !important;
+    border-radius: 16px !important;
+    border: none !important;
+    border-width: 0px !important;
+    border-style: none !important;
+    border-top: none !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    padding: 1.25rem !important;
+    padding-top: 20px !important;
+    width: 100% !important;
+    box-shadow: none !important;
   }
 
   /* Mobile horizontal cards scroller and styling */
@@ -9076,4 +9189,161 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-o
 div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > nav:nth-of-type(1) {
   height: 510px !important;
 }
+
+/* ==========================================================================
+   Fully Responsive & Localized Dashboard Shell Overrides (LTR & RTL)
+   ========================================================================== */
+
+/* 1. Inner dashboard content container: Multi-viewport margin & padding presets */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > main:nth-of-type(1) {
+  margin-right: 0px !important;
+  padding-left: 32px !important;
+  padding-top: 32px !important;
+  padding-right: 32px !important;
+  padding-bottom: 32px !important;
+  margin-left: 270px !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+/* RTL Layout Compatibility: Smart Mirroring */
+html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > main:nth-of-type(1) {
+  margin-left: 0px !important;
+  margin-right: 270px !important;
+}
+
+/* Mobile & Tablet Responsiveness: Fluid adjustment to prevent off-screen shifting */
+@media (max-width: 1023px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > main:nth-of-type(1) {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+}
+
+/* 2. Outer main content area wrapper (Sidebar Inset): Full height flex system */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
+  position: relative !important;
+  background-color: transparent !important;
+  width: 100% !important;
+  padding-top: 70px !important; /* Spacing reserved for header */
+}
+
+/* 2b. Dashboard Header Alignment (Precision Margin, Height & Padding to prevent disappearance) */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) {
+  margin-left: 0px !important;
+  margin-top: -70px !important; /* EXACTLY AS REQUESTED in CSS 2 */
+  height: 140px !important;      /* Offsets margin-top so that header content stays perfectly visible */
+  padding-top: 70px !important;  /* Shifts text/buttons down into the viewport */
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(16, 37, 62, 0.05) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01) !important;
+}
+
+@media (min-width: 1024px) {
+  html:not([dir="rtl"]) div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) {
+    left: 270px !important;
+    right: 0 !important;
+    width: calc(100% - 270px) !important;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) {
+    right: 270px !important;
+    left: 0 !important;
+    width: calc(100% - 270px) !important;
+    padding-right: 32px !important;
+    padding-left: 32px !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* 3. Sidebar Container and Sub-sections: Perfect dimension flow */
+@media (min-width: 1024px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+    width: 270px !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: 40 !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid rgba(16, 37, 62, 0.06) !important;
+    box-shadow: 4px 0 24px rgba(16, 37, 62, 0.02) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+    right: 0 !important;
+    left: auto !important;
+    border-right: none !important;
+    border-left: 1px solid rgba(16, 37, 62, 0.06) !important;
+    box-shadow: -4px 0 24px rgba(16, 37, 62, 0.02) !important;
+  }
+}
+
+/* 3b. Sidebar Footer Area Wrap */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) {
+  width: 260px !important;       /* EXACTLY AS REQUESTED in CSS 3 */
+  height: 112.594px !important;  /* EXACTLY AS REQUESTED in CSS 3 */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  padding: 16px 20px !important;
+  border-top: 1px solid rgba(16, 37, 62, 0.05) !important;
+  background-color: rgba(248, 250, 252, 0.5) !important;
+}
+
+/* 4. Sidebar Action Target Button Override */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1) {
+  padding-left: 0px !important;   /* EXACTLY AS REQUESTED in CSS 4 */
+  padding-top: 0px !important;    /* EXACTLY AS REQUESTED in CSS 4 */
+  padding-right: 0px !important;  /* EXACTLY AS REQUESTED in CSS 4 */
+  padding-bottom: 0px !important; /* EXACTLY AS REQUESTED in CSS 4 */
+  width: 100px !important;         /* EXACTLY AS REQUESTED in CSS 4 */
+  height: 38px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 5. Header quick-action button overrides for standard sizing */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1) {
+  padding: 10px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1):hover {
+  background-color: rgba(16, 37, 62, 0.05) !important;
+}
+
+/* Global Mobile/Tablet/Desktop Transparent Background overrides for Campus Facilities Showcase */
+#campus-facilities-section,
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 

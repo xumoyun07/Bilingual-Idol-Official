@@ -33,6 +33,9 @@ export async function setupVite(app: Express, server: Server) {
     configFile: false,
     server: serverOptions,
     appType: "custom",
+    optimizeDeps: {
+      force: true,
+    },
   });
 
   // In dev mode, prevent Vite from sending immutable / long-lived cache headers

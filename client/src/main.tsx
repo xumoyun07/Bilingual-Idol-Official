@@ -165,6 +165,15 @@ const trpcClient = trpc.createClient({
 });
 
 function MainApp() {
+  // Clear the self-healing reload flag upon successful load so subsequent errors can reload and self-heal
+  try {
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.removeItem("__hook_fix_reload");
+    }
+  } catch (e) {
+    // storage unavailable
+  }
+
   return (
     <ErrorBoundary>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>

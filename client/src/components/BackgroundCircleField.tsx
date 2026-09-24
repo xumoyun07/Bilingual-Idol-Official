@@ -111,20 +111,11 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
       }
     };
 
-    // Initialize spheres with predefined relative grid positions and verify 100px gap
+    // Initialize spheres evenly distributed across the entire document height
     const initBalls = (w: number, h: number) => {
-      const count = 7; // Balanced layout count
+      // Dynamic count based on page height to ensure even distribution throughout the scrollable area
+      const count = Math.max(8, Math.floor(h / 280));
       const list: Ball[] = [];
-
-      const predefinedPositions = [
-        { rx: 0.1, ry: 0.15 }, // left
-        { rx: 0.9, ry: 0.22 }, // right
-        { rx: 0.2, ry: 0.38 }, // left
-        { rx: 0.8, ry: 0.55 }, // right
-        { rx: 0.1, ry: 0.70 }, // left
-        { rx: 0.9, ry: 0.82 }, // right
-        { rx: 0.85, ry: 0.94 } // right
-      ];
 
       for (let i = 0; i < count; i++) {
         let attempts = 0;
@@ -136,16 +127,17 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
         const { minX, maxX } = getSideBoundaries(side, w, r);
 
         while (!valid && attempts < 100) {
-          const pos = predefinedPositions[i] || { rx: side === "left" ? 0.1 : 0.9, ry: random() };
-          // Random adjustment scale increases with attempts to find space
-          const scale = attempts === 0 ? 0 : (attempts / 100);
-          x = minX + (pos.rx < 0.5 ? pos.rx : pos.rx - 0.7) * (maxX - minX) * 2 + (random() - 0.5) * 50 * scale;
-          y = r + pos.ry * (h - r * 2) + (random() - 0.5) * 200 * scale;
+          // Evenly segment along the entire length of the page with random variation
+          const relativeSegmentY = (i + 0.5) / count;
+          const rx = side === "left" ? 0.05 + random() * 0.2 : 0.75 + random() * 0.2;
+
+          x = minX + rx * (maxX - minX);
+          y = r + relativeSegmentY * (h - r * 2) + (random() - 0.5) * 80;
           x = Math.max(minX, Math.min(maxX, x));
           y = Math.max(r, Math.min(h - r, y));
 
           const tempBall = { id: i, x, y, r, side };
-          if (isFarEnough(tempBall as Ball, list, 100)) {
+          if (isFarEnough(tempBall as Ball, list, 80)) {
             valid = true;
           }
           attempts++;
@@ -153,7 +145,7 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
 
         const palette = bluePalettes[Math.floor(random() * bluePalettes.length)]!;
         const angle = random() * Math.PI * 2;
-        const speed = 0.12 + random() * 0.18;
+        const speed = 0.08 + random() * 0.12; // Extremely gentle slow drift for elegant feel
 
         list.push({
           id: i,
@@ -175,7 +167,7 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
 
     initBalls(width, height);
 
-    // ResizeObserver to handle canvas resizing dynamically
+    // ResizeObserver to handle canvas resizing dynamically without resetting or jumping positions
     const resizeObserver = new ResizeObserver((entries) => {
       if (!entries || entries.length === 0) return;
       const entry = entries[0]!;
@@ -250,25 +242,19 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
       if (!ctx) return;
 
       ctx.clearRect(0, 0, width, height);
-
-      // Track scroll delta to translate spheres coordinate space
-      const currentScrollY = window.scrollY;
-      const deltaY = currentScrollY - scrollYRef.current;
-      scrollYRef.current = currentScrollY;
-
       const balls = ballsRef.current;
 
-      // Phase 1: Update each ball's physical position, boundary bouncing, and recycling
+      // Phase 1: Update each ball's physical position & bounds bounce (NO SCROLL INTERFERENCE)
       for (let i = 0; i < balls.length; i++) {
         const ball = balls[i]!;
 
-        // Subtle waves to guarantee micro-movement
-        ball.vx += Math.sin(time * 0.001 + ball.id) * 0.00075;
-        ball.vy += Math.cos(time * 0.001 + ball.id) * 0.00075;
+        // Subtle waves to guarantee organic micro-movement
+        ball.vx += Math.sin(time * 0.001 + ball.id) * 0.0005;
+        ball.vy += Math.cos(time * 0.001 + ball.id) * 0.0005;
 
-        // Cap speed to elegant and visible drifting levels
+        // Cap speed to extremely gentle, premium drifting rates
         const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-        const maxSpeed = 0.32; 
+        const maxSpeed = 0.22; 
         if (speed > maxSpeed) {
           ball.vx = (ball.vx / speed) * maxSpeed;
           ball.vy = (ball.vy / speed) * maxSpeed;
@@ -278,74 +264,29 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
         ball.x += ball.vx;
         ball.y += ball.vy;
 
-        // Apply interactive scrolling translation
-        ball.y -= deltaY;
-
         const { minX, maxX } = getSideBoundaries(ball.side, width, ball.r);
 
-        // Clamp inside its side column
-        ball.x = Math.max(minX, Math.min(maxX, ball.x));
-
-        // Bounce horizontally if hitting its specific side column bounds
+        // Bounce horizontally if hitting side bounds
         if (ball.x <= minX && ball.vx < 0) {
           ball.vx = Math.abs(ball.vx);
         } else if (ball.x >= maxX && ball.vx > 0) {
           ball.vx = -Math.abs(ball.vx);
         }
 
-        // Dynamic infinite loop recycle:
-        // - Scrolling DOWN (spheres move UP): if sphere moves above viewport, recycle to bottom
-        if (ball.y < -ball.r) {
-          ball.y = height + ball.r;
-          ball.r = 25 + Math.floor(random() * 75);
-          
-          const { minX: recMinX, maxX: recMaxX } = getSideBoundaries(ball.side, width, ball.r);
-          let valid = false;
-          let attempts = 0;
-          while (!valid && attempts < 50) {
-            ball.x = recMinX + random() * (recMaxX - recMinX);
-            if (isFarEnough(ball, balls, 100)) {
-              valid = true;
-            }
-            attempts++;
-          }
-
-          ball.vx = -0.15 + random() * 0.3;
-          ball.vy = -0.15 + random() * 0.3;
-          const palette = bluePalettes[Math.floor(random() * bluePalettes.length)]!;
-          ball.color1 = palette.color1;
-          ball.color2 = palette.color2;
-          ball.borderColor = palette.borderColor;
+        // Bounce vertically off top/bottom borders of full page height to maintain exact count and positions
+        if (ball.y <= ball.r && ball.vy < 0) {
+          ball.vy = Math.abs(ball.vy);
+        } else if (ball.y >= height - ball.r && ball.vy > 0) {
+          ball.vy = -Math.abs(ball.vy);
         }
-        // - Scrolling UP (spheres move DOWN): if sphere moves below viewport, recycle to top
-        else if (ball.y > height + ball.r) {
-          ball.y = -ball.r;
-          ball.r = 25 + Math.floor(random() * 75);
-          
-          const { minX: recMinX, maxX: recMaxX } = getSideBoundaries(ball.side, width, ball.r);
-          let valid = false;
-          let attempts = 0;
-          while (!valid && attempts < 50) {
-            ball.x = recMinX + random() * (recMaxX - recMinX);
-            if (isFarEnough(ball, balls, 100)) {
-              valid = true;
-            }
-            attempts++;
-          }
 
-          ball.vx = -0.15 + random() * 0.3;
-          ball.vy = -0.15 + random() * 0.3;
-          const palette = bluePalettes[Math.floor(random() * bluePalettes.length)]!;
-          ball.color1 = palette.color1;
-          ball.color2 = palette.color2;
-          ball.borderColor = palette.borderColor;
-        }
+        // Hard clamping to strictly avoid leaving boundaries
+        ball.x = Math.max(minX, Math.min(maxX, ball.x));
+        ball.y = Math.max(ball.r, Math.min(height - ball.r, ball.y));
       }
 
       // Phase 2: Multi-pass relaxation loop to resolve inter-sphere clumping
-      // This strictly enforces that the physical distance between any two sphere boundaries is >= 100px.
-      // We run multiple passes to resolve multi-ball complex overlaps correctly.
-      for (let pass = 0; pass < 5; pass++) {
+      for (let pass = 0; pass < 3; pass++) {
         for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
             const b1 = balls[i]!;
@@ -353,27 +294,22 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
             const dx = b2.x - b1.x;
             const dy = b2.y - b1.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            // Required distance between centers is radius1 + radius2 + 100px gap
-            const minDist = b1.r + b2.r + 100;
+            const minDist = b1.r + b2.r + 80;
 
             if (dist < minDist) {
               const overlap = minDist - dist;
-              // Normalize direction vector (avoid division by zero)
               const nx = dx / (dist || 1);
               const ny = dy / (dist || 1);
 
-              // Push balls apart to preserve the 100px gap
               b1.x -= nx * (overlap * 0.5);
               b1.y -= ny * (overlap * 0.5);
               b2.x += nx * (overlap * 0.5);
               b2.y += ny * (overlap * 0.5);
 
-              // Bounce velocities
               const rvx = b2.vx - b1.vx;
               const rvy = b2.vy - b1.vy;
               const velAlongNormal = rvx * nx + rvy * ny;
 
-              // If moving towards each other, reverse normal velocity components
               if (velAlongNormal < 0) {
                 const impulse = -2 * velAlongNormal;
                 b1.vx -= (impulse * 0.5) * nx;
@@ -386,22 +322,19 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
         }
       }
 
-      // Phase 3: Rendering the background spheres
+      // Phase 3: Draw spheres at exact absolute layout coordinates
       for (let i = 0; i < balls.length; i++) {
         const ball = balls[i]!;
 
-        // Calculate visual opacity for smooth fade effects at viewport boundaries:
-        // Spheres elegantly stay at top/bottom and gradually fade out before disappearing completely
+        // Gentle visual opacity fade zones at extreme top & bottom boundaries of document
         let finalOpacity = 1;
-        const fadeZone = 180; // 180px smooth gradient fade-out zone
-        
+        const fadeZone = 120;
         if (ball.y < fadeZone) {
-          finalOpacity = Math.max(0, ball.y / fadeZone);
+          finalOpacity = Math.max(0.1, ball.y / fadeZone);
         } else if (ball.y > height - fadeZone) {
-          finalOpacity = Math.max(0, (height - ball.y) / fadeZone);
+          finalOpacity = Math.max(0.1, (height - ball.y) / fadeZone);
         }
 
-        // Draw the sphere
         ctx.save();
         ctx.globalAlpha = finalOpacity;
         ctx.beginPath();
@@ -442,7 +375,7 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 overflow-hidden pointer-events-none select-none w-full h-full"
+      className="absolute inset-0 overflow-hidden pointer-events-none select-none w-full h-full"
       style={{ zIndex: -30 }}
     >
       <canvas
