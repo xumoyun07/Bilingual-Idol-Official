@@ -243,6 +243,41 @@ export function StudentJourneyRoadmap() {
   const stepSummary = step.summaries[language] || step.summaries.en;
   const stepDetails = step.details[language] || step.details.en;
 
+  // Touch Swipe Gesture Support for mobile
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      if (isRTL) {
+        setActiveStep((prev) => Math.max(0, prev - 1));
+      } else {
+        setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1));
+      }
+    } else if (isRightSwipe) {
+      if (isRTL) {
+        setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1));
+      } else {
+        setActiveStep((prev) => Math.max(0, prev - 1));
+      }
+    }
+  };
+
   return (
     <section className={`simple-section bilc-journey-section ${isRTL ? "is-rtl" : ""}`} id="student-journey">
       <div className="bilc-journey-header">
@@ -348,7 +383,7 @@ export function StudentJourneyRoadmap() {
                 disabled={activeStep === JOURNEY_STEPS.length - 1}
                 onClick={() => setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1))}
               >
-                {language === "ms" ? "Langkah Seterusnya" : language === "ar" ? "الخطوة التالية" : "Next Step"}
+                {language === "ms" ? "Langkah Seterusnya" : language === "ar" ? "Langkah Seterusnya" : "Next Step"}
               </button>
             </div>
 
@@ -360,68 +395,137 @@ export function StudentJourneyRoadmap() {
       </div>
 
       {/* =========================================================================
-          MOBILE-ONLY INTUITIVE CHRONOLOGICAL TIMELINE ROADMAP VIEW
+          MOBILE-ONLY PREMIUM INTERACTIVE SLIDER STEPPER (FULLY REDESIGNED)
          ========================================================================= */}
       <div className="block lg:hidden w-full px-4 sm:px-6">
-        <div className={`relative flex flex-col gap-6 ${isRTL ? "pr-8 pl-0 border-r-2 border-slate-200" : "pl-8 pr-0 border-l-2 border-slate-200"}`}>
-          {JOURNEY_STEPS.map((s) => {
-            const SIcon = s.icon;
-            const title = s.titles[language] || s.titles.en;
-            const subtitle = s.subtitles[language] || s.subtitles.en;
-            const summary = s.summaries[language] || s.summaries.en;
-            const details = s.details[language] || s.details.en;
+        {/* Horizontal Progress Timeline Tracker */}
+        <div className="relative w-full flex items-center justify-between mb-6 px-2">
+          {/* Progress Connecting Line Track */}
+          <div className="absolute top-1/2 left-4 right-4 h-[3px] bg-slate-200 -translate-y-1/2 z-0 rounded-full" />
+          
+          {/* Active Progress Highlight Line */}
+          <div 
+            className="absolute top-1/2 h-[3px] bg-[#173fad] -translate-y-1/2 transition-all duration-300 z-0 rounded-full"
+            style={{
+              width: `calc(${(activeStep / (JOURNEY_STEPS.length - 1)) * 100}% - 32px)`,
+              [isRTL ? "right" : "left"]: "16px"
+            }}
+          />
 
+          {/* Stepper Dots/Circles */}
+          {JOURNEY_STEPS.map((s, idx) => {
+            const isActive = activeStep === idx;
+            const isCompleted = idx < activeStep;
             return (
-              <div key={s.number} className="relative flex flex-col text-left">
-                {/* Timeline dot/marker circle */}
-                <div className={`absolute top-0 w-7 h-7 rounded-full bg-white border-2 border-[#173fad] flex items-center justify-center shadow-xs z-10 ${
-                  isRTL ? "-right-[15px]" : "-left-[15px]"
-                }`}>
-                  <span className="text-[10px] font-bold text-[#173fad]">{s.number}</span>
-                </div>
-
-                {/* Content Card with high-end border and shadows */}
-                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all duration-300 hover:border-[#173fad] hover:shadow-xs">
-                  {/* Category Pill and Step Icon */}
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="bg-blue-50 text-[#173fad] text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
-                      {subtitle}
-                    </span>
-                    <div className="w-7 h-7 rounded-lg bg-blue-50/50 border border-blue-100 flex items-center justify-center text-[#173fad]">
-                      <SIcon size={14} className="stroke-[2.5]" />
-                    </div>
-                  </div>
-
-                  {/* Step Title */}
-                  <h3 className="text-sm font-extrabold text-slate-900 tracking-tight leading-snug mb-1.5">
-                    {title}
-                  </h3>
-
-                  {/* Summary */}
-                  <p className="text-slate-500 text-[11px] leading-relaxed mb-3.5">
-                    {summary}
-                  </p>
-
-                  {/* Compact list of guarantees */}
-                  <div className="flex flex-col gap-2 border-t border-slate-100/70 pt-3">
-                    {details.map((detail, dIdx) => (
-                      <div key={dIdx} className="flex items-start gap-1.5 text-[10px] leading-relaxed text-slate-600 font-semibold">
-                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-50 border border-emerald-100/50 flex items-center justify-center text-emerald-600 mt-0.5 flex-shrink-0">
-                          <Check size={9} className="stroke-[3]" />
-                        </div>
-                        <span className="flex-1">{detail}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <button
+                key={s.number}
+                type="button"
+                onClick={() => setActiveStep(idx)}
+                className={`w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-xs z-10 transition-all duration-300 relative border ${
+                  isActive
+                    ? "bg-[#173fad] text-white ring-4 ring-blue-100 border-[#173fad] scale-110 shadow-sm"
+                    : isCompleted
+                    ? "bg-[#173fad] text-white border-[#173fad]"
+                    : "bg-white text-slate-400 border-slate-200"
+                }`}
+                aria-label={`Step ${s.number}`}
+              >
+                {s.number}
+              </button>
             );
           })}
         </div>
 
-        {/* Central Call to Action after reading the whole journey */}
-        <div className="mt-8 px-1">
-          <Link href="/enroll" className="w-full h-12 bg-[#173fad] active:bg-[#001edd] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold shadow-md active:scale-[0.97] transition-all">
+        {/* Active Step Showcase Spotlight Card */}
+        <div 
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs relative overflow-hidden transition-all duration-300"
+        >
+          {/* Subtle elegant background decoration */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50/40 via-transparent to-transparent pointer-events-none rounded-bl-3xl" />
+
+          {/* Step Metadata Header (Unboxed, clean metadata as per zero-pill) */}
+          <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider mb-4 border-b border-slate-100 pb-3">
+            <span className="text-[#173fad]">
+              {language === "ms" 
+                ? `Langkah ${step.number} drpd 06` 
+                : language === "ar" 
+                ? `الخطوة ${step.number} من ٠٦` 
+                : `Step ${step.number} of 06`}
+            </span>
+            <span className="text-slate-300" aria-hidden="true">·</span>
+            <span className="text-slate-500">{stepSubtitle}</span>
+          </div>
+
+          {/* Icon Section */}
+          <div className="w-12 h-12 rounded-xl bg-blue-50/50 border border-blue-100 flex items-center justify-center text-[#173fad] mb-4">
+            <StepIcon size={22} className="stroke-[2.2]" />
+          </div>
+
+          {/* Step Title */}
+          <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug mb-2">
+            {stepTitle}
+          </h3>
+
+          {/* Step Description */}
+          <p className="text-slate-500 text-[12px] leading-relaxed mb-5">
+            {stepSummary}
+          </p>
+
+          {/* Compact Guarantees checklist */}
+          <div className="flex flex-col gap-2.5 border-t border-slate-100 pt-4">
+            <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">
+              {language === "ms" 
+                ? "Jaminan & Sokongan:" 
+                : language === "ar" 
+                ? "المزايا والضمانات:" 
+                : "Guarantees & Support:"}
+            </p>
+            {stepDetails.map((detail, dIdx) => (
+              <div key={dIdx} className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-700 font-semibold">
+                <div className="w-4 h-4 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mt-0.5 flex-shrink-0">
+                  <Check size={10} className="stroke-[3]" />
+                </div>
+                <span className="flex-1">{detail}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Swipe instruction helper (premium touch detail) */}
+        <div className="text-center mt-3 text-[10px] text-slate-400 font-medium">
+          {language === "ms"
+            ? "Leret ke kiri atau kanan untuk menukar langkah"
+            : language === "ar"
+            ? "اسحب لليمين أو اليسار للتنقل بين الخطوات"
+            : "Swipe left or right to switch steps"}
+        </div>
+
+        {/* Interactive Nav Controls */}
+        <div className="flex items-center justify-between gap-3 mt-4">
+          <button
+            type="button"
+            className="flex-1 h-11 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all disabled:opacity-40"
+            disabled={activeStep === 0}
+            onClick={() => setActiveStep((prev) => Math.max(0, prev - 1))}
+          >
+            {language === "ms" ? "Sebelumnya" : language === "ar" ? "السابق" : "Previous"}
+          </button>
+          <button
+            type="button"
+            className="flex-1 h-11 bg-[#173fad] text-white rounded-xl text-xs font-bold transition-all disabled:opacity-40"
+            disabled={activeStep === JOURNEY_STEPS.length - 1}
+            onClick={() => setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1))}
+          >
+            {language === "ms" ? "Seterusnya" : language === "ar" ? "التالي" : "Next Step"}
+          </button>
+        </div>
+
+        {/* Central Call to Action */}
+        <div className="mt-5 px-1">
+          <Link href="/enroll" className="w-full h-12 bg-[#173fad] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-md active:scale-[0.98]">
             {t("nav.makeEnquiry")} <Sparkles size={14} className="stroke-[2.5]" />
           </Link>
         </div>

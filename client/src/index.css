@@ -2081,17 +2081,13 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 }
 
 .floating-scroll-top-button {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 998;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 9999px;
-  background: var(--bilc-blue);
-  color: #ffffff;
-  border: 1px solid var(--bilc-blue);
-  display: none;
+  background: #ffffff;
+  color: var(--bilc-navy);
+  border: 1px solid var(--bilc-line);
+  display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--bilc-shadow);
@@ -2099,41 +2095,16 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   transition: all 0.2s ease;
 }
 
-.floating-scroll-top-button.is-rtl,
-.is-rtl .floating-scroll-top-button {
-  right: auto;
-  left: 1.5rem;
-}
-
-.floating-scroll-top-button.has-back-button {
-  bottom: 5.25rem !important;
-}
-
-@media (max-width: 767px) {
-  .floating-scroll-top-button.is-on-detail {
-    bottom: 9rem;
-  }
-}
-
-.floating-scroll-top-button.is-visible {
-  display: flex;
-}
-
 .floating-scroll-top-button:hover {
   background: var(--bilc-blue-hover);
   color: #ffffff;
   border-color: var(--bilc-blue-hover);
-  transform: translateY(-2px);
 }
 
 /* Static Fixed Page Back Button for Navigation */
 .floating-page-back-button {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 998;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 9999px;
   background: linear-gradient(135deg, var(--bilc-navy, #10253e) 0%, #1c324e 100%);
   color: #ffffff;
@@ -9817,6 +9788,158 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
   html[dir="rtl"] #home-start-here-section .simple-task-card:hover .simple-task-arrow {
     transform: translateX(-3px) !important;
+  }
+}
+
+/* ==========================================================================
+   MOBILE-ONLY HOVER DESTRUCTION & RESET OVERRIDES
+   Ensures absolute zero sticky hover effects, scaling, translating, or shifts
+   when elements are tapped on touch screens.
+   ========================================================================== */
+@media (max-width: 1023px) {
+  /* 1. Prevent physical shifts, translate movements, and scaling for all elements on hover */
+  a:hover,
+  button:hover,
+  input:hover,
+  select:hover,
+  textarea:hover,
+  label:hover,
+  .simple-button:hover,
+  .simple-button-quiet:hover,
+  .simple-text-link:hover,
+  .bilc-option-card:hover,
+  .bilc-course-card:hover,
+  .about-team-card:hover,
+  .news-card:hover,
+  .simple-programme-guide article:hover,
+  .simple-programme-row:hover,
+  .desktop-unified-card-panel:hover,
+  .desktop-unified-selectable-option:hover,
+  .simple-task-card:hover,
+  .simple-task-arrow:hover,
+  .floating-call-button:hover,
+  .floating-scroll-top-button:hover,
+  .floating-page-back-button:hover,
+  .bilc-wa-trigger-btn:hover,
+  .bilc-wa-close-btn:hover,
+  .bilc-wa-topic-item:hover,
+  .bilc-wa-topic-btn:hover,
+  .bilc-service-pill:hover,
+  .bilc-wa-btn:hover,
+  .bilc-lang-card:hover,
+  .bilc-lang-link:hover,
+  .bilc-journey-step-btn:hover,
+  .bilc-stepper-nav-btn:hover,
+  .news-page-number:hover,
+  .bilc-modal-close-btn:hover,
+  .bilc-option-row:hover,
+  .auth-submit:hover,
+  .auth-back:hover,
+  .auth-password-toggle:hover,
+  .minimal-nav-item:hover,
+  .minimal-signout:hover,
+  div#root .bilc-finder-card:hover,
+  div#root .bilc-journey-step-btn:hover,
+  [role="button"]:hover,
+  [tabindex="0"]:hover {
+    transform: none !important;
+    transition-property: none !important;
+    animation-name: none !important;
+  }
+
+  /* 2. Reset Background/Border/Shadow hover states back to resting state to prevent sticky tap color changes */
+  
+  /* Primary buttons */
+  .simple-button:hover,
+  .auth-submit:hover,
+  .bilc-stepper-nav-btn.is-primary:hover {
+    background-color: var(--bilc-blue, #173fad) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 2px 6px rgba(23, 63, 173, 0.24) !important;
+  }
+
+  /* Quiet buttons */
+  .simple-button-quiet:hover,
+  .auth-back:hover,
+  .bilc-stepper-nav-btn:hover {
+    background-color: transparent !important;
+    border-color: var(--bilc-line, #e2e8f0) !important;
+    color: var(--bilc-navy, #10253e) !important;
+    box-shadow: none !important;
+  }
+
+  /* Text links and pills */
+  .simple-text-link:hover {
+    color: var(--bilc-blue, #173fad) !important;
+    background-color: var(--bilc-blue-light, #eef3ff) !important;
+    border-color: rgba(23, 63, 173, 0.15) !important;
+    box-shadow: var(--bilc-shadow-sm) !important;
+  }
+
+  /* Cards and Options */
+  .bilc-option-card:hover,
+  .bilc-option-row:hover {
+    border-color: var(--bilc-line, #e2e8f0) !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Standard navigation links */
+  .simple-public-nav a:hover {
+    color: var(--bilc-muted) !important;
+    background: transparent !important;
+  }
+
+  .simple-public-nav a[aria-current="page"]:hover {
+    color: var(--bilc-blue) !important;
+    background: var(--bilc-blue-light) !important;
+  }
+
+  /* Footers */
+  .simple-public-footer nav a:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-decoration: none !important;
+  }
+
+  /* Course and Program Cards */
+  .bilc-course-card:hover,
+  .bilc-lang-card:hover,
+  .about-team-card:hover,
+  .news-card:hover,
+  .simple-programme-guide article:hover,
+  .desktop-unified-card-panel:hover {
+    border-color: var(--bilc-line, #e2e8f0) !important;
+    background-color: #ffffff !important;
+    box-shadow: var(--bilc-shadow-sm) !important;
+  }
+
+  /* Task cards in home start here section */
+  #home-start-here-section .simple-task-card:hover,
+  #home-start-here-section .simple-task-card:active {
+    background: #f8fafc !important;
+    border-color: var(--bilc-line-subtle, #f1f5f9) !important;
+    box-shadow: none !important;
+  }
+
+  #home-start-here-section .simple-task-card:hover .simple-task-arrow {
+    transform: none !important;
+  }
+
+  /* WhatsApp widget and floating call trigger buttons */
+  .floating-call-button:hover {
+    background-color: #059669 !important; /* var(--bilc-accent-green) */
+    color: #ffffff !important;
+  }
+
+  .floating-scroll-top-button:hover {
+    background-color: #ffffff !important;
+    color: var(--bilc-navy, #10253e) !important;
+  }
+
+  .bilc-wa-trigger-btn:hover {
+    background-color: #25d366 !important;
   }
 }
 

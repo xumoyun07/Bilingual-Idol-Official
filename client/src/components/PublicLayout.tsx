@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUp, Menu, Phone, X } from "lucide-react";
+import { ArrowLeft, ArrowUp, Menu, Phone, X, Gift } from "lucide-react";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -11,6 +11,14 @@ import { Language } from "@/lib/translations";
 import { PromotionalPopupModal, PromotionalFloatingBadge } from "@/components/PromotionalPopup";
 import { OfficialRegistryModal } from "@/components/OfficialRegistryModal";
 
+type FabId = "whatsapp" | "phone" | "promo" | "scrollTop";
+
+interface FabItem {
+  id: FabId;
+  currentSlotIndex: number;
+  isDisplaced: boolean;
+}
+
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [promoOpen, setPromoOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -19,175 +27,200 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { t, isRTL, language } = useLanguage();
   const [isRegistryOpen, setIsRegistryOpen] = useState(false);
 
-  // Vertical dragging, sorting, and evasion states for quick action buttons
-  const [order, setOrder] = useState<string[]>(() => {
-    const saved = localStorage.getItem("bilc_buttons_order");
+  // Vertical dragging, sorting, and physics-compliant collision states for 4 draggable buttons
+  const [fabItems, setFabItems] = useState<FabItem[]>(() => {
+    const saved = localStorage.getItem("bilc_fab_slots_v4");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 3) return parsed;
+        if (Array.isArray(parsed) && parsed.length === 4) {
+          return parsed.map(item => ({ ...item, isDisplaced: false }));
+        }
       } catch (e) {}
     }
-    return ["promo", "phone", "whatsapp"];
+    return [
+      { id: "whatsapp", currentSlotIndex: 1, isDisplaced: false },
+      { id: "phone", currentSlotIndex: 2, isDisplaced: false },
+      { id: "promo", currentSlotIndex: 3, isDisplaced: false },
+      { id: "scrollTop", currentSlotIndex: 4, isDisplaced: false },
+    ];
   });
+
   const [draggedKey, setDraggedKey] = useState<string | null>(null);
   const [dragStartY, setDragStartY] = useState<number>(0);
   const [dragOffset, setDragOffset] = useState<number>(0);
-  const [evasions, setEvasions] = useState<Record<string, boolean>>({});
+  const [startingSlotIndex, setStartingSlotIndex] = useState<number>(1);
+  const [targetSlotIndex, setTargetSlotIndex] = useState<number>(1);
   const hasDraggedRef = useRef(false);
 
-  const getInitialIndex = (key: string) => {
-    if (key === "promo") return 0;
-    if (key === "phone") return 1;
-    return 2;
+  // Synchronous references to guarantee 0ms latency in paint cycles
+  const dragStartYRef = useRef(0);
+  const draggedKeyRef = useRef<string | null>(null);
+  const startingSlotIndexRef = useRef(1);
+  const targetSlotIndexRef = useRef(1);
+  const fabItemsRef = useRef(fabItems);
+
+  useEffect(() => {
+    draggedKeyRef.current = draggedKey;
+  }, [draggedKey]);
+
+  useEffect(() => {
+    fabItemsRef.current = fabItems;
+  }, [fabItems]);
+
+  const saveFabItems = (items: FabItem[]) => {
+    localStorage.setItem("bilc_fab_slots_v4", JSON.stringify(
+      items.map(it => ({ id: it.id, currentSlotIndex: it.currentSlotIndex }))
+    ));
   };
 
-  // Synchronous refs to prevent React state update lag during rapid pointermove events
-  const orderSyncRef = useRef(order);
-  orderSyncRef.current = order;
+  const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const dragStartYSyncRef = useRef(dragStartY);
-  dragStartYSyncRef.current = dragStartY;
-
-  const dragOffsetSyncRef = useRef(dragOffset);
-  dragOffsetSyncRef.current = dragOffset;
-
-  const updateOrderSync = (newOrder: string[]) => {
-    orderSyncRef.current = newOrder;
-    setOrder(newOrder);
-    localStorage.setItem("bilc_buttons_order", JSON.stringify(newOrder));
-  };
-
-  const updateDragStartYSync = (y: number) => {
-    dragStartYSyncRef.current = y;
-    setDragStartY(y);
-  };
-
-  const updateDragOffsetSync = (offset: number) => {
-    dragOffsetSyncRef.current = offset;
-    setDragOffset(offset);
-  };
-
-  // Global pointer move and up handlers to avoid capture/bubbling issues across elements
+  // Global pointer event registers with multi-touch locks, resize recovery and axis clamping
   useEffect(() => {
     if (!draggedKey) return;
 
     const handleGlobalPointerMove = (e: PointerEvent) => {
-      const currentStartY = dragStartYSyncRef.current;
-      const currentOrder = orderSyncRef.current;
-      const currentIndex = currentOrder.indexOf(draggedKey);
-
-      let deltaY = e.clientY - currentStartY;
-
-      // Bound deltaY strictly between Slot 0 (top-most) and Slot 2 (bottom-most)
-      const minDeltaY = -currentIndex * 68;
-      const maxDeltaY = 136 - currentIndex * 68;
-      if (deltaY < minDeltaY) {
-        deltaY = minDeltaY;
-      } else if (deltaY > maxDeltaY) {
-        deltaY = maxDeltaY;
-      }
+      const startY = dragStartYRef.current;
+      const startSlot = startingSlotIndexRef.current;
+      let deltaY = e.clientY - startY;
 
       if (Math.abs(deltaY) > 5) {
         hasDraggedRef.current = true;
       }
 
-      updateDragOffsetSync(deltaY);
+      // 4. Clamping bounds: prevent button from being dragged outside of safe area (Slots 1 to 4)
+      // Translate coordinates: Slot index s has translation = -s * 64px.
+      // We clamp the resulting translateY between -4 * 64 (-256px) and -1 * 64 (-64px).
+      const currentTranslateY = -startSlot * 64 + deltaY;
+      const clampedTranslateY = Math.max(-256, Math.min(-64, currentTranslateY));
+      const clampedDeltaY = clampedTranslateY - (-startSlot * 64);
 
-      // Calculate virtual Y position relative to the slot start (index * 68)
-      const currentY = currentIndex * 68 + deltaY;
+      setDragOffset(clampedDeltaY);
 
-      // Track evasion and swap
-      const newEvasions: Record<string, boolean> = {};
-      let targetIndex = currentIndex;
+      // Determine the target logic slot index
+      const logicSlot = Math.round(-clampedTranslateY / 64);
+      const clampedLogicSlot = Math.max(1, Math.min(4, logicSlot));
 
-      currentOrder.forEach((key, idx) => {
-        if (key === draggedKey) return;
-        const slotCenter = idx * 68;
-        const distance = currentY - slotCenter;
+      setTargetSlotIndex(clampedLogicSlot);
+      targetSlotIndexRef.current = clampedLogicSlot;
 
-        // If dragged button is close to this slot, trigger evasion
-        if (Math.abs(distance) < 40) {
-          newEvasions[key] = true;
-        }
-
-        // If dragged button is extremely close to this slot, trigger real-time swap!
-        if (Math.abs(distance) < 22) {
-          targetIndex = idx;
-        }
+      // Update displacement zones for all other buttons
+      setFabItems(prev => {
+        return prev.map(item => {
+          if (item.id === draggedKey) {
+            return { ...item, isDisplaced: false };
+          }
+          const isAtTarget = item.currentSlotIndex === clampedLogicSlot;
+          return {
+            ...item,
+            isDisplaced: isAtTarget
+          };
+        });
       });
-
-      setEvasions(newEvasions);
-
-      if (targetIndex !== currentIndex) {
-        // Perform real-time swap synchronously
-        const nextOrder = [...currentOrder];
-        nextOrder[currentIndex] = currentOrder[targetIndex];
-        nextOrder[targetIndex] = draggedKey;
-        
-        updateOrderSync(nextOrder);
-
-        // Adjust dragStartY by the distance between slots to prevent any jump!
-        const slotDiff = (targetIndex - currentIndex) * 68;
-        updateDragStartYSync(currentStartY + slotDiff);
-        updateDragOffsetSync(deltaY - slotDiff);
-      }
     };
 
     const handleGlobalPointerUp = () => {
+      const activeKey = draggedKeyRef.current;
+      const startSlot = startingSlotIndexRef.current;
+      const targetSlot = targetSlotIndexRef.current;
+
+      if (activeKey && startSlot !== targetSlot) {
+        setFabItems(prev => {
+          const updated = prev.map(item => {
+            if (item.id === activeKey) {
+              return { ...item, currentSlotIndex: targetSlot, isDisplaced: false };
+            }
+            if (item.currentSlotIndex === targetSlot) {
+              return { ...item, currentSlotIndex: startSlot, isDisplaced: false };
+            }
+            return { ...item, isDisplaced: false };
+          });
+          saveFabItems(updated);
+          return updated;
+        });
+      } else {
+        setFabItems(prev => prev.map(item => ({ ...item, isDisplaced: false })));
+      }
+
       setDraggedKey(null);
       setDragOffset(0);
-      setEvasions({});
       
       setTimeout(() => {
         hasDraggedRef.current = false;
       }, 100);
     };
 
+    const handleCancel = () => {
+      handleGlobalPointerUp();
+    };
+
     window.addEventListener("pointermove", handleGlobalPointerMove);
     window.addEventListener("pointerup", handleGlobalPointerUp);
+    window.addEventListener("resize", handleCancel);
+    window.addEventListener("orientationchange", handleCancel);
+
     return () => {
       window.removeEventListener("pointermove", handleGlobalPointerMove);
       window.removeEventListener("pointerup", handleGlobalPointerUp);
+      window.removeEventListener("resize", handleCancel);
+      window.removeEventListener("orientationchange", handleCancel);
     };
   }, [draggedKey]);
 
-  const handlePointerDown = (key: string, e: React.PointerEvent) => {
+  const handlePointerDown = (id: string, slotIndex: number, e: React.PointerEvent) => {
+    if (draggedKey !== null) return; // Prevent multi-touch drag overlap
+    
     const target = e.target as HTMLElement;
     if (target.closest(".bilc-wa-popup") || target.closest(".bilc-wa-backdrop") || target.closest(".bilc-wa-close-btn")) {
       return;
     }
-    if (e.button !== 0) return;
+    if (e.button !== 0) return; // Only trigger on left click
 
     e.preventDefault();
-    setDraggedKey(key);
-    updateDragStartYSync(e.clientY);
-    updateDragOffsetSync(0);
+    setDraggedKey(id);
+    setDragStartY(e.clientY);
+    dragStartYRef.current = e.clientY;
+    setStartingSlotIndex(slotIndex);
+    startingSlotIndexRef.current = slotIndex;
+    setTargetSlotIndex(slotIndex);
+    targetSlotIndexRef.current = slotIndex;
+    setDragOffset(0);
     hasDraggedRef.current = false;
   };
 
-  const getButtonStyle = (key: string) => {
-    const currentIndex = order.indexOf(key);
-    const initialIndex = getInitialIndex(key);
-    const slotOffset = (currentIndex - initialIndex) * 68;
+  const getButtonStyle = (id: string) => {
+    const item = fabItems.find(it => it.id === id);
+    if (!item) return {};
 
-    const isDragged = key === draggedKey;
-    const y = slotOffset + (isDragged ? dragOffset : 0);
-    const evadeDir = isRTL ? 64 : -64;
-    const x = evasions[key] ? evadeDir : 0;
+    const isDragged = id === draggedKey;
+    const currentSlot = item.currentSlotIndex;
+
+    const baseTranslateY = -currentSlot * 64;
+    const y = baseTranslateY + (isDragged ? dragOffset : 0);
+
+    const displaceX = isRTL ? 64 : -64;
+    const x = item.isDisplaced ? displaceX : 0;
+
+    const transition = prefersReducedMotion
+      ? "none"
+      : isDragged
+      ? "opacity 0.3s ease"
+      : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease";
 
     return {
+      position: "absolute" as const,
+      bottom: 0,
+      left: 0,
+      width: "52px",
+      height: "52px",
       transform: `translate3d(${x}px, ${y}px, 0)`,
-      transition: isDragged ? "transform 0.05s linear, opacity 0.3s ease" : "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
-      touchAction: "none" as const,
+      transition,
       zIndex: isDragged ? 1000 : 999,
       cursor: isDragged ? "grabbing" : "grab",
-      position: "relative" as const,
+      touchAction: "none" as const,
+      pointerEvents: "auto" as const,
       userSelect: "none" as const,
-      height: "56px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
     };
   };
 
@@ -525,91 +558,43 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <div
         className={`floating-actions-dock ${isRTL ? "is-rtl" : ""} ${location.startsWith("/programs/") && location !== "/programs" ? "is-on-detail" : ""}`}
         aria-label={language === "ar" ? "إجراءат сриعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
+        style={{
+          position: "fixed",
+          right: isRTL ? "auto" : "1.5rem",
+          left: isRTL ? "1.5rem" : "auto",
+          bottom: location.startsWith("/programs/") && location !== "/programs" ? "5.5rem" : "1.5rem",
+          width: "52px",
+          height: "320px", // 5 slots x 64px = 320px
+          zIndex: 999,
+          pointerEvents: "none",
+        }}
       >
-        {order.map((key) => {
-          if (key === "promo") {
-            return (
-              <div
-                key="promo"
-                style={getButtonStyle("promo")}
-                onPointerDown={(e) => handlePointerDown("promo", e)}
-                onClickCapture={(e) => {
-                  if (hasDraggedRef.current) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }
-                }}
-              >
-                <PromotionalFloatingBadge isOpen={promoOpen} setIsOpen={setPromoOpen} key="promo-badge" />
-              </div>
-            );
-          }
-
-          if (key === "phone") {
-            return (
-              <div
-                key="phone"
-                style={getButtonStyle("phone")}
-                onPointerDown={(e) => handlePointerDown("phone", e)}
-                onClickCapture={(e) => {
-                  if (hasDraggedRef.current) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }
-                }}
-              >
-                <a
-                  href="tel:+60367310449"
-                  className="floating-call-button"
-                  key="phone-btn"
-                  aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-                  title={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-                >
-                  <Phone size={22} className="floating-call-icon" aria-hidden="true" />
-                  <span className="floating-call-ping" aria-hidden="true" />
-                </a>
-              </div>
-            );
-          }
-
-          if (key === "whatsapp") {
-            return (
-              <div
-                key="whatsapp"
-                style={getButtonStyle("whatsapp")}
-                onPointerDown={(e) => handlePointerDown("whatsapp", e)}
-                onClickCapture={(e) => {
-                  if (hasDraggedRef.current) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }
-                }}
-              >
-                <SmartWhatsAppWidget key="whatsapp-widget" />
-              </div>
-            );
-          }
-
-          return null;
-        })}
-
-        {/* Static Fixed Page Back Button - now seamlessly part of the dock flow at the bottom */}
-        {location !== "/" && (
+        {/* ==================== SLOT 0: STATIC BACK BUTTON ==================== */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "52px",
+            height: "52px",
+            transform: "translate3d(0, 0, 0)",
+            transition: prefersReducedMotion ? "none" : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease",
+            opacity: location !== "/" ? 1 : 0,
+            pointerEvents: location !== "/" ? "auto" : "none",
+            zIndex: 990,
+          }}
+        >
           <button
             type="button"
             className="floating-page-back-button"
             style={{
-              position: "relative",
-              bottom: "auto",
-              right: "auto",
-              left: "auto",
-              margin: "0",
+              margin: 0,
               width: "52px",
               height: "52px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+              border: "none",
             }}
             onClick={() => {
               if (window.history.length > 1) {
@@ -623,22 +608,117 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           >
             <ArrowLeft size={22} className="floating-page-back-icon" aria-hidden="true" />
           </button>
-        )}
-      </div>
+        </div>
 
-      {/* Static Fixed Scroll to Top Button (Cannot be dragged, matches RTL/LTR dynamically) */}
-      <button
-        type="button"
-        id="floating-scroll-top"
-        className={`floating-scroll-top-button ${isRTL ? "is-rtl" : ""} ${location !== "/" ? "has-back-button" : ""} ${showScrollTop ? "is-visible" : ""} ${isScrolling ? "is-scrolling" : ""}`}
-        onClick={scrollToTop}
-        aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
-        title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
-        aria-hidden={!showScrollTop}
-        tabIndex={showScrollTop ? 0 : -1}
-      >
-        <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
-      </button>
+        {/* ==================== DRAGGABLE BUTTONS (SLOTS 1 to 4) ==================== */}
+        {fabItems.map((item) => {
+          let buttonContent = null;
+
+          if (item.id === "whatsapp") {
+            buttonContent = (
+              <SmartWhatsAppWidget key="whatsapp-widget" />
+            );
+          } else if (item.id === "phone") {
+            buttonContent = (
+              <a
+                href="tel:+60367310449"
+                className="floating-call-button"
+                style={{
+                  width: "52px",
+                  height: "52px",
+                  borderRadius: "9999px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+                title={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+              >
+                <Phone size={22} className="floating-call-icon" aria-hidden="true" />
+                <span className="floating-call-ping" aria-hidden="true" />
+              </a>
+            );
+          } else if (item.id === "promo") {
+            buttonContent = (
+              <button
+                type="button"
+                className="floating-promo-button"
+                style={{
+                  width: "52px",
+                  height: "52px",
+                  borderRadius: "9999px",
+                  background: "linear-gradient(135deg, #dc2626, #be123c)",
+                  color: "#ffffff",
+                  boxShadow: "var(--bilc-shadow-sm)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "none",
+                  position: "relative",
+                }}
+                onClick={() => setPromoOpen(true)}
+                aria-label={t("promo.buttonLabel", undefined, "Show Active Promotions")}
+                title="Active Promotions"
+              >
+                <span className="relative flex h-5 w-5 items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <Gift size={22} className="relative text-white" />
+                </span>
+              </button>
+            );
+          } else if (item.id === "scrollTop") {
+            buttonContent = (
+              <div
+                style={{
+                  opacity: showScrollTop ? 1 : 0,
+                  pointerEvents: showScrollTop ? "auto" : "none",
+                  transition: "opacity 0.3s ease",
+                  width: "52px",
+                  height: "52px",
+                }}
+              >
+                <button
+                  type="button"
+                  className="floating-scroll-top-button"
+                  style={{
+                    width: "52px",
+                    height: "52px",
+                    borderRadius: "9999px",
+                    background: "#ffffff",
+                    color: "var(--bilc-navy)",
+                    border: "1px solid var(--bilc-line)",
+                    boxShadow: "var(--bilc-shadow-sm)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onClick={scrollToTop}
+                  aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
+                  title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
+                >
+                  <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <div
+              key={item.id}
+              style={getButtonStyle(item.id)}
+              onPointerDown={(e) => handlePointerDown(item.id, item.currentSlotIndex, e)}
+              onClickCapture={(e) => {
+                if (hasDraggedRef.current) {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }
+              }}
+            >
+              {buttonContent}
+            </div>
+          );
+        })}
+      </div>
 
       {/* Official Registry Modal */}
       <OfficialRegistryModal isOpen={isRegistryOpen} onClose={() => setIsRegistryOpen(false)} />
