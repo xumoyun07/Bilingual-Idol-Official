@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
-import { OfficialPriceList2026 } from "@/components/OfficialPriceList2026";
+import { OfficialPriceList2026, SHOW_COURSE_PRICING } from "@/components/OfficialPriceList2026";
 import { CampusFacilitiesShowcase } from "@/components/CampusFacilitiesShowcase";
 import { StudentJourneyRoadmap } from "@/components/StudentJourneyRoadmap";
 import { VerifiedTestimonials } from "@/components/VerifiedTestimonials";
@@ -72,6 +72,19 @@ export default function Home() {
     setLocation(`/contact?reason=${reason}`);
   };
 
+  useEffect(() => {
+    const handleHashCheck = () => {
+      if (window.location.hash === "#course-pricing" || window.location.hash.includes("course-pricing")) {
+        window.location.hash = "";
+        setLocation("/programs#course-pricing");
+      }
+    };
+
+    handleHashCheck();
+    window.addEventListener("hashchange", handleHashCheck);
+    return () => window.removeEventListener("hashchange", handleHashCheck);
+  }, [setLocation]);
+
   return (
     <PublicLayout>
       <div id="home-page-container" data-page="home" className={`simple-public-page home-page page-home ${isRTL ? "is-rtl" : ""} max-md:!mt-[10px]`}>
@@ -132,9 +145,9 @@ export default function Home() {
               >
                 <Sparkles size={17} /> {t("home.ctaPlacement")}
               </button>
-              <a href="#course-pricing" className="simple-button simple-button-quiet">
+              <Link href="/programs#course-pricing" className="simple-button simple-button-quiet cursor-pointer">
                 {t("home.pricingEyebrow")} <ArrowRight size={17} className={isRTL ? "rotate-180" : ""} />
-              </a>
+              </Link>
               <Link
                 href="/contact?reason=campusTour"
                 className="simple-button simple-button-quiet cursor-pointer"
@@ -281,7 +294,7 @@ export default function Home() {
           </div>
           
           <div className="simple-task-grid">
-            <a href="#course-pricing" className="simple-task-card">
+            <Link href="/programs#course-pricing" className="simple-task-card">
               <div className="simple-task-card-media-wrap">
                 {programmesMedia ? (
                   <img className="simple-task-media" src={programmesMedia.publicUrl} alt={programmesMedia.altText} loading="lazy" decoding="async" />
@@ -301,7 +314,7 @@ export default function Home() {
                   <ArrowRight size={16} className={`simple-task-arrow ${isRTL ? "rotate-180" : ""}`} />
                 </div>
               </div>
-            </a>
+            </Link>
 
             <Link 
               href="/contact?reason=consultation" 
@@ -351,10 +364,6 @@ export default function Home() {
             </Link>
           </div>
         </section>
-
-        {/* Dynamic Section 2: Official 2026 Price List & Course Guide */}
-        <OfficialPriceList2026 />
-
         {/* Dynamic Section 3: World-Class Campus Facilities */}
         <CampusFacilitiesShowcase />
 

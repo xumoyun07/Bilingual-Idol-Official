@@ -226,10 +226,11 @@ export function SmartWhatsAppWidget() {
 
       <button
         type="button"
-        className={`bilc-wa-trigger-btn ${isOpen ? "is-open" : ""}`}
+        className={`bilc-wa-trigger-btn focus-visible:ring-2 focus-visible:ring-[#10253e] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full ${isOpen ? "is-open" : ""}`}
         onClick={() => setIsOpen(prev => !prev)}
         aria-label={language === "ar" ? "تواصل معنا عبر واتساب" : language === "ms" ? "Hubungi kami melalui WhatsApp" : "Chat with Bilingual Idol on WhatsApp"}
         title={language === "ar" ? "تواصل عبر واتساب" : language === "ms" ? "WhatsApp Kemasukan" : "Chat with Admissions on WhatsApp"}
+        aria-describedby="fab-instructions"
       >
         <span className="bilc-wa-glow-halo" aria-hidden="true" />
         {isOpen ? (

@@ -74,6 +74,46 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     ));
   };
 
+  const [announcement, setAnnouncement] = useState("");
+
+  const moveSlot = (id: FabId, direction: "up" | "down") => {
+    const item = fabItems.find(it => it.id === id);
+    if (!item) return;
+
+    const currentSlot = item.currentSlotIndex;
+    const targetSlot = direction === "up" ? currentSlot + 1 : currentSlot - 1;
+
+    if (targetSlot < 1 || targetSlot > 4) return;
+
+    setFabItems(prev => {
+      const updated = prev.map(it => {
+        if (it.id === id) {
+          return { ...it, currentSlotIndex: targetSlot };
+        }
+        if (it.currentSlotIndex === targetSlot) {
+          return { ...it, currentSlotIndex: currentSlot };
+        }
+        return it;
+      });
+      saveFabItems(updated);
+      return updated;
+    });
+
+    const names: Record<FabId, string> = {
+      whatsapp: "WhatsApp",
+      phone: language === "ar" ? "الهاتف" : language === "ms" ? "Telefon" : "Phone call",
+      promo: language === "ar" ? "العروض" : language === "ms" ? "Promosi" : "Active promotions",
+      scrollTop: language === "ar" ? "الرجوع لأعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top"
+    };
+    const name = names[id] || id;
+    const message = language === "ar"
+      ? `تم نقل زر ${name} إلى الموضع ${targetSlot} من 4`
+      : language === "ms"
+      ? `Butang ${name} dipindahkan ke posisi ${targetSlot} daripada 4`
+      : `${name} button moved to position ${targetSlot} of 4`;
+    setAnnouncement(message);
+  };
+
   const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Global pointer event registers with multi-touch locks, resize recovery and axis clamping
@@ -554,10 +594,22 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       {/* Promotional Campaign Modal Popup */}
       <PromotionalPopupModal isOpen={promoOpen} setIsOpen={setPromoOpen} />
 
+      {/* Accessibility Helpers for Quick Actions */}
+      <div id="fab-instructions" className="sr-only">
+        {language === "ar"
+          ? "استخدم سهمي الأعلى والأسفل لتغيير موضع الزر في قائمة الإجراءات السريعة."
+          : language === "ms"
+          ? "Gunakan kekunci anak panah Atas dan Bawah untuk menukar posisi butang dalam senarai tindakan pantas."
+          : "Use Up and Down arrow keys to change the button's position in the quick actions stack."}
+      </div>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
+
       {/* Floating Actions Dock */}
       <div
         className={`floating-actions-dock ${isRTL ? "is-rtl" : ""} ${location.startsWith("/programs/") && location !== "/programs" ? "is-on-detail" : ""}`}
-        aria-label={language === "ar" ? "إجراءат сриعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
+        aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
         style={{
           position: "fixed",
           right: isRTL ? "auto" : "1.5rem",
@@ -586,7 +638,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         >
           <button
             type="button"
-            className="floating-page-back-button"
+            className="floating-page-back-button focus-visible:ring-2 focus-visible:ring-[#173fad] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
             style={{
               margin: 0,
               width: "52px",
@@ -611,7 +663,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ==================== DRAGGABLE BUTTONS (SLOTS 1 to 4) ==================== */}
-        {fabItems.map((item) => {
+        {[...fabItems].sort((a, b) => a.currentSlotIndex - b.currentSlotIndex).map((item) => {
           let buttonContent = null;
 
           if (item.id === "whatsapp") {
@@ -622,7 +674,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             buttonContent = (
               <a
                 href="tel:+60367310449"
-                className="floating-call-button"
+                className="floating-call-button focus-visible:ring-2 focus-visible:ring-[#173fad] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
                 style={{
                   width: "52px",
                   height: "52px",
@@ -633,6 +685,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 }}
                 aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
                 title={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+                aria-describedby="fab-instructions"
               >
                 <Phone size={22} className="floating-call-icon" aria-hidden="true" />
                 <span className="floating-call-ping" aria-hidden="true" />
@@ -642,7 +695,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             buttonContent = (
               <button
                 type="button"
-                className="floating-promo-button"
+                className="floating-promo-button focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
                 style={{
                   width: "52px",
                   height: "52px",
@@ -659,6 +712,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 onClick={() => setPromoOpen(true)}
                 aria-label={t("promo.buttonLabel", undefined, "Show Active Promotions")}
                 title="Active Promotions"
+                aria-describedby="fab-instructions"
               >
                 <span className="relative flex h-5 w-5 items-center justify-center">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -679,7 +733,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               >
                 <button
                   type="button"
-                  className="floating-scroll-top-button"
+                  className="floating-scroll-top-button focus-visible:ring-2 focus-visible:ring-[#173fad] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
                   style={{
                     width: "52px",
                     height: "52px",
@@ -695,6 +749,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                   onClick={scrollToTop}
                   aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
                   title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
+                  aria-describedby="fab-instructions"
                 >
                   <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
                 </button>
@@ -711,6 +766,15 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 if (hasDraggedRef.current) {
                   e.stopPropagation();
                   e.preventDefault();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  moveSlot(item.id, "up");
+                } else if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  moveSlot(item.id, "down");
                 }
               }}
             >

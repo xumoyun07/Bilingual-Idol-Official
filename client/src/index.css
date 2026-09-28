@@ -9943,4 +9943,14 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   }
 }
 
+/* Custom desktop-only margins for the WhatsApp concierge popup */
+@media (min-width: 768px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) {
+    margin-right: 60px !important;
+    margin-top: 0px !important;
+    margin-bottom: -60px !important;
+  }
+}
+
+
 

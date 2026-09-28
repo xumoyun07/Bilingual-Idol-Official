@@ -1,6 +1,6 @@
 import { CheckCircle2, ChevronDown, ChevronRight, Clock, FileText, Globe, GraduationCap, Sparkles, UserCheck, Users } from "lucide-react";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
 
@@ -304,7 +304,27 @@ const LANGUAGE_HIGHLIGHTS: Record<string, { en: string[]; ms: string[]; ar: stri
   },
 };
 
+// Toggle this variable to true to return the "Course Fee Structure" (OfficialPriceList2026) section back to its place
+export const SHOW_COURSE_PRICING = true;
+
+const getLanguageSlug = (code: string) => {
+  switch (code) {
+    case "EN": return "general-english";
+    case "ZH": return "mandarin";
+    case "MS": return "bahasa-melayu";
+    case "AR": return "arabic";
+    case "KO": return "korean";
+    case "JA": return "japanese";
+    default: return "general-english";
+  }
+};
+
 export function OfficialPriceList2026() {
+  if (!SHOW_COURSE_PRICING) {
+    return null;
+  }
+
+  const [_, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<CourseCategory>("general");
   const { t, isRTL, language } = useLanguage();
 
@@ -454,7 +474,7 @@ export function OfficialPriceList2026() {
                           <td>
                             <button
                               type="button"
-                              onClick={() => handleEnquireClick(`General English (${course.rawDuration})`)}
+                              onClick={() => setLocation("/programs/general-english")}
                               className="bilc-enroll-inline-btn cursor-pointer"
                             >
                               {language === "ms" ? "Daftar" : language === "ar" ? "استفسار" : "Enquire"}
@@ -518,7 +538,7 @@ export function OfficialPriceList2026() {
 
                     <button 
                       type="button"
-                      onClick={() => handleEnquireClick(`General English (${course.rawDuration})`)}
+                      onClick={() => setLocation("/programs/general-english")}
                       className="bilc-mobile-card-cta cursor-pointer text-left w-full flex justify-between items-center"
                     >
                       <span>
@@ -535,13 +555,13 @@ export function OfficialPriceList2026() {
               <div className="bilc-note-item">
                 <FileText size={16} />
                 <span>
-                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> <bdi dir="ltr">RM 500</bdi> {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
+                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> <bdi dir="ltr">{isAuthenticated ? "RM 500" : (language === "ms" ? "Disediakan atas Permintaan" : language === "ar" ? "عند الاستفسار" : "Upon Request")}</bdi> {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
                 </span>
               </div>
               <div className="bilc-note-item">
                 <UserCheck size={16} />
                 <span>
-                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> <bdi dir="ltr">RM 300</bdi> {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
+                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> <bdi dir="ltr">{isAuthenticated ? "RM 300" : (language === "ms" ? "Disediakan atas Permintaan" : language === "ar" ? "عند الاستفسار" : "Upon Request")}</bdi> {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
                 </span>
               </div>
             </div>
@@ -582,7 +602,7 @@ export function OfficialPriceList2026() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleEnquireClick(`IELTS: ${course.rawName}`)}
+                      onClick={() => setLocation("/programs/ielts-preparation")}
                       className="simple-button w-full cursor-pointer"
                     >
                       {language === "ms" ? `Tanya mengenai ${nameText}` : language === "ar" ? `استفسر عن ${nameText}` : `Enquire for ${nameText}`}
@@ -629,7 +649,7 @@ export function OfficialPriceList2026() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleEnquireClick(`Summer Camp: ${course.rawName}`)}
+                      onClick={() => setLocation("/programs/kids-english")}
                       className="simple-button w-full cursor-pointer"
                     >
                       {language === "ms" ? "Tanya mengenai Kem" : language === "ar" ? "استفسر عن المخيم" : "Enquire for Camp"}
@@ -673,7 +693,7 @@ export function OfficialPriceList2026() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleEnquireClick(`Private Lessons: ${course.rawPackage}`)}
+                    onClick={() => setLocation("/programs/speaking-conversation")}
                     className="simple-button w-full cursor-pointer"
                   >
                     {language === "ms" ? `Tempah ${pkgText}` : language === "ar" ? `حجز ${pkgText}` : `Book ${pkgText}`}
@@ -721,7 +741,7 @@ export function OfficialPriceList2026() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleEnquireClick(`Executive Program: ${course.rawProgramme}`)}
+                    onClick={() => setLocation("/programs/business-english")}
                     className="simple-button w-full cursor-pointer"
                   >
                     {language === "ms" ? `Tanya mengenai ${progText}` : language === "ar" ? `استفسر عن ${progText}` : `Enquire for ${progText}`}
@@ -779,7 +799,7 @@ export function OfficialPriceList2026() {
 
                   <button
                     type="button"
-                    onClick={() => handleEnquireClick(`World Language: ${lang.rawName}`)}
+                    onClick={() => setLocation(`/programs/${getLanguageSlug(lang.code)}`)}
                     className="simple-button w-full cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>

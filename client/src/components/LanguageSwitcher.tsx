@@ -25,7 +25,11 @@ export function LanguageSwitcher({
 }) {
   const { language, setLanguage, isRTL } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const optionsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   const currentLang = languages.find((l) => l.code === language) || languages[0];
 
@@ -39,9 +43,27 @@ export function LanguageSwitcher({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // When dropdown opens, initialize focused option
+  useEffect(() => {
+    if (isOpen) {
+      const idx = languages.findIndex(l => l.code === language);
+      setFocusedIndex(idx >= 0 ? idx : 0);
+    } else {
+      setFocusedIndex(-1);
+    }
+  }, [isOpen, language]);
+
+  // Set keyboard focus on the current option when cycling
+  useEffect(() => {
+    if (isOpen && focusedIndex >= 0 && optionsRef.current[focusedIndex]) {
+      optionsRef.current[focusedIndex]?.focus();
+    }
+  }, [isOpen, focusedIndex]);
+
   const handleSelect = (code: Language) => {
     setLanguage(code);
     setIsOpen(false);
+    buttonRef.current?.focus();
   };
 
   if (variant === "inline") {
@@ -77,9 +99,16 @@ export function LanguageSwitcher({
   return (
     <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3 py-1.5 text-xs font-bold text-[#354c6d] bg-white hover:bg-[#eef3ff] hover:text-[#173fad] border border-[#d9e2f1] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setIsOpen(true);
+          }
+        }}
+        className="inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3 py-1.5 text-xs font-bold text-[#354c6d] bg-white hover:bg-[#eef3ff] hover:text-[#173fad] border border-[#d9e2f1] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20 focus-visible:ring-[#173fad]"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label={
@@ -108,14 +137,32 @@ export function LanguageSwitcher({
           role="listbox"
           aria-label={language === "ar" ? "اختر اللغة" : language === "ms" ? "Pilih bahasa" : "Select language"}
         >
-          {languages.map((item) => {
+          {languages.map((item, index) => {
             const isSelected = item.code === language;
             return (
               <button
                 key={item.code}
+                ref={(el) => {
+                  optionsRef.current[index] = el;
+                }}
                 type="button"
                 onClick={() => handleSelect(item.code)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition-colors min-h-[40px] ${
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setFocusedIndex((prev) => (prev + 1) % languages.length);
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setFocusedIndex((prev) => (prev - 1 + languages.length) % languages.length);
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setIsOpen(false);
+                    buttonRef.current?.focus();
+                  } else if (e.key === "Tab") {
+                    setIsOpen(false);
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-start transition-colors min-h-[40px] focus:outline-none focus:bg-[#eef3ff] ${
                   isSelected
                     ? "bg-[#eef3ff] text-[#173fad] font-bold"
                     : "text-[#2e4259] hover:bg-slate-50 hover:text-[#10253e] font-medium"
@@ -125,7 +172,7 @@ export function LanguageSwitcher({
               >
                 <span className="flex items-center gap-2.5">
                   <span className="text-base leading-none" aria-hidden="true">{item.flag}</span>
-                  <span className="flex flex-col">
+                  <span className="flex flex-col text-start">
                     <span className="font-bold">{item.nativeName}</span>
                     <span className="text-[10px] text-[#71808a] font-normal">{item.label}</span>
                   </span>
