@@ -2140,23 +2140,24 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
 /* Smart Multi-Topic WhatsApp Concierge */
 .bilc-wa-trigger-btn {
-  width: 56px;
-  height: 56px;
+  width: 100%;
+  height: 100%;
   border-radius: 9999px;
   background: #25d366;
   color: #ffffff;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
   cursor: pointer;
   border: none;
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
 .bilc-wa-trigger-btn:hover {
   transform: scale(1.08);
+  background: #20ba5a;
 }
 
 .bilc-wa-glow-halo {
@@ -5192,14 +5193,14 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   /* WHATSAPP CONCIERGE MODAL & TOPIC BUTTONS */
   /* ========================================== */
   .bilc-wa-popup,
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup {
     position: absolute !important;
     bottom: 80px !important;
     right: 0 !important;
     width: 355px !important;
   }
   .is-rtl .bilc-wa-popup,
-  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup {
     right: auto !important;
     left: 0 !important;
   }
@@ -7471,8 +7472,8 @@ div#root:nth-of-type(1) > main#login-page-container:nth-of-type(1) > section#log
   }
 
   /* Adaptive WhatsApp Concierge modal layout on mobile screen sizes */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
-  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1),
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup,
+  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup,
   .bilc-wa-popup,
   .is-rtl .bilc-wa-popup {
     position: fixed !important;
@@ -9306,25 +9307,11 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     height: 221px !important;
   }
 
-  /* Scale individual buttons down slightly (0.8 scale is perfect "slightly, just a little bit" reduction) */
-  .floating-call-button,
-  .floating-scroll-top-button,
-  .bilc-wa-trigger-btn,
-  .floating-actions-dock > button {
-    transform: scale(0.8) !important;
-    transform-origin: center !important;
-  }
-
-  /* Make sure floating-actions-dock and its modals display perfectly at full size, without inherit scales */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2),
-  .floating-actions-dock {
-    transform: none !important;
-    gap: 0.5rem !important;
-  }
+  /* Retained for structural cleanliness - new layout handles precise responsive sizing automatically */
 
   /* Ensure the WhatsApp popup modal displays perfectly at its designed scale and position on mobile */
   .bilc-wa-popup,
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup {
     position: fixed !important;
     bottom: 84px !important;
     left: 12px !important;
@@ -9937,20 +9924,82 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     background-color: #ffffff !important;
     color: var(--bilc-navy, #10253e) !important;
   }
-
-  .bilc-wa-trigger-btn:hover {
-    background-color: #25d366 !important;
-  }
 }
 
 /* Custom desktop-only margins for the WhatsApp concierge popup */
 @media (min-width: 768px) {
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) {
-    margin-right: 60px !important;
-    margin-top: 0px !important;
-    margin-bottom: -60px !important;
+  .desktop-quick-actions-bar .bilc-wa-popup {
+    margin-right: 60px;
+    margin-top: 0px;
+    margin-bottom: -60px;
   }
 }
+
+/* Scroll to Top Button premium style overrides and hover stabilizer */
+.mobile-quick-actions-bar,
+.mobile-quick-actions-bar:hover {
+  transform: translateX(-50%) !important;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease !important;
+}
+
+/* Force hover animations, transitions, scale, and click states on both desktop and mobile */
+.bilc-quick-btn,
+.bilc-wa-trigger-btn {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, background-color 0.3s ease, filter 0.3s ease !important;
+}
+
+.bilc-quick-btn:hover,
+.bilc-wa-trigger-btn:hover {
+  transform: scale(1.1) !important;
+  filter: brightness(1.05) !important;
+  box-shadow: 0 8px 20px rgba(23, 63, 173, 0.22) !important;
+}
+
+.bilc-quick-btn:active,
+.bilc-wa-trigger-btn:active {
+  transform: scale(0.94) !important;
+  filter: brightness(0.95) !important;
+  box-shadow: 0 2px 6px rgba(23, 63, 173, 0.1) !important;
+}
+
+/* Strict sizing consistency to prevent WhatsApp button from shrinking */
+@media (min-width: 768px) {
+  .desktop-quick-actions-bar .bilc-quick-btn,
+  .desktop-quick-actions-bar .bilc-wa-trigger-btn {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 767px) {
+  .mobile-quick-actions-bar .bilc-quick-btn,
+  .mobile-quick-actions-bar .bilc-wa-trigger-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Precise CSS Focus-Mode Selectors Targeting the Requested UI Elements */
+
+/* 2. Desktop Back-to-Top Button SVG */
+.desktop-scroll-top-wrap .bilc-scroll-top-btn svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+/* 3. Desktop Back-to-Top Button */
+.desktop-scroll-top-wrap .bilc-scroll-top-btn {
+  background-color: #173fad;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(23, 63, 173, 0.22);
+}
+
+.desktop-scroll-top-wrap .bilc-scroll-top-btn:hover {
+  background-color: #2563eb;
+  transform: scale(1.1) !important;
+}
+
 
 
 

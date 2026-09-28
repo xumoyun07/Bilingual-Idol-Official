@@ -125,7 +125,7 @@ function WhatsAppIcon({ size = 26 }: { size?: number }) {
   );
 }
 
-export function SmartWhatsAppWidget() {
+export function SmartWhatsAppWidget({ className = "w-12 h-12" }: { className?: string }) {
   const { language, isRTL } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -136,8 +136,15 @@ export function SmartWhatsAppWidget() {
     setIsOpen(false);
   };
 
+  const tooltipText =
+    language === "ar"
+      ? "واتساب قسم القبول"
+      : language === "ms"
+      ? "WhatsApp Kemasukan"
+      : "WhatsApp Admissions";
+
   return (
-    <div className={`bilc-wa-floating-dock ${isRTL ? "is-rtl" : ""}`}>
+    <div className={`relative ${className} ${isRTL ? "is-rtl" : ""}`}>
       {isOpen && (
         <>
           <div className="bilc-wa-popup" role="dialog" aria-label={language === "ar" ? "قائمة محادثة واتساب" : language === "ms" ? "Pilihan sembang WhatsApp" : "Smart WhatsApp Chat Selection"}>
@@ -178,7 +185,7 @@ export function SmartWhatsAppWidget() {
               {language === "ms"
                 ? "Bagaimanakah pasukan kemasukan kami boleh membantu anda hari ini?"
                 : language === "ar"
-                ? "كيف يمكن لفريق القبول مساعدتك اليوم؟"
+                ? "كيف يمكن لفريق القبول مساعدتك اليوم"
                 : "How can our admissions team assist you today?"}
             </p>
             <div className="bilc-wa-topics-list">
@@ -224,21 +231,33 @@ export function SmartWhatsAppWidget() {
         </>
       )}
 
-      <button
-        type="button"
-        className={`bilc-wa-trigger-btn focus-visible:ring-2 focus-visible:ring-[#10253e] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full ${isOpen ? "is-open" : ""}`}
-        onClick={() => setIsOpen(prev => !prev)}
-        aria-label={language === "ar" ? "تواصل معنا عبر واتساب" : language === "ms" ? "Hubungi kami melalui WhatsApp" : "Chat with Bilingual Idol on WhatsApp"}
-        title={language === "ar" ? "تواصل عبر واتساب" : language === "ms" ? "WhatsApp Kemasukan" : "Chat with Admissions on WhatsApp"}
-        aria-describedby="fab-instructions"
-      >
-        <span className="bilc-wa-glow-halo" aria-hidden="true" />
-        {isOpen ? (
-          <X size={24} className="bilc-wa-icon" />
-        ) : (
-          <WhatsAppIcon size={28} />
-        )}
-      </button>
+      <div className="relative group w-full h-full">
+        <button
+          type="button"
+          className={`bilc-wa-trigger-btn w-full h-full rounded-full bg-gradient-to-br from-[#25d366] to-[#128c7e] hover:from-[#20ba5a] hover:to-[#0e7064] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(37,211,102,0.3)] hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#10253e] focus-visible:ring-offset-2 focus-visible:outline-none ${isOpen ? "is-open" : ""}`}
+          onClick={() => setIsOpen(prev => !prev)}
+          aria-label={language === "ar" ? "تواصل معنا عبر واتساب" : language === "ms" ? "Hubungi kami melalui WhatsApp" : "Chat with Bilingual Idol on WhatsApp"}
+          aria-describedby="fab-instructions"
+        >
+          <span className="bilc-wa-glow-halo" aria-hidden="true" />
+          {isOpen ? (
+            <X size={20} className="bilc-wa-icon" aria-hidden="true" />
+          ) : (
+            <WhatsAppIcon size={24} />
+          )}
+        </button>
+
+        {/* Custom CSS Tooltip - Only on desktop */}
+        <div
+          className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+            isRTL
+              ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+              : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+          }`}
+        >
+          {tooltipText}
+        </div>
+      </div>
     </div>
   );
 }

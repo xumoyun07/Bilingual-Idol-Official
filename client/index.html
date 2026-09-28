@@ -25,37 +25,6 @@
         try {
           if (typeof window === 'undefined') return;
 
-          // Exception-safe Service Worker and Cache Storage removal
-          try {
-            if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-              navigator.serviceWorker.getRegistrations().then(function(regs) {
-                if (regs && regs.length > 0) {
-                  for (var i = 0; i < regs.length; i++) {
-                    try {
-                      regs[i].unregister();
-                    } catch (err) {}
-                  }
-                }
-              }).catch(function() {});
-            }
-          } catch (e) {
-            console.warn('[SW Cleanup Error]', e);
-          }
-
-          try {
-            if (typeof window !== 'undefined' && 'caches' in window) {
-              caches.keys().then(function(keys) {
-                if (keys && keys.length > 0) {
-                  Promise.all(keys.map(function(k) { 
-                    try { return caches.delete(k); } catch (err) { return Promise.resolve(false); }
-                  })).catch(function() {});
-                }
-              }).catch(function() {});
-            }
-          } catch (e) {
-            console.warn('[Cache Cleanup Error]', e);
-          }
-
           // Exception-safe sessionStorage access
           var sessionStore = null;
           try {

@@ -33,9 +33,6 @@ export async function setupVite(app: Express, server: Server) {
     configFile: false,
     server: serverOptions,
     appType: "custom",
-    optimizeDeps: {
-      force: true,
-    },
   });
 
   // In dev mode, prevent Vite from sending immutable / long-lived cache headers
@@ -88,7 +85,6 @@ export async function setupVite(app: Express, server: Server) {
         "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         "Pragma": "no-cache",
         "Expires": "0",
-        "Clear-Site-Data": '"cache"',
       }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);

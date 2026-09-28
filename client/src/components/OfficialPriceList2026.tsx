@@ -555,13 +555,13 @@ export function OfficialPriceList2026() {
               <div className="bilc-note-item">
                 <FileText size={16} />
                 <span>
-                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> <bdi dir="ltr">{isAuthenticated ? "RM 500" : (language === "ms" ? "Disediakan atas Permintaan" : language === "ar" ? "عند الاستفسار" : "Upon Request")}</bdi> {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
+                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> <bdi dir="ltr">RM 500</bdi> {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
                 </span>
               </div>
               <div className="bilc-note-item">
                 <UserCheck size={16} />
                 <span>
-                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> <bdi dir="ltr">{isAuthenticated ? "RM 300" : (language === "ms" ? "Disediakan atas Permintaan" : language === "ar" ? "عند الاستفسار" : "Upon Request")}</bdi> {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
+                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> <bdi dir="ltr">RM 300</bdi> {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
                 </span>
               </div>
             </div>

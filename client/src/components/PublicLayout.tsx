@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
 import { PromotionalPopupModal, PromotionalFloatingBadge } from "@/components/PromotionalPopup";
 import { OfficialRegistryModal } from "@/components/OfficialRegistryModal";
+import { trpc } from "@/lib/trpc";
 
 type FabId = "whatsapp" | "phone" | "promo" | "scrollTop";
 
@@ -27,242 +28,67 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { t, isRTL, language } = useLanguage();
   const [isRegistryOpen, setIsRegistryOpen] = useState(false);
 
-  // Vertical dragging, sorting, and physics-compliant collision states for 4 draggable buttons
-  const [fabItems, setFabItems] = useState<FabItem[]>(() => {
-    const saved = localStorage.getItem("bilc_fab_slots_v4");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 4) {
-          return parsed.map(item => ({ ...item, isDisplaced: false }));
-        }
-      } catch (e) {}
+  const { data: settings, isLoading: isSettingsLoading } = trpc.content.siteSettings.useQuery();
+  const { data: publicPromos, isLoading: isPromosLoading } = trpc.promotions.publicList.useQuery();
+
+  const isPromoLoading = isSettingsLoading || isPromosLoading;
+
+  let isPromoActive = settings?.promo_active === "true";
+  let promoDiscount = settings?.promo_discount || "";
+  let promoColor = settings?.promo_color || "red";
+
+  if (!isPromoActive && publicPromos && publicPromos.length > 0) {
+    const latestPromo = publicPromos[0];
+    isPromoActive = true;
+    promoDiscount = latestPromo.discountType === "percentage" ? `${latestPromo.discountValue}% OFF` : `RM ${latestPromo.discountValue} OFF`;
+    promoColor = "blue";
+  }
+
+  const getPromoTheme = (color: string) => {
+    switch (color) {
+      case "blue":
+        return {
+          bg: "from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800",
+          ping: "bg-blue-400",
+          shadow: "shadow-[0_4px_14px_rgba(37,99,235,0.25)]",
+        };
+      case "green":
+        return {
+          bg: "from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800",
+          ping: "bg-emerald-400",
+          shadow: "shadow-[0_4px_14px_rgba(5,150,105,0.25)]",
+        };
+      case "amber":
+        return {
+          bg: "from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700",
+          ping: "bg-amber-400",
+          shadow: "shadow-[0_4px_14px_rgba(245,158,11,0.25)]",
+        };
+      case "purple":
+        return {
+          bg: "from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800",
+          ping: "bg-purple-400",
+          shadow: "shadow-[0_4px_14px_rgba(147,51,234,0.25)]",
+        };
+      case "slate":
+        return {
+          bg: "from-slate-600 to-slate-800 hover:from-slate-700 hover:to-slate-900",
+          ping: "bg-slate-400",
+          shadow: "shadow-[0_4px_14px_rgba(71,85,105,0.25)]",
+        };
+      case "red":
+      default:
+        return {
+          bg: "from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700",
+          ping: "bg-rose-400",
+          shadow: "shadow-[0_4px_14px_rgba(244,63,94,0.25)]",
+        };
     }
-    return [
-      { id: "whatsapp", currentSlotIndex: 1, isDisplaced: false },
-      { id: "phone", currentSlotIndex: 2, isDisplaced: false },
-      { id: "promo", currentSlotIndex: 3, isDisplaced: false },
-      { id: "scrollTop", currentSlotIndex: 4, isDisplaced: false },
-    ];
-  });
-
-  const [draggedKey, setDraggedKey] = useState<string | null>(null);
-  const [dragStartY, setDragStartY] = useState<number>(0);
-  const [dragOffset, setDragOffset] = useState<number>(0);
-  const [startingSlotIndex, setStartingSlotIndex] = useState<number>(1);
-  const [targetSlotIndex, setTargetSlotIndex] = useState<number>(1);
-  const hasDraggedRef = useRef(false);
-
-  // Synchronous references to guarantee 0ms latency in paint cycles
-  const dragStartYRef = useRef(0);
-  const draggedKeyRef = useRef<string | null>(null);
-  const startingSlotIndexRef = useRef(1);
-  const targetSlotIndexRef = useRef(1);
-  const fabItemsRef = useRef(fabItems);
-
-  useEffect(() => {
-    draggedKeyRef.current = draggedKey;
-  }, [draggedKey]);
-
-  useEffect(() => {
-    fabItemsRef.current = fabItems;
-  }, [fabItems]);
-
-  const saveFabItems = (items: FabItem[]) => {
-    localStorage.setItem("bilc_fab_slots_v4", JSON.stringify(
-      items.map(it => ({ id: it.id, currentSlotIndex: it.currentSlotIndex }))
-    ));
   };
 
-  const [announcement, setAnnouncement] = useState("");
+  const promoTheme = getPromoTheme(promoColor);
 
-  const moveSlot = (id: FabId, direction: "up" | "down") => {
-    const item = fabItems.find(it => it.id === id);
-    if (!item) return;
-
-    const currentSlot = item.currentSlotIndex;
-    const targetSlot = direction === "up" ? currentSlot + 1 : currentSlot - 1;
-
-    if (targetSlot < 1 || targetSlot > 4) return;
-
-    setFabItems(prev => {
-      const updated = prev.map(it => {
-        if (it.id === id) {
-          return { ...it, currentSlotIndex: targetSlot };
-        }
-        if (it.currentSlotIndex === targetSlot) {
-          return { ...it, currentSlotIndex: currentSlot };
-        }
-        return it;
-      });
-      saveFabItems(updated);
-      return updated;
-    });
-
-    const names: Record<FabId, string> = {
-      whatsapp: "WhatsApp",
-      phone: language === "ar" ? "الهاتف" : language === "ms" ? "Telefon" : "Phone call",
-      promo: language === "ar" ? "العروض" : language === "ms" ? "Promosi" : "Active promotions",
-      scrollTop: language === "ar" ? "الرجوع لأعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top"
-    };
-    const name = names[id] || id;
-    const message = language === "ar"
-      ? `تم نقل زر ${name} إلى الموضع ${targetSlot} من 4`
-      : language === "ms"
-      ? `Butang ${name} dipindahkan ke posisi ${targetSlot} daripada 4`
-      : `${name} button moved to position ${targetSlot} of 4`;
-    setAnnouncement(message);
-  };
-
-  const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Global pointer event registers with multi-touch locks, resize recovery and axis clamping
-  useEffect(() => {
-    if (!draggedKey) return;
-
-    const handleGlobalPointerMove = (e: PointerEvent) => {
-      const startY = dragStartYRef.current;
-      const startSlot = startingSlotIndexRef.current;
-      let deltaY = e.clientY - startY;
-
-      if (Math.abs(deltaY) > 5) {
-        hasDraggedRef.current = true;
-      }
-
-      // 4. Clamping bounds: prevent button from being dragged outside of safe area (Slots 1 to 4)
-      // Translate coordinates: Slot index s has translation = -s * 64px.
-      // We clamp the resulting translateY between -4 * 64 (-256px) and -1 * 64 (-64px).
-      const currentTranslateY = -startSlot * 64 + deltaY;
-      const clampedTranslateY = Math.max(-256, Math.min(-64, currentTranslateY));
-      const clampedDeltaY = clampedTranslateY - (-startSlot * 64);
-
-      setDragOffset(clampedDeltaY);
-
-      // Determine the target logic slot index
-      const logicSlot = Math.round(-clampedTranslateY / 64);
-      const clampedLogicSlot = Math.max(1, Math.min(4, logicSlot));
-
-      setTargetSlotIndex(clampedLogicSlot);
-      targetSlotIndexRef.current = clampedLogicSlot;
-
-      // Update displacement zones for all other buttons
-      setFabItems(prev => {
-        return prev.map(item => {
-          if (item.id === draggedKey) {
-            return { ...item, isDisplaced: false };
-          }
-          const isAtTarget = item.currentSlotIndex === clampedLogicSlot;
-          return {
-            ...item,
-            isDisplaced: isAtTarget
-          };
-        });
-      });
-    };
-
-    const handleGlobalPointerUp = () => {
-      const activeKey = draggedKeyRef.current;
-      const startSlot = startingSlotIndexRef.current;
-      const targetSlot = targetSlotIndexRef.current;
-
-      if (activeKey && startSlot !== targetSlot) {
-        setFabItems(prev => {
-          const updated = prev.map(item => {
-            if (item.id === activeKey) {
-              return { ...item, currentSlotIndex: targetSlot, isDisplaced: false };
-            }
-            if (item.currentSlotIndex === targetSlot) {
-              return { ...item, currentSlotIndex: startSlot, isDisplaced: false };
-            }
-            return { ...item, isDisplaced: false };
-          });
-          saveFabItems(updated);
-          return updated;
-        });
-      } else {
-        setFabItems(prev => prev.map(item => ({ ...item, isDisplaced: false })));
-      }
-
-      setDraggedKey(null);
-      setDragOffset(0);
-      
-      setTimeout(() => {
-        hasDraggedRef.current = false;
-      }, 100);
-    };
-
-    const handleCancel = () => {
-      handleGlobalPointerUp();
-    };
-
-    window.addEventListener("pointermove", handleGlobalPointerMove);
-    window.addEventListener("pointerup", handleGlobalPointerUp);
-    window.addEventListener("resize", handleCancel);
-    window.addEventListener("orientationchange", handleCancel);
-
-    return () => {
-      window.removeEventListener("pointermove", handleGlobalPointerMove);
-      window.removeEventListener("pointerup", handleGlobalPointerUp);
-      window.removeEventListener("resize", handleCancel);
-      window.removeEventListener("orientationchange", handleCancel);
-    };
-  }, [draggedKey]);
-
-  const handlePointerDown = (id: string, slotIndex: number, e: React.PointerEvent) => {
-    if (draggedKey !== null) return; // Prevent multi-touch drag overlap
-    
-    const target = e.target as HTMLElement;
-    if (target.closest(".bilc-wa-popup") || target.closest(".bilc-wa-backdrop") || target.closest(".bilc-wa-close-btn")) {
-      return;
-    }
-    if (e.button !== 0) return; // Only trigger on left click
-
-    e.preventDefault();
-    setDraggedKey(id);
-    setDragStartY(e.clientY);
-    dragStartYRef.current = e.clientY;
-    setStartingSlotIndex(slotIndex);
-    startingSlotIndexRef.current = slotIndex;
-    setTargetSlotIndex(slotIndex);
-    targetSlotIndexRef.current = slotIndex;
-    setDragOffset(0);
-    hasDraggedRef.current = false;
-  };
-
-  const getButtonStyle = (id: string) => {
-    const item = fabItems.find(it => it.id === id);
-    if (!item) return {};
-
-    const isDragged = id === draggedKey;
-    const currentSlot = item.currentSlotIndex;
-
-    const baseTranslateY = -currentSlot * 64;
-    const y = baseTranslateY + (isDragged ? dragOffset : 0);
-
-    const displaceX = isRTL ? 64 : -64;
-    const x = item.isDisplaced ? displaceX : 0;
-
-    const transition = prefersReducedMotion
-      ? "none"
-      : isDragged
-      ? "opacity 0.3s ease"
-      : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease";
-
-    return {
-      position: "absolute" as const,
-      bottom: 0,
-      left: 0,
-      width: "52px",
-      height: "52px",
-      transform: `translate3d(${x}px, ${y}px, 0)`,
-      transition,
-      zIndex: isDragged ? 1000 : 999,
-      cursor: isDragged ? "grabbing" : "grab",
-      touchAction: "none" as const,
-      pointerEvents: "auto" as const,
-      userSelect: "none" as const,
-    };
-  };
+  // Static Quick Action button list and states are simplified for permanent non-draggable layouts.
 
   useEffect(() => {
     const handleOpen = () => setIsRegistryOpen(true);
@@ -575,7 +401,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       <OfflineIndicator />
 
-      <main id="main-content" className="simple-public-main" tabIndex={-1}>
+      <main id="main-content" className="simple-public-main pb-24 md:pb-0" tabIndex={-1}>
         {children}
       </main>
 
@@ -594,194 +420,182 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       {/* Promotional Campaign Modal Popup */}
       <PromotionalPopupModal isOpen={promoOpen} setIsOpen={setPromoOpen} />
 
-      {/* Accessibility Helpers for Quick Actions */}
-      <div id="fab-instructions" className="sr-only">
-        {language === "ar"
-          ? "استخدم سهمي الأعلى والأسفل لتغيير موضع الزر في قائمة الإجراءات السريعة."
-          : language === "ms"
-          ? "Gunakan kekunci anak panah Atas dan Bawah untuk menukar posisi butang dalam senarai tindakan pantas."
-          : "Use Up and Down arrow keys to change the button's position in the quick actions stack."}
-      </div>
-      <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {announcement}
-      </div>
-
-      {/* Floating Actions Dock */}
+      {/* Desktop Version: Static, Cohesive Vertical Capsule Dock Centered Vertically (for screens >= 768px) */}
       <div
-        className={`floating-actions-dock ${isRTL ? "is-rtl" : ""} ${location.startsWith("/programs/") && location !== "/programs" ? "is-on-detail" : ""}`}
-        aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
+        className="desktop-quick-actions-bar hidden md:flex flex-col items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] px-2 py-3.5 rounded-[32px] gap-4 z-[999]"
         style={{
           position: "fixed",
+          top: "50%",
+          transform: "translateY(-50%)",
           right: isRTL ? "auto" : "1.5rem",
           left: isRTL ? "1.5rem" : "auto",
-          bottom: location.startsWith("/programs/") && location !== "/programs" ? "5.5rem" : "1.5rem",
-          width: "52px",
-          height: "320px", // 5 slots x 64px = 320px
-          zIndex: 999,
-          pointerEvents: "none",
+          width: "64px",
+          transition: "right 0.3s ease, left 0.3s ease",
+        }}
+        aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
+      >
+        {/* Button 1 (Topmost): Promotions / Gift Button with dynamic glow and active discount badge */}
+        <div className="relative group">
+          <button
+            type="button"
+            className={`bilc-quick-btn w-12 h-12 rounded-full bg-gradient-to-br ${promoTheme.bg} text-white flex items-center justify-center ${promoTheme.shadow} hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/15 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#173fad] relative`}
+            onClick={() => setPromoOpen(true)}
+            aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
+          >
+            <span className="relative flex h-5 w-5 items-center justify-center mx-auto">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
+              <Gift size={22} className="relative text-white group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+            </span>
+            {promoDiscount && (
+              <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+                {promoDiscount}
+              </span>
+            )}
+          </button>
+          {/* Tooltip */}
+          <div
+            className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+              isRTL
+                ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+                : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+            }`}
+          >
+            {language === "ar" ? "العروض النشطة" : language === "ms" ? "Promosi Aktif" : "Active Promotions"}
+          </div>
+        </div>
+
+        {/* Button 2: Call/Phone Link */}
+        <div className="relative group">
+          <a
+            href="tel:+60367310449"
+            className="bilc-quick-btn w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center justify-center shadow-[0_4px_14px_rgba(37,99,235,0.25)] hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/10 focus-visible:ring-2 focus-visible:ring-[#173fad]"
+            aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+          >
+            <Phone size={20} className="group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+          </a>
+          {/* Tooltip */}
+          <div
+            className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+              isRTL
+                ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+                : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+            }`}
+          >
+            {language === "ar" ? "اتصل بقسم القبول" : language === "ms" ? "Hubungi Kemasukan" : "Call Admissions"}
+          </div>
+        </div>
+
+        {/* Button 3: Smart WhatsApp Widget */}
+        <div className="w-12 h-12 flex items-center justify-center shrink-0">
+          <SmartWhatsAppWidget key="whatsapp-widget" className="w-12 h-12" />
+        </div>
+      </div>
+
+      {/* Desktop Version: Separate Fixed Scroll-to-Top Button */}
+      <div
+        className="desktop-scroll-top-wrap hidden md:block transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{
+          position: "fixed",
+          bottom: "2rem",
+          right: isRTL ? "auto" : "2rem",
+          left: isRTL ? "2rem" : "auto",
+          zIndex: 998,
+          pointerEvents: showScrollTop ? "auto" : "none",
+          opacity: showScrollTop ? 1 : 0,
+          transform: showScrollTop ? "scale(1) translateY(0)" : "scale(0.8) translateY(12px)",
         }}
       >
-        {/* ==================== SLOT 0: STATIC BACK BUTTON ==================== */}
+        <div className="relative group">
+          <button
+            type="button"
+            className="bilc-scroll-top-btn bilc-quick-btn w-12 h-12 rounded-full bg-[#173fad] hover:bg-[#2563eb] text-white flex items-center justify-center shadow-[0_8px_24px_rgba(23,63,173,0.22)] hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-[#173fad]/20 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#173fad]"
+            onClick={scrollToTop}
+            aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
+          >
+            <ArrowUp size={20} className="group-hover:-translate-y-0.5 transition-transform duration-300" aria-hidden="true" />
+          </button>
+          {/* Tooltip */}
+          <div
+            className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+              isRTL
+                ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+                : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+            }`}
+          >
+            {language === "ar" ? "الرجوع للأعلى" : language === "ms" ? "Kembali ke Atas" : "Back to Top"}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Version: Bottom Horizontal Floating Panel Capsule (for screens < 768px) */}
+      <div
+        className={`mobile-quick-actions-bar md:hidden flex items-center justify-between bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] rounded-full z-[999] ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+        style={{
+          position: "fixed",
+          bottom: "calc(1.25rem + env(safe-area-inset-bottom))",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: showScrollTop ? "264px" : "200px",
+          paddingLeft: "14px",
+          paddingRight: "14px",
+          paddingTop: "0.6rem",
+          paddingBottom: "0.6rem",
+          transition: "width 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+        aria-label={language === "ar" ? "إجراءات سريعة للجوال" : language === "ms" ? "Tindakan pantas mudah alih" : "Mobile quick actions"}
+      >
+        {/* Button 1: Promotions / Gift Button with dynamic glow and active discount badge */}
+        <button
+          type="button"
+          className={`bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br ${promoTheme.bg} active:scale-95 text-white flex items-center justify-center ${promoTheme.shadow} border border-white/15 cursor-pointer relative shrink-0`}
+          onClick={() => setPromoOpen(true)}
+          aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
+        >
+          <span className="relative flex h-5 w-5 items-center justify-center">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
+            <Gift size={18} className="relative text-white" aria-hidden="true" />
+          </span>
+          {promoDiscount && (
+            <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+              {promoDiscount}
+            </span>
+          )}
+        </button>
+
+        {/* Button 2: Call/Phone Link */}
+        <a
+          href="tel:+60367310449"
+          className="bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 active:scale-95 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.25)] border border-white/10 shrink-0"
+          aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+        >
+          <Phone size={18} aria-hidden="true" />
+        </a>
+
+        {/* Button 3: Smart WhatsApp Widget */}
+        <div className="w-11 h-11 flex items-center justify-center shrink-0">
+          <SmartWhatsAppWidget key="whatsapp-widget-mobile" className="w-11 h-11" />
+        </div>
+
+        {/* Button 4 (Appears on scroll on the right side of the panel): Scroll-to-Top Button */}
         <div
+          className="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center shrink-0"
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "52px",
-            height: "52px",
-            transform: "translate3d(0, 0, 0)",
-            transition: prefersReducedMotion ? "none" : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease",
-            opacity: location !== "/" ? 1 : 0,
-            pointerEvents: location !== "/" ? "auto" : "none",
-            zIndex: 990,
+            width: showScrollTop ? "44px" : "0px",
+            opacity: showScrollTop ? 1 : 0,
+            transform: showScrollTop ? "scale(1)" : "scale(0.8)",
+            pointerEvents: showScrollTop ? "auto" : "none",
+            overflow: "visible",
           }}
         >
           <button
             type="button"
-            className="floating-page-back-button focus-visible:ring-2 focus-visible:ring-[#173fad] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
-            style={{
-              margin: 0,
-              width: "52px",
-              height: "52px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-            }}
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                window.location.href = "/";
-              }
-            }}
-            aria-label={language === "ar" ? "رجوع" : language === "ms" ? "Kembali" : "Back"}
-            title={language === "ar" ? "رجوع" : language === "ms" ? "Kembali" : "Back"}
+            className="bilc-scroll-top-btn bilc-quick-btn w-11 h-11 rounded-full bg-[#173fad] hover:bg-[#2563eb] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(23,63,173,0.22)] border border-[#173fad]/20 cursor-pointer active:scale-95"
+            onClick={scrollToTop}
+            aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top"}
           >
-            <ArrowLeft size={22} className="floating-page-back-icon" aria-hidden="true" />
+            <ArrowUp size={18} />
           </button>
         </div>
-
-        {/* ==================== DRAGGABLE BUTTONS (SLOTS 1 to 4) ==================== */}
-        {[...fabItems].sort((a, b) => a.currentSlotIndex - b.currentSlotIndex).map((item) => {
-          let buttonContent = null;
-
-          if (item.id === "whatsapp") {
-            buttonContent = (
-              <SmartWhatsAppWidget key="whatsapp-widget" />
-            );
-          } else if (item.id === "phone") {
-            buttonContent = (
-              <a
-                href="tel:+60367310449"
-                className="floating-call-button focus-visible:ring-2 focus-visible:ring-[#173fad] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
-                style={{
-                  width: "52px",
-                  height: "52px",
-                  borderRadius: "9999px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-                title={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-                aria-describedby="fab-instructions"
-              >
-                <Phone size={22} className="floating-call-icon" aria-hidden="true" />
-                <span className="floating-call-ping" aria-hidden="true" />
-              </a>
-            );
-          } else if (item.id === "promo") {
-            buttonContent = (
-              <button
-                type="button"
-                className="floating-promo-button focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
-                style={{
-                  width: "52px",
-                  height: "52px",
-                  borderRadius: "9999px",
-                  background: "linear-gradient(135deg, #dc2626, #be123c)",
-                  color: "#ffffff",
-                  boxShadow: "var(--bilc-shadow-sm)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "none",
-                  position: "relative",
-                }}
-                onClick={() => setPromoOpen(true)}
-                aria-label={t("promo.buttonLabel", undefined, "Show Active Promotions")}
-                title="Active Promotions"
-                aria-describedby="fab-instructions"
-              >
-                <span className="relative flex h-5 w-5 items-center justify-center">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <Gift size={22} className="relative text-white" />
-                </span>
-              </button>
-            );
-          } else if (item.id === "scrollTop") {
-            buttonContent = (
-              <div
-                style={{
-                  opacity: showScrollTop ? 1 : 0,
-                  pointerEvents: showScrollTop ? "auto" : "none",
-                  transition: "opacity 0.3s ease",
-                  width: "52px",
-                  height: "52px",
-                }}
-              >
-                <button
-                  type="button"
-                  className="floating-scroll-top-button focus-visible:ring-2 focus-visible:ring-[#173fad] focus-visible:ring-offset-2 focus-visible:outline-none rounded-full"
-                  style={{
-                    width: "52px",
-                    height: "52px",
-                    borderRadius: "9999px",
-                    background: "#ffffff",
-                    color: "var(--bilc-navy)",
-                    border: "1px solid var(--bilc-line)",
-                    boxShadow: "var(--bilc-shadow-sm)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  onClick={scrollToTop}
-                  aria-label={language === "ar" ? "الرجوع إلى أعلى الصفحة" : language === "ms" ? "Tatal ke atas" : "Scroll to top of page"}
-                  title={language === "ar" ? "إلى الأعلى" : language === "ms" ? "Ke atas" : "Scroll to top"}
-                  aria-describedby="fab-instructions"
-                >
-                  <ArrowUp size={22} className="floating-scroll-top-icon" aria-hidden="true" />
-                </button>
-              </div>
-            );
-          }
-
-          return (
-            <div
-              key={item.id}
-              style={getButtonStyle(item.id)}
-              onPointerDown={(e) => handlePointerDown(item.id, item.currentSlotIndex, e)}
-              onClickCapture={(e) => {
-                if (hasDraggedRef.current) {
-                  e.stopPropagation();
-                  e.preventDefault();
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowUp") {
-                  e.preventDefault();
-                  moveSlot(item.id, "up");
-                } else if (e.key === "ArrowDown") {
-                  e.preventDefault();
-                  moveSlot(item.id, "down");
-                }
-              }}
-            >
-              {buttonContent}
-            </div>
-          );
-        })}
       </div>
 
       {/* Official Registry Modal */}

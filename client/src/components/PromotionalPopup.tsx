@@ -99,17 +99,17 @@ function getColorTheme(colorName?: string): ColorTheme {
     case "red":
     default:
       return {
-        floatingBg: "bg-gradient-to-br from-red-600 to-rose-700",
-        floatingPing: "bg-red-400",
-        floatingShadow: "shadow-[0_10px_24px_-3px_rgba(220,38,38,0.45),_0_4px_10px_-2px_rgba(16,37,62,0.2)] hover:shadow-[0_14px_30px_-3px_rgba(220,38,38,0.58),_0_6px_14px_-2px_rgba(16,37,62,0.26)]",
-        modalStripe: "bg-gradient-to-r from-red-600 via-rose-500 to-red-700",
-        tagText: "text-red-600",
-        iconBg: "bg-red-50 text-red-600 border border-red-100",
-        discountText: "text-rose-500",
-        closeBtnHover: "hover:bg-red-50 hover:text-red-600",
-        codeBox: "bg-red-50/75 border border-dashed border-red-200",
-        codeBtn: "bg-white hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800",
-        ctaBg: "from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800"
+        floatingBg: "bg-gradient-to-br from-rose-500 to-red-600",
+        floatingPing: "bg-rose-400",
+        floatingShadow: "shadow-[0_10px_24px_-3px_rgba(244,63,94,0.45),_0_4px_10px_-2px_rgba(16,37,62,0.2)] hover:shadow-[0_14px_30px_-3px_rgba(244,63,94,0.58),_0_6px_14px_-2px_rgba(16,37,62,0.26)]",
+        modalStripe: "bg-gradient-to-r from-rose-500 via-red-500 to-rose-600",
+        tagText: "text-rose-600",
+        iconBg: "bg-rose-50 text-rose-600 border border-rose-100",
+        discountText: "text-red-500",
+        closeBtnHover: "hover:bg-rose-50 hover:text-rose-600",
+        codeBox: "bg-rose-50/75 border border-dashed border-rose-200",
+        codeBtn: "bg-white hover:bg-rose-100 border border-rose-200 text-rose-700 hover:text-rose-800",
+        ctaBg: "from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700"
       };
   }
 }
