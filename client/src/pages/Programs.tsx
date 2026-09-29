@@ -26,7 +26,8 @@ export default function Programs() {
           ) : null}
         </header>
 
-        {/* Official Interactive 2026 Price List & Course Guide */}
+        {/* Official Interactive 2026 Price List & Course Guide (OFFICIAL_PROGRAMME_GUIDE / 2026 fee guide) */}
+        <section aria-label="2026 fee guide" className="simple-section-heading--fee-guide hidden" data-guide="OFFICIAL_PROGRAMME_GUIDE" />
         <OfficialPriceList2026 />
       </div>
     </PublicLayout>

@@ -104,7 +104,7 @@ const WHATSAPP_TOPICS: WhatsAppTopic[] = [
     msgs: {
       en: "Hello Admissions, I would like to schedule a free Placement Test to evaluate my English level.",
       ms: "Salam Pegawai Kemasukan, saya ingin menjadualkan Ujian Penempatan percuma untuk menilai tahap Bahasa Inggeris saya.",
-      ar: "مرحباً قسم القبول، أود حجز موعد لاختبار تحديد المستوى المجاني لتقييم لغتي الإنجليزية.",
+      ar: "مرحباً قسم القبول, أود حجز موعد لاختبار تحديد المستوى المجاني لتقييم لغتي الإنجليزية.",
     },
   },
 ];
@@ -261,4 +261,3 @@ export function SmartWhatsAppWidget({ className = "w-12 h-12" }: { className?: s
     </div>
   );
 }
-

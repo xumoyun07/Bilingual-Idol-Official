@@ -143,21 +143,61 @@ body {
 /* ==========================================================================
    Dynamic blue grid and motion layer
    ========================================================================== */
-.simple-public-shell, .auth-page, .member-page {
+.simple-public-shell, .auth-page, .member-page, .blue-workspace, .minimal-dashboard-inset,
+.blue-auth-page,
+.page-login,
+.minimal-auth-state,
+.blue-auth-state,
+.blue-member-page,
+.workspace-page,
+.founder-command,
+.workspace-surface,
+.founder-workspace,
+#admin-dashboard-container,
+#superadmin-dashboard-container,
+#user-dashboard-container,
+#teacher-dashboard-container,
+#marketing-dashboard-container,
+#auditlogs-container,
+#students-profile-container,
+#login-page-container {
   position: relative;
 }
 
-.workspace-surface::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
+.simple-public-shell::before,
+.auth-page::before,
+.member-page::before,
+.blue-workspace::before,
+.minimal-dashboard-inset::before,
+.workspace-surface::before,
+.blue-auth-page::before,
+.page-login::before,
+.minimal-auth-state::before,
+.blue-auth-state::before,
+.blue-member-page::before,
+.workspace-page::before,
+.founder-command::before,
+.founder-workspace::before,
+#admin-dashboard-container::before,
+#superadmin-dashboard-container::before,
+#user-dashboard-container::before,
+#teacher-dashboard-container::before,
+#marketing-dashboard-container::before,
+#auditlogs-container::before,
+#students-profile-container::before,
+#login-page-container::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
   background-image: 
-    radial-gradient(circle at 50% 50%, rgba(23, 63, 173, 0.03) 1px, transparent 1px);
-  background-size: 32px 32px;
+    radial-gradient(circle at 50% 50%, rgba(23, 63, 173, 0.05) 1.25px, transparent 1.25px) !important;
+  background-size: 32px 32px !important;
   background-attachment: fixed;
-  animation: bilc-grid-drift 20s linear infinite;
-  z-index: 0;
+  animation: bilc-grid-drift 20s linear infinite !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  display: block !important;
 }
 
 @keyframes bilc-grid-drift {
@@ -917,7 +957,7 @@ button:focus-visible {
     font-size: 0.875rem !important;
   }
   .bilc-opt-text span {
-    font-size: 0.75rem !important;
+    display: none !important;
   }
   .bilc-finder-progress-bar {
     margin-bottom: 1.25rem !important;
@@ -7471,39 +7511,131 @@ div#root:nth-of-type(1) > main#login-page-container:nth-of-type(1) > section#log
     margin-top: 30px !important;
   }
 
-  /* Adaptive WhatsApp Concierge modal layout on mobile screen sizes */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup,
-  .is-rtl div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup,
+  /* Adaptive WhatsApp Concierge bottom-sheet on mobile screen sizes */
+  .mobile-quick-actions-bar .bilc-wa-popup,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > .mobile-quick-actions-bar .bilc-wa-popup,
   .bilc-wa-popup,
   .is-rtl .bilc-wa-popup {
     position: fixed !important;
-    bottom: 84px !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: auto !important;
-    max-width: calc(100vw - 24px) !important;
-    border-radius: 1.25rem !important;
-    box-shadow: 0 12px 36px rgba(10, 17, 40, 0.3) !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    border-radius: 24px 24px 0 0 !important;
+    border: none !important;
+    box-shadow: 0 -8px 40px rgba(10, 17, 40, 0.25) !important;
     z-index: 1001 !important;
+    animation: bilc-bottom-sheet-slide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes bilc-bottom-sheet-slide {
+    from {
+      transform: translateY(100%) !important;
+    }
+    to {
+      transform: translateY(0) !important;
+    }
+  }
+
+  /* Backdrop: Dim overlay with blur effect only on mobile to focus attention */
+  .bilc-wa-backdrop {
+    background: rgba(15, 23, 42, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    animation: bilc-fade-in 0.3s ease forwards !important;
+    z-index: -1 !important;
+  }
+
+  @keyframes bilc-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .bilc-wa-popup-header {
     background: var(--bilc-navy, #0a1128) !important;
     padding: 1rem 1.25rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .bilc-wa-popup-header strong {
+    font-size: 0.875rem !important;
+  }
+
+  .bilc-wa-popup-header p {
+    font-size: 0.7rem !important;
   }
 
   .bilc-wa-popup-body {
     padding: 1rem !important;
     background: #ffffff !important;
-    max-height: 280px !important;
+    max-height: 380px !important;
+  }
+
+  .bilc-wa-prompt {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+  }
+
+  /* Unify 5 items into a ultra-compact 2-column grid */
+  .bilc-wa-topics-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Compact button styling on mobile */
+  .bilc-wa-topic-item, .bilc-wa-topic-btn {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+    border-radius: 10px !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    min-height: 48px !important;
+    align-items: center !important;
+  }
+
+  /* Make the 5th item span across both columns for visual balance */
+  .bilc-wa-topic-item:nth-child(5) {
+    grid-column: span 2 !important;
+    min-height: 44px !important;
+  }
+
+  .bilc-topic-emoji, .bilc-wa-topic-icon {
+    font-size: 1rem !important;
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+    background-color: #f1f5f9 !important;
+  }
+
+  .bilc-topic-copy, .bilc-wa-topic-copy {
+    gap: 0 !important;
+  }
+
+  .bilc-topic-copy strong, .bilc-wa-topic-title {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Hide descriptions on mobile to keep layout ultra-clean, readable and compact */
+  .bilc-topic-copy span, .bilc-wa-topic-desc {
+    display: none !important;
   }
 
   .bilc-wa-popup-footer {
-    background-color: var(--bilc-surface, #f8fafc) !important;
-    border-top: 1px solid var(--bilc-line, #cbd5e1) !important;
-    padding: 0.875rem 1rem !important;
-    font-weight: 600 !important;
-    color: var(--bilc-navy, #0f172a) !important;
+    background-color: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    color: #334155 !important;
   }
 
   /* ==========================================================================
@@ -7674,7 +7806,7 @@ div#root:nth-of-type(1) > main#login-page-container:nth-of-type(1) > section#log
     font-size: 0.875rem !important;
   }
   .bilc-opt-text span {
-    font-size: 0.75rem !important;
+    display: none !important;
   }
 
   /* 3. Course Pricing (Selector 3) */
@@ -9309,16 +9441,30 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
   /* Retained for structural cleanliness - new layout handles precise responsive sizing automatically */
 
-  /* Ensure the WhatsApp popup modal displays perfectly at its designed scale and position on mobile */
-  .bilc-wa-popup,
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup {
+  /* Ensure the WhatsApp popup modal displays perfectly as a compact bottom sheet on mobile */
+  .mobile-quick-actions-bar .bilc-wa-popup,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > .mobile-quick-actions-bar .bilc-wa-popup,
+  .bilc-wa-popup {
     position: fixed !important;
-    bottom: 84px !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: auto !important;
-    max-width: calc(100vw - 24px) !important;
-    transform: none !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    border-radius: 24px 24px 0 0 !important;
+    border: none !important;
+    box-shadow: 0 -8px 40px rgba(10, 17, 40, 0.25) !important;
+    animation: bilc-bottom-sheet-slide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup {
+    height: 410px !important;
+    width: 300px !important;
+    margin-left: -50px !important;
+    border-radius: 16px !important;
+    margin-top: 0px !important;
+    margin-bottom: 80px !important;
   }
 }
 
@@ -9929,16 +10075,24 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 /* Custom desktop-only margins for the WhatsApp concierge popup */
 @media (min-width: 768px) {
   .desktop-quick-actions-bar .bilc-wa-popup {
-    margin-right: 60px;
-    margin-top: 0px;
-    margin-bottom: -60px;
+    margin-right: 70px !important;
+    margin-top: 0px !important;
+    margin-bottom: -200px !important;
+  }
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) {
+    margin-bottom: -200px !important;
+    margin-right: 70px !important;
   }
 }
 
 /* Scroll to Top Button premium style overrides and hover stabilizer */
 .mobile-quick-actions-bar,
 .mobile-quick-actions-bar:hover {
-  transform: translateX(-50%) !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease !important;
 }
 
@@ -10000,6 +10154,95 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   transform: scale(1.1) !important;
 }
 
+/* Hide helper text on mobile by default */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#find-your-course:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(4) > div:nth-of-type(1) > span:nth-of-type(1) {
+  display: none !important;
+}
 
+/* Show helper text only in desktop mode */
+@media (min-width: 1025px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#find-your-course:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(4) > div:nth-of-type(1) > span:nth-of-type(1) {
+    display: inline !important;
+  }
+}
 
+/* ==========================================================================
+   Dashboard Floating Island Redesign
+   ========================================================================== */
 
+/* Warm background of the workspace matching public branding */
+.blue-workspace {
+  background-color: #fbf8f2;
+}
+
+/* Floating Sidebar island - desktop / tablet full state */
+.blue-workspace .bilc-floating-sidebar {
+  position: fixed;
+  top: 1rem;
+  bottom: 1rem;
+  inset-inline-start: 1rem;
+  height: calc(100vh - 2rem);
+  width: var(--dashboard-sidebar-width);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(16, 37, 62, 0.05);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 45;
+}
+
+/* Floating Header island */
+.blue-workspace .bilc-floating-header {
+  position: fixed;
+  top: 1rem;
+  inset-inline-start: calc(var(--dashboard-sidebar-width) + 2rem);
+  inset-inline-end: 1rem;
+  height: 4.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(16, 37, 62, 0.05);
+  transition: inset-inline-start 0.3s cubic-bezier(0.16, 1, 0.3, 1), inset-inline-end 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 1.5rem;
+}
+
+/* Main Content Area flow on desktop */
+.blue-workspace .bilc-dashboard-main {
+  padding-top: 6.5rem;
+  padding-inline-start: calc(var(--dashboard-sidebar-width) + 2rem);
+  padding-inline-end: 1rem;
+  padding-bottom: 2rem;
+  transition: padding-inline-start 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Responsive constraints on mobile drawer and spacing */
+@media (max-width: 1024px) {
+  .blue-workspace .bilc-floating-sidebar {
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    height: 100vh;
+    border-radius: 0;
+    width: 18.5rem;
+  }
+  
+  .blue-workspace .bilc-floating-header {
+    inset-inline-start: 1rem;
+    inset-inline-end: 1rem;
+  }
+  
+  .blue-workspace .bilc-dashboard-main {
+    padding-inline-start: 1rem;
+    padding-inline-end: 1rem;
+    padding-top: 6.5rem;
+    padding-bottom: 3rem;
+  }
+}

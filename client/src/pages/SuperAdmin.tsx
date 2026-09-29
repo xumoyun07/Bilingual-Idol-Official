@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import DashboardLayout from "@/components/DashboardLayout";
+import DashboardLayout, { ModuleSkeleton, ModuleEmptyState, ModuleErrorState, DashboardContentArea } from "@/components/DashboardLayout";
 import { ConfigurableCreateUserModal } from "@/components/ConfigurableCreateUserModal";
 import { trpc } from "@/lib/trpc";
 import AuditLogs from "./AuditLogs";
@@ -47,18 +47,42 @@ export default function SuperAdmin() {
 function SuperAdminConsole() {
   const [location] = useLocation();
   if (location === "/super-admin/audit-logs") return <AuditLogs role="super_admin" />;
-  return <div id="superadmin-dashboard-container" data-page="superadmin" className="workspace-page founder-command founder-workspace page-superadmin mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-10">{location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}</div>;
+  return (
+    <div id="superadmin-dashboard-container" data-page="superadmin" className="workspace-page founder-command w-full space-y-6">
+      <DashboardContentArea>
+        {location === "/super-admin/users" ? <SuperAdminUsersModule /> : <SuperAdminDashboard />}
+      </DashboardContentArea>
+    </div>
+  );
 }
 
 function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
-  return <header className="founder-command-header"><div><p className="founder-command-eyebrow">{eyebrow}</p><h1 className="founder-command-title">{title}</h1><p className="founder-command-description">{description}</p></div>{action ? <div className="founder-command-action">{action}</div> : null}</header>;
+  return (
+    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#dfd1bf]/50">
+      <div className="space-y-1 text-start">
+        <p className="text-xs font-bold uppercase tracking-widest text-[#708098]">{eyebrow}</p>
+        <h1 className="font-bold text-[#10253e] tracking-tight text-[clamp(1.5rem,4vw,2.25rem)] leading-tight">{title}</h1>
+        <p className="text-xs sm:text-sm text-[#53657a] max-w-2xl leading-relaxed">{description}</p>
+      </div>
+      {action && <div className="flex shrink-0 items-center">{action}</div>}
+    </header>
+  );
 }
 
 function SuperAdminDashboard() {
-  return <>
-    <ModuleHeader eyebrow="Administration · Executive Overview" title="Central Platform Administration & Governance" description="Supreme authority dashboard for system-wide account control, institutional operations, staff governance, and audit verification." action={<Link href="/super-admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />Open Users<ArrowUpRight size={16} /></Link>} />
-    <section className="founder-panel founder-panel-paper mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="founder-command-eyebrow">Primary task</p><h2 className="mt-2 font-display text-3xl text-[#10253e]">Institutional User & Staff Directory</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[#53657a]">Search, review, issue, configure or remove administrator, marketing, instructor, and student accounts across the learning centre.</p></div><Link href="/super-admin/users" className="compass-btn-secondary inline-flex items-center gap-2"><UserPlus size={17} />Manage users<ChevronRight size={16} /></Link></section>
-  </>;
+  return (
+    <div className="space-y-6">
+      <ModuleHeader eyebrow="Administration · Executive Overview" title="Central Platform Administration & Governance" description="Supreme authority dashboard for system-wide account control, institutional operations, staff governance, and audit verification." action={<Link href="/super-admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />Open Users<ArrowUpRight size={16} /></Link>} />
+      <section className="founder-panel founder-panel-paper mt-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between p-6 bg-white border border-[#eee4d7] rounded-2xl shadow-xs">
+        <div className="text-start">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#708098]">Primary task</p>
+          <h2 className="mt-2 font-display text-2xl font-bold text-[#10253e]">Institutional User & Staff Directory</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#53657a]">Search, review, issue, configure or remove administrator, marketing, instructor, and student accounts across the learning centre.</p>
+        </div>
+        <Link href="/super-admin/users" className="compass-btn-secondary inline-flex items-center gap-2 shrink-0"><UserPlus size={17} />Manage users<ChevronRight size={16} /></Link>
+      </section>
+    </div>
+  );
 }
 
 function SuperAdminUsersModule() {
@@ -92,15 +116,37 @@ function SuperAdminUsersModule() {
 
   return <>
     <ModuleHeader eyebrow="Administration · User Directory" title="Central User & Staff Directory" description="Comprehensive directory of institutional administrators, instructors, marketing officers, and students with full access controls." action={<Button type="button" onClick={openCreate} className="compass-btn-primary gap-2"><Plus size={17} />New user</Button>} />
-    <nav className="founder-panel founder-panel-paper mt-6 p-3" aria-label="User type modules"><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{categoryItems.map(({ role, icon: Icon }) => <button key={role} type="button" aria-pressed={category === role} onClick={() => chooseCategory(role)} className={`flex min-h-16 items-center gap-3 rounded-xl px-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${category === role ? "bg-[#10253e] text-white" : "bg-[#faf6ef] text-[#29415b] hover:bg-[#eef4ff]"}`}><span className={`grid h-8 w-8 place-items-center rounded-lg ${category === role ? "bg-white/15 text-[#f3b59f]" : roleTone[role]}`}><Icon size={16} /></span><span><span className="block text-[11px] font-extrabold tracking-[.08em] uppercase opacity-70">Type</span><span className="block text-sm font-extrabold">{roleLabels[role]}</span></span></button>)}</div></nav>
+    <nav className="founder-panel founder-panel-paper mt-6 p-3 rounded-2xl border border-[#eee4d7] bg-[#faf7f2]/30" aria-label="User type modules">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
+        {categoryItems.map(({ role, icon: Icon }) => (
+          <button
+            key={role}
+            type="button"
+            aria-pressed={category === role}
+            onClick={() => chooseCategory(role)}
+            className={`flex min-h-16 items-center gap-3 rounded-xl px-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${
+              category === role ? "bg-[#10253e] text-white" : "bg-white text-[#29415b] hover:bg-[#eee4d7]/40 border border-[#dfd1bf]/60"
+            }`}
+          >
+            <span className={`grid h-8 w-8 place-items-center rounded-lg ${category === role ? "bg-white/15 text-[#f3b59f]" : roleTone[role]}`}>
+              <Icon size={16} />
+            </span>
+            <span>
+              <span className="block text-[10px] font-extrabold tracking-[.08em] uppercase opacity-70">Type</span>
+              <span className="block text-sm font-extrabold">{roleLabels[role]}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </nav>
     {/* UPGRADED MODERN FILTER SECTION */}
-    <section className="founder-panel founder-panel-paper mt-6 rounded-2xl border border-[#dce4e7] bg-white p-5 sm:p-6 shadow-sm transition-all hover:border-[#cfd9de]" aria-label={`${roleLabels[category]} filters`}>
+    <section className="founder-panel founder-panel-paper mt-6 rounded-2xl border border-[#eee4d7] bg-white p-5 sm:p-6 shadow-sm transition-all hover:border-[#dfd1bf]/70" aria-label={`${roleLabels[category]} filters`}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf2f4] pb-4 mb-4">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef4ff] text-[#173fad]">
             <SlidersHorizontal size={16} />
           </div>
-          <div>
+          <div className="text-start">
             <h2 className="text-sm font-bold text-[#10253e] uppercase tracking-wider">{roleLabels[category]} directory filters</h2>
             <p className="text-xs text-[#53657a]">{list.isLoading ? "Refreshing directory…" : `${list.data?.total ?? 0} account${(list.data?.total ?? 0) === 1 ? "" : "s"} in this group`}</p>
           </div>
@@ -116,7 +162,7 @@ function SuperAdminUsersModule() {
             <button
               type="button"
               onClick={clearFilters}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] px-3 py-1.5 text-xs font-bold text-[#b4563c] transition-colors hover:bg-[#fff0ed] hover:border-[#efc4b8]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#eee4d7] px-3 py-1.5 text-xs font-bold text-[#b4563c] transition-colors hover:bg-[#fff0ed] hover:border-[#efc4b8]"
             >
               <RotateCcw size={13} />
               <span>Reset all</span>
@@ -125,7 +171,7 @@ function SuperAdminUsersModule() {
         </div>
       </div>
 
-      <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-12">
+      <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-12 text-start">
         {/* Search Input */}
         <div className="sm:col-span-2 lg:col-span-5">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#53657a] mb-1.5">
@@ -136,14 +182,14 @@ function SuperAdminUsersModule() {
             <input
               value={search}
               onChange={event => setSearch(event.target.value)}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-10 pe-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#eee4d7] bg-[#faf7f2]/20 ps-10 pe-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
               placeholder={`Search ${roleLabels[category].toLowerCase()} by name, email or ID…`}
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
+                className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#faf7f2] hover:text-[#10253e]"
                 title="Clear search"
               >
                 <X size={14} />
@@ -161,7 +207,7 @@ function SuperAdminUsersModule() {
             <select
               value={status}
               onChange={event => setStatus(event.target.value as FilterStatus)}
-              className="h-11 w-full appearance-none rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-3.5 pe-8 text-sm font-medium text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full appearance-none rounded-xl border border-[#eee4d7] bg-[#faf7f2]/20 ps-3.5 pe-8 text-sm font-medium text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
             >
               <option value="all">All statuses</option>
               <option value="active">Active accounts</option>
@@ -184,13 +230,13 @@ function SuperAdminUsersModule() {
               type="date"
               value={createdFrom}
               onChange={event => setCreatedFrom(event.target.value)}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-8 pe-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#eee4d7] bg-[#faf7f2]/20 ps-8 pe-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
             />
             {createdFrom && (
               <button
                 type="button"
                 onClick={() => setCreatedFrom("")}
-                className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#faf7f2]"
               >
                 <X size={12} />
               </button>
@@ -209,13 +255,13 @@ function SuperAdminUsersModule() {
               type="date"
               value={createdTo}
               onChange={event => setCreatedTo(event.target.value)}
-              className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] ps-8 pe-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              className="h-11 w-full rounded-xl border border-[#eee4d7] bg-[#faf7f2]/20 ps-8 pe-7 text-xs font-semibold text-[#10253e] transition-all focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
             />
             {createdTo && (
               <button
                 type="button"
                 onClick={() => setCreatedTo("")}
-                className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4]"
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#faf7f2]"
               >
                 <X size={12} />
               </button>
@@ -229,25 +275,25 @@ function SuperAdminUsersModule() {
         <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#edf2f4] pt-3.5">
           <span className="text-xs font-semibold text-[#708098]">Applied filters:</span>
           {search.trim() && (
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#faf7f2] border border-[#dfd1bf]/50 px-2.5 py-1 text-xs font-medium text-[#10253e]">
               <span>Query: <strong>"{search}"</strong></span>
               <button type="button" onClick={() => setSearch("")} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
             </span>
           )}
           {status !== "all" && (
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#faf7f2] border border-[#dfd1bf]/50 px-2.5 py-1 text-xs font-medium text-[#10253e]">
               <span>Status: <strong>{status === "active" ? "Active" : "Inactive"}</strong></span>
               <button type="button" onClick={() => setStatus("all")} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
             </span>
           )}
           {createdFrom && (
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#faf7f2] border border-[#dfd1bf]/50 px-2.5 py-1 text-xs font-medium text-[#10253e]">
               <span>From: <strong>{createdFrom}</strong></span>
               <button type="button" onClick={() => setCreatedFrom("")} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
             </span>
           )}
           {createdTo && (
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#faf7f2] border border-[#dfd1bf]/50 px-2.5 py-1 text-xs font-medium text-[#10253e]">
               <span>To: <strong>{createdTo}</strong></span>
               <button type="button" onClick={() => setCreatedTo("")} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
             </span>
@@ -256,7 +302,37 @@ function SuperAdminUsersModule() {
       )}
     </section>
     {mutationError && !modal ? <Alert variant="destructive" className="mt-5"><AlertCircle className="h-4 w-4" /><AlertTitle>Account action needs attention</AlertTitle><AlertDescription>{mutationError.message}</AlertDescription></Alert> : null}
-    <section className="founder-panel founder-panel-paper mt-6 overflow-hidden p-0"><div className="border-b border-[#eee4d7] px-5 py-5"><h2 className="font-display text-3xl text-[#10253e]">{roleLabels[category]}</h2><p className="mt-1 text-sm text-[#53657a]">Open an account to view its authorised actions.</p></div>{list.isLoading ? <LoadingDirectory /> : list.error ? <DirectoryError /> : !list.data?.rows.length ? <EmptyDirectory role={roleLabels[category]} onCreate={openCreate} /> : <div className="divide-y divide-[#f0e9df]">{list.data.rows.map(account => <AccountRow key={account.id} account={account as ManagedAccount} onClick={() => { setSelectedId(account.id); setModal("detail"); }} />)}</div>}</section>
+    <section className="founder-panel founder-panel-paper mt-6 overflow-hidden p-0 rounded-2xl border border-[#eee4d7] bg-white">
+      <div className="border-b border-[#eee4d7] px-5 py-5 bg-[#faf7f2]/30 text-start">
+        <h2 className="font-display text-2xl font-bold text-[#10253e]">{roleLabels[category]}</h2>
+        <p className="mt-1 text-sm text-[#53657a]">Open an account to view its authorised actions.</p>
+      </div>
+      {list.isLoading ? (
+        <div className="p-8"><ModuleSkeleton /></div>
+      ) : list.error ? (
+        <div className="p-8"><ModuleErrorState error={list.error.message} onRetry={() => list.refetch()} /></div>
+      ) : !list.data?.rows.length ? (
+        <div className="p-8">
+          <ModuleEmptyState
+            title={`No records found`}
+            description={`Adjust the local filters or create a new account for this part of the platform.`}
+            icon={UsersRound}
+            action={
+              <Button type="button" onClick={openCreate} className="compass-btn-primary gap-2">
+                <Plus size={16} />
+                Create user
+              </Button>
+            }
+          />
+        </div>
+      ) : (
+        <div className="divide-y divide-[#f0e9df]">
+          {list.data.rows.map(account => (
+            <AccountRow key={account.id} account={account as ManagedAccount} onClick={() => { setSelectedId(account.id); setModal("detail"); }} />
+          ))}
+        </div>
+      )}
+    </section>
     <Dialog open={modal !== null} onOpenChange={open => { if (!open) closeModal(); }}><DialogContent className="max-h-[calc(100dvh-2rem)] max-w-[calc(100%-1rem)] overflow-y-auto rounded-[1.25rem] border-[#dfd1bf] bg-[#fbf8f2] p-0 sm:max-w-2xl" showCloseButton={false}><SuperAdminUserModal mode={modal} selected={selected} loading={detail.isLoading} draft={draft} setDraft={setDraft} profileValues={profileValues} setProfileValues={setProfileValues} pending={create.isPending || update.isPending || remove.isPending} error={mutationError?.message} onSubmit={submit} onClose={closeModal} onDelete={() => selectedId && remove.mutate({ id: selectedId })} /></DialogContent></Dialog>
   </>;
 }
@@ -370,6 +446,4 @@ function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: ()
     </div>
   );
 }
-function LoadingDirectory() { return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div>; }
-function DirectoryError() { return <div className="p-8"><Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>Directory unavailable</AlertTitle><AlertDescription>Refresh the page or try again shortly.</AlertDescription></Alert></div>; }
-function EmptyDirectory({ role, onCreate }: { role: string; onCreate: () => void }) { return <div className="p-10 text-center"><UsersRound className="mx-auto text-[#aab5c1]" size={28} /><h3 className="mt-4 font-display text-3xl text-[#10253e]">No {role.toLowerCase()} yet</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#53657a]">Adjust the local filters or create an account for this part of the platform.</p><Button type="button" onClick={onCreate} className="compass-btn-primary mt-6"><Plus size={16} />Create user</Button></div>; }
+// Legacy helper functions removed. Using global loaders from DashboardLayout.

@@ -232,14 +232,14 @@ export function MarketingContentModule() {
       />
 
       {/* Filter Bar */}
-      <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
+      <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border border-[#eee4d7] shadow-sm">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={td("Search content blocks by title, key, or copy...")}
-            className="pl-9 h-9 text-sm"
+            className="pl-9 h-10 text-sm border-[#eee4d7]"
           />
         </div>
         <span className="text-xs text-[#53657a] px-2 whitespace-nowrap">{filteredBlocks.length} {td("blocks")}</span>
@@ -247,25 +247,25 @@ export function MarketingContentModule() {
 
       {/* Grid */}
       {filteredBlocks.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
+        <div className="text-center py-16 bg-white border border-[#eee4d7] rounded-2xl">
           <Layers className="mx-auto size-10 text-[#53657a]/50" />
           <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No content blocks found")}</p>
           <p className="text-xs text-[#53657a]">{td("Click \"Add Content Block\" to create a new editable message.")}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredBlocks.map((b) => (
-            <Card key={b.id} className="border-[#dce4e7] shadow-sm flex flex-col justify-between">
+            <Card key={b.id} className="border-[#eee4d7] bg-white rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden transition-all hover:border-[#dfd1bf]/80 hover:shadow-md">
               <div>
-                <div className="p-4 border-b border-[#edf2f5]">
+                <div className="p-5 border-b border-[#eee4d7]/60">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#f0f4f8] text-[#53657a]">
+                    <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-lg bg-[#faf7f2] text-[#53657a] border border-[#eee4d7]/40">
                       {b.category}
                     </span>
                     <button
                       type="button"
                       onClick={() => toggleActive(b.id)}
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
+                      className={`text-[10px] px-2.5 py-0.5 rounded-full font-semibold border ${
                         b.isActive
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-gray-100 text-gray-600 border-gray-200"
@@ -274,18 +274,18 @@ export function MarketingContentModule() {
                       {b.isActive ? td("Active on Site") : td("Hidden")}
                     </button>
                   </div>
-                  <h3 className="font-bold text-base text-[#10253e] mt-2">{b.title}</h3>
-                  <code className="text-[11px] font-mono text-[#173fad] mt-1 block">{td("Key")}: #{b.blockKey}</code>
+                  <h3 className="font-bold text-base text-[#10253e] mt-3 text-start leading-snug">{b.title}</h3>
+                  <code className="text-[11px] font-mono text-[#173fad] mt-1 block text-start">{td("Key")}: #{b.blockKey}</code>
                 </div>
 
-                <CardContent className="p-4 space-y-2 text-xs text-[#53657a]">
-                  <p className="text-[#314155] leading-relaxed bg-[#f8fafc] p-2.5 rounded-lg border border-[#edf2f5]">
+                <CardContent className="p-5 space-y-3.5 text-xs text-[#53657a] text-start">
+                  <p className="text-[#314155] leading-relaxed bg-[#faf7f2]/80 p-3 rounded-lg border border-[#eee4d7]/60">
                     {b.content}
                   </p>
                   {b.ctaText ? (
                     <div className="flex items-center gap-2 pt-1 text-[11px]">
                       <span className="font-semibold text-[#10253e]">{td("CTA Button")}:</span>
-                      <span className="bg-[#e8eeff] text-[#173fad] px-2 py-0.5 rounded font-medium">
+                      <span className="bg-[#e8eeff] text-[#173fad] px-2.5 py-0.5 rounded-lg font-medium">
                         {b.ctaText} ({b.ctaLink})
                       </span>
                     </div>
@@ -293,14 +293,14 @@ export function MarketingContentModule() {
                 </CardContent>
               </div>
 
-              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 rounded-b-xl">
-                <span className="text-[10px] text-[#8292a1]">{td("Updated")} {b.updatedAt}</span>
+              <div className="p-4 bg-[#faf7f2]/30 border-t border-[#eee4d7]/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <span className="text-[10px] text-[#8292a1] text-start">{td("Updated")} {b.updatedAt}</span>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleOpenEdit(b)}
-                    className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs gap-1 flex-1 sm:flex-initial"
+                    className="min-h-[44px] h-11 text-xs gap-1.5 flex-1 sm:flex-initial rounded-xl border-[#eee4d7] hover:bg-[#faf7f2]/80"
                   >
                     <Edit2 size={13} />
                     {td("Edit")}
@@ -309,7 +309,7 @@ export function MarketingContentModule() {
                     variant="outline"
                     size="sm"
                     onClick={() => setDeleteTargetId(b.id)}
-                    className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1 flex-1 sm:flex-initial"
+                    className="min-h-[44px] h-11 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1.5 flex-1 sm:flex-initial rounded-xl"
                   >
                     <Trash2 size={13} />
                     {td("Delete")}

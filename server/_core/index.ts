@@ -51,6 +51,16 @@ async function startServer() {
     createExpressMiddleware({
       router: appRouter,
       createContext,
+      allowMethodOverride: true,
+      responseMeta(opts) {
+        const hasErrors = opts.errors && opts.errors.length > 0;
+        if (hasErrors) {
+          return {
+            status: 200,
+          };
+        }
+        return {};
+      },
       onError({ error, path }) {
         if (error.code === "INTERNAL_SERVER_ERROR") {
           console.error(`[tRPC Error on ${path}]:`, error);

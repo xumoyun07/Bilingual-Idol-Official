@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import DashboardLayout from "@/components/DashboardLayout";
+import DashboardLayout, { ModuleSkeleton, ModuleEmptyState, ModuleErrorState, DashboardContentArea } from "@/components/DashboardLayout";
 import { ConfigurableCreateUserModal } from "@/components/ConfigurableCreateUserModal";
 import { DynamicUserProfileFields, type DynamicField, type DynamicSection } from "@/components/DynamicUserProfileFields";
 import { UserFieldBuilder } from "@/components/UserFieldBuilder";
@@ -180,9 +180,9 @@ function FounderConsole() {
   const currentSection = FOUNDER_NAVIGATION_SECTIONS.find((sec) => sec.type === roleParam) || FOUNDER_NAVIGATION_SECTIONS[0];
 
   return (
-    <div id="admin-dashboard-container" data-page="admin" className={`workspace-page founder-command founder-workspace page-admin mx-auto w-full max-w-[88rem] px-4 sm:px-6 md:px-8 overflow-x-hidden pb-12 ${isRTL ? "dir-rtl" : ""}`}>
+    <div id="admin-dashboard-container" data-page="admin" className={`workspace-page founder-command w-full space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
       {/* Top User Type Pill Navigator */}
-      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-2.5 sm:p-3 rounded-2xl border border-[#dce4e7] shadow-xs">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-2.5 sm:p-3 rounded-2xl border border-[#eee4d7] shadow-xs">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth pb-1 sm:pb-0 sm:flex-wrap">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#708098] px-2 shrink-0 hidden xs:inline">
             {td("User Type Focus:")}
@@ -198,12 +198,12 @@ function FounderConsole() {
                 className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
                   isSelected
                     ? "bg-[#10253e] text-white shadow-xs"
-                    : "bg-[#f8fafc] text-[#475569] hover:bg-[#eef2f6] border border-[#e2e8f0]"
+                    : "bg-[#faf7f2] text-[#475569] hover:bg-[#eee4d7]/40 border border-[#dfd1bf]/60"
                 }`}
               >
                 <SecIcon size={14} className={isSelected ? "text-amber-300" : "text-[#64748b]"} />
                 <span>{td(sec.label)}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-[#edf2f7] text-[#64748b]"}`}>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-[#faf7f2] text-[#64748b]"}`}>
                   {sec.modules.length}
                 </span>
               </button>
@@ -232,7 +232,7 @@ function FounderConsole() {
                 className={`shrink-0 inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
                   isModActive
                     ? "bg-[#173fad] text-white shadow-xs"
-                    : "bg-white text-[#53657a] hover:bg-[#f1f5f9] hover:text-[#10253e] border border-[#dce4e7]"
+                    : "bg-white text-[#53657a] hover:bg-[#faf7f2] hover:text-[#10253e] border border-[#eee4d7]"
                 }`}
               >
                 <ModIcon size={14} className={isModActive ? "text-white" : "text-[#64748b]"} />
@@ -240,7 +240,7 @@ function FounderConsole() {
                 {mod.badge && (
                   <span
                     className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                      isModActive ? "bg-white/20 text-white" : "bg-[#edf2f7] text-[#53657a]"
+                      isModActive ? "bg-white/20 text-white" : "bg-[#faf7f2] text-[#53657a]"
                     }`}
                   >
                     {td(mod.badge)}
@@ -252,7 +252,9 @@ function FounderConsole() {
         </div>
       )}
 
-      {renderActiveModule()}
+      <DashboardContentArea>
+        {renderActiveModule()}
+      </DashboardContentArea>
     </div>
   );
 }
@@ -731,7 +733,37 @@ function UsersModule() {
       )}
     </section>
     {mutationError && !modal ? <Alert variant="destructive" className="mt-5"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Account action needs attention")}</AlertTitle><AlertDescription>{mutationError.message}</AlertDescription></Alert> : null}
-    <section className="founder-panel founder-panel-paper mt-6 overflow-hidden p-0"><div className="border-b border-[#eee4d7] px-5 py-5"><h2 className="font-display text-3xl text-[#10253e]">{td(roleLabels[category])}</h2><p className="mt-1 text-sm text-[#53657a]">{td("Open an account to view its full profile and authorised actions.")}</p></div>{list.isLoading ? <LoadingDirectory /> : list.error ? <DirectoryError /> : !list.data?.rows.length ? <EmptyDirectory role={roleLabels[category]} onCreate={openCreate} /> : <div className="divide-y divide-[#f0e9df]">{list.data.rows.map(account => <AccountRow key={account.id} account={account as ManagedAccount} onClick={() => openDetail(account.id)} />)}</div>}</section>
+    <section className="founder-panel founder-panel-paper mt-6 overflow-hidden p-0 rounded-2xl border border-[#eee4d7] bg-white">
+      <div className="border-b border-[#eee4d7] px-5 py-5 bg-[#faf7f2]/30">
+        <h2 className="font-display text-2xl font-bold text-[#10253e]">{td(roleLabels[category])}</h2>
+        <p className="mt-1 text-sm text-[#53657a]">{td("Open an account to view its full profile and authorised actions.")}</p>
+      </div>
+      {list.isLoading ? (
+        <div className="p-8"><ModuleSkeleton /></div>
+      ) : list.error ? (
+        <div className="p-8"><ModuleErrorState error={list.error.message} onRetry={() => list.refetch()} /></div>
+      ) : !list.data?.rows.length ? (
+        <div className="p-8">
+          <ModuleEmptyState
+            title={td(`No accounts found`)}
+            description={td("Adjust the local filters or create a new account for this part of the platform.")}
+            icon={UsersRound}
+            action={
+              <Button type="button" onClick={openCreate} className="compass-btn-primary gap-2">
+                <Plus size={16} />
+                {td("Create user")}
+              </Button>
+            }
+          />
+        </div>
+      ) : (
+        <div className="divide-y divide-[#f0e9df]">
+          {list.data.rows.map(account => (
+            <AccountRow key={account.id} account={account as ManagedAccount} onClick={() => openDetail(account.id)} />
+          ))}
+        </div>
+      )}
+    </section>
     <Dialog open={modal !== null} onOpenChange={open => { if (!open) closeModal(); }}><DialogContent className="w-full h-full max-h-screen max-w-none overflow-y-auto rounded-none border-0 bg-[#fbf8f2] p-0 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:max-w-2xl sm:rounded-[1.25rem] sm:border sm:border-[#dfd1bf]" showCloseButton={false}><UserModal mode={modal} selected={selected} loading={detail.isLoading} draft={draft} setDraft={setDraft} profileFields={(formSchema.data?.fields ?? []) as DynamicField[]} profileSections={(formSchema.data?.sections ?? []) as DynamicSection[]} profileValues={profileValues} setProfileValues={setProfileValues} pending={create.isPending || update.isPending || remove.isPending} error={mutationError?.message} onSubmit={submit} onClose={closeModal} onDelete={() => selectedId && remove.mutate({ id: selectedId })} /></DialogContent></Dialog>
     <UserFieldBuilder open={builderOpen} onOpenChange={setBuilderOpen} />
   </>;
@@ -859,6 +891,3 @@ function UserModal({ mode, selected, loading, draft, setDraft, profileFields, pr
 }
 
 function TextField({ label, value, onChange, type = "text", required, hint, autoComplete }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; hint?: string; autoComplete?: string }) { return <label className="block text-xs font-extrabold text-[#53657a]">{label}<input required={required} type={type} autoComplete={autoComplete} value={value} onChange={event => onChange(event.target.value)} className="mt-1.5 h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" />{hint ? <span className="mt-1.5 block text-[11px] font-normal leading-4 text-[#708098]">{hint}</span> : null}</label>; }
-function LoadingDirectory() { const { td } = useLanguage(); return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" />{td("Loading…")}</div>; }
-function DirectoryError() { const { td } = useLanguage(); return <div className="p-8"><Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>{td("Directory unavailable")}</AlertTitle><AlertDescription>{td("Refresh the page or try again shortly.")}</AlertDescription></Alert></div>; }
-function EmptyDirectory({ role, onCreate }: { role: string; onCreate: () => void }) { const { td } = useLanguage(); return <div className="p-10 text-center"><UsersRound className="mx-auto text-[#aab5c1]" size={28} /><h3 className="mt-4 font-display text-3xl text-[#10253e]">{td("No")} {td(role).toLowerCase()} {td("yet")}</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#53657a]">{td("Adjust the local filters or create an account for this part of the platform.")}</p><Button type="button" onClick={onCreate} className="compass-btn-primary mt-6"><Plus size={16} />{td("Create user")}</Button></div>; }

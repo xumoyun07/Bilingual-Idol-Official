@@ -146,7 +146,7 @@ function DashboardShell({
     navigateTo,
     toggleSection,
   } = useFounderNav();
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { isMobile, setOpenMobile, state } = useSidebar();
 
   // Header Title
   const getHeaderTitle = () => {
@@ -207,14 +207,19 @@ function DashboardShell({
     return td("Student Account");
   };
 
+  const sidebarWidth = isMobile ? "0px" : state === "collapsed" ? "5rem" : "18.5rem";
+
   return (
-    <>
+    <div
+      style={{ "--dashboard-sidebar-width": sidebarWidth } as React.CSSProperties}
+      className={`min-h-screen w-full bg-[#fbf8f2] text-[#10253e] pb-12 transition-all duration-300 ${
+        isRTL ? "is-rtl" : ""
+      }`}
+    >
       <Sidebar
         side={isRTL ? "right" : "left"}
         collapsible="icon"
-        className={`minimal-sidebar fixed inset-y-0 ${
-          isRTL ? "right-0 border-l" : "left-0 border-r-0"
-        }`}
+        className="bilc-floating-sidebar"
       >
         <SidebarHeader className="minimal-sidebar-header border-b border-[#edf2f5] pb-3">
           <span className="minimal-brand-mark" aria-hidden="true">
@@ -519,16 +524,16 @@ function DashboardShell({
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset className={`minimal-dashboard-inset ${isRTL ? "rtl-inset" : ""}`}>
+      <SidebarInset className={`minimal-dashboard-inset transition-all duration-300 ${isRTL ? "rtl-inset" : ""}`}>
         <BackgroundCircleField seed={`dashboard-${role}-${location}`} />
-        <header className="minimal-dashboard-header fixed top-0 z-50 flex items-center justify-between bg-white/95 backdrop-blur-md border-b border-[#edf2f5] px-4 sm:px-6 md:px-8">
+        <header className="bilc-floating-header minimal-dashboard-header">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <SidebarTrigger className="minimal-mobile-trigger shrink-0" aria-label={td("Open menu")}>
               <Menu className="size-5" />
             </SidebarTrigger>
             <div className="min-w-0">
               <p className="minimal-eyebrow text-[10px] uppercase tracking-wider">{td("BILC Management Console")}</p>
-              <h1 className="text-xs sm:text-base md:text-lg font-bold text-[#10253e] leading-tight" title={getHeaderTitle()}>
+              <h1 className="text-xs sm:text-base md:text-lg font-bold text-[#10253e] leading-tight truncate" title={getHeaderTitle()}>
                 {getHeaderTitle()}
               </h1>
             </div>
@@ -540,71 +545,83 @@ function DashboardShell({
             </span>
           </div>
         </header>
-        <main className="minimal-dashboard-main workspace-surface pb-24 md:pb-8">{children}</main>
 
-        {/* Elegant Mobile Bottom Navigation Bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-[#edf2f5] bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,16px)] md:hidden flex items-center justify-around px-4">
-          {(() => {
-            const tabs = (() => {
-              if (role === "student") {
-                return [
-                  { label: td("Dashboard"), icon: LayoutDashboard, href: "/dashboard", active: location === "/dashboard" },
-                  { label: td("Programs"), icon: BookOpen, href: "/programs", active: false },
-                  { label: td("Support"), icon: MessageSquare, href: "/contact", active: location === "/contact" },
-                  { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
-                ];
-              }
-              if (role === "teacher") {
-                return [
-                  { label: td("Schedule"), icon: CalendarDays, href: "/teacher", active: location === "/teacher" },
-                  { label: td("Catalog"), icon: BookOpen, href: "/programs", active: false },
-                  { label: td("Support"), icon: MessageSquare, href: "/contact", active: location === "/contact" },
-                  { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
-                ];
-              }
-              if (role === "marketing") {
-                return [
-                  { label: td("Overview"), icon: LayoutDashboard, onClick: () => externalSetActiveTab?.("overview"), active: externalActiveTab === "overview" },
-                  { label: td("Content"), icon: FileText, onClick: () => externalSetActiveTab?.("content"), active: externalActiveTab === "content" },
-                  { label: td("Media"), icon: ImageIcon, onClick: () => externalSetActiveTab?.("media"), active: externalActiveTab === "media" },
-                  { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
-                ];
-              }
-              // admin, super_admin, founder
-              const baseAdminUrl = role === "super_admin" ? "/super-admin" : "/admin";
-              return [
-                { label: td("Admin"), icon: Shield, href: baseAdminUrl, active: location === baseAdminUrl },
-                { label: td("Users"), icon: UsersRound, href: `${baseAdminUrl}/users`, active: location === `${baseAdminUrl}/users` },
-                { label: td("Logs"), icon: FileText, href: `${baseAdminUrl}/audit-logs`, active: location === `${baseAdminUrl}/audit-logs` },
-                { label: td("Sign Out"), icon: LogOut, onClick: () => logout(), active: false },
-              ];
-            })();
-
-            return tabs.map((tab, idx) => {
-              const TabIcon = tab.icon;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    if (tab.onClick) {
-                      tab.onClick();
-                    } else if (tab.href) {
-                      setLocation(tab.href);
-                    }
-                  }}
-                  className={`flex flex-col items-center justify-center gap-1 text-[11px] font-semibold h-full w-20 transition-all ${
-                    tab.active ? "text-[#173fad]" : "text-[#566983]"
-                  }`}
-                >
-                  <TabIcon size={18} className={tab.active ? "text-[#173fad]" : "text-[#566983]"} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            });
-          })()}
-        </div>
+        <main className="bilc-dashboard-main">
+          <DashboardContentArea>{children}</DashboardContentArea>
+        </main>
       </SidebarInset>
-    </>
+    </div>
   );
 }
+
+export function ModuleSkeleton() {
+  return (
+    <div className="w-full space-y-6 animate-pulse">
+      <div className="h-10 w-1/4 bg-slate-200/60 rounded-lg"></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="h-40 bg-slate-200/50 rounded-2xl"></div>
+        <div className="h-40 bg-slate-200/50 rounded-2xl"></div>
+        <div className="h-40 bg-slate-200/50 rounded-2xl"></div>
+      </div>
+      <div className="space-y-4">
+        <div className="h-12 bg-slate-200/40 rounded-xl w-full"></div>
+        <div className="h-12 bg-slate-200/40 rounded-xl w-full"></div>
+        <div className="h-12 bg-slate-200/40 rounded-xl w-full"></div>
+      </div>
+    </div>
+  );
+}
+
+interface ModuleEmptyStateProps {
+  title: string;
+  description: string;
+  icon?: React.ComponentType<{ className?: string; size?: number }>;
+  action?: React.ReactNode;
+}
+
+export function ModuleEmptyState({ title, description, icon: Icon, action }: ModuleEmptyStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-[#dfd1bf] rounded-2xl bg-white/50 backdrop-blur-xs min-h-[350px]">
+      <div className="p-4 rounded-full bg-[#faf7f2] border border-[#f0e6d6] text-[#708098] mb-4">
+        {Icon ? <Icon size={32} /> : <div className="size-8 rounded-full bg-slate-200" />}
+      </div>
+      <h3 className="text-lg font-bold text-[#10253e] mb-2">{title}</h3>
+      <p className="text-sm text-[#53657a] max-w-sm leading-relaxed mb-6">{description}</p>
+      {action || null}
+    </div>
+  );
+}
+
+interface ModuleErrorStateProps {
+  error?: string;
+  onRetry?: () => void;
+}
+
+export function ModuleErrorState({ error, onRetry }: ModuleErrorStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center p-8 border border-red-100 rounded-2xl bg-red-50/30 backdrop-blur-xs min-h-[300px]">
+      <div className="p-4 rounded-full bg-red-50 border border-red-100 text-red-600 mb-4">
+        <ShieldCheck size={32} className="text-red-600 rotate-180" />
+      </div>
+      <h3 className="text-lg font-bold text-[#10253e] mb-2">Something went wrong</h3>
+      <p className="text-sm text-[#7a5353] max-w-sm leading-relaxed mb-6">
+        {error || "An error occurred while loading this section. Please try again."}
+      </p>
+      {onRetry && (
+        <Button onClick={onRetry} variant="outline" className="border-red-200 hover:bg-red-50 text-red-700">
+          <ChevronDown size={16} className="rotate-90 inline-block me-2" />
+          Retry loading
+        </Button>
+      )}
+    </div>
+  );
+}
+
+export function DashboardContentArea({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-full max-w-7xl mx-auto space-y-6">
+      {children}
+    </div>
+  );
+}
+

@@ -74,7 +74,7 @@ export function FounderModuleHeader({
           </div>
 
           {/* Heading */}
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#10253e] leading-tight font-display">
+          <h1 className="text-[clamp(1.25rem,4vw,1.875rem)] font-extrabold tracking-tight text-[#10253e] leading-tight font-display">
             {td(title)}
           </h1>
 

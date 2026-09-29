@@ -221,14 +221,14 @@ export function MarketingCampaignsModule() {
       />
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-[#dce4e7] shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-2xl border border-[#eee4d7] shadow-sm">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#53657a]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={td("Search campaigns by name, promo code, or target audience...")}
-            className="pl-9 h-9 text-sm"
+            className="pl-9 h-10 text-sm border-[#eee4d7]"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export function MarketingCampaignsModule() {
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             aria-label="Filter campaigns by status"
-            className="h-9 px-3 text-xs font-medium rounded-lg border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
+            className="h-10 px-3 text-xs font-medium rounded-xl border border-[#eee4d7] bg-[#faf7f2]/40 text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]"
           >
             <option value="all">{td("All Statuses")}</option>
             <option value="active">{td("Active")}</option>
@@ -251,17 +251,17 @@ export function MarketingCampaignsModule() {
 
       {/* Cards */}
       {filteredCampaigns.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-[#dce4e7] rounded-xl">
+        <div className="text-center py-16 bg-white border border-[#eee4d7] rounded-2xl">
           <Tag className="mx-auto size-10 text-[#53657a]/50" />
           <p className="mt-2 text-sm font-semibold text-[#10253e]">{td("No campaigns found")}</p>
           <p className="text-xs text-[#53657a]">{td("Click \"Create Campaign\" to launch a promotional code.")}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCampaigns.map((camp) => (
-            <Card key={camp.id} className="border-[#dce4e7] shadow-sm flex flex-col justify-between">
+            <Card key={camp.id} className="border-[#eee4d7] bg-white rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden transition-all hover:border-[#dfd1bf]/80 hover:shadow-md">
               <div>
-                <div className="p-4 border-b border-[#edf2f5]">
+                <div className="p-5 border-b border-[#eee4d7]/60">
                   <div className="flex items-center justify-between gap-2">
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border ${
@@ -274,50 +274,50 @@ export function MarketingCampaignsModule() {
                     >
                       {td(camp.status)}
                     </span>
-                    <span className="text-xs font-bold text-[#173fad] bg-[#e8eeff] px-2 py-0.5 rounded">
+                    <span className="text-xs font-bold text-[#173fad] bg-[#e8eeff] px-2.5 py-0.5 rounded-lg">
                       {camp.discountValue}
                     </span>
                   </div>
-                  <h3 className="font-bold text-base text-[#10253e] mt-2">{camp.name}</h3>
-                  <div className="mt-2 flex items-center gap-1.5">
+                  <h3 className="font-bold text-base text-[#10253e] mt-3 text-start leading-snug">{camp.name}</h3>
+                  <div className="mt-2.5 flex items-center gap-1.5 justify-start">
                     <span className="text-xs text-[#53657a]">{td("Code")}:</span>
-                    <code className="text-xs font-mono font-bold bg-[#f1f5f9] px-2 py-0.5 rounded text-[#10253e] border border-[#e2e8f0]">
+                    <code className="text-xs font-mono font-bold bg-[#faf7f2] px-2.5 py-0.5 rounded-lg text-[#10253e] border border-[#eee4d7]">
                       {camp.promoCode}
                     </code>
                   </div>
                 </div>
 
-                <CardContent className="p-4 space-y-2 text-xs text-[#53657a]">
+                <CardContent className="p-5 space-y-3.5 text-xs text-[#53657a] text-start">
                   <div>
-                    <span className="text-[#10253e] font-semibold block">{td("Target Audience")}:</span>
-                    <span className="text-[#314155]">{camp.targetAudience}</span>
+                    <span className="text-[#10253e] font-semibold block mb-0.5">{td("Target Audience")}:</span>
+                    <span className="text-[#314155] leading-relaxed">{camp.targetAudience}</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-2 gap-4 pt-1">
                     <div>
-                      <span className="text-[#10253e] font-semibold block">{td("Duration")}:</span>
-                      <span>
+                      <span className="text-[#10253e] font-semibold block mb-0.5">{td("Duration")}:</span>
+                      <span className="leading-relaxed">
                         {camp.startDate} {td("to")} {camp.endDate}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#10253e] font-semibold block">{td("Allocated Budget")}:</span>
-                      <span className="text-[#10253e] font-medium">{camp.budget}</span>
+                      <span className="text-[#10253e] font-semibold block mb-0.5">{td("Allocated Budget")}:</span>
+                      <span className="text-[#10253e] font-medium leading-relaxed">{camp.budget}</span>
                     </div>
                   </div>
                   {camp.notes ? (
-                    <p className="text-[11px] italic bg-[#f8fafc] p-1.5 rounded border border-[#edf2f5] mt-1">
+                    <p className="text-[11px] italic bg-[#faf7f2]/70 p-2 rounded-lg border border-[#eee4d7]/60 mt-2 leading-relaxed">
                       {camp.notes}
                     </p>
                   ) : null}
                 </CardContent>
               </div>
 
-              <div className="p-3 bg-[#f8fafc] border-t border-[#edf2f5] flex items-center justify-end gap-2 rounded-b-xl">
+              <div className="p-4 bg-[#faf7f2]/30 border-t border-[#eee4d7]/60 flex items-center justify-end gap-2.5">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenEdit(camp)}
-                  className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs gap-1 flex-1 sm:flex-initial"
+                  className="min-h-[44px] h-11 text-xs gap-1.5 flex-1 sm:flex-initial rounded-xl border-[#eee4d7] hover:bg-[#faf7f2]/80"
                 >
                   <Edit2 size={13} />
                   {td("Edit")}
@@ -326,7 +326,7 @@ export function MarketingCampaignsModule() {
                   variant="outline"
                   size="sm"
                   onClick={() => setDeleteTargetId(camp.id)}
-                  className="min-h-[44px] sm:min-h-[32px] sm:h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1 flex-1 sm:flex-initial"
+                  className="min-h-[44px] h-11 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 gap-1.5 flex-1 sm:flex-initial rounded-xl"
                 >
                   <Trash2 size={13} />
                   {td("Delete")}
