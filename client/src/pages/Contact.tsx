@@ -52,10 +52,6 @@ export default function Contact() {
               </div>
             ))}
           </div>
-          <div className="simple-map-block contact-map-block--light">
-            <MapPin size={18} aria-hidden="true" />
-            <p>{t("contact.addressText")}</p>
-          </div>
           <div className="simple-map contact-map--rounded contact-map--borderless">
             <CentreMap />
           </div>

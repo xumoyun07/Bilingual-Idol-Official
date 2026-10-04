@@ -99,12 +99,13 @@ async function startServer() {
     serveStatic(app);
   }
 
-  // Seed default users if database is connected
+  // Seed default users and run submissions to programId mapping migration if database is connected
   try {
-    const { seedDatabaseDefaultUsers } = await import("../db");
+    const { seedDatabaseDefaultUsers, migrateExistingSubmissionsToProgramId } = await import("../db");
     await seedDatabaseDefaultUsers();
+    await migrateExistingSubmissionsToProgramId();
   } catch (error) {
-    console.error("[Seed] Failed to seed default users:", error);
+    console.error("[Startup] Failed to seed default users or run programId mapping migration:", error);
   }
 
   const port = 3000;

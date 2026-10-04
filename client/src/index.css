@@ -8458,7 +8458,7 @@ div#root:nth-of-type(1) > main#login-page-container:nth-of-type(1) > section#log
     box-sizing: border-box !important;
   }
   /* Hide the desktop stepper view on mobile/tablet to prevent horizontal layout break */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(6) > div:nth-of-type(2) {
+  section#student-journey > div:nth-of-type(2) {
     display: none !important;
   }
   div#root > div > main#main-content > div#home-page-container > section#student-journey > .bilc-journey-header,
@@ -9308,44 +9308,6 @@ div#root > div > main#main-content > div#home-page-container > section#verified-
   color: #ffffff !important;
 }
 
-/* Focus Mode: Mobile style overrides for Student Journey roadmap stepper buttons */
-@media (max-width: 767px) {
-  /* Stepper container forces equal 6 grid columns on mobile */
-  div#root > div > main#main-content > div#home-page-container > section#student-journey > div:nth-of-type(2) {
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 0.375rem !important;
-    margin-bottom: 1.5rem !important;
-    display: grid !important;
-  }
-
-  /* Keep step buttons' original rectangular shape and slightly adjust padding/size */
-  div#root > div > main#main-content > div#home-page-container > section#student-journey > div:nth-of-type(2) button.bilc-journey-step-btn {
-    padding: 0.875rem 0.5rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-direction: column !important;
-    border-radius: 1rem !important; /* Preserves the original 1rem rectangular rounded corners shape */
-    text-align: center !important;
-    min-height: 52px !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  /* Hide texts on mobile */
-  div#root > div > main#main-content > div#home-page-container > section#student-journey > div:nth-of-type(2) button.bilc-journey-step-btn .bilc-step-name,
-  div#root > div > main#main-content > div#home-page-container > section#student-journey > div:nth-of-type(2) button.bilc-journey-step-btn .bilc-step-zh {
-    display: none !important;
-  }
-
-  /* Enlarge the active/inactive step numbers in this mode */
-  div#root > div > main#main-content > div#home-page-container > section#student-journey > div:nth-of-type(2) button.bilc-journey-step-btn .bilc-step-num {
-    font-size: 1.5rem !important;
-    margin-bottom: 0 !important;
-    line-height: 1 !important;
-    display: block !important;
-  }
-}
 
 /* Disable all hover transition effects, scales, and translate movements on mobile (max-width: 1024px) */
 @media (max-width: 1024px) {
@@ -10245,4 +10207,71 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     padding-top: 6.5rem;
     padding-bottom: 3rem;
   }
+}
+
+/* Mobile-only overrides as requested by User and Element Selection */
+@media (max-width: 767px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(5) {
+    margin-bottom: 90px !important;
+    width: 340px !important;
+    margin-left: 18px !important;
+    border-radius: 24px !important;
+  }
+}
+
+/* Campus Facilities section border style override */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(4) {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: var(--border) !important;
+  border-radius: 16px !important;
+}
+
+/* Student Journey section mobile overrides */
+@media (max-width: 767px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(5) {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    width: 355px !important;
+  }
+
+  /* Selector 2: Mobile padding for student journey mobile wrapper */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#student-journey:nth-of-type(5) > div:nth-of-type(3) {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  /* Selector 3: Mobile padding for testimonials */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#verified-testimonials-section:nth-of-type(6) {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  /* Selector 4: Mobile styles for contact strip section */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#home-contact-strip-section:nth-of-type(7) {
+    padding-left: 20px !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    width: 355px !important;
+  }
+
+  /* Selector 6: Mobile padding-top and padding-bottom for main element */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) {
+    padding-top: 70px !important;
+    padding-bottom: 0px !important;
+  }
+}
+
+
+/* Verified Testimonials slider item styling override */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#verified-testimonials-section:nth-of-type(6) > div:nth-of-type(3) > div:nth-of-type(1) {
+  background-color: #ffffff !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: var(--border, #edf2f7) !important;
+  border-radius: 16px !important;
+  padding-left: 20px !important;
+  padding-top: 20px !important;
+  padding-right: 20px !important;
+  padding-bottom: 20px !important;
 }

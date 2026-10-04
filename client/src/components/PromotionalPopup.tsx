@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Gift, X, ArrowRight, Sparkles, Megaphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
@@ -241,7 +242,9 @@ export function PromotionalPopupModal({ isOpen, setIsOpen }: PromoProps) {
 
   if (!isActive || isLoading) return null;
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -355,6 +358,7 @@ export function PromotionalPopupModal({ isOpen, setIsOpen }: PromoProps) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

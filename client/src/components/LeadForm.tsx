@@ -9,6 +9,7 @@ const inquirySchema = z.object({
   name: z.string().trim().min(2, "Please enter your name."),
   email: z.string().trim().max(320).optional().default(""),
   phone: z.string().trim().max(64).optional().default(""),
+  programId: z.string().optional().default(""),
   message: z.string().trim().max(1500, "Please keep your message under 1,500 characters.").optional(),
   reasonType: z.enum(["general", "consultation", "campusTour"]),
 }).refine(data => data.email.trim().length > 0 || data.phone.trim().length > 0, {
@@ -27,10 +28,13 @@ export function LeadForm({ title }: { type?: "enrollment" | "inquiry"; title?: s
       name: "",
       email: "",
       phone: "",
+      programId: "",
       message: "",
       reasonType: "general",
     },
   });
+
+  const programsQuery = trpc.content.publicPrograms.useQuery();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -45,7 +49,12 @@ export function LeadForm({ title }: { type?: "enrollment" | "inquiry"; title?: s
   const onSubmit = async (values: InquiryValues) => {
     try {
       await mutation.mutateAsync({
-        ...values,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        programId: values.programId ? Number(values.programId) : null,
+        message: values.message,
+        reasonType: values.reasonType,
         sourcePage: window.location.pathname + window.location.search,
       });
       form.reset();
@@ -108,6 +117,20 @@ export function LeadForm({ title }: { type?: "enrollment" | "inquiry"; title?: s
             <option value="general">{language === "ms" ? "Pertanyaan Umum" : language === "ar" ? "استفسار عام" : "General Enquiry"}</option>
             <option value="consultation">{language === "ms" ? "Tempah Sesi Konsultasi" : language === "ar" ? "حجز جلسة استشارة" : "Book Consultation"}</option>
             <option value="campusTour">{language === "ms" ? "Tempah Lawatan Kampus" : language === "ar" ? "حجز جولة في المركز" : "Book Campus Tour"}</option>
+          </select>
+        </label>
+
+        <label className="text-sm font-bold text-[#29415b] sm:col-span-2">
+          {language === "ms" ? "Program yang Diminati" : language === "ar" ? "البرنامج المطلوب" : "Programme of Interest"}
+          <select
+            className={fieldClass}
+            aria-invalid={Boolean(errorFor("programId"))}
+            {...form.register("programId")}
+          >
+            <option value="">{language === "ms" ? "Pilih program (Pilihan)..." : language === "ar" ? "اختر البرنامج (اختياري)..." : "Select a programme (Optional)..."}</option>
+            {programsQuery.data?.map(prog => (
+              <option key={prog.id} value={String(prog.id)}>{prog.title} ({prog.language})</option>
+            ))}
           </select>
         </label>
 

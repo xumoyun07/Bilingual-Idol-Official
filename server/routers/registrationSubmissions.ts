@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, publicProcedure, marketingProcedure, router } from "../_core/trpc";
 
 export const registrationSubmissionsRouter = router({
   // CRM Registration Submissions (Form 2)
@@ -14,7 +14,8 @@ export const registrationSubmissionsRouter = router({
 
   submit: publicProcedure
     .input(z.object({
-      programInterest: z.string().trim().min(2, "Select a course interest"),
+      programId: z.number().int().positive(),
+      programInterest: z.string().trim().optional(),
       applicantCategory: z.string().trim().min(1, "Select applicant category"),
       fullName: z.string().trim().min(2, "Enter your full name"),
       email: z.string().trim().email("Enter a valid email address"),
@@ -31,8 +32,20 @@ export const registrationSubmissionsRouter = router({
     }))
     .mutation(async ({ input }) => {
       const { fieldValues, ...submissionData } = input;
+      const programs = await db.listPrograms();
+      const matched = programs.find(p => p.id === input.programId);
+      if (!matched) {
+        throw new Error("Selected program does not exist.");
+      }
+      
+      const interestText = input.programInterest 
+        ? `${matched.title} (${input.programInterest})` 
+        : matched.title;
+
       return db.createRegistrationSubmission({
         ...submissionData,
+        programId: input.programId,
+        programInterest: interestText,
         assignedToUserId: null,
         utmSource: input.utmSource ?? null,
         utmMedium: input.utmMedium ?? null,
@@ -42,11 +55,11 @@ export const registrationSubmissionsRouter = router({
       }, fieldValues);
     }),
 
-  list: adminProcedure.query(async () => {
+  list: marketingProcedure.query(async () => {
     return db.listRegistrationSubmissions();
   }),
 
-  updateStatus: adminProcedure
+  updateStatus: marketingProcedure
     .input(z.object({
       id: z.number().int().positive(),
       status: z.enum(["new", "routed", "accountCreated", "rejected"]),

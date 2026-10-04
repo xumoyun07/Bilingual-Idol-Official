@@ -4,7 +4,8 @@ import * as db from "../db";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 
 export const registrationSubmitInput = z.object({
-  programInterest: z.string().trim().min(2, "Select a course interest"),
+  programId: z.number().int().positive(),
+  programInterest: z.string().trim().optional(),
   applicantCategory: z.string().trim().min(1, "Select applicant category"),
   fullName: z.string().trim().min(2, "Enter your full name"),
   email: z.string().trim().email("Enter a valid email address"),
@@ -41,8 +42,23 @@ export const registrationRouter = router({
       }
 
       const { fieldValues, ...submissionData } = input;
+      const programs = await db.listPrograms();
+      const matched = programs.find(p => p.id === input.programId);
+      if (!matched) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Selected program does not exist.",
+        });
+      }
+
+      const interestText = input.programInterest 
+        ? `${matched.title} (${input.programInterest})` 
+        : matched.title;
+
       return db.createRegistrationSubmission({
         ...submissionData,
+        programId: input.programId,
+        programInterest: interestText,
         assignedToUserId: null,
         utmSource: input.utmSource ?? null,
         utmMedium: input.utmMedium ?? null,

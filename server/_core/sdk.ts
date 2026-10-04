@@ -5,7 +5,7 @@ import * as db from "../db";
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-at-least-32-chars-long-secured";
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-export async function createSessionToken(openId: string, options?: { name?: string; expiresInMs?: number }) {
+export async function createSessionToken(openId: string, options?: { name?: string; expiresInMs?: number; sessionVersion?: number; isRestricted?: boolean }) {
   const isCron = openId.startsWith("cron:") || openId === "cron";
   const taskUid = isCron ? openId.split(":")[1] || "cron_task" : undefined;
 
@@ -14,6 +14,8 @@ export async function createSessionToken(openId: string, options?: { name?: stri
     name: options?.name,
     isCron,
     taskUid,
+    sessionVersion: options?.sessionVersion,
+    isRestricted: options?.isRestricted,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -76,7 +78,16 @@ export async function authenticateRequest(req: any) {
     if (!user) {
       throw new Error(`User not found for openId: ${openId}`);
     }
-    return user;
+
+    // Check if the session version matches the database user's session version to allow instant atomic revocation
+    if (payload.sessionVersion !== undefined && user.sessionVersion !== payload.sessionVersion) {
+      throw new Error("Session has been revoked or expired");
+    }
+
+    return {
+      ...user,
+      isRestricted: !!payload.isRestricted,
+    } as any;
   } catch (error: any) {
     // If it's a verification error of an invalid token or parsing error
     throw new Error(error.message || "Failed to authenticate request");

@@ -1,12 +1,56 @@
 import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment } from "../drizzle/schema";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment, enrollments, Enrollment } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { shouldGrantFounderRole } from "./founderIdentity";
 import { createUserPasswordHash } from "./userAuth";
+import { EmailProvider } from "./email";
 import { normaliseOptions, parseFieldOptions, type RuntimeUserField, type UserFieldType, validateProfileValues } from "./userFieldSchema";
 import { BILC_DOMAIN, generateBilcEmail, resolveLoginIdentifier, validateNickname } from "../shared/nickname";
+
+export function transliterate(text: string): string {
+  const mapping: Record<string, string> = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+    'ا': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh', 'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y', 'ء': 'a', 'ى': 'a', 'ة': 't',
+  };
+  return text.split('').map(char => mapping[char] ?? char).join('');
+}
+
+export async function generateUniqueUserLogin(fullName: string, createdAt: Date): Promise<string> {
+  const transliterated = transliterate(fullName);
+  let baseName = transliterated.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!baseName) {
+    baseName = "user";
+  }
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kuala_Lumpur",
+    year: "numeric",
+    month: "2-digit",
+  });
+  const parts = formatter.formatToParts(createdAt);
+  const mm = parts.find(p => p.type === "month")?.value || "10";
+  const yyyy = parts.find(p => p.type === "year")?.value || "2026";
+  const dateSuffix = `${mm}${yyyy}`;
+
+  const baseLogin = `${baseName}${dateSuffix}`;
+  let candidateEmail = `${baseLogin}@bilc.my`;
+  let suffix = 0;
+
+  while (true) {
+    const existing = await getUserByEmail(candidateEmail);
+    if (!existing) {
+      break;
+    }
+    suffix++;
+    candidateEmail = `${baseLogin}_${suffix}@bilc.my`;
+  }
+
+  return candidateEmail;
+}
+
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -103,6 +147,7 @@ export const inMemoryStore = {
   registrationSubmissions: [] as RegistrationSubmission[],
   registrationSubmissionValues: [] as RegistrationSubmissionValue[],
   applications: [] as Application[],
+  enrollments: [] as Enrollment[],
   placementTests: [
     {
       id: 1,
@@ -587,6 +632,7 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
   let finalEmail: string;
   let finalNickname: string | undefined;
 
+
   if (suppliedNickname) {
     const validation = validateNickname(suppliedNickname);
     if (!validation.valid) {
@@ -597,18 +643,20 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
   } else if (suppliedEmail) {
     finalEmail = suppliedEmail;
   } else {
-    const generatedNick = `user_${randomUUID().replace(/-/g, "").slice(0, 10)}`;
-    finalEmail = generateBilcEmail(generatedNick);
-    finalNickname = generatedNick;
+    // Generate official BILC login identifier format: nameMMYYYY@bilc.my
+    const generatedLogin = await generateUniqueUserLogin(input.name || "user", new Date());
+    finalEmail = generatedLogin;
+    finalNickname = generatedLogin.split("@")[0];
   }
 
   const existing = await getUserByEmail(finalEmail);
   if (existing) {
-    throw new Error(`An account with this nickname (${finalEmail}) already exists. Please choose a different nickname.`);
+    throw new Error(`An account with this email/nickname (${finalEmail}) already exists.`);
   }
 
-  const credentialsIssued = Boolean((suppliedNickname || suppliedEmail) && input.password);
-  const password = input.password ?? randomUUID().replace(/-/g, "") + randomUUID().replace(/-/g, "");
+  const credentialsIssued = Boolean((suppliedNickname || suppliedEmail || input.name) && input.password);
+  // Generate random 12-char OTP if password not specified
+  const password = input.password ?? "BILC$OTP$" + randomUUID().slice(0, 8);
   const profileRows = await validatedProfileRows(input.profileValues ?? {});
   
   if (database) {
@@ -618,10 +666,15 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
         name: input.name?.trim() || (finalNickname ? finalNickname : "Unnamed account"),
         email: finalEmail,
         passwordHash: createUserPasswordHash(password),
-        isActive: input.isActive ?? credentialsIssued,
+        isActive: input.isActive ?? true,
         loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
         role: input.role ?? "student",
         lastSignedIn: new Date(),
+        // OTP secure track:
+        isOtp: true,
+        otpCreatedAt: new Date(),
+        failedAttempts: 0,
+        sessionVersion: 1,
       });
       const userId = Number(created[0].insertId);
       if (profileRows.length) await tx.insert(userProfileValues).values(profileRows.map(row => ({ userId, fieldId: row.fieldId, value: row.value })));
@@ -629,7 +682,18 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
     });
     const created = await getManagedUser(Number(result[0].insertId));
     if (!created) throw new Error("The account could not be created.");
-    return { ...created, generatedEmail: finalEmail, nickname: finalNickname };
+
+    // Extract dynamic contactEmail if specified in profileValues to send login info
+    const contactEmail = input.profileValues?.contactEmail || input.email;
+    if (contactEmail && contactEmail.includes("@")) {
+      try {
+        await EmailProvider.sendOtpEmail(contactEmail, finalEmail, password, "en");
+      } catch (err) {
+        console.error("[Email] Failed to dispatch OTP email:", err);
+      }
+    }
+
+    return { ...created, generatedEmail: finalEmail, nickname: finalNickname, tempPassword: password };
   }
 
   const now = new Date();
@@ -640,20 +704,35 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
     name: input.name?.trim() || (finalNickname ? finalNickname : "Unnamed account"),
     email: finalEmail,
     passwordHash: createUserPasswordHash(password),
-    isActive: input.isActive ?? credentialsIssued,
+    isActive: input.isActive ?? true,
     loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
     role: input.role ?? "student",
     createdAt: now,
     updatedAt: now,
     lastSignedIn: now,
-  };
+    // OTP columns
+    isOtp: true,
+    otpCreatedAt: now,
+    failedAttempts: 0,
+    sessionVersion: 1,
+  } as any;
   inMemoryStore.users.push(newUser);
   for (const row of profileRows) {
     inMemoryStore.userProfileValues.push({ userId, fieldId: row.fieldId, value: row.value });
   }
   const created = await getManagedUser(userId);
   if (!created) throw new Error("The account could not be created.");
-  return { ...created, generatedEmail: finalEmail, nickname: finalNickname };
+
+  const contactEmail = input.profileValues?.contactEmail || input.email;
+  if (contactEmail && contactEmail.includes("@")) {
+    try {
+      await EmailProvider.sendOtpEmail(contactEmail, finalEmail, password, "en");
+    } catch (err) {
+      console.error("[Email] Failed to dispatch OTP email in memory:", err);
+    }
+  }
+
+  return { ...created, generatedEmail: finalEmail, nickname: finalNickname, tempPassword: password };
 }
 
 export async function createSuperAdminManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
@@ -743,6 +822,7 @@ export type SubmissionInput = {
   parentName: string;
   parentEmail: string;
   parentPhone: string;
+  programId?: number | null;
   programInterest: string;
   preferredSchedule: string;
   message?: string;
@@ -760,6 +840,7 @@ export async function createSubmission(input: SubmissionInput) {
   if (db) {
     const result = await db.insert(submissions).values({
       ...input,
+      programId: input.programId || null,
       message: input.message?.trim() || null,
       source: input.source?.trim() || "website",
       reasonType: input.reasonType || "general",
@@ -780,6 +861,7 @@ export async function createSubmission(input: SubmissionInput) {
     parentName: input.parentName,
     parentEmail: input.parentEmail,
     parentPhone: input.parentPhone,
+    programId: input.programId || null,
     programInterest: input.programInterest,
     preferredSchedule: input.preferredSchedule,
     reasonType: input.reasonType || "general",
@@ -1744,4 +1826,406 @@ export async function getRegistrationSubmission(id: number) {
   };
 }
 
+// ==========================================
+// ENROLLMENTS DB & BUSINESS LOGIC OPERATIONS
+// ==========================================
+
+export async function listEnrollments() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(enrollments).orderBy(desc(enrollments.createdAt));
+  }
+  return inMemoryStore.enrollments;
+}
+
+export async function getEnrollmentsByUserId(userId: number) {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(enrollments).where(eq(enrollments.userId, userId)).orderBy(desc(enrollments.createdAt));
+  }
+  return inMemoryStore.enrollments.filter(e => e.userId === userId);
+}
+
+export async function createEnrollment(input: Omit<Enrollment, "id" | "createdAt" | "updatedAt">) {
+  // Check if there is already an active enrollment for the student
+  const existing = await getEnrollmentsByUserId(input.userId);
+  const activeEnrollment = existing.find(e => e.status === "active");
+  if (activeEnrollment) {
+    throw new Error("Student already has an active enrollment. Close or cancel the current one first.");
+  }
+
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(enrollments).values({
+      ...input,
+      notes: input.notes?.trim() || null,
+      completedAt: null,
+    });
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newEnrollment: Enrollment = {
+    id,
+    ...input,
+    notes: input.notes?.trim() || null,
+    completedAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.enrollments.unshift(newEnrollment);
+  return { id };
+}
+
+export async function closeEnrollment(enrollmentId: number, status: "completed" | "cancelled") {
+  const db = await getDb();
+  const completedAt = new Date();
+  if (db) {
+    await db.update(enrollments).set({ status, completedAt }).where(eq(enrollments.id, enrollmentId));
+    return { success: true };
+  }
+
+  const found = inMemoryStore.enrollments.find(e => e.id === enrollmentId);
+  if (found) {
+    found.status = status;
+    found.completedAt = completedAt;
+    found.updatedAt = completedAt;
+  }
+  return { success: true };
+}
+
+// Helper to map programInterest strings to proper DB program IDs
+export function matchProgramInterestToId(interest: string, programsList: Program[]) {
+  const norm = interest.toLowerCase().trim();
+  if (norm.includes("general") && norm.includes("english")) return programsList.find(p => p.slug === "general-english")?.id || null;
+  if (norm.includes("kids")) return programsList.find(p => p.slug === "kids-english")?.id || null;
+  if (norm.includes("speaking") || norm.includes("conversation")) return programsList.find(p => p.slug === "speaking-conversation")?.id || null;
+  if (norm.includes("ielts")) return programsList.find(p => p.slug === "ielts-preparation")?.id || null;
+  if (norm.includes("bahasa") || norm.includes("melayu")) return programsList.find(p => p.slug === "bahasa-melayu")?.id || null;
+  if (norm.includes("mandarin") || norm.includes("chinese")) return programsList.find(p => p.slug === "mandarin")?.id || null;
+  if (norm.includes("arabic")) return programsList.find(p => p.slug === "arabic")?.id || null;
+  if (norm.includes("japanese")) return programsList.find(p => p.slug === "japanese")?.id || null;
+  if (norm.includes("korean")) return programsList.find(p => p.slug === "korean")?.id || null;
+  if (norm.includes("business") && norm.includes("english")) return programsList.find(p => p.slug === "business-english")?.id || null;
+  return null;
+}
+
+// DB mapping data migration runner
+export async function migrateExistingSubmissionsToProgramId() {
+  const programsList = await listPrograms();
+  const db = await getDb();
+  if (db) {
+    try {
+      const subs = await db.select().from(submissions);
+      for (const sub of subs) {
+        if (!sub.programId && sub.programInterest) {
+          const matchedId = matchProgramInterestToId(sub.programInterest, programsList);
+          if (matchedId) {
+            await db.update(submissions).set({ programId: matchedId }).where(eq(submissions.id, sub.id));
+          }
+        }
+      }
+      const regSubs = await db.select().from(registrationSubmissions);
+      for (const reg of regSubs) {
+        if (!reg.programId && reg.programInterest) {
+          const matchedId = matchProgramInterestToId(reg.programInterest, programsList);
+          if (matchedId) {
+            await db.update(registrationSubmissions).set({ programId: matchedId }).where(eq(registrationSubmissions.id, reg.id));
+          }
+        }
+      }
+      console.log("[Migration] Successfully completed existing submissions to programId mapping");
+    } catch (err) {
+      console.warn("[Migration] Database mapping failed:", err);
+    }
+  } else {
+    for (const sub of inMemoryStore.submissions) {
+      if (!sub.programId && sub.programInterest) {
+        sub.programId = matchProgramInterestToId(sub.programInterest, programsList);
+      }
+    }
+    for (const reg of inMemoryStore.registrationSubmissions) {
+      if (!reg.programId && reg.programInterest) {
+        reg.programId = matchProgramInterestToId(reg.programInterest, programsList);
+      }
+    }
+    console.log("[Migration] Completed inMemoryStore mapping fallback successfully");
+  }
+}
+
+export async function createClientAccountAndEnrollment(input: {
+  name: string;
+  email: string;
+  phone: string;
+  programId: number;
+  agreedPrice: number;
+  registrationFee: number;
+  placementTestFee: number;
+  visaFee: number;
+  approvedByUserId: number;
+  source: "registration_form" | "enquiry_form" | "direct_call" | "whatsapp";
+  submissionId?: number | null;
+  registrationSubmissionId?: number | null;
+  notes?: string;
+}) {
+  const database = await getDb();
+  
+  // 1. Validate that forms have their respective submission links as required
+  if (input.source === "registration_form" && !input.registrationSubmissionId) {
+    throw new Error("A registration submission link is mandatory when registering from a registration form.");
+  }
+  if (input.source === "enquiry_form" && !input.submissionId) {
+    throw new Error("An enquiry submission link is mandatory when registering from an enquiry form.");
+  }
+
+  // 2. Validate/Normalize contact email
+  const contactEmail = input.email.trim().toLowerCase();
+
+  // Generate unique Latin login identifier e.g. ivansidorov102026@bilc.my
+  const loginEmail = await generateUniqueUserLogin(input.name, new Date());
+
+  // Generate a random temporary password OTP
+  const tempPassword = "BILC$Student$" + randomUUID().slice(0, 8);
+  const passwordHash = createUserPasswordHash(tempPassword);
+
+  let userId: number;
+
+  if (database) {
+    // Transactional creation
+    const result = await database.transaction(async tx => {
+      // Create user
+      const createdUser = await tx.insert(users).values({
+        openId: `issued:${randomUUID()}`,
+        name: input.name.trim(),
+        email: loginEmail, // User's login identifier
+        passwordHash,
+        isActive: true,
+        loginMethod: "issued_by_founder",
+        role: "student",
+        lastSignedIn: new Date(),
+        // Set OTP track columns:
+        isOtp: true,
+        otpCreatedAt: new Date(),
+        failedAttempts: 0,
+        sessionVersion: 1,
+      });
+      const uId = Number(createdUser[0].insertId);
+      
+      // Create student profile
+      await tx.insert(studentProfiles).values({
+        userId: uId,
+        contactEmail: contactEmail, // Student's actual communication email
+        guardianPhone: input.phone,
+        notes: input.notes?.trim() || null,
+      });
+
+      // Create enrollment
+      await tx.insert(enrollments).values({
+        userId: uId,
+        programId: input.programId,
+        agreedPrice: input.agreedPrice,
+        registrationFee: input.registrationFee,
+        placementTestFee: input.placementTestFee,
+        visaFee: input.visaFee,
+        approvedByUserId: input.approvedByUserId,
+        notes: input.notes?.trim() || null,
+        status: "active",
+        source: input.source,
+        submissionId: input.submissionId || null,
+        registrationSubmissionId: input.registrationSubmissionId || null,
+      });
+
+      // Update linked submission status
+      if (input.submissionId) {
+        await tx.update(submissions)
+          .set({ status: "account_created" })
+          .where(eq(submissions.id, input.submissionId));
+      }
+      if (input.registrationSubmissionId) {
+        await tx.update(registrationSubmissions)
+          .set({ status: "accountCreated" })
+          .where(eq(registrationSubmissions.id, input.registrationSubmissionId));
+      }
+
+      return uId;
+    });
+    userId = result;
+  } else {
+    // Fallback for inMemoryStore
+    const now = new Date();
+    userId = ++inMemoryStore.nextId;
+    
+    // Create user in inMemoryStore
+    inMemoryStore.users.push({
+      id: userId,
+      openId: `issued:${randomUUID()}`,
+      name: input.name.trim(),
+      email: loginEmail, // User's login identifier
+      passwordHash,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      role: "student",
+      createdAt: now,
+      updatedAt: now,
+      lastSignedIn: now,
+      // OTP columns
+      isOtp: true,
+      otpCreatedAt: now,
+      failedAttempts: 0,
+      sessionVersion: 1,
+    } as any);
+
+    // Create student profile
+    inMemoryStore.studentProfiles = inMemoryStore.studentProfiles || [];
+    inMemoryStore.studentProfiles.push({
+      id: ++inMemoryStore.nextId,
+      userId,
+      guardianName: null,
+      guardianPhone: input.phone,
+      contactEmail: contactEmail, // Student's actual communication email
+      dateOfBirth: null,
+      address: null,
+      notes: input.notes?.trim() || null,
+      attendedSessions: 0,
+      totalSessions: 0,
+      currentLevel: null,
+      courseName: null,
+      courseCode: null,
+      courseStartDate: null,
+      courseEndDate: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Create active enrollment
+    inMemoryStore.enrollments.unshift({
+      id: ++inMemoryStore.nextId,
+      userId,
+      programId: input.programId,
+      agreedPrice: input.agreedPrice,
+      registrationFee: input.registrationFee,
+      placementTestFee: input.placementTestFee,
+      visaFee: input.visaFee,
+      approvedByUserId: input.approvedByUserId,
+      approvedAt: now,
+      notes: input.notes?.trim() || null,
+      status: "active",
+      completedAt: null,
+      source: input.source,
+      submissionId: input.submissionId || null,
+      registrationSubmissionId: input.registrationSubmissionId || null,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Update linked submission status
+    if (input.submissionId) {
+      const sub = inMemoryStore.submissions.find(s => s.id === input.submissionId);
+      if (sub) sub.status = "account_created";
+    }
+    if (input.registrationSubmissionId) {
+      const sub = inMemoryStore.registrationSubmissions.find(s => s.id === input.registrationSubmissionId);
+      if (sub) sub.status = "accountCreated";
+    }
+  }
+
+  // Send single-use OTP credentials email to student's communication email address
+  try {
+    await EmailProvider.sendOtpEmail(contactEmail, loginEmail, tempPassword, "en");
+  } catch (err) {
+    console.error("[Email] Failed to dispatch initial OTP login email:", err);
+  }
+
+  return { userId, tempPassword, generatedLogin: loginEmail };
+}
+
+export async function getContactEmailForUser(userId: number, role: string, defaultEmail: string | null): Promise<string> {
+  const database = await getDb();
+  if (role === "student" || role === "user") {
+    if (database) {
+      const profile = (await database.select().from(studentProfiles).where(eq(studentProfiles.userId, userId)).limit(1))[0];
+      if (profile?.contactEmail) return profile.contactEmail;
+    } else {
+      const profile = (inMemoryStore.studentProfiles || []).find(p => p.userId === userId);
+      if (profile?.contactEmail) return profile.contactEmail;
+    }
+  }
+  return defaultEmail || "";
+}
+
+export async function resetUserPasswordAndSession(userId: number, passwordHash: string): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      passwordHash,
+      isOtp: true,
+      otpCreatedAt: new Date(),
+      failedAttempts: 0,
+      sessionVersion: sql`sessionVersion + 1`,
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.passwordHash = passwordHash;
+      user.isOtp = true;
+      user.otpCreatedAt = new Date();
+      user.failedAttempts = 0;
+      user.sessionVersion = (user.sessionVersion || 1) + 1;
+    }
+  }
+}
+
+export async function incrementFailedAttempts(userId: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      failedAttempts: sql`failedAttempts + 1`,
+      updatedAt: new Date()
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.failedAttempts = (user.failedAttempts || 0) + 1;
+      user.updatedAt = new Date();
+    }
+  }
+}
+
+export async function resetFailedAttempts(userId: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      failedAttempts: 0,
+      updatedAt: new Date(),
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.failedAttempts = 0;
+      user.updatedAt = new Date();
+    }
+  }
+}
+
+export async function burnOtp(userId: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      isOtp: false,
+      passwordHash: null,
+      failedAttempts: 0,
+      updatedAt: new Date(),
+      lastSignedIn: new Date()
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.isOtp = false;
+      user.passwordHash = null;
+      user.failedAttempts = 0;
+      user.updatedAt = new Date();
+      user.lastSignedIn = new Date();
+    }
+  }
+}
 

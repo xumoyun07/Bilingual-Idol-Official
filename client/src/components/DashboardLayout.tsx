@@ -458,12 +458,28 @@ function DashboardShell({
             <SidebarMenu className="px-2">
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={location === "/dashboard"}
-                  onClick={() => setLocation("/dashboard")}
+                  isActive={externalActiveTab === "overview" || !externalActiveTab}
+                  onClick={() => {
+                    if (location !== "/dashboard") setLocation("/dashboard");
+                    externalSetActiveTab?.("overview");
+                  }}
                   className="minimal-nav-item"
                 >
                   <LayoutDashboard size={18} />
                   <span>{td("My Dashboard")}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={externalActiveTab === "enrollments"}
+                  onClick={() => {
+                    if (location !== "/dashboard") setLocation("/dashboard");
+                    externalSetActiveTab?.("enrollments");
+                  }}
+                  className="minimal-nav-item"
+                >
+                  <ShieldCheck size={18} />
+                  <span>{td("My Enrollments")}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>

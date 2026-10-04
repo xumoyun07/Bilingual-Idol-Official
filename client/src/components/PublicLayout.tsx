@@ -88,7 +88,134 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const promoTheme = getPromoTheme(promoColor);
 
-  // Static Quick Action button list and states are simplified for permanent non-draggable layouts.
+  // Persistent drag-and-drop state for the vertical side capsule buttons (desktop)
+  const [order, setOrder] = useState<FabId[]>(() => {
+    const saved = localStorage.getItem("bilc_buttons_order_v3");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as FabId[];
+        const DEFAULT_ORDER: FabId[] = ["promo", "phone", "whatsapp"];
+        if (Array.isArray(parsed) && parsed.every(k => DEFAULT_ORDER.includes(k))) {
+          const missing = DEFAULT_ORDER.filter(k => !parsed.includes(k));
+          return [...parsed, ...missing];
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    return ["promo", "phone", "whatsapp"];
+  });
+
+  const [draggedKey, setDraggedKey] = useState<FabId | null>(null);
+  const [dragOffsetY, setDragOffsetY] = useState<number>(0);
+  const [isWaOpen, setIsWaOpen] = useState(false);
+  const [showBackButton, setShowBackButton] = useState(false);
+
+  const draggedKeyRef = useRef<FabId | null>(null);
+  const dragStartYRef = useRef<number>(0);
+  const dragOffsetYRef = useRef<number>(0);
+  const orderRef = useRef<FabId[]>(order);
+  const hasDraggedRef = useRef<boolean>(false);
+
+  // Keep order ref in sync
+  useEffect(() => {
+    orderRef.current = order;
+    localStorage.setItem("bilc_buttons_order_v3", JSON.stringify(order));
+  }, [order]);
+
+  // Back button visibility condition: sub-pages and scroll threshold
+  useEffect(() => {
+    if (location === "/") {
+      setShowBackButton(false);
+      return;
+    }
+    const handleScroll = () => {
+      setShowBackButton(window.scrollY > 80);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location]);
+
+  const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Pointer event handlers
+  const handlePointerDown = (id: FabId, e: React.PointerEvent) => {
+    if (e.button !== 0) return; // Left click only
+    const target = e.currentTarget as HTMLElement;
+    target.setPointerCapture(e.pointerId);
+
+    draggedKeyRef.current = id;
+    dragStartYRef.current = e.clientY;
+    dragOffsetYRef.current = 0;
+    hasDraggedRef.current = false;
+
+    setDraggedKey(id);
+    setDragOffsetY(0);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (draggedKeyRef.current === null) return;
+    const id = draggedKeyRef.current;
+    const deltaY = e.clientY - dragStartYRef.current;
+    dragOffsetYRef.current = deltaY;
+
+    if (Math.abs(deltaY) > 5) {
+      hasDraggedRef.current = true;
+    }
+
+    setDragOffsetY(deltaY);
+
+    // List of currently visible capsule buttons in order
+    const currentVisible = orderRef.current.filter(k => k !== "scrollTop");
+    const draggedIdx = currentVisible.indexOf(id);
+    if (draggedIdx === -1) return;
+
+    // Determine target slot by rounding delta Y with 60px slot size
+    const deltaSlot = -Math.round(deltaY / 60);
+    const targetIdx = draggedIdx + deltaSlot;
+
+    if (targetIdx >= 0 && targetIdx < currentVisible.length && targetIdx !== draggedIdx) {
+      const targetKey = currentVisible[targetIdx];
+      const newOrder = [...orderRef.current];
+      const fullDraggedIdx = newOrder.indexOf(id);
+      const fullTargetIdx = newOrder.indexOf(targetKey);
+
+      if (fullDraggedIdx !== -1 && fullTargetIdx !== -1) {
+        newOrder[fullDraggedIdx] = targetKey;
+        newOrder[fullTargetIdx] = id;
+        setOrder(newOrder);
+
+        // Adjust starting coordinates to maintain smooth tracking without jumps
+        const actualDeltaSlot = targetIdx - draggedIdx;
+        dragStartYRef.current -= actualDeltaSlot * 60;
+        dragOffsetYRef.current = e.clientY - dragStartYRef.current;
+        setDragOffsetY(dragOffsetYRef.current);
+      }
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (draggedKeyRef.current === null) return;
+    const target = e.currentTarget as HTMLElement;
+    try {
+      target.releasePointerCapture(e.pointerId);
+    } catch (err) {
+      // ignore
+    }
+    draggedKeyRef.current = null;
+    setDraggedKey(null);
+    setDragOffsetY(0);
+  };
+
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    if (hasDraggedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    action();
+  };
 
   useEffect(() => {
     const handleOpen = () => setIsRegistryOpen(true);
@@ -420,9 +547,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       {/* Promotional Campaign Modal Popup */}
       <PromotionalPopupModal isOpen={promoOpen} setIsOpen={setPromoOpen} />
 
-      {/* Desktop Version: Static, Cohesive Vertical Capsule Dock Centered Vertically (for screens >= 768px) */}
+      {/* Desktop Version: Premium Draggable Cohesive Vertical Capsule Dock (for screens >= 768px) */}
       <div
-        className="desktop-quick-actions-bar hidden md:flex flex-col items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] px-2 py-3.5 rounded-[32px] gap-4 z-[999]"
+        className="desktop-quick-actions-bar hidden md:flex flex-col items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] px-2 rounded-[32px] z-[999]"
         style={{
           position: "fixed",
           top: "50%",
@@ -430,64 +557,185 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           right: isRTL ? "auto" : "1.5rem",
           left: isRTL ? "1.5rem" : "auto",
           width: "64px",
-          transition: "right 0.3s ease, left 0.3s ease",
+          height: showBackButton ? "264px" : "200px",
+          transition: "height 0.3s cubic-bezier(0.16, 1, 0.3, 1), right 0.3s ease, left 0.3s ease",
+          paddingTop: "12px",
+          paddingBottom: "12px",
         }}
         aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
       >
-        {/* Button 1 (Topmost): Promotions / Gift Button with dynamic glow and active discount badge */}
-        <div className="relative group">
-          <button
-            type="button"
-            className={`bilc-quick-btn w-12 h-12 rounded-full bg-gradient-to-br ${promoTheme.bg} text-white flex items-center justify-center ${promoTheme.shadow} hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/15 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#173fad] relative`}
-            onClick={() => setPromoOpen(true)}
-            aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
-          >
-            <span className="relative flex h-5 w-5 items-center justify-center mx-auto">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
-              <Gift size={22} className="relative text-white group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
-            </span>
-            {promoDiscount && (
-              <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
-                {promoDiscount}
-              </span>
-            )}
-          </button>
-          {/* Tooltip */}
+        <div className="relative w-full h-full pointer-events-none">
+          {/* Render Page Back Button (Slot 0 if visible) */}
           <div
-            className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
-              isRTL
-                ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
-                : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
-            }`}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              opacity: showBackButton ? 1 : 0,
+              scale: showBackButton ? 1 : 0.8,
+              pointerEvents: showBackButton ? "auto" : "none",
+              transition: prefersReducedMotion
+                ? "none"
+                : "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), scale 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              zIndex: 5,
+            }}
           >
-            {language === "ar" ? "العروض النشطة" : language === "ms" ? "Promosi Aktif" : "Active Promotions"}
+            <button
+              type="button"
+              className="floating-page-back-button w-12 h-12 flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  window.location.href = "/";
+                }
+              }}
+              aria-label={language === "ar" ? "رجوع" : language === "ms" ? "Kembali" : "Back"}
+            >
+              <ArrowLeft size={22} className="floating-page-back-icon" aria-hidden="true" />
+            </button>
           </div>
-        </div>
 
-        {/* Button 2: Call/Phone Link */}
-        <div className="relative group">
-          <a
-            href="tel:+60367310449"
-            className="bilc-quick-btn w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center justify-center shadow-[0_4px_14px_rgba(37,99,235,0.25)] hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/10 focus-visible:ring-2 focus-visible:ring-[#173fad]"
-            aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-          >
-            <Phone size={20} className="group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
-          </a>
-          {/* Tooltip */}
-          <div
-            className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
-              isRTL
-                ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
-                : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
-            }`}
-          >
-            {language === "ar" ? "اتصل بقسم القبول" : language === "ms" ? "Hubungi Kemasukan" : "Call Admissions"}
-          </div>
-        </div>
+          {/* Render Draggable Visible Buttons */}
+          {order.map((id, itemIdx) => {
+            const isDragging = id === draggedKey;
+            const slotIndex = showBackButton ? itemIdx + 1 : itemIdx;
+            const baseY = -slotIndex * 60;
+            const translateY = isDragging ? baseY + dragOffsetY : baseY;
 
-        {/* Button 3: Smart WhatsApp Widget */}
-        <div className="w-12 h-12 flex items-center justify-center shrink-0">
-          <SmartWhatsAppWidget key="whatsapp-widget" className="w-12 h-12" />
+            // Compute lateral displacement for other buttons
+            let translateX = 0;
+            if (draggedKey !== null && id !== draggedKey) {
+              const draggedBaseIdx = order.indexOf(draggedKey);
+              const draggedSlotIdx = showBackButton ? draggedBaseIdx + 1 : draggedBaseIdx;
+              const draggedBaseY = -draggedSlotIdx * 60;
+              const draggedCurrentY = draggedBaseY + dragOffsetY;
+              const currentY = baseY;
+              const distY = Math.abs(draggedCurrentY - currentY);
+
+              if (distY < 52) {
+                translateX = isRTL ? 52 : -52;
+              }
+            }
+
+            return (
+              <div
+                key={id}
+                onPointerDown={(e) => handlePointerDown(id, e)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: "50%",
+                  marginLeft: "-24px",
+                  transform: `translateY(${translateY}px) translateX(${translateX}px)`,
+                  transition: isDragging || prefersReducedMotion
+                    ? "none"
+                    : "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                  touchAction: "none",
+                  zIndex: isDragging ? 100 : 10,
+                  pointerEvents: "auto",
+                }}
+              >
+                {/* Button Content based on ID */}
+                {id === "promo" && (
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      className={`bilc-quick-btn w-12 h-12 rounded-full bg-gradient-to-br ${promoTheme.bg} text-white flex items-center justify-center ${promoTheme.shadow} hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/15 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#173fad] relative`}
+                      onClick={(e) => handleButtonClick(e, () => setPromoOpen(true))}
+                      aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
+                    >
+                      <span className="relative flex h-5 w-5 items-center justify-center mx-auto">
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
+                        <Gift size={22} className="relative text-white group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+                      </span>
+                      {promoDiscount && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+                          {promoDiscount}
+                        </span>
+                      )}
+                    </button>
+                    {/* Tooltip */}
+                    {!isDragging && (
+                      <div
+                        className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+                          isRTL
+                            ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+                            : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+                        }`}
+                      >
+                        {language === "ar" ? "العروض النشطة" : language === "ms" ? "Promosi Aktif" : "Active Promotions"}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {id === "phone" && (
+                  <div className="relative group">
+                    <a
+                      href="tel:+60367310449"
+                      onClick={(e) => {
+                        if (hasDraggedRef.current) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                      className="bilc-quick-btn w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center justify-center shadow-[0_4px_14px_rgba(37,99,235,0.25)] hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/10 focus-visible:ring-2 focus-visible:ring-[#173fad]"
+                      aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+                    >
+                      <Phone size={20} className="group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+                    </a>
+                    {/* Tooltip */}
+                    {!isDragging && (
+                      <div
+                        className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+                          isRTL
+                            ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+                            : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+                        }`}
+                      >
+                        {language === "ar" ? "اتصل بقسم القبول" : language === "ms" ? "Hubungi Kemasukan" : "Call Admissions"}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {id === "whatsapp" && (
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      className={`bilc-wa-trigger-btn w-12 h-12 rounded-full bg-gradient-to-br from-[#25d366] to-[#128c7e] hover:from-[#20ba5a] hover:to-[#0e7064] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(37,211,102,0.3)] hover:scale-[1.08] active:scale-95 transition-all duration-300 border border-white/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#10253e] focus-visible:ring-offset-2 focus-visible:outline-none ${isWaOpen ? "is-open" : ""}`}
+                      onClick={(e) => handleButtonClick(e, () => setIsWaOpen(!isWaOpen))}
+                      aria-label={language === "ar" ? "تواصل معنا عبر واتساب" : language === "ms" ? "Hubungi kami melalui WhatsApp" : "Chat with Bilingual Idol on WhatsApp"}
+                    >
+                      <span className="bilc-wa-glow-halo" aria-hidden="true" />
+                      {isWaOpen ? (
+                        <X size={20} className="bilc-wa-icon" aria-hidden="true" />
+                      ) : (
+                        <WhatsAppIcon size={24} />
+                      )}
+                    </button>
+                    {/* Tooltip */}
+                    {!isDragging && (
+                      <div
+                        className={`hidden md:block absolute top-1/2 -translate-y-1/2 bg-[#10253e] text-white text-[11px] px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap font-medium tracking-wide border border-white/10 z-[1000] flex items-center ${
+                          isRTL
+                            ? "left-[60px] -translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-[4px] after:border-y-[4px] after:border-y-transparent after:border-r-[4px] after:border-r-[#10253e]"
+                            : "right-[60px] translate-x-2 group-hover:translate-x-0 group-focus-within:translate-x-0 after:content-[''] after:absolute after:top-1/2 after:-translate-y-1/2 after:-right-[4px] after:border-y-[4px] after:border-y-transparent after:border-l-[4px] after:border-l-[#10253e]"
+                        }`}
+                      >
+                        {language === "ar" ? "واتساب قسم القبول" : language === "ms" ? "WhatsApp Kemasukan" : "WhatsApp Admissions"}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -537,7 +785,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           right: "0",
           marginLeft: "auto",
           marginRight: "auto",
-          width: showScrollTop ? "264px" : "200px",
+          width: showScrollTop ? "244px" : "188px",
           paddingLeft: "14px",
           paddingRight: "14px",
           paddingTop: "0.6rem",
@@ -547,35 +795,46 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         aria-label={language === "ar" ? "إجراءات سريعة للجوال" : language === "ms" ? "Tindakan pantas mudah alih" : "Mobile quick actions"}
       >
         {/* Button 1: Promotions / Gift Button with dynamic glow and active discount badge */}
-        <button
-          type="button"
-          className={`bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br ${promoTheme.bg} active:scale-95 text-white flex items-center justify-center ${promoTheme.shadow} border border-white/15 cursor-pointer relative shrink-0`}
-          onClick={() => setPromoOpen(true)}
-          aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
-        >
-          <span className="relative flex h-5 w-5 items-center justify-center">
-            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
-            <Gift size={18} className="relative text-white" aria-hidden="true" />
-          </span>
-          {promoDiscount && (
-            <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
-              {promoDiscount}
+        <div className="w-11 h-11 flex items-center justify-center shrink-0">
+          <button
+            type="button"
+            className={`bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br ${promoTheme.bg} active:scale-95 text-white flex items-center justify-center ${promoTheme.shadow} border border-white/15 cursor-pointer relative shrink-0`}
+            onClick={() => setPromoOpen(true)}
+            aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
+          >
+            <span className="relative flex h-5 w-5 items-center justify-center">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
+              <Gift size={18} className="relative text-white" aria-hidden="true" />
             </span>
-          )}
-        </button>
+            {promoDiscount && (
+              <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+                {promoDiscount}
+              </span>
+            )}
+          </button>
+        </div>
 
         {/* Button 2: Call/Phone Link */}
-        <a
-          href="tel:+60367310449"
-          className="bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 active:scale-95 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.25)] border border-white/10 shrink-0"
-          aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
-        >
-          <Phone size={18} aria-hidden="true" />
-        </a>
+        <div className="w-11 h-11 flex items-center justify-center shrink-0">
+          <a
+            href="tel:+60367310449"
+            className="bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 active:scale-95 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.25)] border border-white/10 shrink-0"
+            aria-label={`${t("common.call")} Bilingual Idol: +60 3 6731 0449`}
+          >
+            <Phone size={18} aria-hidden="true" />
+          </a>
+        </div>
 
         {/* Button 3: Smart WhatsApp Widget */}
         <div className="w-11 h-11 flex items-center justify-center shrink-0">
-          <SmartWhatsAppWidget key="whatsapp-widget-mobile" className="w-11 h-11" />
+          <button
+            type="button"
+            className={`bilc-wa-trigger-btn w-11 h-11 rounded-full bg-gradient-to-br from-[#25d366] to-[#128c7e] hover:from-[#20ba5a] hover:to-[#0e7064] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(37,211,102,0.3)] border border-white/10 cursor-pointer active:scale-95 ${isWaOpen ? "is-open" : ""}`}
+            onClick={() => setIsWaOpen(!isWaOpen)}
+            aria-label={language === "ar" ? "تواصل معنا عبر واتساب" : language === "ms" ? "Hubungi kami melalui WhatsApp" : "Chat with Bilingual Idol on WhatsApp"}
+          >
+            {isWaOpen ? <X size={18} /> : <WhatsAppIcon size={20} />}
+          </button>
         </div>
 
         {/* Button 4 (Appears on scroll on the right side of the panel): Scroll-to-Top Button */}
@@ -600,8 +859,233 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
+      {/* Shared WhatsApp Dialog Popup Panel */}
+      {isWaOpen && (
+        <>
+          <div
+            className="bilc-wa-popup"
+            style={{
+              position: "fixed",
+              bottom: "calc(6rem + env(safe-area-inset-bottom))",
+              right: isRTL ? "auto" : "1.5rem",
+              left: isRTL ? "1.5rem" : "auto",
+              width: "355px",
+              zIndex: 1000,
+            }}
+            role="dialog"
+            aria-label={language === "ar" ? "قائمة محادثة واتساب" : language === "ms" ? "Pilihan sembang WhatsApp" : "Smart WhatsApp Chat Selection"}
+          >
+            <div className="bilc-wa-popup-header">
+              <div className="flex items-center gap-2">
+                <div className="bilc-wa-avatar">
+                  <WhatsAppIcon size={18} />
+                </div>
+                <div>
+                  <strong>
+                    {language === "ms"
+                      ? "Kemasukan Bilingual Idol"
+                      : language === "ar"
+                      ? "قسم القبول والتسجيل"
+                      : "Bilingual Idol Admissions"}
+                  </strong>
+                  <p>
+                    {language === "ms"
+                      ? "Pavilion Embassy · Membalas dalam beberapa minit"
+                      : language === "ar"
+                      ? "بافيليون إمباسي · الرد عادة خلال دقائق"
+                      : "Pavilion Embassy · Typically replies within minutes"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="bilc-wa-close-btn"
+                onClick={() => setIsWaOpen(false)}
+                aria-label={language === "ar" ? "إغلاق قائمة الواتساب" : language === "ms" ? "Tutup Menu WhatsApp" : "Close WhatsApp Menu"}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="bilc-wa-popup-body">
+              <p className="bilc-wa-prompt">
+                {language === "ms"
+                  ? "Bagaimanakah pasukan kemasukan kami boleh membantu anda hari ini?"
+                  : language === "ar"
+                  ? "كيف يمكن لفريق القبول مساعدتك اليوم"
+                  : "How can our admissions team assist you today?"}
+              </p>
+              <div className="bilc-wa-topics-list">
+                {WHATSAPP_TOPICS.map((topic) => {
+                  const topicTitle = topic.titles[language] || topic.titles.en;
+                  const topicDesc = topic.descs[language] || topic.descs.en;
+                  const topicMsg = topic.msgs[language] || topic.msgs.en;
+                  return (
+                    <button
+                      key={topic.id}
+                      type="button"
+                      className="bilc-wa-topic-item"
+                      onClick={() => {
+                        const encoded = encodeURIComponent(topicMsg);
+                        const url = `https://wa.me/60367310449?text=${encoded}`;
+                        window.open(url, "_blank", "noreferrer");
+                        setIsWaOpen(false);
+                      }}
+                    >
+                      <span className="bilc-topic-emoji">{topic.icon}</span>
+                      <div className="bilc-topic-copy">
+                        <strong>{topicTitle}</strong>
+                        <span>{topicDesc}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="bilc-wa-popup-footer">
+              <span>
+                {language === "ms" ? (
+                  <>WhatsApp Terus: <bdi dir="ltr">+60 3-6731 0449</bdi></>
+                ) : language === "ar" ? (
+                  <>واتساب المباشر: <bdi dir="ltr">+60 3-6731 0449</bdi></>
+                ) : (
+                  <>Direct WhatsApp: <bdi dir="ltr">+60 3-6731 0449</bdi></>
+                )}
+              </span>
+            </div>
+          </div>
+          <div
+            className="bilc-wa-backdrop"
+            onClick={() => setIsWaOpen(false)}
+            aria-hidden="true"
+          />
+        </>
+      )}
+
       {/* Official Registry Modal */}
       <OfficialRegistryModal isOpen={isRegistryOpen} onClose={() => setIsRegistryOpen(false)} />
     </div>
   );
 }
+
+function WhatsAppIcon({ size = 24 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.276-.1-.476-.15-.677.15-.2.301-.777.979-.953 1.18-.175.2-.351.225-.652.075-.301-.15-1.27-.468-2.42-1.493-.894-.798-1.498-1.784-1.674-2.085-.176-.301-.019-.464.132-.614.136-.135.301-.351.452-.527.15-.176.2-.301.301-.502.1-.2.05-.376-.025-.526-.075-.15-.677-1.632-.928-2.235-.245-.588-.494-.508-.677-.518-.175-.008-.376-.01-.577-.01-.2 0-.527.075-.803.376s-1.054 1.03-1.054 2.511c0 1.482 1.079 2.911 1.23 3.112.15.2 2.124 3.244 5.145 4.549.718.311 1.279.497 1.716.636.722.23 1.379.197 1.898.12.579-.086 1.78-.727 2.03-1.43.251-.703.251-1.305.176-1.43-.075-.126-.276-.201-.577-.351z" />
+      <path d="M12.004 2c-5.518 0-9.996 4.478-9.996 9.996 0 1.764.46 3.486 1.334 5.004L2 22l5.13-1.308c1.472.802 3.13 1.228 4.874 1.228 5.518 0 9.996-4.478 9.996-9.996S17.522 2 12.004 2zm0 18.258c-1.503 0-2.975-.405-4.256-1.171l-.305-.181-3.045.776.812-2.968-.198-.316c-.84-1.338-1.284-2.889-1.284-4.398 0-4.553 3.705-8.258 8.276-8.258 4.571 0 8.276 3.705 8.276 8.258 0 4.553-3.705 8.258-8.276 8.258z" />
+    </svg>
+  );
+}
+
+interface WhatsAppTopic {
+  id: string;
+  icon: string;
+  titles: Record<Language, string>;
+  descs: Record<Language, string>;
+  msgs: Record<Language, string>;
+}
+
+const WHATSAPP_TOPICS: WhatsAppTopic[] = [
+  {
+    id: "general",
+    icon: "📚",
+    titles: {
+      en: "Course & 2026 Price Enquiry",
+      ms: "Pertanyaan Kursus & Yuran 2026",
+      ar: "استفسار عن الدورات وأسعار 2026",
+    },
+    descs: {
+      en: "Ask about tuition fees, timetables and course catalogs",
+      ms: "Tanya tentang yuran pengajian, jadual & katalog kursus",
+      ar: "استفسر عن الرسوم والجداول الدراسية وكتالوج البرامج",
+    },
+    msgs: {
+      en: "Hello Bilingual Idol, I would like to inquire about your 2026 courses, fees, and schedule at Pavilion Embassy.",
+      ms: "Salam Bilingual Idol, saya ingin bertanya mengenai kursus, yuran dan jadual 2026 di Pavilion Embassy.",
+      ar: "مرحباً بايلينجوال آيدول، أود الاستفسار عن دورات 2026 والرسوم وجداول الحصص في بافيليون إمباسي.",
+    },
+  },
+  {
+    id: "international",
+    icon: "✈️",
+    titles: {
+      en: "International Student & Visa",
+      ms: "Pelajar Antarabangsa & Visa",
+      ar: "شؤون الطلاب الدوليين والفيزا",
+    },
+    descs: {
+      en: "EMGS student visa support, accommodation & airport transfer",
+      ms: "Sokongan visa pelajar EMGS, penginapan & ketibaan",
+      ar: "دعم تأشيرة EMGS والسكن الجامعي والاستقبال من المطار",
+    },
+    msgs: {
+      en: "Hello! I am an international student planning to study English at Bilingual Idol Malaysia. I would like details about EMGS visas and enrolment.",
+      ms: "Hai! Saya seorang pelajar antarabangsa yang merancang untuk belajar Bahasa Inggeris di Bilingual Idol Malaysia. Saya ingin maklumat lanjut tentang visa EMGS.",
+      ar: "مرحباً! أنا طالب دولي أخطط لدراسة اللغة الإنجليزية في بايلينجوال آيدول ماليزيا. أود معرفة تفاصيل فيزا EMGS وإجراءات القبول.",
+    },
+  },
+  {
+    id: "ielts",
+    icon: "🎯",
+    titles: {
+      en: "IELTS Preparation Coaching",
+      ms: "Bimbingan Persediaan IELTS",
+      ar: "دورات التحضير لاختبار الآيلتس",
+    },
+    descs: {
+      en: "Express 4w, Intensive 8w, Premium 12w coaching",
+      ms: "Pakej Ekspres 4 minggu, Intensif 8 minggu, Premium 12 minggu",
+      ar: "باقات مكثفة 4، 8، و12 أسبوعاً مع تدريب امتحاني مباشر",
+    },
+    msgs: {
+      en: "Hello Bilingual Idol! I want to prepare for the IELTS exam. Please share details regarding your upcoming IELTS intakes and diagnostic test.",
+      ms: "Hai Bilingual Idol! Saya ingin membuat persediaan untuk peperiksaan IELTS. Sila kongsikan maklumat pengambilan terdekat dan ujian diagnostik.",
+      ar: "مرحباً بايلينجوال آيدول! أود التحضير لاختبار الآيلتس. يرجى تزويدي بمواعيد الدورات القادمة واختبار تحديد المستوى.",
+    },
+  },
+  {
+    id: "camp",
+    icon: "☀️",
+    titles: {
+      en: "Summer Camps & Kids Programs",
+      ms: "Kem Musim Panas & Program Kanak-kanak",
+      ar: "المخيمات الصيفية وبرامج الصغار",
+    },
+    descs: {
+      en: "Junior English, International Camp & Leadership Programs",
+      ms: "Bahasa Inggeris Junior, Kem Antarabangsa & Kepimpinan",
+      ar: "إنجليزية للصغار، مخيمات دولية وبرامج قيادية",
+    },
+    msgs: {
+      en: "Hello! I would like information about the upcoming Summer Camps and youth programmes at Bilingual Idol.",
+      ms: "Hai! Saya ingin maklumat mengenai Kem Musim Panas dan program belia yang akan datang di Bilingual Idol.",
+      ar: "مرحباً! أود الحصول على معلومات حول المخيمات الصيفية القادمة وبرامج الشباب في بايلينجوال آيدول.",
+    },
+  },
+  {
+    id: "placement",
+    icon: "📝",
+    titles: {
+      en: "Book Free Placement Test",
+      ms: "Tempah Ujian Penempatan Percuma",
+      ar: "حجز اختبار تحديد مستوى مجاني",
+    },
+    descs: {
+      en: "Schedule a diagnostic test in person or via Zoom",
+      ms: "Jadualkan ujian diagnostik secara bersemuka atau melalui Zoom",
+      ar: "حدد موعداً للاختبار حضورياً أو عبر تطبيق زووم",
+    },
+    msgs: {
+      en: "Hello Admissions, I would like to schedule a free Placement Test to evaluate my English level.",
+      ms: "Salam Pegawai Kemasukan, saya ingin menjadualkan Ujian Penempatan percuma untuk menilai tahap Bahasa Inggeris saya.",
+      ar: "مرحباً قسم القبول, أود حجز موعد لاختبار تحديد المستوى المجاني لتقييم لغتي الإنجليزية.",
+    },
+  },
+];

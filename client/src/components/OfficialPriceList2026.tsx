@@ -341,10 +341,10 @@ export function OfficialPriceList2026() {
           <GraduationCap size={16} />
           <span>
             {language === "ms"
-              ? "Katalog Akademik Rasmi 2026"
+              ? "Panduan Akademik Rasmi 2026"
               : language === "ar"
               ? "الدليل الأكاديمي الرسمي 2026"
-              : "Official 2026 Academic Catalog"}
+              : "Official 2026 Academic Guide"}
           </span>
         </div>
         <h2>{t("home.pricingTitle")}</h2>
@@ -448,8 +448,6 @@ export function OfficialPriceList2026() {
                     <tr>
                       <th>{language === "ms" ? "Tempoh" : language === "ar" ? "المدة" : "Duration"}</th>
                       <th>{language === "ms" ? "Jadual" : language === "ar" ? "الجدول الدراسي" : "Schedule"}</th>
-                      <th>{language === "ms" ? "Yuran Visa" : language === "ar" ? "رسوم الفيزا" : "Visa Fee"}</th>
-                      <th>{language === "ms" ? "Yuran Pengajian (RM)" : language === "ar" ? "الرسوم الدراسية (RM)" : "Tuition Fee (RM)"}</th>
                       <th>{language === "ms" ? "Tindakan" : language === "ar" ? "التسجيل" : "Action"}</th>
                     </tr>
                   </thead>
@@ -457,7 +455,6 @@ export function OfficialPriceList2026() {
                     {GENERAL_COURSES.map((course) => {
                       const durText = course.duration[language] || course.duration.en;
                       const clsText = course.classes[language] || course.classes.en;
-                      const visaText = course.visaFee[language] || course.visaFee.en;
                       return (
                         <tr key={course.rawDuration} className={course.popular ? "is-highlighted" : ""}>
                           <td>
@@ -469,8 +466,6 @@ export function OfficialPriceList2026() {
                             )}
                           </td>
                           <td>{clsText}</td>
-                          <td><bdi dir="ltr">{visaText}</bdi></td>
-                          <td className="bilc-price-cell"><bdi dir="ltr">{course.tuitionFee}</bdi></td>
                           <td>
                             <button
                               type="button"
@@ -493,7 +488,6 @@ export function OfficialPriceList2026() {
               {GENERAL_COURSES.map((course) => {
                 const durText = course.duration[language] || course.duration.en;
                 const clsText = course.classes[language] || course.classes.en;
-                const visaText = course.visaFee[language] || course.visaFee.en;
                 return (
                   <div 
                     key={course.rawDuration} 
@@ -513,21 +507,9 @@ export function OfficialPriceList2026() {
                         </h3>
                         <span className="bilc-mobile-card-sub">{clsText}</span>
                       </div>
-                      <div className="bilc-mobile-card-price">
-                        <strong><bdi dir="ltr">{course.tuitionFee}</bdi></strong>
-                        <span>{language === "ms" ? "Yuran Pengajian" : language === "ar" ? "الرسوم الدراسية" : "Tuition Fee"}</span>
-                      </div>
                     </div>
 
                     <div className="bilc-mobile-card-specs">
-                      <div className="bilc-spec-row">
-                        <span className="bilc-spec-label">
-                          {language === "ms" ? "Pas Pelajar EMGS:" : language === "ar" ? "فيزا الطالب EMGS:" : "EMGS Student Visa:"}
-                        </span>
-                        <span className="bilc-spec-val">
-                          {visaText === "—" ? (language === "ms" ? "Lawatan Singkat / Pelancong" : language === "ar" ? "فيزا سياحية / زيارة قصيرة" : "Tourist / Short Visit") : <bdi dir="ltr">{visaText}</bdi>}
-                        </span>
-                      </div>
                       <div className="bilc-spec-row">
                         <span className="bilc-spec-label">
                           {language === "ms" ? "Lokasi Kampus:" : language === "ar" ? "مقر الحرم:" : "Campus Location:"}
@@ -549,21 +531,6 @@ export function OfficialPriceList2026() {
                   </div>
                 );
               })}
-            </div>
-
-            <div className="bilc-fee-notes">
-              <div className="bilc-note-item">
-                <FileText size={16} />
-                <span>
-                  <strong>{language === "ms" ? "Yuran Pendaftaran:" : language === "ar" ? "رسوم التسجيل:" : "Registration Fee:"}</strong> <bdi dir="ltr">RM 500</bdi> {language === "ms" ? "(sekali semasa pendaftaran)" : language === "ar" ? "(تدفع لمرة واحدة عند التسجيل)" : "(one-time upon enrollment)"}
-                </span>
-              </div>
-              <div className="bilc-note-item">
-                <UserCheck size={16} />
-                <span>
-                  <strong>{language === "ms" ? "Yuran Ujian Penempatan:" : language === "ar" ? "رسوم تحديد المستوى:" : "Placement Test Fee:"}</strong> <bdi dir="ltr">RM 300</bdi> {language === "ms" ? "(penilaian diagnostik komprehensif)" : language === "ar" ? "(تقييم تشخيصي شامل)" : "(comprehensive diagnostic assessment)"}
-                </span>
-              </div>
             </div>
           </div>
         )}

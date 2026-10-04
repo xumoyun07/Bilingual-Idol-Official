@@ -9,7 +9,7 @@ const registrationSchema = z.object({
   fullName: z.string().trim().min(2, "Please enter your full name."),
   email: z.string().trim().email("Please enter a valid email address."),
   phone: z.string().trim().min(7, "Please enter a valid phone number."),
-  programInterest: z.string().min(2, "Please select a programme of interest."),
+  programId: z.string().min(1, "Please select a programme of interest."),
   applicantCategory: z.string().min(1, "Please select an applicant category."),
 });
 
@@ -27,7 +27,7 @@ export function RegistrationForm({ title }: { title?: string }) {
       fullName: "",
       email: "",
       phone: "",
-      programInterest: "",
+      programId: "",
       applicantCategory: "",
     },
   });
@@ -46,9 +46,7 @@ export function RegistrationForm({ title }: { title?: string }) {
         p => p.title.toLowerCase() === progPrefill.toLowerCase() || p.slug === progPrefill.toLowerCase()
       );
       if (match) {
-        form.setValue("programInterest", match.title);
-      } else {
-        form.setValue("programInterest", progPrefill);
+        form.setValue("programId", String(match.id));
       }
     }
 
@@ -64,9 +62,7 @@ export function RegistrationForm({ title }: { title?: string }) {
           p => p.title.toLowerCase() === pInterest.toLowerCase() || p.slug === pInterest.toLowerCase()
         );
         if (match) {
-          form.setValue("programInterest", match.title);
-        } else {
-          form.setValue("programInterest", pInterest);
+          form.setValue("programId", String(match.id));
         }
       }
       if (customEvent.detail?.applicantCategory) {
@@ -127,13 +123,17 @@ export function RegistrationForm({ title }: { title?: string }) {
     }));
 
     await mutation.mutateAsync({
-      ...values,
+      fullName: values.fullName,
+      email: values.email,
+      phone: values.phone,
+      programId: Number(values.programId),
+      applicantCategory: values.applicantCategory,
       fieldValues,
-      utmSource,
-      utmMedium,
-      utmCampaign,
-      utmTerm,
-      utmContent,
+      utmSource: utmSource || undefined,
+      utmMedium: utmMedium || undefined,
+      utmCampaign: utmCampaign || undefined,
+      utmTerm: utmTerm || undefined,
+      utmContent: utmContent || undefined,
     });
 
     form.reset();
@@ -211,20 +211,20 @@ export function RegistrationForm({ title }: { title?: string }) {
           {errorFor("phone") && <span className="text-xs text-red-500 mt-1 block">{errorFor("phone")}</span>}
         </label>
 
-        {/* Program Interest */}
+        {/* Program ID Selection */}
         <label className="text-sm font-bold text-[#29415b]">
           {courseLabel}
           <select
             className={fieldClass}
-            aria-invalid={Boolean(errorFor("programInterest"))}
-            {...form.register("programInterest")}
+            aria-invalid={Boolean(errorFor("programId"))}
+            {...form.register("programId")}
           >
             <option value="">{language === "ms" ? "Pilih kursus..." : language === "ar" ? "اختر البرنامج..." : "Select a programme..."}</option>
             {programsQuery.data?.map(prog => (
-              <option key={prog.id} value={prog.title}>{prog.title} ({prog.language})</option>
+              <option key={prog.id} value={String(prog.id)}>{prog.title} ({prog.language})</option>
             ))}
           </select>
-          {errorFor("programInterest") && <span className="text-xs text-red-500 mt-1 block">{errorFor("programInterest")}</span>}
+          {errorFor("programId") && <span className="text-xs text-red-500 mt-1 block">{errorFor("programId")}</span>}
         </label>
 
         {/* Applicant Category */}

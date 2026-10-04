@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { adminProcedure, publicProcedure, studentProcedure, router } from "../_core/trpc";
+import { adminProcedure, publicProcedure, studentProcedure, marketingProcedure, router } from "../_core/trpc";
 
 export const submissionInput = z.object({
   type: z.enum(["enrollment", "inquiry"]),
@@ -34,9 +34,9 @@ export const createInquiryInput = z.object({
 });
 
 export const submissionsRouter = router({
-  list: adminProcedure.query(() => db.listSubmissions()),
+  list: marketingProcedure.query(() => db.listSubmissions()),
   create: publicProcedure.input(submissionInput).mutation(({ input }) => db.createSubmission(input)),
-  updateStatus: adminProcedure
+  updateStatus: marketingProcedure
     .input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "contacted", "interested", "enrolled", "closed"]) }))
     .mutation(({ input }) => db.updateSubmissionStatus(input.id, input.status)),
   delete: adminProcedure
@@ -49,6 +49,8 @@ export const submissionsRouter = router({
       name: z.string().trim().min(2, "Name is too short.").max(160),
       email: z.string().trim().max(320).optional().default(""),
       phone: z.string().trim().max(64).optional().default(""),
+      programId: z.number().int().positive().nullable().optional(),
+      programInterest: z.string().trim().optional().default(""),
       message: z.string().trim().max(1500).optional(),
       reasonType: z.enum(["general", "consultation", "campusTour"]),
       sourcePage: z.string().trim().max(255).optional().default(""),
@@ -56,30 +58,43 @@ export const submissionsRouter = router({
       message: "Please provide at least an email or phone number.",
       path: ["email"],
     }))
-    .mutation(({ input }) => db.createSubmission({
-      type: "inquiry",
-      studentName: input.name,
-      studentAge: 18, // Default fallback age
-      parentName: input.name,
-      parentEmail: input.email || "no-email@bilc.my",
-      parentPhone: input.phone || "no-phone",
-      programInterest: "General Inquiry",
-      preferredSchedule: "Any",
-      message: input.message || "",
-      source: input.sourcePage || "website",
-      reasonType: input.reasonType,
-    })),
+    .mutation(async ({ input }) => {
+      const programs = await db.listPrograms();
+      const matched = input.programId ? programs.find(p => p.id === input.programId) : null;
+      const programInterestText = matched ? matched.title : input.programInterest || "General Inquiry";
+
+      return db.createSubmission({
+        type: "inquiry",
+        studentName: input.name,
+        studentAge: 18, // Default fallback age
+        parentName: input.name,
+        parentEmail: input.email || "no-email@bilc.my",
+        parentPhone: input.phone || "no-phone",
+        programId: input.programId || null,
+        programInterest: programInterestText,
+        preferredSchedule: "Any",
+        message: input.message || "",
+        source: input.sourcePage || "website",
+        reasonType: input.reasonType,
+      });
+    }),
 
   // Form 2 Schema & Submission
   getRegistrationSchema: publicProcedure.query(() => db.getRegistrationFormSchema()),
   createRegistration: publicProcedure
     .input(z.object({
-      programInterest: z.string().trim().min(1, "Please select a program."),
-      applicantCategory: z.enum(["child", "adult", "international"]),
+      programId: z.number().int().positive(),
+      programInterest: z.string().trim().optional().default(""),
+      applicantCategory: z.string().min(1, "Please select an applicant category."),
       fullName: z.string().trim().min(2, "Name must be at least 2 characters."),
       email: z.string().trim().email("Please enter a valid email address."),
       phone: z.string().trim().min(7, "Please enter a valid phone number."),
       values: z.record(z.string(), z.string()).default({}),
+      utmSource: z.string().trim().max(100).optional().nullable(),
+      utmMedium: z.string().trim().max(100).optional().nullable(),
+      utmCampaign: z.string().trim().max(100).optional().nullable(),
+      utmTerm: z.string().trim().max(100).optional().nullable(),
+      utmContent: z.string().trim().max(100).optional().nullable(),
     }))
     .mutation(async ({ input }) => {
       const { fields } = await db.getUserFormSchema(false);
@@ -96,18 +111,23 @@ export const submissionsRouter = router({
         }
       }
 
+      const programs = await db.listPrograms();
+      const matched = programs.find(p => p.id === input.programId);
+      const programInterestText = matched ? matched.title : input.programInterest || "Unknown Program";
+
       const submissionInput = {
-        programInterest: input.programInterest,
+        programId: input.programId,
+        programInterest: programInterestText,
         applicantCategory: input.applicantCategory,
         fullName: input.fullName,
         email: input.email,
         phone: input.phone,
         assignedToUserId: null,
-        utmSource: null,
-        utmMedium: null,
-        utmCampaign: null,
-        utmTerm: null,
-        utmContent: null,
+        utmSource: input.utmSource || null,
+        utmMedium: input.utmMedium || null,
+        utmCampaign: input.utmCampaign || null,
+        utmTerm: input.utmTerm || null,
+        utmContent: input.utmContent || null,
       };
 
       return db.createRegistrationSubmission(submissionInput, fieldValues);

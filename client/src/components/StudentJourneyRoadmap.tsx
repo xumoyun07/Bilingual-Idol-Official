@@ -395,137 +395,135 @@ export function StudentJourneyRoadmap() {
       </div>
 
       {/* =========================================================================
-          MOBILE-ONLY PREMIUM INTERACTIVE SLIDER STEPPER (FULLY REDESIGNED)
+          MOBILE-ONLY PREMIUM INTERACTIVE ACCORDION ROADMAP LIST (OPTIMIZED)
          ========================================================================= */}
       <div className="block lg:hidden w-full px-4 sm:px-6">
-        {/* Horizontal Progress Timeline Tracker */}
-        <div className="relative w-full flex items-center justify-between mb-6 px-2">
-          {/* Progress Connecting Line Track */}
-          <div className="absolute top-1/2 left-4 right-4 h-[3px] bg-slate-200 -translate-y-1/2 z-0 rounded-full" />
-          
-          {/* Active Progress Highlight Line */}
-          <div 
-            className="absolute top-1/2 h-[3px] bg-[#173fad] -translate-y-1/2 transition-all duration-300 z-0 rounded-full"
-            style={{
-              width: `calc(${(activeStep / (JOURNEY_STEPS.length - 1)) * 100}% - 32px)`,
-              [isRTL ? "right" : "left"]: "16px"
-            }}
-          />
-
-          {/* Stepper Dots/Circles */}
+        <div className="flex flex-col gap-3">
           {JOURNEY_STEPS.map((s, idx) => {
             const isActive = activeStep === idx;
-            const isCompleted = idx < activeStep;
+            const itemTitle = s.titles[language] || s.titles.en;
+            const itemSub = s.subtitles[language] || s.subtitles.en;
+            const itemSummary = s.summaries[language] || s.summaries.en;
+            const itemDetails = s.details[language] || s.details.en;
+
             return (
-              <button
+              <div
                 key={s.number}
-                type="button"
-                onClick={() => setActiveStep(idx)}
-                className={`w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-xs z-10 transition-all duration-300 relative border ${
+                className={`transition-all duration-300 rounded-xl border ${
                   isActive
-                    ? "bg-[#173fad] text-white ring-4 ring-blue-100 border-[#173fad] scale-110 shadow-sm"
-                    : isCompleted
-                    ? "bg-[#173fad] text-white border-[#173fad]"
-                    : "bg-white text-slate-400 border-slate-200"
-                }`}
-                aria-label={`Step ${s.number}`}
+                    ? "bg-white border-[#173fad]/30 shadow-[0_4px_20px_rgba(23,63,173,0.05)]"
+                    : "bg-white/40 border-slate-200/60 hover:bg-white"
+                } overflow-hidden`}
               >
-                {s.number}
-              </button>
+                {/* Accordion Trigger Header */}
+                <button
+                  type="button"
+                  onClick={() => setActiveStep(idx)}
+                  className="w-full px-4 py-3.5 flex items-center justify-between text-left cursor-pointer transition-colors"
+                  style={{ textAlign: isRTL ? "right" : "left", direction: isRTL ? "rtl" : "ltr" }}
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Circle Step Number */}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold transition-colors shrink-0 ${
+                        isActive
+                          ? "bg-[#173fad] text-white"
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      {s.number}
+                    </div>
+                    <div className="text-left">
+                      <span
+                        className={`text-xs font-extrabold transition-colors block leading-tight ${
+                          isActive ? "text-[#173fad]" : "text-slate-800"
+                        }`}
+                        style={{ textAlign: isRTL ? "right" : "left" }}
+                      >
+                        {itemTitle}
+                      </span>
+                      {!isActive && (
+                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
+                          {itemSub}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right hand toggle indicator */}
+                  <div
+                    className={`text-slate-400 transition-transform duration-300 shrink-0 ${
+                      isActive ? "rotate-180" : ""
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+
+                {/* Accordion Expanded Content */}
+                <div
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    isActive ? "max-h-[1000px] border-t border-slate-100 pb-4 pt-3.5 px-4" : "max-h-0 pointer-events-none"
+                  }`}
+                  style={{ direction: isRTL ? "rtl" : "ltr" }}
+                >
+                  {isActive && (
+                    <div className="flex flex-col gap-3">
+                      {/* Step Subtitle */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                          {itemSub}
+                        </span>
+                      </div>
+
+                      {/* Brief description */}
+                      <p className="text-slate-600 text-[12px] leading-relaxed">
+                        {itemSummary}
+                      </p>
+
+                      {/* Compact checklist */}
+                      <div className="flex flex-col gap-2 mt-2">
+                        <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mb-0.5">
+                          {language === "ms"
+                            ? "Sokongan & Jaminan:"
+                            : language === "ar"
+                            ? "الضمانات والمزايا:"
+                            : "Support & Guarantees:"}
+                        </p>
+                        {itemDetails.map((detail, dIdx) => (
+                          <div
+                            key={dIdx}
+                            className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-700 font-medium"
+                          >
+                            <div className="w-3.5 h-3.5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mt-0.5 shrink-0">
+                              <Check size={9} className="stroke-[3.5]" />
+                            </div>
+                            <span>{detail}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
 
-        {/* Active Step Showcase Spotlight Card */}
-        <div 
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs relative overflow-hidden transition-all duration-300"
-        >
-          {/* Subtle elegant background decoration */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50/40 via-transparent to-transparent pointer-events-none rounded-bl-3xl" />
-
-          {/* Step Metadata Header (Unboxed, clean metadata as per zero-pill) */}
-          <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider mb-4 border-b border-slate-100 pb-3">
-            <span className="text-[#173fad]">
-              {language === "ms" 
-                ? `Langkah ${step.number} drpd 06` 
-                : language === "ar" 
-                ? `الخطوة ${step.number} من ٠٦` 
-                : `Step ${step.number} of 06`}
-            </span>
-            <span className="text-slate-300" aria-hidden="true">·</span>
-            <span className="text-slate-500">{stepSubtitle}</span>
-          </div>
-
-          {/* Icon Section */}
-          <div className="w-12 h-12 rounded-xl bg-blue-50/50 border border-blue-100 flex items-center justify-center text-[#173fad] mb-4">
-            <StepIcon size={22} className="stroke-[2.2]" />
-          </div>
-
-          {/* Step Title */}
-          <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug mb-2">
-            {stepTitle}
-          </h3>
-
-          {/* Step Description */}
-          <p className="text-slate-500 text-[12px] leading-relaxed mb-5">
-            {stepSummary}
-          </p>
-
-          {/* Compact Guarantees checklist */}
-          <div className="flex flex-col gap-2.5 border-t border-slate-100 pt-4">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">
-              {language === "ms" 
-                ? "Jaminan & Sokongan:" 
-                : language === "ar" 
-                ? "المزايا والضمانات:" 
-                : "Guarantees & Support:"}
-            </p>
-            {stepDetails.map((detail, dIdx) => (
-              <div key={dIdx} className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-700 font-semibold">
-                <div className="w-4 h-4 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mt-0.5 flex-shrink-0">
-                  <Check size={10} className="stroke-[3]" />
-                </div>
-                <span className="flex-1">{detail}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Swipe instruction helper (premium touch detail) */}
-        <div className="text-center mt-3 text-[10px] text-slate-400 font-medium">
-          {language === "ms"
-            ? "Leret ke kiri atau kanan untuk menukar langkah"
-            : language === "ar"
-            ? "اسحب لليمين أو اليسار للتنقل بين الخطوات"
-            : "Swipe left or right to switch steps"}
-        </div>
-
-        {/* Interactive Nav Controls */}
-        <div className="flex items-center justify-between gap-3 mt-4">
-          <button
-            type="button"
-            className="flex-1 h-11 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all disabled:opacity-40"
-            disabled={activeStep === 0}
-            onClick={() => setActiveStep((prev) => Math.max(0, prev - 1))}
+        {/* Unified premium Call to Action button */}
+        <div className="mt-6 px-1">
+          <Link
+            href="/enroll"
+            className="w-full h-12 bg-[#173fad] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-md active:scale-[0.98] cursor-pointer"
           >
-            {language === "ms" ? "Sebelumnya" : language === "ar" ? "السابق" : "Previous"}
-          </button>
-          <button
-            type="button"
-            className="flex-1 h-11 bg-[#173fad] text-white rounded-xl text-xs font-bold transition-all disabled:opacity-40"
-            disabled={activeStep === JOURNEY_STEPS.length - 1}
-            onClick={() => setActiveStep((prev) => Math.min(JOURNEY_STEPS.length - 1, prev + 1))}
-          >
-            {language === "ms" ? "Seterusnya" : language === "ar" ? "التالي" : "Next Step"}
-          </button>
-        </div>
-
-        {/* Central Call to Action */}
-        <div className="mt-5 px-1">
-          <Link href="/enroll" className="w-full h-12 bg-[#173fad] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-md active:scale-[0.98]">
             {t("nav.makeEnquiry")} <Sparkles size={14} className="stroke-[2.5]" />
           </Link>
         </div>

@@ -520,14 +520,10 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                 <p className="bilc-result-desc">{rec.description}</p>
 
                 {/* Desktop Grid (Hidden on Mobile) */}
-                <div className="hidden sm:grid grid-cols-3 gap-4 mb-6 bilc-result-meta-grid">
+                <div className="hidden sm:grid grid-cols-2 gap-4 mb-6 bilc-result-meta-grid">
                   <div className="bilc-meta-box">
                     <span>{language === "ms" ? "Tempoh Pengajian" : language === "ar" ? "مدة الدراسة" : "Duration"}</span>
                     <strong>{rec.duration}</strong>
-                  </div>
-                  <div className="bilc-meta-box">
-                    <span>{language === "ms" ? "Yuran Rasmi" : language === "ar" ? "الرسوم الرسمية" : "Official Tuition"}</span>
-                    <strong>{rec.tuition}</strong>
                   </div>
                   <div className="bilc-meta-box">
                     <span>{language === "ms" ? "Ciri Utama" : language === "ar" ? "أبرز المزايا" : "Key Highlight"}</span>
@@ -542,12 +538,6 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                       {language === "ms" ? "⏳ Tempoh:" : language === "ar" ? "⏳ المدة:" : "⏳ Duration:"}
                     </span>
                     <strong className="text-[#0f172a] font-extrabold">{rec.duration}</strong>
-                  </div>
-                  <div className="flex items-start gap-2 text-xs border-t border-slate-100 pt-2.5">
-                    <span className="text-slate-400 font-bold w-20 shrink-0">
-                      {language === "ms" ? "💵 Yuran:" : language === "ar" ? "💵 الرسوم:" : "💵 Tuition:"}
-                    </span>
-                    <strong className="text-[#173fad] font-extrabold">{rec.tuition}</strong>
                   </div>
                   <div className="flex items-start gap-2 text-xs border-t border-slate-100 pt-2.5">
                     <span className="text-slate-400 font-bold w-20 shrink-0">

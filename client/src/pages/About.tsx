@@ -1,4 +1,5 @@
-import { BookMarked, Compass, Heart, UsersRound } from "lucide-react";
+import { useState } from "react";
+import { BookMarked, ChevronLeft, ChevronRight, Compass, Heart, UsersRound } from "lucide-react";
 import { Link } from "wouter";
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
@@ -30,6 +31,7 @@ function AboutImage({ media, className, loading = "lazy" }: { media: AboutMedia;
 
 export default function About() {
   const { t, isRTL, language } = useLanguage();
+  const [activeApproach, setActiveApproach] = useState(0);
   const team = trpc.content.publicTeamProfiles.useQuery();
   const media = trpc.media.publicList.useQuery();
   const mediaItems = media.data;
@@ -83,21 +85,83 @@ export default function About() {
             </div>
             <p className="about-approach-intro-copy text-slate-500 text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-indigo-500/30 pl-4 py-1">{t("about.approachSubtitle")}</p>
           </div>
-          <div className="about-method-layout mt-8">
-            <div className="simple-approach-list about-approach-list about-approach-list--surface">
-              {approach.map(({ icon: Icon, title, body }) => (
-                <article key={title}>
-                  <Icon size={18} />
-                  <div>
-                    <strong>{title}</strong>
-                    <p>{body}</p>
-                  </div>
-                </article>
-              ))}
+
+          {/* DESKTOP VERSION - SIDE BY SIDE WITH RICH GRAPHIC (md:block hidden) */}
+          <div className="hidden md:block">
+            <div className="about-method-layout mt-8">
+              <div className="simple-approach-list about-approach-list about-approach-list--surface">
+                {approach.map(({ icon: Icon, title, body }) => (
+                  <article key={title}>
+                    <Icon size={18} />
+                    <div>
+                      <strong>{title}</strong>
+                      <p>{body}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <figure className="about-feature-media about-method-media">
+                <AboutImage media={methodMedia} />
+              </figure>
             </div>
-            <figure className="about-feature-media about-method-media">
-              <AboutImage media={methodMedia} />
-            </figure>
+          </div>
+
+          {/* MOBILE VERSION - COMPACT INTERACTIVE CAPSULE SELECTOR (block md:hidden) */}
+          <div className="block md:hidden mt-6">
+            {/* Highly Professional Vertical Segmented Button Stack */}
+            <div className="flex flex-col gap-2 w-full">
+              {approach.map(({ icon: Icon, title }, idx) => {
+                const isActive = activeApproach === idx;
+                const ArrowIcon = isRTL ? ChevronLeft : ChevronRight;
+                return (
+                  <button
+                    key={title}
+                    type="button"
+                    onClick={() => setActiveApproach(idx)}
+                    className={`flex items-center justify-between w-full px-4 py-3.5 rounded-xl border text-xs font-extrabold transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? "bg-[#173fad] border-[#173fad] text-white shadow-sm"
+                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    }`}
+                    style={{ direction: isRTL ? "rtl" : "ltr" }}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Icon size={15} className={`shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
+                      <span className="text-[11px] sm:text-xs text-left" style={{ textAlign: isRTL ? "right" : "left" }}>
+                        {title}
+                      </span>
+                    </div>
+                    <ArrowIcon
+                      size={14}
+                      className={`shrink-0 transition-all duration-300 ${
+                        isActive ? "opacity-100 scale-110" : "opacity-30"
+                      } ${isActive && !isRTL ? "translate-x-0.5" : ""} ${isActive && isRTL ? "-translate-x-0.5" : ""}`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Showcase Detail Card */}
+            <div className="bg-white border border-slate-200/70 rounded-2xl p-5 mt-4 shadow-xs relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50/30 to-transparent pointer-events-none rounded-bl-3xl" />
+              
+              <div className="flex items-center gap-2.5 mb-3" style={{ direction: isRTL ? "rtl" : "ltr" }}>
+                <div className="w-8 h-8 rounded-xl bg-blue-50/50 border border-blue-100 flex items-center justify-center text-[#173fad] shrink-0">
+                  {(() => {
+                    const ActiveIcon = approach[activeApproach].icon;
+                    return <ActiveIcon size={15} className="stroke-[2.2]" />;
+                  })()}
+                </div>
+                <strong className="text-xs font-extrabold text-slate-800 leading-tight">
+                  {approach[activeApproach].title}
+                </strong>
+              </div>
+              
+              <p className="text-slate-500 text-[12px] leading-relaxed" style={{ textAlign: isRTL ? "right" : "left" }}>
+                {approach[activeApproach].body}
+              </p>
+            </div>
           </div>
         </section>
 

@@ -12,6 +12,12 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+
+  // Secure Workflow Columns:
+  sessionVersion: int("sessionVersion").default(1).notNull(), // Incremented to atomically revoke previous sessions
+  isOtp: boolean("isOtp").default(false).notNull(), // Flag indicating if current password is an unburned single-use OTP
+  otpCreatedAt: timestamp("otpCreatedAt"), // Expiration limit tracking (7 days)
+  failedAttempts: int("failedAttempts").default(0).notNull(), // Track sequential failed login attempts to lock account
 });
 
 export const userFormSections = mysqlTable("userFormSections", {
@@ -86,11 +92,12 @@ export const submissions = mysqlTable("submissions", {
   parentName: varchar("parentName", { length: 160 }).notNull(),
   parentEmail: varchar("parentEmail", { length: 320 }).notNull(),
   parentPhone: varchar("parentPhone", { length: 64 }).notNull(),
+  programId: int("programId"),
   programInterest: varchar("programInterest", { length: 180 }).notNull(),
   preferredSchedule: varchar("preferredSchedule", { length: 180 }).notNull(),
   message: text("message"),
   source: varchar("source", { length: 100 }).default("website").notNull(),
-  status: mysqlEnum("status", ["new", "contacted", "interested", "enrolled", "closed"]).default("new").notNull(),
+  status: mysqlEnum("status", ["new", "contacted", "meeting_scheduled", "agreed", "account_created", "rejected", "interested", "enrolled", "closed"]).default("new").notNull(),
   utmSource: varchar("utmSource", { length: 100 }),
   utmMedium: varchar("utmMedium", { length: 100 }),
   utmCampaign: varchar("utmCampaign", { length: 100 }),
@@ -502,12 +509,13 @@ export const messageTemplates = mysqlTable("messageTemplates", {
 
 export const registrationSubmissions = mysqlTable("registrationSubmissions", {
   id: int("id").autoincrement().primaryKey(),
+  programId: int("programId"),
   programInterest: varchar("programInterest", { length: 180 }).notNull(),
   applicantCategory: varchar("applicantCategory", { length: 80 }).notNull(),
   fullName: varchar("fullName", { length: 160 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
   phone: varchar("phone", { length: 64 }).notNull(),
-  status: mysqlEnum("status", ["new", "routed", "accountCreated", "rejected"]).default("new").notNull(),
+  status: mysqlEnum("status", ["new", "routed", "accountCreated", "rejected", "contacted", "meeting_scheduled", "agreed"]).default("new").notNull(),
   assignedToUserId: int("assignedToUserId"),
   utmSource: varchar("utmSource", { length: 100 }),
   utmMedium: varchar("utmMedium", { length: 100 }),
@@ -517,6 +525,29 @@ export const registrationSubmissions = mysqlTable("registrationSubmissions", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
+
+export const enrollments = mysqlTable("enrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  programId: int("programId").notNull(),
+  agreedPrice: int("agreedPrice").notNull(), // amount in sen
+  registrationFee: int("registrationFee").default(0).notNull(), // amount in sen
+  placementTestFee: int("placementTestFee").default(0).notNull(), // amount in sen
+  visaFee: int("visaFee").default(0).notNull(), // amount in sen
+  approvedByUserId: int("approvedByUserId").notNull(),
+  approvedAt: timestamp("approvedAt").defaultNow().notNull(),
+  notes: text("notes"),
+  status: mysqlEnum("status", ["active", "completed", "cancelled"]).default("active").notNull(),
+  completedAt: timestamp("completedAt"),
+  source: mysqlEnum("source", ["registration_form", "enquiry_form", "direct_call", "whatsapp"]).notNull(),
+  submissionId: int("submissionId"),
+  registrationSubmissionId: int("registrationSubmissionId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  userIndex: index("enrollments_user_idx").on(table.userId),
+  programIndex: index("enrollments_program_idx").on(table.programId),
+}));
 
 export const registrationSubmissionValues = mysqlTable("registrationSubmissionValues", {
   id: int("id").autoincrement().primaryKey(),
@@ -636,3 +667,5 @@ export type PlacementTest = typeof placementTests.$inferSelect;
 export type PlacementTestAttempt = typeof placementTestAttempts.$inferSelect;
 export type Promotion = typeof promotions.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
+export type Enrollment = typeof enrollments.$inferSelect;
+export type InsertEnrollment = typeof enrollments.$inferInsert;

@@ -11,10 +11,26 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 
 const requireUser = t.middleware(async opts => {
-  const { ctx, next } = opts;
+  const { ctx, next, path } = opts;
 
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
+  }
+
+  // Whitelisted endpoints for restricted sessions (onboarding)
+  const whitelistedPaths = [
+    "auth.me",
+    "auth.logout",
+    "auth.completeOnboarding",
+    "users.formSchema",
+    "superAdminUsers.formSchema"
+  ];
+
+  if ((ctx.user as any).isRestricted && !whitelistedPaths.includes(path)) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "This restricted session is limited to completing your first sign-in onboarding workflow."
+    });
   }
 
   return next({

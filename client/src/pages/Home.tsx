@@ -16,6 +16,20 @@ export default function Home() {
   const [isPlacementTestOpen, setIsPlacementTestOpen] = useState(false);
   const { t, isRTL, language } = useLanguage();
 
+  const exploreProgrammesLabel =
+    language === "ar"
+      ? "استكشف البرامج"
+      : language === "ms"
+      ? "Terokai Program"
+      : "Explore Programmes";
+
+  const academicGuideLabel =
+    language === "ar"
+      ? "الدليل الأكاديمي"
+      : language === "ms"
+      ? "Panduan Akademik"
+      : "Academic Guide";
+
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const activePromotionsQuery = trpc.promotions.publicList.useQuery();
 
@@ -89,7 +103,7 @@ export default function Home() {
     <PublicLayout>
       <div id="home-page-container" data-page="home" className={`simple-public-page home-page page-home ${isRTL ? "is-rtl" : ""} max-md:!mt-[10px]`}>
         {/* Luxury Hero Section with Seamless Loop Video */}
-        <section id="home-hero-section" className="simple-home-intro simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580 max-md:!mt-[10px]">
+        <section id="home-hero-section" className="simple-home-intro simple-home-intro-offset simple-home-intro--refined simple-home-intro--desktop-geometry simple-home-intro--mobile-480 simple-home-intro--desktop-580 max-md:!mt-[10px] relative overflow-hidden">
           <video
             ref={heroVideoRef}
             className="simple-home-hero-media"
@@ -108,7 +122,10 @@ export default function Home() {
             <source src={`${heroVideoUrl}${heroVideoUrl.includes("?") ? "&" : "?"}v=trim-1s`} type="video/mp4" />
           </video>
           
-          <div className="simple-home-intro-content simple-home-intro-content--desktop-offset simple-home-intro-content--desktop-geometry">
+          {/* Progressively dark glass gradient overlay for ultimate premium text contrast on mobile */}
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[0.5px] md:bg-transparent pointer-events-none z-[1]" />
+          
+          <div className="simple-home-intro-content simple-home-intro-content--desktop-offset simple-home-intro-content--desktop-geometry relative z-[2]">
             <div className="bilc-hero-cert-badge">
               <ShieldCheck size={15} />
               <span>
@@ -120,33 +137,34 @@ export default function Home() {
               </span>
             </div>
             
-            <h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
               {language === "ms"
                 ? "Di Mana Bahasa dan Keanggunan Bersatu."
                 : language === "ar"
                 ? "حيث تلتقي فصاحة اللغة مع رفاهية التعلم."
                 : "Where Language and Luxury Converge."}
             </h1>
-            <p className="bilc-hero-zh-slogan">
+            <p className="bilc-hero-zh-slogan text-xs sm:text-sm">
               {language === "ms"
                 ? "Belajar Hari Ini... Memimpin Hari Esok · Learn Today... Lead Tomorrow"
                 : language === "ar"
                 ? "تعلم اليوم... لتَقود الغد · Learn Today... Lead Tomorrow"
                 : "语言与奢华的交汇处 · Learn Today... Lead Tomorrow"}
             </p>
-            <p>{t("home.heroSubtitle")}</p>
+            <p className="text-sm sm:text-base leading-relaxed text-slate-200">{t("home.heroSubtitle")}</p>
             
-            <div className="simple-actions-row max-md:pb-[15px]">
+            {/* Desktop Actions Row (hidden on mobile) */}
+            <div className="hidden md:flex simple-actions-row simple-home-hero-actions-desktop">
               <button 
                 type="button" 
                 onClick={() => setIsPlacementTestOpen(true)}
-                className="simple-button"
+                className="simple-button hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 style={{ background: "#173fad", color: "#ffffff" }}
               >
                 <Sparkles size={17} /> {t("home.ctaPlacement")}
               </button>
-              <Link href="/programs#course-pricing" className="simple-button simple-button-quiet cursor-pointer">
-                {t("home.pricingEyebrow")} <ArrowRight size={17} className={isRTL ? "rotate-180" : ""} />
+              <Link href="/programs" className="simple-button simple-button-quiet cursor-pointer">
+                {exploreProgrammesLabel} <ArrowRight size={17} className={isRTL ? "rotate-180" : ""} />
               </Link>
               <Link
                 href="/contact?reason=campusTour"
@@ -154,6 +172,37 @@ export default function Home() {
               >
                 <Calendar size={17} /> {t("home.ctaBooking")}
               </Link>
+            </div>
+
+            {/* Mobile Actions Row (fully optimized, compact, responsive actions) */}
+            <div className="flex md:hidden flex-col gap-3.5 w-full mt-6 max-w-sm mx-auto">
+              {/* Primary Action Button (Placement Test) */}
+              <button 
+                type="button" 
+                onClick={() => setIsPlacementTestOpen(true)}
+                className="w-full h-12 rounded-xl bg-[#173fad] text-white flex items-center justify-center gap-2 text-xs font-extrabold shadow-md active:scale-[0.98] cursor-pointer"
+              >
+                <Sparkles size={15} className="stroke-[2.2]" />
+                <span>{t("home.ctaPlacement")}</span>
+              </button>
+              
+              {/* Secondary Actions (Pricing and Campus Tour) */}
+              <div className="grid grid-cols-2 gap-2.5">
+                <Link 
+                  href="/programs" 
+                  className="h-10 rounded-xl bg-white/10 backdrop-blur-xs text-white border border-white/20 flex items-center justify-center gap-1.5 text-[11px] font-bold active:scale-[0.98] cursor-pointer"
+                >
+                  <span>{exploreProgrammesLabel}</span> 
+                  <ArrowRight size={13} className={isRTL ? "rotate-180" : ""} />
+                </Link>
+                <Link
+                  href="/contact?reason=campusTour"
+                  className="h-10 rounded-xl bg-white/10 backdrop-blur-xs text-white border border-white/20 flex items-center justify-center gap-1.5 text-[11px] font-bold active:scale-[0.98] cursor-pointer"
+                >
+                  <Calendar size={13} />
+                  <span>{t("home.ctaBooking")}</span>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -294,12 +343,12 @@ export default function Home() {
           </div>
           
           <div className="simple-task-grid">
-            <Link href="/programs#course-pricing" className="simple-task-card">
+            <Link href="/programs" className="simple-task-card">
               <div className="simple-task-card-media-wrap">
                 {programmesMedia ? (
                   <img className="simple-task-media" src={programmesMedia.publicUrl} alt={programmesMedia.altText} loading="lazy" decoding="async" />
                 ) : null}
-                <span className="simple-task-card-tag">{t("home.pricingEyebrow")}</span>
+                <span className="simple-task-card-tag">{academicGuideLabel}</span>
               </div>
               <div className="simple-task-card-body">
                 <div className="simple-task-card-header">
