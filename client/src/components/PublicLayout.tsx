@@ -316,6 +316,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     metaKeywords.setAttribute("content", language === "ar" ? arabicKeywords : defaultKeywords);
   }, [location, language]);
 
+  // Auto-open promotional popup on first entry or page refresh/reload (when layout mounts)
+  useEffect(() => {
+    if (!isPromoLoading && isPromoActive) {
+      if (!(window as any).__bilc_promo_shown) {
+        setPromoOpen(true);
+        (window as any).__bilc_promo_shown = true;
+      }
+    }
+  }, [isPromoLoading, isPromoActive]);
+
   const scrollAnimRef = useRef<number | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -454,7 +464,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const close = () => setOpen(false);
 
   return (
-    <div className={`simple-public-shell ${isRTL ? "is-rtl" : ""}`}>
+    <div className={`simple-public-shell ${isRTL ? "is-rtl" : ""} ${isWaOpen ? "has-wa-open" : ""}`}>
       <BackgroundCircleField />
       <a className="simple-skip-link" href="#main-content">
         {t("nav.skipToContent")}
@@ -548,7 +558,13 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </footer>
 
       {/* Promotional Campaign Modal Popup */}
-      <PromotionalPopupModal isOpen={promoOpen} setIsOpen={setPromoOpen} />
+      <PromotionalPopupModal 
+        isOpen={promoOpen} 
+        setIsOpen={setPromoOpen} 
+        settings={settings}
+        publicPromos={publicPromos}
+        isLoading={isPromoLoading}
+      />
 
       {/* Desktop Version: Premium Draggable Cohesive Vertical Capsule Dock (for screens >= 768px) */}
       <div

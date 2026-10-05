@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 
 interface BackgroundCircleFieldProps {
   seed?: string;
@@ -6,46 +6,57 @@ interface BackgroundCircleFieldProps {
 
 interface Ball {
   id: number;
-  x: number;
-  y: number;
+  cx: number; // Home center X
+  cy: number; // Home center Y
   vx: number;
   vy: number;
+  displacementX: number; // Dynamic physical displacement offset
+  displacementY: number; // Dynamic physical displacement offset
   r: number;
   side: "left" | "right";
 }
 
-export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircleFieldProps) {
-  const gridCanvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export const BackgroundCircleField = memo(function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircleFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<number | null>(null);
 
-  // Use refs to store physics state for 60 FPS animation loop
+  // Balls list stored in React state for DOM rendering, and in refs for high-speed physics access
+  const [balls, setBalls] = useState<Ball[]>([]);
   const ballsRef = useRef<Ball[]>([]);
+  const ballDomRefs = useRef<{ [id: number]: HTMLDivElement | null }>({});
+  const lastAppliedTransformsRef = useRef<{ [id: number]: string }>({});
+  
   const pointerRef = useRef({ x: -1000, y: -1000 });
+  
+  // High-performance refs for dimensions
+  const widthRef = useRef(1200);
+  const heightRef = useRef(1000);
+  const lastWidthRef = useRef(0);
+  const lastSeedRef = useRef("");
+  const generatedScreensRef = useRef<Set<number>>(new Set());
 
-  // Dimensions state representing full scrollable document width and height
-  const [dimensions, setDimensions] = useState({ width: 1200, height: 1000 });
+  // High-precision scroll tracking
+  const targetScrollYRef = useRef(0);
+
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  // Brand-aligned luxury blue color matching the project style (Bilc Blue - #173fad)
-  // Designed for elegant, sharp glass bubbles / bubbles with crisp vector outlines
-  const sphereColor = {
-    center: "rgba(23, 63, 173, 0.18)",  // Soft elegant brand blue center
-    middle: "rgba(23, 63, 173, 0.10)",  // Smooth translucent body fill
-    outer: "rgba(23, 63, 173, 0.04)",   // Boundary fill
-    border: "rgba(23, 63, 173, 0.38)",  // Sharp, precise contour outline matching the brand
+  // Extremely smooth, slow, and elegant swaying parameters for state of rest (halved speed)
+  const getSway = (time: number, id: number) => {
+    return {
+      x: Math.sin(time * 0.000375 + id * 1.7) * 55, 
+      y: Math.cos(time * 0.000300 + id * 2.3) * 55, 
+    };
   };
 
-  // Boundaries calculation to keep spheres inside the silent side zones
+  // Boundaries calculation to keep spheres strictly in the left/right side margins
   const getSideBoundaries = (side: "left" | "right", w: number, r: number) => {
-    const margin = Math.max(0, (w - 1216) / 2); // 1216px - content grid width
+    const margin = Math.max(20, (w - 1216) / 2); // 1216px - central content zone width
     if (side === "left") {
-      const maxVal = margin > 100 ? margin + 120 : w * 0.28;
-      return { minX: r, maxX: Math.max(r + 50, maxVal) };
+      const maxX = margin > 100 ? margin + 60 : w * 0.22;
+      return { minX: r + 15, maxX: Math.max(r + 45, maxX) };
     } else {
-      const minVal = margin > 100 ? w - margin - 120 : w * 0.72;
-      return { minX: Math.min(w - r - 50, minVal), maxX: w - r };
+      const minX = margin > 100 ? w - margin - 60 : w * 0.78;
+      return { minX: Math.min(w - r - 45, minX), maxX: w - r - 15 };
     }
   };
 
@@ -58,28 +69,140 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
     return () => mediaQuery.removeEventListener("change", listener);
   }, []);
 
-  // 2. Track pointer position in document space for high-fidelity repulsion
+  // 2. Track pointer position in viewport space for repulsion
   useEffect(() => {
     if (reducedMotion) return;
 
     const handlePointerMove = (e: PointerEvent) => {
-      pointerRef.current = { x: e.pageX, y: e.pageY };
+      pointerRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const handlePointerLeave = () => {
       pointerRef.current = { x: -1000, y: -1000 };
     };
 
+    // Mobile tap shockwave push handler (Pointer Down trigger)
+    const handlePointerDown = (e: PointerEvent) => {
+      const clickX = e.clientX;
+      const clickY = e.clientY + targetScrollYRef.current;
+
+      ballsRef.current.forEach((ball) => {
+        const sway = getSway(performance.now(), ball.id);
+        const currentX = ball.cx + sway.x + ball.displacementX;
+        const currentY = ball.cy + sway.y + ball.displacementY;
+
+        const dx = currentX - clickX;
+        const dy = currentY - clickY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const blastRadius = 250;
+
+        if (dist < blastRadius) {
+          // Extremely gentle mobile pulse for a soft, liquid-like dispersion with no abrupt movements (halved force)
+          const force = (1 - dist / blastRadius) * 0.075; 
+          const nx = dx / (dist || 1);
+          const ny = dy / (dist || 1);
+          ball.vx += nx * force;
+          ball.vy += ny * force;
+        }
+      });
+    };
+
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerleave", handlePointerLeave, { passive: true });
+    window.addEventListener("pointerdown", handlePointerDown, { passive: true });
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [reducedMotion]);
 
-  // 3. Manage Window Resize and Document Height Resizing
+  // 3. Initialize/Append Spheres dynamically based on Document height
+  const updateSpheres = () => {
+    const width = widthRef.current;
+    const documentHeight = heightRef.current;
+    const screenHeight = window.innerHeight || 800;
+    const numScreens = Math.max(1, Math.ceil(documentHeight / screenHeight));
+
+    const widthDiff = Math.abs(width - lastWidthRef.current);
+    const seedChanged = seed !== lastSeedRef.current;
+
+    // Reset if layout changed significantly or seed changed
+    if (ballsRef.current.length === 0 || widthDiff > 100 || seedChanged) {
+      ballsRef.current = [];
+      generatedScreensRef.current = new Set();
+      lastWidthRef.current = width;
+      lastSeedRef.current = seed;
+    }
+
+    // Seed hashing to number
+    let seedHash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      seedHash = (seedHash << 5) - seedHash + seed.charCodeAt(i);
+      seedHash |= 0;
+    }
+    seedHash = Math.abs(seedHash) || 1;
+
+    const list = [...ballsRef.current];
+    let maxId = list.reduce((max, b) => Math.max(max, b.id), -1);
+    let ballId = maxId + 1;
+
+    const sides: ("left" | "right")[] = ["left", "right"];
+
+    for (let s = 0; s < numScreens; s++) {
+      if (generatedScreensRef.current.has(s)) {
+        continue;
+      }
+
+      const screenYStart = s * screenHeight;
+
+      for (const side of sides) {
+        // Balanced count of 2 to 4 spheres per side per screen, seed-stable
+        let sideSeed = seedHash + s * 79 + (side === "left" ? 13 : 37);
+        const randomForSide = () => {
+          const x = Math.sin(sideSeed++) * 10000;
+          return x - Math.floor(x);
+        };
+
+        const countOnSide = 2 + Math.floor(randomForSide() * 3); // 2, 3, or 4
+        const segmentHeight = screenHeight / countOnSide;
+
+        for (let j = 0; j < countOnSide; j++) {
+          const r = 25 + randomForSide() * 75; // Radius: 25px - 100px (Diameter: 50px - 200px)
+          const bounds = getSideBoundaries(side, width, r);
+
+          // Uniform horizontal distribution
+          const startX = bounds.minX + randomForSide() * (bounds.maxX - bounds.minX);
+
+          // Strictly slot heights vertically to enforce 100px - 400px gaps
+          const slotYStart = screenYStart + j * segmentHeight;
+          const slotMinY = slotYStart + r + 35;
+          const slotMaxY = slotYStart + segmentHeight - r - 35;
+          const startY = slotMinY + randomForSide() * (Math.max(10, slotMaxY - slotMinY));
+
+          list.push({
+            id: ballId++,
+            cx: startX,
+            cy: startY,
+            vx: 0,
+            vy: 0,
+            displacementX: 0,
+            displacementY: 0,
+            r,
+            side,
+          });
+        }
+      }
+
+      generatedScreensRef.current.add(s);
+    }
+
+    ballsRef.current = list;
+    setBalls(list);
+  };
+
+  // 4. Manage Viewport Resize and height tracking
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -90,36 +213,26 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
         1000
       );
 
-      setDimensions({ width, height });
+      widthRef.current = width;
+      heightRef.current = height;
 
-      const dpr = window.devicePixelRatio || 1;
-      const resizeCanvas = (canvas: HTMLCanvasElement | null) => {
-        if (!canvas) return;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.scale(dpr, dpr);
-        }
-      };
-
-      resizeCanvas(gridCanvasRef.current);
-      resizeCanvas(canvasRef.current);
+      updateSpheres();
     };
 
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    // Check periodically if document height changed due to content loads
+    // Check periodically for scrollHeight updates (e.g. dynamic content loads) without scroll events
     const interval = setInterval(() => {
-      const currentDocHeight = Math.max(
+      const currentHeight = Math.max(
         document.documentElement.scrollHeight,
         document.body.scrollHeight,
         window.innerHeight,
         1000
       );
-      if (currentDocHeight !== dimensions.height) {
-        handleResize();
+      if (Math.abs(currentHeight - heightRef.current) > 10) {
+        heightRef.current = currentHeight;
+        updateSpheres();
       }
     }, 1000);
 
@@ -127,296 +240,158 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
       window.removeEventListener("resize", handleResize);
       clearInterval(interval);
     };
-  }, [dimensions.height]);
+  }, [seed]);
 
-  // 4. Initialize Deterministic Spheres Based on Seed
+  // 5. Scroll Tracker (Saves scrollY to ref for pointer coordinate conversion)
   useEffect(() => {
-    const w = dimensions.width;
-    const documentHeight = dimensions.height;
-
-    // Seed hashing to number
-    let seedHash = 0;
-    for (let i = 0; i < seed.length; i++) {
-      seedHash = (seedHash << 5) - seedHash + seed.charCodeAt(i);
-      seedHash |= 0;
-    }
-    seedHash = Math.abs(seedHash) || 1;
-
-    let localSeed = seedHash;
-    const random = () => {
-      const x = Math.sin(localSeed++) * 10000;
-      return x - Math.floor(x);
+    const handleScroll = () => {
+      targetScrollYRef.current = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     };
 
-    // Calculate count based on document height
-    const count = Math.max(8, Math.floor(documentHeight / 280));
-    const list: Ball[] = [];
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
-    for (let i = 0; i < count; i++) {
-      const side = random() > 0.5 ? "left" : "right";
-      const r = 25 + random() * 75; // Radius: 25px - 100px (Diameter: 50px - 200px)
-      const bounds = getSideBoundaries(side, w, r);
-
-      const startX = bounds.minX + random() * (bounds.maxX - bounds.minX);
-      const startY = random() * documentHeight;
-
-      // Small initial velocities
-      const vx = random() * 0.08 - 0.04;
-      const vy = random() * 0.08 - 0.04;
-
-      list.push({
-        id: i,
-        x: startX,
-        y: startY,
-        vx,
-        vy,
-        r,
-        side,
-      });
-    }
-
-    ballsRef.current = list;
-  }, [dimensions.width, dimensions.height, seed]);
-
-  // 5. Draw Coordinate Grid (Disabled - completely transparent to show global CSS background instead)
+  // 6. Physics Animation Loop (Runs physical updates and updates DOM transforms directly for ultra-performance)
   useEffect(() => {
-    const canvas = gridCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const width = dimensions.width;
-    const height = dimensions.height;
-
-    ctx.clearRect(0, 0, width, height);
-  }, [dimensions.width, dimensions.height]);
-
-  // Helper method to draw a single premium glossy realistic bubble
-  const drawBubble = (ctx: CanvasRenderingContext2D, ball: Ball, opacity: number) => {
-    ctx.save();
-    ctx.globalAlpha = opacity;
-
-    // 1. Precise outer glass refraction outline (CRISP vector border)
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-    ctx.strokeStyle = sphereColor.border;
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-
-    // 2. Full background radial gradient for the bubble body
-    const gradX = ball.x - ball.r * 0.15;
-    const gradY = ball.y - ball.r * 0.15;
-
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-
-    const bodyGradient = ctx.createRadialGradient(
-      gradX,
-      gradY,
-      ball.r * 0.05,
-      ball.x,
-      ball.y,
-      ball.r
-    );
-
-    bodyGradient.addColorStop(0, sphereColor.center);
-    bodyGradient.addColorStop(0.3, sphereColor.center);
-    bodyGradient.addColorStop(0.7, sphereColor.middle);
-    bodyGradient.addColorStop(0.92, sphereColor.outer);
-    bodyGradient.addColorStop(1.0, "rgba(255, 255, 255, 0)");
-
-    ctx.fillStyle = bodyGradient;
-    ctx.fill();
-
-    // 3. Specular highlight curve on the top-left to simulate light reflecting on a glossy bubble sphere
-    ctx.beginPath();
-    const hRadius = ball.r * 0.18;
-    const hX = ball.x - ball.r * 0.35;
-    const hY = ball.y - ball.r * 0.35;
-    ctx.arc(hX, hY, hRadius, 0, Math.PI * 2);
-
-    const highlightGrad = ctx.createRadialGradient(
-      hX,
-      hY,
-      0,
-      hX,
-      hY,
-      hRadius
-    );
-    highlightGrad.addColorStop(0, "rgba(255, 255, 255, 0.75)");
-    highlightGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-    ctx.fillStyle = highlightGrad;
-    ctx.fill();
-
-    // 4. Soft secondary ambient reflection on the bottom-right for realistic depth
-    ctx.beginPath();
-    const bRadius = ball.r * 0.14;
-    const bX = ball.x + ball.r * 0.32;
-    const bY = ball.y + ball.r * 0.32;
-    ctx.arc(bX, bY, bRadius, 0, Math.PI * 2);
-
-    const bottomGrad = ctx.createRadialGradient(
-      bX,
-      bY,
-      0,
-      bX,
-      bY,
-      bRadius
-    );
-    bottomGrad.addColorStop(0, "rgba(23, 63, 173, 0.22)");
-    bottomGrad.addColorStop(1, "rgba(23, 63, 173, 0)");
-    ctx.fillStyle = bottomGrad;
-    ctx.fill();
-
-    ctx.restore();
-  };
-
-  // 6. Physics Animation Loop for Dynamic Spheres
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const width = dimensions.width;
-    const height = dimensions.height;
-
-    // Clear and draw once if user prefers reduced motion (zero-CPU active drawing)
-    if (reducedMotion) {
-      ctx.clearRect(0, 0, width, height);
-      const spheres = ballsRef.current;
-      spheres.forEach((ball) => {
-        drawBubble(ctx, ball, 1.0);
-      });
-      return;
-    }
-
     const tick = (time: number) => {
-      const activeCanvas = canvasRef.current;
-      if (!activeCanvas) {
-        requestRef.current = requestAnimationFrame(tick);
-        return;
-      }
-      const activeCtx = activeCanvas.getContext("2d");
-      if (!activeCtx) {
-        requestRef.current = requestAnimationFrame(tick);
-        return;
-      }
-
-      const w = dimensions.width;
-      const h = dimensions.height;
-
-      activeCtx.clearRect(0, 0, w, h);
-
+      const targetScrollY = targetScrollYRef.current;
+      const w = window.innerWidth;
       const spheres = ballsRef.current;
       const pointer = pointerRef.current;
 
-      // Phase A: Apply Physics, Fluid Micro-drift, Cursor Repulsion, and Side Boundaries Bounce
+      // Physics, Harmonic Swaying at rest, and responsive repulsion
       spheres.forEach((ball) => {
-        // Fluid Viscosity: slower, highly premium damping so drift feels majestic and calm
-        ball.vx *= 0.992;
-        ball.vy *= 0.992;
+        // Calculate organic swaying coordinates for state of rest
+        const sway = getSway(time, ball.id);
 
-        // Fluid Micro-drift (ultra-languid oscillations)
-        ball.vx += Math.sin(time * 0.0008 + ball.id) * 0.00008;
-        ball.vy += Math.cos(time * 0.0008 + ball.id) * 0.00008;
+        const currentX = ball.cx + sway.x + ball.displacementX;
+        const currentY = ball.cy + sway.y + ball.displacementY;
 
-        // Gentle, extremely subtle Pointer/Cursor repulsion
-        const dx = ball.x - pointer.x;
-        const dy = ball.y - pointer.y;
+        const ballViewportY = currentY - targetScrollY;
+        const dx = currentX - pointer.x;
+        const dy = ballViewportY - pointer.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxInfluence = 260; // 260px hover influence zone
+        const maxInfluence = 220;
 
         if (dist < maxInfluence) {
-          const force = (1 - dist / maxInfluence) * 0.015; // Extremely gentle and luxurious push force
+          // Extremely gentle, luxurious fluid-like repulsion for super smooth sliding (halved force)
+          const force = (1 - dist / maxInfluence) * 0.01; 
           const nx = dx / (dist || 1);
           const ny = dy / (dist || 1);
           ball.vx += nx * force;
           ball.vy += ny * force;
         }
 
-        // Limit maximum speed strictly to 0.08 px/frame for a truly slow, premium movement
-        const maxSpeed = 0.08;
-        const currentSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-        if (currentSpeed > maxSpeed) {
-          ball.vx = (ball.vx / currentSpeed) * maxSpeed;
-          ball.vy = (ball.vy / currentSpeed) * maxSpeed;
-        }
+        // Spring restoring force pulls active displacement back to home zone (halved return speed)
+        ball.vx += (0 - ball.displacementX) * 0.00025;
+        ball.vy += (0 - ball.displacementY) * 0.00025;
 
-        ball.x += ball.vx;
-        ball.y += ball.vy;
+        // Rich liquid viscosity damping for high-deceleration smooth settling (friction: 0.955)
+        ball.vx *= 0.955;
+        ball.vy *= 0.955;
 
-        // Bounce gently inside side boundary silent zones (protecting central 1216px area)
+        // Apply velocity with half-speed multiplier to ensure physics is perfectly smooth & half as fast!
+        ball.displacementX += ball.vx * 0.5;
+        ball.displacementY += ball.vy * 0.5;
+
+        // Re-calculate positions after physics updates
+        const finalX = ball.cx + sway.x + ball.displacementX;
+        const finalY = ball.cy + sway.y + ball.displacementY;
+
+        // Soft elastic boundaries (absolutely no hard clamping or sharp teleport bounces!)
         const bounds = getSideBoundaries(ball.side, w, ball.r);
         if (ball.side === "left") {
-          if (ball.x - ball.r < bounds.minX - 100) {
-            ball.x = bounds.minX - 100 + ball.r;
-            ball.vx = Math.abs(ball.vx);
-          } else if (ball.x + ball.r > bounds.maxX) {
-            ball.x = bounds.maxX - ball.r;
-            ball.vx = -Math.abs(ball.vx);
+          if (finalX - ball.r < bounds.minX - 50) {
+            const depth = (bounds.minX - 50) - (finalX - ball.r);
+            ball.vx += depth * 0.0008; // soft magnetic cushion push
+          } else if (finalX + ball.r > bounds.maxX) {
+            const depth = (finalX + ball.r) - bounds.maxX;
+            ball.vx -= depth * 0.0008; // soft magnetic cushion push
           }
         } else {
-          if (ball.x - ball.r < bounds.minX) {
-            ball.x = bounds.minX + ball.r;
-            ball.vx = Math.abs(ball.vx);
-          } else if (ball.x + ball.r > bounds.maxX + 100) {
-            ball.x = bounds.maxX + 100 - ball.r;
-            ball.vx = -Math.abs(ball.vx);
+          if (finalX - ball.r < bounds.minX) {
+            const depth = bounds.minX - (finalX - ball.r);
+            ball.vx += depth * 0.0008; // soft magnetic cushion push
+          } else if (finalX + ball.r > bounds.maxX + 50) {
+            const depth = (finalX + ball.r) - (bounds.maxX + 50);
+            ball.vx -= depth * 0.0008; // soft magnetic cushion push
           }
         }
 
-        // Bounce gently off top/bottom page height
-        if (ball.y - ball.r < -100) {
-          ball.y = -100 + ball.r;
-          ball.vy = Math.abs(ball.vy);
-        } else if (ball.y + ball.r > h + 100) {
-          ball.y = h + 100 - ball.r;
-          ball.vy = -Math.abs(ball.vy);
+        if (finalY - ball.r < -30) {
+          const depth = -30 - (finalY - ball.r);
+          ball.vy += depth * 0.0008; // soft magnetic cushion push
+        } else if (finalY + ball.r > heightRef.current + 30) {
+          const depth = (finalY + ball.r) - (heightRef.current + 30);
+          ball.vy -= depth * 0.0008; // soft magnetic cushion push
+        }
+
+        // Direct DOM update of 100% native absolute scrolling elements
+        // Optimized to only update visible elements and round positions to 0.5px to completely eliminate sub-pixel jitter & main-thread layout thrashing!
+        const dom = ballDomRefs.current[ball.id];
+        if (dom) {
+          const screenHeight = window.innerHeight || 800;
+          const isVisible = finalY + ball.r >= targetScrollY - 300 && finalY - ball.r <= targetScrollY + screenHeight + 300;
+
+          if (isVisible) {
+            const finalXRounded = Math.round((finalX - ball.r) * 2) / 2;
+            const finalYRounded = Math.round((finalY - ball.r) * 2) / 2;
+            const transformStr = `translate3d(${finalXRounded}px, ${finalYRounded}px, 0)`;
+
+            if (lastAppliedTransformsRef.current[ball.id] !== transformStr) {
+              dom.style.transform = transformStr;
+              lastAppliedTransformsRef.current[ball.id] = transformStr;
+            }
+            if (dom.style.display === "none") {
+              dom.style.display = "block";
+            }
+          } else {
+            if (dom.style.display !== "none") {
+              dom.style.display = "none";
+            }
+          }
         }
       });
 
-      // Phase B: Collision Separation (Multi-pass Relaxation Loop with 80px buffer)
-      const passes = 2;
+      // Collision Separation (ensures spheres stay apart strictly with high physical damping)
+      const passes = 3;
       for (let p = 0; p < passes; p++) {
         for (let i = 0; i < spheres.length; i++) {
           for (let j = i + 1; j < spheres.length; j++) {
             const b1 = spheres[i];
             const b2 = spheres[j];
 
-            const dx = b2.x - b1.x;
-            const dy = b2.y - b1.y;
+            const sway1 = getSway(time, b1.id);
+            const x1 = b1.cx + sway1.x + b1.displacementX;
+            const y1 = b1.cy + sway1.y + b1.displacementY;
+
+            const sway2 = getSway(time, b2.id);
+            const x2 = b2.cx + sway2.x + b2.displacementX;
+            const y2 = b2.cy + sway2.y + b2.displacementY;
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            const minDist = b1.r + b2.r + 80; // Sum of radii + 80px buffer gap
+            
+            const minDist = b1.r + b2.r + 150; 
 
             if (dist < minDist) {
               const overlap = minDist - dist;
               const nx = dx / (dist || 1);
               const ny = dy / (dist || 1);
 
-              // Softly repel balls in opposite directions
-              b1.x -= nx * (overlap * 0.5);
-              b1.y -= ny * (overlap * 0.5);
-              b2.x += nx * (overlap * 0.5);
-              b2.y += ny * (overlap * 0.5);
+              // Soft, highly cushioned collision separation
+              b1.displacementX -= nx * (overlap * 0.25);
+              b1.displacementY -= ny * (overlap * 0.25);
+              b2.displacementX += nx * (overlap * 0.25);
+              b2.displacementY += ny * (overlap * 0.25);
             }
           }
         }
       }
-
-      // Phase C: Render realistic glossy bubbles with specular reflections and clear vector contours
-      spheres.forEach((ball) => {
-        // Soft fading at top/bottom of page (Fade Zones)
-        let finalOpacity = 1;
-        const fadeZone = 120; // 120px fade out zone from edges
-        if (ball.y < fadeZone) {
-          finalOpacity = Math.max(0.1, ball.y / fadeZone);
-        } else if (ball.y > h - fadeZone) {
-          finalOpacity = Math.max(0.1, (h - ball.y) / fadeZone);
-        }
-
-        drawBubble(activeCtx, ball, finalOpacity);
-      });
 
       requestRef.current = requestAnimationFrame(tick);
     };
@@ -428,30 +403,45 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [dimensions.width, dimensions.height, reducedMotion]);
+  }, [reducedMotion]);
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden pointer-events-none select-none w-full h-full"
-      style={{ zIndex: -30 }}
+      className="absolute inset-0 overflow-hidden pointer-events-none select-none w-full h-full transform-gpu"
+      style={{
+        zIndex: -30,
+        backgroundImage: `
+          radial-gradient(circle at 1.25px 1.25px, rgba(23, 63, 173, 0.12) 1.25px, transparent 1.25px),
+          linear-gradient(to right, rgba(23, 63, 173, 0.025) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(23, 63, 173, 0.025) 1px, transparent 1px)
+        `,
+        backgroundSize: "60px 60px",
+        backgroundPosition: "0px 0px"
+      }}
       aria-hidden="true"
     >
-      {/* Слой 1: Статичная сетка координат (перерисовывается только при ресайзе экрана) */}
-      <canvas
-        ref={gridCanvasRef}
-        className="absolute inset-0 w-full h-full block"
-        style={{ zIndex: -20 }}
-      />
-
-      {/* Слой 2: Динамические сферы (высокопроизводительные реалистичные стеклянные пузыри с точным контуром) */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full block"
-        style={{ zIndex: -10 }}
-      />
+      {balls.map((ball) => (
+        <div
+          key={ball.id}
+          ref={(el) => (ballDomRefs.current[ball.id] = el)}
+          className="bilc-ambient-glow-orb absolute pointer-events-none rounded-full transform-gpu"
+          style={{
+            willChange: "transform",
+            transform: `translate3d(${ball.cx - ball.r}px, ${ball.cy - ball.r}px, 0)`,
+            width: `${ball.r * 2}px`,
+            height: `${ball.r * 2}px`,
+            minWidth: `${ball.r * 2}px`,
+            minHeight: `${ball.r * 2}px`,
+            maxWidth: `${ball.r * 2}px`,
+            maxHeight: `${ball.r * 2}px`,
+            borderRadius: "50%",
+            ["--ball-size" as any]: `${ball.r * 2}px`
+          }}
+        />
+      ))}
     </div>
   );
-}
+});
 
 export default BackgroundCircleField;

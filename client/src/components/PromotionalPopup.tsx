@@ -8,6 +8,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface PromoProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  settings?: any;
+  publicPromos?: any;
+  isLoading?: boolean;
 }
 
 interface ColorTheme {
@@ -206,12 +209,22 @@ export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
   );
 }
 
-export function PromotionalPopupModal({ isOpen, setIsOpen }: PromoProps) {
+export function PromotionalPopupModal({ 
+  isOpen, 
+  setIsOpen, 
+  settings: propSettings, 
+  publicPromos: propPublicPromos, 
+  isLoading: propIsLoading 
+}: PromoProps) {
   const { t, isRTL } = useLanguage();
-  const { data: settings, isLoading: isSettingsLoading } = trpc.content.siteSettings.useQuery();
-  const { data: publicPromos, isLoading: isPromosLoading } = trpc.promotions.publicList.useQuery();
+  
+  // Conditionally enable fallback queries to prevent redundant fetches if props are available
+  const settingsQuery = trpc.content.siteSettings.useQuery(undefined, { enabled: !propSettings });
+  const promosQuery = trpc.promotions.publicList.useQuery(undefined, { enabled: !propPublicPromos });
 
-  const isLoading = isSettingsLoading || isPromosLoading;
+  const settings = propSettings || settingsQuery.data;
+  const publicPromos = propPublicPromos || promosQuery.data;
+  const isLoading = propIsLoading !== undefined ? propIsLoading : (settingsQuery.isLoading || promosQuery.isLoading);
 
   let isActive = settings?.promo_active === "true";
   let title = settings?.promo_title || "";
