@@ -34,6 +34,7 @@ import {
   MessageSquare,
   Settings2,
   BookOpen,
+  X,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -52,6 +53,59 @@ import { useFounderNav } from "@/components/founder/useFounderNav";
 // Accessibility requirements: tooltip={item.label} onClick={() => setLocation(item.path)}
 
 type DashboardRole = "founder" | "super_admin" | "teacher" | "marketing" | "student";
+
+const STRATEGIC_PORTFOLIOS = [
+  {
+    id: "platform-gov",
+    label: "Platform & Governance",
+    icon: Crown,
+    tone: "bg-[#fff8e6] text-[#b47d00] border-[#ffd580]",
+    modules: [
+      { id: "founder-overview", title: "Overview", icon: LayoutDashboard, role: "founder" },
+      { id: "founder-users", title: "User Accounts", icon: UsersRound, role: "founder" },
+      { id: "founder-fields", title: "Profile Schema", icon: Settings2, role: "founder" },
+      { id: "founder-dossier", title: "Project Dossier", icon: ScrollText, role: "founder" },
+      { id: "founder-settings", title: "Platform Settings", icon: Settings2, role: "founder" },
+      { id: "founder-audit", title: "Audit & Security", icon: ScrollText, role: "founder" },
+    ],
+  },
+  {
+    id: "academic-ops",
+    label: "Academic Operations",
+    icon: GraduationCap,
+    tone: "bg-[#e8eeff] text-[#173fad] border-[#c0d4ff]",
+    modules: [
+      { id: "founder-students", title: "Student Directory", icon: GraduationCap, role: "founder" },
+      { id: "admin-schedule", title: "Class Timetable", icon: CalendarDays, role: "admin" },
+      { id: "teacher-attendance", title: "Attendance Tracking", icon: UsersRound, role: "teacher" },
+      { id: "teacher-grades", title: "Assessments & Grades", icon: FileText, role: "teacher" },
+      { id: "teacher-lessons", title: "Curriculum Plans", icon: BookOpen, role: "teacher" },
+    ],
+  },
+  {
+    id: "programs-dues",
+    label: "Programs & Dues",
+    icon: ScrollText,
+    tone: "bg-[#efe8fb] text-[#6e4c9a] border-[#d8c3f8]",
+    modules: [
+      { id: "admin-programs", title: "Language Programs", icon: BookOpen, role: "admin" },
+      { id: "admin-payments", title: "Tuition Dues & Payments", icon: ScrollText, role: "admin" },
+    ],
+  },
+  {
+    id: "growth-presence",
+    label: "Growth & Content",
+    icon: Megaphone,
+    tone: "bg-[#fff0ed] text-[#a34732] border-[#ffd1c7]",
+    modules: [
+      { id: "founder-news", title: "News Updates", icon: Newspaper, role: "founder" },
+      { id: "marketing-campaigns", title: "Campaigns & Promos", icon: Megaphone, role: "marketing" },
+      { id: "marketing-content", title: "CMS Content Blocks", icon: Settings2, role: "marketing" },
+      { id: "marketing-testimonials", title: "Verified Reviews", icon: MessageSquare, role: "marketing" },
+      { id: "founder-media", title: "Media Library", icon: FileImage, role: "founder" },
+    ],
+  },
+];
 
 export default function DashboardLayout({
   children,
@@ -139,6 +193,13 @@ function DashboardShell({
   const { user, logout } = useAuth();
   const { t, td, isRTL } = useLanguage();
   const [location, setLocation] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openPortfolios, setOpenPortfolios] = useState<Record<string, boolean>>({
+    "platform-gov": true,
+    "academic-ops": false,
+    "programs-dues": false,
+    "growth-presence": false,
+  });
   const {
     activeRole,
     activeTab,
@@ -147,6 +208,313 @@ function DashboardShell({
     toggleSection,
   } = useFounderNav();
   const { isMobile, setOpenMobile, state } = useSidebar();
+
+  const renderNavigationLinks = (isMobileLayout: boolean) => {
+    const handleLinkClick = (action: () => void) => {
+      action();
+      if (isMobileLayout) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    if (role === "founder") {
+      return (
+        <div className="space-y-2.5">
+          {user?.role === "founder" && role === "founder" ? (
+            STRATEGIC_PORTFOLIOS.map((section) => {
+              const isOpen = openPortfolios[section.id];
+              const SectionIcon = section.icon;
+              const hasActiveModule = section.modules.some((m) => m.id === activeTab);
+
+              return (
+                <div
+                  key={section.id}
+                  className="rounded-xl border border-[#edf2f5] bg-white overflow-hidden shadow-xs"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenPortfolios(prev => ({ ...prev, [section.id]: !prev[section.id] }))}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors ${
+                      hasActiveModule
+                        ? "bg-[#f8fafc] text-[#10253e]"
+                        : "hover:bg-[#fafbfc] text-[#33475b]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span
+                        className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-bold border ${section.tone}`}
+                      >
+                        <SectionIcon size={15} />
+                      </span>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold text-[#10253e] truncate">
+                          {td(section.label)}
+                        </span>
+                        <span className="block text-[10px] text-[#708098] truncate">
+                          {section.modules.length} {td("strategic modules")}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ChevronDown
+                      size={14}
+                      className={`text-[#708098] transition-transform duration-200 shrink-0 ${
+                        isOpen ? "rotate-180 text-[#173fad]" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="bg-[#fcfdfe] px-2 py-1.5 space-y-0.5 border-t border-[#edf2f5]">
+                      {section.modules.map((mod) => {
+                        const isModuleActive = activeTab === mod.id;
+                        const ModIcon = mod.icon;
+
+                        return (
+                          <button
+                            key={mod.id}
+                            type="button"
+                            onClick={() => {
+                              handleLinkClick(() => navigateTo(mod.role as PlatformUserType, mod.id));
+                            }}
+                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                              isModuleActive
+                                ? "bg-[#173fad] text-white font-semibold shadow-xs"
+                                : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <ModIcon
+                                size={14}
+                                className={isModuleActive ? "text-white" : "text-[#64748b]"}
+                              />
+                              <span className="truncate">{td(mod.title)}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            FOUNDER_NAVIGATION_SECTIONS.filter((section) => {
+              if (user?.role === "founder") return true;
+              if (user?.role === "admin") {
+                return ["admin", "teacher", "marketing"].includes(section.type);
+              }
+              return section.type === user?.role;
+            }).map((section) => {
+              const isOpen = openSections[section.type];
+              const SectionIcon = section.icon;
+              const hasActiveModule = section.modules.some((m) => m.id === activeTab);
+
+              return (
+                <div
+                  key={section.type}
+                  className="rounded-xl border border-[#edf2f5] bg-white overflow-hidden shadow-xs"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.type)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors ${
+                      hasActiveModule
+                        ? "bg-[#f8fafc] text-[#10253e]"
+                        : "hover:bg-[#fafbfc] text-[#33475b]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span
+                        className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-bold border ${section.tone}`}
+                      >
+                        <SectionIcon size={15} />
+                      </span>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold text-[#10253e] truncate">
+                          {td(section.label)}
+                        </span>
+                        <span className="block text-[10px] text-[#708098] truncate">
+                          {td(section.roleBadge)} · {section.modules.length} {td("modules")}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ChevronDown
+                      size={14}
+                      className={`text-[#708098] transition-transform duration-200 shrink-0 ${
+                        isOpen ? "rotate-180 text-[#173fad]" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="bg-[#fcfdfe] px-2 py-1.5 space-y-0.5 border-t border-[#edf2f5]">
+                      {section.modules.map((mod) => {
+                        const isModuleActive = activeTab === mod.id;
+                        const ModIcon = mod.icon;
+
+                        return (
+                          <button
+                            key={mod.id}
+                            type="button"
+                            onClick={() => {
+                              handleLinkClick(() => navigateTo(section.type, mod.id));
+                            }}
+                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                              isModuleActive
+                                ? "bg-[#173fad] text-white font-semibold shadow-xs"
+                                : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <ModIcon
+                                size={14}
+                                className={isModuleActive ? "text-white" : "text-[#64748b]"}
+                              />
+                              <span className="truncate">{td(mod.title)}</span>
+                            </div>
+                            {mod.badge && (
+                              <span
+                                className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
+                                  isModuleActive
+                                    ? "bg-white/20 text-white"
+                                    : "bg-[#edf2f7] text-[#475569]"
+                                }`}
+                              >
+                                {td(mod.badge)}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      );
+    }
+
+    if (role === "super_admin") {
+      return (
+        <div className="space-y-1">
+          <button
+            onClick={() => handleLinkClick(() => setLocation("/super-admin"))}
+            className={`minimal-nav-item w-full ${location === "/super-admin" ? "is-active" : ""}`}
+          >
+            <LayoutDashboard size={18} />
+            <span>{td("Super Admin Overview")}</span>
+          </button>
+          <button
+            onClick={() => handleLinkClick(() => setLocation("/super-admin/users"))}
+            className={`minimal-nav-item w-full ${location === "/super-admin/users" ? "is-active" : ""}`}
+          >
+            <UsersRound size={18} />
+            <span>{td("Staff & Users")}</span>
+          </button>
+          <button
+            onClick={() => handleLinkClick(() => setLocation("/super-admin/audit-logs"))}
+            className={`minimal-nav-item w-full ${location === "/super-admin/audit-logs" ? "is-active" : ""}`}
+          >
+            <ScrollText size={18} />
+            <span>{td("Audit Logs")}</span>
+          </button>
+        </div>
+      );
+    }
+
+    if (role === "marketing") {
+      const items = [
+        { tab: "overview", label: "Overview & Analytics", icon: BarChart3 },
+        { tab: "content", label: "Content Management", icon: FileText },
+        { tab: "media", label: "Media Assets", icon: ImageIcon },
+        { tab: "audiences", label: "Audience Segments", icon: UsersRound },
+        { tab: "channels", label: "Channels & FAQ", icon: MessageSquare },
+        { tab: "settings", label: "CTA & Tracking", icon: Settings2 },
+        { tab: "restrictions", label: "Guardrails", icon: ShieldCheck, isDanger: true },
+      ];
+
+      return (
+        <div className="space-y-1">
+          {items.map((item) => (
+            <button
+              key={item.tab}
+              onClick={() => handleLinkClick(() => externalSetActiveTab?.(item.tab))}
+              className={`minimal-nav-item w-full ${
+                externalActiveTab === item.tab
+                  ? item.isDanger
+                    ? "bg-red-50 text-red-700 font-semibold"
+                    : "is-active font-semibold"
+                  : item.isDanger
+                  ? "text-red-600 hover:text-red-700 hover:bg-red-50/50"
+                  : ""
+              }`}
+            >
+              <item.icon size={18} />
+              <span>{td(item.label)}</span>
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    if (role === "student") {
+      return (
+        <div className="space-y-1">
+          <button
+            onClick={() => handleLinkClick(() => {
+              if (location !== "/dashboard") setLocation("/dashboard");
+              externalSetActiveTab?.("overview");
+            })}
+            className={`minimal-nav-item w-full ${
+              (externalActiveTab === "overview" || !externalActiveTab) && location === "/dashboard"
+                ? "is-active font-semibold"
+                : ""
+            }`}
+          >
+            <LayoutDashboard size={18} />
+            <span>{td("My Dashboard")}</span>
+          </button>
+          <button
+            onClick={() => handleLinkClick(() => {
+              if (location !== "/dashboard") setLocation("/dashboard");
+              externalSetActiveTab?.("enrollments");
+            })}
+            className={`minimal-nav-item w-full ${
+              externalActiveTab === "enrollments" && location === "/dashboard"
+                ? "is-active font-semibold"
+                : ""
+            }`}
+          >
+            <ShieldCheck size={18} />
+            <span>{td("My Enrollments")}</span>
+          </button>
+          <button
+            onClick={() => handleLinkClick(() => setLocation("/programs"))}
+            className={`minimal-nav-item w-full ${location === "/programs" ? "is-active font-semibold" : ""}`}
+          >
+            <BookOpen size={18} />
+            <span>{td("Browse Programs")}</span>
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-1">
+        <button
+          onClick={() => handleLinkClick(() => setLocation("/teacher"))}
+          className={`minimal-nav-item w-full ${location === "/teacher" ? "is-active font-semibold" : ""}`}
+        >
+          <CalendarDays size={18} />
+          <span>{td("My Classes & Schedule")}</span>
+        </button>
+      </div>
+    );
+  };
 
   // Header Title
   const getHeaderTitle = () => {
@@ -212,14 +580,14 @@ function DashboardShell({
   return (
     <div
       style={{ "--dashboard-sidebar-width": sidebarWidth } as React.CSSProperties}
-      className={`min-h-screen w-full bg-[#fbf8f2] text-[#10253e] pb-12 transition-all duration-300 ${
+      className={`min-h-screen w-full bg-transparent text-[#10253e] pb-12 transition-all duration-300 flex blue-workspace ${
         isRTL ? "is-rtl" : ""
       }`}
     >
       <Sidebar
         side={isRTL ? "right" : "left"}
         collapsible="icon"
-        className="bilc-floating-sidebar"
+        className="bilc-floating-sidebar hidden lg:flex"
       >
         <SidebarHeader className="minimal-sidebar-header border-b border-[#edf2f5] pb-3">
           <span className="minimal-brand-mark" aria-hidden="true">
@@ -233,335 +601,165 @@ function DashboardShell({
           </span>
         </SidebarHeader>
 
-        <SidebarContent className="minimal-sidebar-content px-2 py-3 overflow-y-auto space-y-4">
-          {role === "founder" ? (
-            <div className="space-y-2">
-              <div className="px-2 py-1 flex items-center justify-between">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#708098]">
-                  {td("Platform User Types & Modules")}
-                </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad]">
-                  {user?.role === "founder" ? td("Founder Access") : td("Admin Access")}
-                </span>
-              </div>
-
-              {/* Render User Types Main Menu (Student Excluded) */}
-              <div className="space-y-1.5">
-                {FOUNDER_NAVIGATION_SECTIONS.filter((section) => {
-                  if (user?.role === "founder") return true;
-                  if (user?.role === "admin") {
-                    return ["admin", "teacher", "marketing"].includes(section.type);
-                  }
-                  return section.type === user?.role;
-                }).map((section) => {
-                  const isOpen = openSections[section.type];
-                  const SectionIcon = section.icon;
-                  const hasActiveModule = section.modules.some((m) => m.id === activeTab);
-
-                  return (
-                    <div
-                      key={section.type}
-                      className="rounded-xl border border-[#edf2f5] bg-white overflow-hidden shadow-xs"
-                    >
-                      {/* User Type Header / Click to Toggle Submenu */}
-                      <button
-                        type="button"
-                        onClick={() => toggleSection(section.type)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors ${
-                          hasActiveModule
-                            ? "bg-[#f8fafc] text-[#10253e]"
-                            : "hover:bg-[#fafbfc] text-[#33475b]"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span
-                            className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-bold border ${section.tone}`}
-                          >
-                            <SectionIcon size={15} />
-                          </span>
-                          <div className="min-w-0">
-                            <span className="block text-xs font-bold text-[#10253e] truncate">
-                              {td(section.label)}
-                            </span>
-                            <span className="block text-[10px] text-[#708098] truncate">
-                              {td(section.roleBadge)} · {section.modules.length} {td("modules")}
-                            </span>
-                          </div>
-                        </div>
-
-                        <ChevronDown
-                          size={15}
-                          className={`text-[#708098] transition-transform duration-200 shrink-0 ${
-                            isOpen ? "rotate-180 text-[#173fad]" : ""
-                          }`}
-                        />
-                      </button>
-
-                      {/* Nested Submenu for this User Type */}
-                      {isOpen && (
-                        <div className="bg-[#fcfdfe] px-2 py-1.5 space-y-0.5 border-t border-[#edf2f5]">
-                          {section.modules.map((mod) => {
-                            const isModuleActive = activeTab === mod.id;
-                            const ModIcon = mod.icon;
-
-                            return (
-                              <button
-                                key={mod.id}
-                                type="button"
-                                onClick={() => {
-                                  navigateTo(section.type, mod.id);
-                                  if (isMobile) setOpenMobile(false);
-                                }}
-                                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                                  isModuleActive
-                                    ? "bg-[#173fad] text-white font-semibold shadow-xs"
-                                    : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
-                                }`}
-                              >
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <ModIcon
-                                    size={14}
-                                    className={
-                                      isModuleActive ? "text-white" : "text-[#64748b]"
-                                    }
-                                  />
-                                  <span className="truncate">{td(mod.title)}</span>
-                                </div>
-                                {mod.badge && (
-                                  <span
-                                    className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                                      isModuleActive
-                                        ? "bg-white/20 text-white"
-                                        : "bg-[#edf2f7] text-[#475569]"
-                                    }`}
-                                  >
-                                    {td(mod.badge)}
-                                  </span>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : role === "super_admin" ? (
-            <SidebarMenu className="px-2">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={location === "/super-admin"}
-                  onClick={() => setLocation("/super-admin")}
-                  className="minimal-nav-item"
-                >
-                  <LayoutDashboard size={18} />
-                  <span>{td("Super Admin Overview")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={location === "/super-admin/users"}
-                  onClick={() => setLocation("/super-admin/users")}
-                  className="minimal-nav-item"
-                >
-                  <UsersRound size={18} />
-                  <span>{td("Staff & Users")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={location === "/super-admin/audit-logs"}
-                  onClick={() => setLocation("/super-admin/audit-logs")}
-                  className="minimal-nav-item"
-                >
-                  <ScrollText size={18} />
-                  <span>{td("Audit Logs")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          ) : role === "marketing" ? (
-            <SidebarMenu className="px-2 space-y-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "overview"}
-                  onClick={() => externalSetActiveTab?.("overview")}
-                  className="minimal-nav-item"
-                >
-                  <BarChart3 size={18} />
-                  <span>{td("Overview & Analytics")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "content"}
-                  onClick={() => externalSetActiveTab?.("content")}
-                  className="minimal-nav-item"
-                >
-                  <FileText size={18} />
-                  <span>{td("Content Management")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "media"}
-                  onClick={() => externalSetActiveTab?.("media")}
-                  className="minimal-nav-item"
-                >
-                  <ImageIcon size={18} />
-                  <span>{td("Media Assets")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "audiences"}
-                  onClick={() => externalSetActiveTab?.("audiences")}
-                  className="minimal-nav-item"
-                >
-                  <UsersRound size={18} />
-                  <span>{td("Audience Segments")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "channels"}
-                  onClick={() => externalSetActiveTab?.("channels")}
-                  className="minimal-nav-item"
-                >
-                  <MessageSquare size={18} />
-                  <span>{td("Channels & FAQ")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "settings"}
-                  onClick={() => externalSetActiveTab?.("settings")}
-                  className="minimal-nav-item"
-                >
-                  <Settings2 size={18} />
-                  <span>{td("CTA & Tracking")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "restrictions"}
-                  onClick={() => externalSetActiveTab?.("restrictions")}
-                  className="minimal-nav-item text-red-600 hover:text-red-700 hover:bg-red-50/50"
-                >
-                  <ShieldCheck size={18} />
-                  <span>{td("Guardrails")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          ) : role === "student" ? (
-            <SidebarMenu className="px-2">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "overview" || !externalActiveTab}
-                  onClick={() => {
-                    if (location !== "/dashboard") setLocation("/dashboard");
-                    externalSetActiveTab?.("overview");
-                  }}
-                  className="minimal-nav-item"
-                >
-                  <LayoutDashboard size={18} />
-                  <span>{td("My Dashboard")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={externalActiveTab === "enrollments"}
-                  onClick={() => {
-                    if (location !== "/dashboard") setLocation("/dashboard");
-                    externalSetActiveTab?.("enrollments");
-                  }}
-                  className="minimal-nav-item"
-                >
-                  <ShieldCheck size={18} />
-                  <span>{td("My Enrollments")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={false}
-                  onClick={() => setLocation("/programs")}
-                  className="minimal-nav-item"
-                >
-                  <BookOpen size={18} />
-                  <span>{td("Browse Programs")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          ) : (
-            <SidebarMenu className="px-2">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={location === "/teacher"}
-                  onClick={() => setLocation("/teacher")}
-                  className="minimal-nav-item"
-                >
-                  <CalendarDays size={18} />
-                  <span>{td("My Classes & Schedule")}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          )}
+        <SidebarContent className="minimal-sidebar-content px-2 py-3 overflow-y-auto">
+          {renderNavigationLinks(false)}
         </SidebarContent>
 
         <SidebarFooter className="minimal-sidebar-footer border-t border-[#edf2f5]">
-          <div className="flex min-w-0 items-center gap-3 group-data-[collapsible=icon]:justify-center">
-            <Avatar className="h-9 w-9 border border-[#d9e2f1]">
-              <AvatarFallback className="bg-[#e8eeff] text-xs font-bold text-[#173fad]">
-                {getFallbackInitials()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-              <p className="truncate text-sm font-semibold text-[#10253e]">
-                {getDefaultName()}
-              </p>
-              <p className="truncate text-xs text-[#566983]">{getDefaultEmail()}</p>
+          <div className="flex flex-col gap-3.5 w-full group-data-[collapsible=icon]:items-center">
+            {/* Premium user identity card */}
+            <div className="flex items-center gap-3 p-2.5 rounded-2xl border border-slate-100 bg-white/60 backdrop-blur-md shadow-sm transition-all duration-250 hover:bg-white hover:border-slate-200 w-full group-data-[collapsible=icon]:p-1 group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none">
+              <Avatar className="h-9 w-9 border border-[#d9e2f1] shrink-0">
+                <AvatarFallback className="bg-gradient-to-br from-[#e8eeff] to-[#d0ddff] text-xs font-bold text-[#173fad]">
+                  {getFallbackInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden text-start">
+                <p className="truncate text-xs font-bold text-[#10253e] flex items-center gap-1.5 leading-none mb-1">
+                  {getDefaultName()}
+                </p>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="truncate text-[10px] text-[#566983] font-semibold leading-none">
+                    @{getDefaultEmail()?.split('@')[0] || 'user'}
+                  </span>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad] tracking-wider shrink-0 leading-none">
+                    {role}
+                  </span>
+                </div>
+              </div>
             </div>
+
+            {/* Polished, interactive destructive action button */}
+            <button
+              type="button"
+              className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-xs font-bold text-[#566983] border border-[#edf2f5] bg-white hover:bg-rose-50/50 hover:text-rose-600 hover:border-rose-100 transition-all duration-200 shadow-sm group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none group-data-[collapsible=icon]:text-[#566983] group-data-[collapsible=icon]:hover:text-rose-600"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                logout();
+              }}
+            >
+              <LogOut size={14} className="shrink-0" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                {t("nav.signOut", undefined, "Sign out")}
+              </span>
+            </button>
           </div>
-          <button
-            type="button"
-            className="minimal-signout group-data-[collapsible=icon]:justify-center"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              logout();
-            }}
-          >
-            <LogOut size={16} />
-            <span className="group-data-[collapsible=icon]:hidden">
-              {t("nav.signOut", undefined, "Sign out")}
-            </span>
-          </button>
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset className={`minimal-dashboard-inset transition-all duration-300 ${isRTL ? "rtl-inset" : ""}`}>
-        <BackgroundCircleField seed={`dashboard-${role}-${location}`} />
-        <header className="bilc-floating-header minimal-dashboard-header">
+      <SidebarInset className={`minimal-dashboard-inset transition-all duration-300 ${isRTL ? "rtl-inset" : ""} bg-transparent`}>
+        <BackgroundCircleField />
+        
+        {/* Compact Mobile Top Navbar - Floating Island Style */}
+        <header className="lg:hidden fixed top-3 inset-x-3 h-14 bg-white/90 backdrop-blur-md border border-slate-100/80 rounded-2xl shadow-md z-50 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="minimal-brand-mark w-8 h-8 rounded-lg bg-[#173fad] text-white flex items-center justify-center font-bold text-xs shrink-0">
+              BI
+            </span>
+            <div className="min-w-0 text-start">
+              <h2 className="text-xs font-bold text-[#10253e] truncate max-w-[180px] sm:max-w-[300px]">
+                {getHeaderTitle()}
+              </h2>
+              <p className="text-[9px] text-[#566983] leading-none uppercase tracking-wider">
+                {getSessionBadgeLabel()}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center shrink-0">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              className="p-1.5 rounded-lg border border-[#edf2f5] bg-white text-[#10253e] hover:bg-slate-50 transition-colors"
+              aria-label={td("Toggle menu")}
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </header>
+
+        {/* Unified Mobile Floating Navigation Panel */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden fixed top-[5rem] inset-x-3 bottom-3 bg-[#fafbfe]/98 backdrop-blur-md border border-slate-100/80 rounded-2xl shadow-xl z-45 overflow-y-auto p-4 flex flex-col gap-5 select-none animate-in fade-in slide-in-from-top-4 duration-250">
+            {/* Unified Identity Card with Avatar, Name & Session status */}
+            <div className="p-3.5 rounded-2xl border border-slate-100 bg-white shadow-sm flex items-center justify-between gap-3 text-start">
+              <div className="flex items-center gap-3 min-w-0">
+                <Avatar className="h-10 w-10 border border-[#d9e2f1] shrink-0">
+                  <AvatarFallback className="bg-gradient-to-br from-[#e8eeff] to-[#d0ddff] text-xs font-bold text-[#173fad]">
+                    {getFallbackInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-[#10253e] leading-tight mb-0.5 truncate">
+                    {getDefaultName()}
+                  </h4>
+                  <p className="text-[11px] text-[#566983] leading-none truncate">
+                    @{getDefaultEmail()?.split('@')[0] || 'user'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad] tracking-wider leading-none">
+                  {role}
+                </span>
+                <span className="text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100 shrink-0 leading-none">
+                  ● {getSessionBadgeLabel()}
+                </span>
+              </div>
+            </div>
+
+            {/* Mobile Navigation Links */}
+            <div className="flex-1 space-y-3">
+              {renderNavigationLinks(true)}
+            </div>
+
+            {/* Consolidated Footer Actions inside Mobile Menu with Language Selector */}
+            <div className="pt-4 border-t border-[#edf2f5] mt-auto flex flex-col gap-3">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-bold text-[#566983]">{td("Language")}</span>
+                <LanguageSwitcher variant="dropdown" className="dashboard-lang-switcher" />
+              </div>
+              <button
+                type="button"
+                className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-xs font-bold text-rose-600 border border-rose-100 bg-rose-50/20 hover:bg-rose-50 hover:border-rose-200 transition-all duration-200 shadow-sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMobileMenuOpen(false);
+                  logout();
+                }}
+              >
+                <LogOut size={15} className="shrink-0" />
+                <span>{t("nav.signOut", undefined, "Sign out")}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop Header - Floating Style */}
+        <header className="bilc-floating-header minimal-dashboard-header hidden lg:flex">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <SidebarTrigger className="minimal-mobile-trigger shrink-0" aria-label={td("Open menu")}>
               <Menu className="size-5" />
             </SidebarTrigger>
-            <div className="min-w-0">
-              <p className="minimal-eyebrow text-[10px] uppercase tracking-wider">{td("BILC Management Console")}</p>
+            <div className="min-w-0 text-start">
+              <p className="minimal-eyebrow text-[10px] uppercase tracking-wider leading-none mb-0.5">{td("BILC Management Console")}</p>
               <h1 className="text-xs sm:text-base md:text-lg font-bold text-[#10253e] leading-tight truncate" title={getHeaderTitle()}>
                 {getHeaderTitle()}
               </h1>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <LanguageSwitcher variant="dropdown" />
-            <span className="hidden text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 sm:inline">
+            <LanguageSwitcher variant="dropdown" className="dashboard-lang-switcher" />
+            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
               ● {getSessionBadgeLabel()}
             </span>
           </div>
         </header>
 
+        {/* Dashboard Main Content Area */}
         <main className="bilc-dashboard-main">
           <DashboardContentArea>{children}</DashboardContentArea>
         </main>

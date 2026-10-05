@@ -178,7 +178,7 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
     ballsRef.current = list;
   }, [dimensions.width, dimensions.height, seed]);
 
-  // 5. Draw Coordinate Grid (Static Layer - strictly optimized for Single Light Theme)
+  // 5. Draw Coordinate Grid (Disabled - completely transparent to show global CSS background instead)
   useEffect(() => {
     const canvas = gridCanvasRef.current;
     if (!canvas) return;
@@ -189,43 +189,6 @@ export function BackgroundCircleField({ seed = "default-seed" }: BackgroundCircl
     const height = dimensions.height;
 
     ctx.clearRect(0, 0, width, height);
-
-    const gridSpacing = 60;
-    const dotRadius = 1.2;
-
-    // Exact required colors for the premium coordinate grid in Light Theme
-    const lineColor = "rgba(16, 37, 62, 0.08)";
-    const dotColor = "rgba(16, 37, 62, 0.15)";
-
-    ctx.lineWidth = 1;
-
-    // Draw vertical lines
-    for (let x = 0; x < width; x += gridSpacing) {
-      ctx.beginPath();
-      ctx.strokeStyle = lineColor;
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-    }
-
-    // Draw horizontal lines
-    for (let y = 0; y < height; y += gridSpacing) {
-      ctx.beginPath();
-      ctx.strokeStyle = lineColor;
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-    }
-
-    // Draw intersections dots
-    for (let x = 0; x < width; x += gridSpacing) {
-      for (let y = 0; y < height; y += gridSpacing) {
-        ctx.beginPath();
-        ctx.fillStyle = dotColor;
-        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
   }, [dimensions.width, dimensions.height]);
 
   // Helper method to draw a single premium glossy realistic bubble

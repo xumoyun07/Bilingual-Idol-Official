@@ -282,8 +282,33 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
     expect(statusRes).toHaveProperty("isEnabled");
   });
 
-  it("8. Verify signature generation matches the official documented Billplz reference example", () => {
-    // Official Billplz documented example payload and signature key
+  it("8. Verify signature generation matches the clean callback webhook format processed in production", () => {
+    // Pure Callback format (webhook POST style) from Billplz
+    const payload = {
+      "id": "zq0tm2wc",
+      "paid": "true",
+      "paid_at": "2018-09-27 15:15:09 +0800",
+      "x_signature": "4db8ddef73ae51dbf8df9268aacc0d746756e8cc0e4ebdb7a4522ed8c3c07ef1"
+    };
+    const signatureKey = "S-s7b4yWpp9h7rrkNM1i3Z_g";
+
+    // 1. Verify standard helper function matches expected hash exactly
+    const computed = paymentProvider.generateBillplzSignature(payload, signatureKey);
+    expect(computed).toBe("4db8ddef73ae51dbf8df9268aacc0d746756e8cc0e4ebdb7a4522ed8c3c07ef1");
+
+    // 2. Verify BillplzProvider.verifyCallback processes the payload and returns true
+    const origSigKey = process.env.BILLPLZ_SIGNATURE_KEY;
+    process.env.BILLPLZ_SIGNATURE_KEY = signatureKey;
+
+    const provider = new paymentProvider.BillplzProvider();
+    const isVerified = provider.verifyCallback(payload);
+    expect(isVerified).toBe(true);
+
+    process.env.BILLPLZ_SIGNATURE_KEY = origSigKey;
+  });
+
+  it("9. Verify signature generation matches the official mixed/redirect reference example from Billplz documentation", () => {
+    // Official Billplz documented reference example payload with mixed/bracket keys and x_signature
     const payload = {
       "billplz[id]": "zq0tm2wc",
       "billplz[paid]": "true",

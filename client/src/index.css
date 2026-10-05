@@ -3902,12 +3902,12 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 }
 
 .minimal-sidebar-footer {
-  padding: 1.25rem;
-  border-top: 1px solid #edf2f5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bilc-surface);
+  padding: 1rem !important;
+  border-top: 1px solid #edf2f5 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  background: transparent !important;
 }
 
 .minimal-signout {
@@ -3925,7 +3925,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   flex-direction: column;
   min-height: 100vh;
   position: relative;
-  background: var(--bilc-surface);
+  background: transparent !important;
 }
 
 .minimal-dashboard-header {
@@ -4262,63 +4262,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     border-color: var(--bilc-line) !important;
   }
 
-  /* Dashboard Panel Unifications (Applies to Student, Teacher, Admin, SuperAdmin workspaces) */
-  .blue-workspace .minimal-dashboard-main section,
-  .blue-workspace .workspace-surface section,
-  .blue-workspace .member-page section,
-  .blue-workspace .workspace-page section,
-  .blue-workspace .member-status,
-  .blue-workspace .member-next-step,
-  .blue-workspace .workspace-surface .rounded-xl.border,
-  .blue-workspace .workspace-surface .bg-white.rounded-xl.border,
-  .blue-workspace .member-page .bg-white.rounded-xl.border,
-  .blue-workspace .minimal-dashboard-inset .bg-white.rounded-xl.border,
-  .blue-workspace .minimal-dashboard-inset .rounded-2xl.border,
-  .blue-workspace .rounded-xl.border.bg-card,
-  .blue-workspace .border.bg-card {
-    background: #ffffff !important;
-    border: 1px solid var(--bilc-line, #cbd5e1) !important;
-    border-radius: 1.25rem !important;
-    padding: 2.25rem !important;
-    box-shadow: var(--bilc-shadow-sm, 0 1px 3px rgba(0,0,0,0.05)) !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
 
-  .blue-workspace .minimal-dashboard-main section:hover,
-  .blue-workspace .workspace-surface section:hover,
-  .blue-workspace .member-page section:hover,
-  .blue-workspace .workspace-page section:hover,
-  .blue-workspace .member-status:hover,
-  .blue-workspace .member-next-step:hover,
-  .blue-workspace .workspace-surface .rounded-xl.border:hover,
-  .blue-workspace .workspace-surface .bg-white.rounded-xl.border:hover,
-  .blue-workspace .member-page .bg-white.rounded-xl.border:hover,
-  .blue-workspace .minimal-dashboard-inset .bg-white.rounded-xl.border:hover,
-  .blue-workspace .minimal-dashboard-inset .rounded-2xl.border:hover,
-  .blue-workspace .rounded-xl.border.bg-card:hover,
-  .blue-workspace .border.bg-card:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: var(--bilc-shadow-lg, 0 10px 25px rgba(0,0,0,0.1)) !important;
-    border-color: var(--bilc-line) !important;
-  }
-
-  /* Option Buttons and Selectable Actions on Dashboards and Forms */
-  .blue-workspace .workspace-surface button.border,
-  .blue-workspace .workspace-surface .border.rounded-xl,
-  .blue-workspace .minimal-dashboard-inset button.border,
-  .auth-page .auth-form .auth-input-wrap input:focus,
-  .auth-page .auth-form .auth-input-wrap input:hover {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-
-  .blue-workspace .workspace-surface button.border:hover,
-  .blue-workspace .workspace-surface .border.rounded-xl:hover,
-  .blue-workspace .minimal-dashboard-inset button.border:hover {
-    border-color: var(--bilc-blue, #173fad) !important;
-    background: var(--bilc-surface, #f8fafc) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 14px rgba(23, 63, 173, 0.12) !important;
-  }
 }
 
 /* 4. Focus Mode Selector Style Overrides for Desktop Viewport */
@@ -7557,7 +7501,7 @@ div#root:nth-of-type(1) > main#login-page-container:nth-of-type(1) > section#log
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;
     animation: bilc-fade-in 0.3s ease forwards !important;
-    z-index: -1 !important;
+    z-index: 1000 !important;
   }
 
   @keyframes bilc-fade-in {
@@ -9666,38 +9610,197 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-
   }
 }
 
-/* 3b. Sidebar Footer Area Wrap */
+/* 3b. Sidebar Footer Area Wrap - Expanded */
 div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) {
-  width: 260px !important;       /* EXACTLY AS REQUESTED in CSS 3 */
-  height: 112.594px !important;  /* EXACTLY AS REQUESTED in CSS 3 */
+  width: 100% !important;
+  height: auto !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important;
+  gap: 12px !important;
   padding: 16px 20px !important;
-  border-top: 1px solid rgba(16, 37, 62, 0.05) !important;
-  background-color: rgba(248, 250, 252, 0.5) !important;
+  border-top: 1px solid rgba(16, 37, 62, 0.06) !important;
+  background-color: rgba(248, 250, 252, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
-/* 4. Sidebar Action Target Button Override */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1) {
-  padding-left: 0px !important;   /* EXACTLY AS REQUESTED in CSS 4 */
-  padding-top: 0px !important;    /* EXACTLY AS REQUESTED in CSS 4 */
-  padding-right: 0px !important;  /* EXACTLY AS REQUESTED in CSS 4 */
-  padding-bottom: 0px !important; /* EXACTLY AS REQUESTED in CSS 4 */
-  width: 100px !important;         /* EXACTLY AS REQUESTED in CSS 4 */
-  height: 38px !important;
-  border-radius: 8px !important;
+/* Sidebar Footer Area Wrap - Collapsed (Icon Mode) */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) {
+  width: 100% !important;
+  height: auto !important;
+  padding: 12px 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-top: 1px solid rgba(16, 37, 62, 0.06) !important;
+  background-color: transparent !important;
+}
+
+/* 4. Sidebar Action Target Button Override - Expanded */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1),
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) button {
+  padding-left: 12px !important;
+  padding-top: 9px !important;
+  padding-right: 12px !important;
+  padding-bottom: 9px !important;
+  width: 100% !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  background-color: #ffffff !important;
+  color: #ef4444 !important;
+  box-shadow: 0 1px 2px rgba(16, 37, 62, 0.03) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1):hover,
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) button:hover {
+  background-color: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  color: #dc2626 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08) !important;
+}
+
+/* Sidebar Action Target Button - Collapsed (Icon Mode) */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1),
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) button {
+  padding: 8px !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background-color: #ffffff !important;
+  color: #566983 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1):hover,
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) button:hover {
+  background-color: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  color: #dc2626 !important;
+}
+
 /* 5. Header quick-action button overrides for standard sizing */
-div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1) {
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1) {
   padding: 10px !important;
   border-radius: 8px !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
-div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1):hover {
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1):hover {
   background-color: rgba(16, 37, 62, 0.05) !important;
+}
+
+/* Dashboard Language Switcher Premium Style (Only inside Dashboards) */
+.dashboard-lang-switcher button[type="button"] {
+  min-height: 38px !important;
+  padding: 6px 14px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  color: #10253e !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  box-shadow: 0 1px 2px rgba(16, 37, 62, 0.02) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.dashboard-lang-switcher button[type="button"]:hover {
+  background: #ffffff !important;
+  border-color: #b8cce9 !important;
+  color: #173fad !important;
+  box-shadow: 0 4px 12px rgba(23, 63, 173, 0.06) !important;
+}
+
+/* Dashboard Language Switcher Dropdown Menu Window */
+.dashboard-lang-switcher div[role="listbox"] {
+  width: 13.5rem !important; /* Elegant slightly wider size for premium spacing */
+  border-radius: 16px !important;
+  border: 1px solid rgba(16, 37, 62, 0.08) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 12px 30px rgba(16, 37, 62, 0.08), 0 4px 12px rgba(16, 37, 62, 0.03) !important;
+  padding: 6px !important;
+  margin-top: 8px !important;
+  z-index: 9999 !important; /* Ensure it floats above all other dashboard objects */
+}
+
+/* Individual Option Button Style */
+.dashboard-lang-switcher div[role="listbox"] button {
+  width: 100% !important;
+  min-height: 44px !important; /* Touch target standard for professional accessibility */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease-in-out !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Inner option text layout */
+.dashboard-lang-switcher div[role="listbox"] button span.flex-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.dashboard-lang-switcher div[role="listbox"] button span.font-bold {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #10253e !important;
+  line-height: 1.2 !important;
+  transition: color 0.2s ease-in-out !important;
+}
+
+.dashboard-lang-switcher div[role="listbox"] button span.text-\[10px\] {
+  font-size: 11px !important;
+  color: #566983 !important;
+  font-weight: 500 !important;
+  transition: color 0.2s ease-in-out !important;
+}
+
+/* Hover State - Soft slate-blue premium background */
+.dashboard-lang-switcher div[role="listbox"] button:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.dashboard-lang-switcher div[role="listbox"] button:hover span.font-bold {
+  color: #173fad !important;
+}
+
+.dashboard-lang-switcher div[role="listbox"] button:hover span.text-\[10px\] {
+  color: #435b7a !important;
+}
+
+/* Selected State - Soft brand-blue background with crisp dark blue text */
+.dashboard-lang-switcher div[role="listbox"] button[aria-selected="true"] {
+  background-color: #e8eeff !important;
+}
+
+.dashboard-lang-switcher div[role="listbox"] button[aria-selected="true"] span.font-bold {
+  color: #173fad !important;
+  font-weight: 700 !important;
+}
+
+.dashboard-lang-switcher div[role="listbox"] button[aria-selected="true"] span.text-\[10px\] {
+  color: #5571bd !important;
+}
+
+/* Selected check icon styling */
+.dashboard-lang-switcher div[role="listbox"] button svg {
+  color: #173fad !important;
+  stroke-width: 2.5px !important;
 }
 
 /* Global Mobile/Tablet/Desktop Transparent Background overrides for Campus Facilities Showcase */
@@ -10146,7 +10249,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
 /* Warm background of the workspace matching public branding */
 .blue-workspace {
-  background-color: #fbf8f2;
+  background-color: transparent !important;
 }
 
 /* Floating Sidebar island - desktop / tablet full state */
@@ -10216,7 +10319,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   .blue-workspace .bilc-dashboard-main {
     padding-inline-start: 1rem;
     padding-inline-end: 1rem;
-    padding-top: 6.5rem;
+    padding-top: 5.5rem;
     padding-bottom: 3rem;
   }
 }
@@ -10286,4 +10389,99 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   padding-top: 20px !important;
   padding-right: 20px !important;
   padding-bottom: 20px !important;
+}
+
+/* Specific desktop header width correction keeping layout and floating positioning intact */
+@media (min-width: 1024px) {
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) {
+    width: 1080px !important;
+    inset-inline-start: calc(var(--dashboard-sidebar-width) + 2rem) !important;
+    inset-inline-end: 2rem !important;
+    margin-inline: auto !important;
+    max-width: calc(100% - var(--dashboard-sidebar-width) - 4rem) !important;
+  }
+}
+
+/* Premium styling directly targeting the user's selected CSS Selector for the dropdown menu window */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+  width: 13.5rem !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(16, 37, 62, 0.08) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 12px 30px rgba(16, 37, 62, 0.08), 0 4px 12px rgba(16, 37, 62, 0.03) !important;
+  padding: 6px !important;
+  margin-top: 8px !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+/* Individual Option Button Style inside the selected container */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > button,
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button {
+  width: 100% !important;
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease-in-out !important;
+  border: none !important;
+  background-color: transparent !important;
+  box-sizing: border-box !important;
+}
+
+/* Option inner text labels styling */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.flex-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-bold,
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-semibold {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #10253e !important;
+  line-height: 1.2 !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.text-\[10px\],
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-medium {
+  font-size: 11px !important;
+  color: #566983 !important;
+  font-weight: 500 !important;
+}
+
+/* Hover and selection transitions */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover {
+  background-color: #f1f5f9 !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover span.font-bold,
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover span.font-semibold {
+  color: #173fad !important;
+}
+
+/* Selected option item */
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] {
+  background-color: #e8eeff !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-bold,
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-semibold {
+  color: #173fad !important;
+  font-weight: 700 !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.text-\[10px\],
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-medium {
+  color: #5571bd !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button svg {
+  color: #173fad !important;
+  stroke-width: 2.5px !important;
 }

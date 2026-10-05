@@ -66,6 +66,8 @@ export function LanguageSwitcher({
     buttonRef.current?.focus();
   };
 
+  const isDashboard = className.includes("dashboard-lang-switcher");
+
   if (variant === "inline") {
     return (
       <div
@@ -96,6 +98,14 @@ export function LanguageSwitcher({
     );
   }
 
+  const dropdownContainerClass = isDashboard
+    ? `absolute mt-2 w-54 rounded-2xl bg-white border border-[#edf2f6] shadow-[0_12px_30px_rgba(16,37,62,0.08),0_4px_12px_rgba(16,37,62,0.03)] p-1.5 z-[100] pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
+        isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
+      }`
+    : `absolute mt-1.5 w-48 rounded-xl bg-white border border-[#d9e2f1] shadow-2xl py-1.5 z-[100] pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
+        isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
+      }`;
+
   return (
     <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
       <button
@@ -108,7 +118,10 @@ export function LanguageSwitcher({
             setIsOpen(true);
           }
         }}
-        className="inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3 py-1.5 text-xs font-bold text-[#354c6d] bg-white hover:bg-[#eef3ff] hover:text-[#173fad] border border-[#d9e2f1] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20 focus-visible:ring-[#173fad]"
+        className={isDashboard 
+          ? "inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3.5 py-2 text-xs font-semibold text-[#10253e] bg-white/75 hover:bg-white border border-[#edf2f6] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 backdrop-blur-xs focus:outline-none focus:ring-2 focus:ring-[#173fad]/20 focus-visible:ring-[#173fad]"
+          : "inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3 py-1.5 text-xs font-bold text-[#354c6d] bg-white hover:bg-[#eef3ff] hover:text-[#173fad] border border-[#d9e2f1] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20 focus-visible:ring-[#173fad]"
+        }
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label={
@@ -131,14 +144,24 @@ export function LanguageSwitcher({
 
       {isOpen && (
         <div
-          className={`absolute mt-1.5 w-48 rounded-xl bg-white border border-[#d9e2f1] shadow-2xl py-1.5 z-[100] pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
-            isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
-          }`}
+          className={dropdownContainerClass}
           role="listbox"
           aria-label={language === "ar" ? "اختر اللغة" : language === "ms" ? "Pilih bahasa" : "Select language"}
         >
           {languages.map((item, index) => {
             const isSelected = item.code === language;
+            const buttonClass = isDashboard
+              ? `w-full flex items-center justify-between px-3 py-2.5 text-xs text-start rounded-xl transition-all duration-150 min-h-[44px] focus:outline-none ${
+                  isSelected
+                    ? "bg-[#e8eeff] text-[#173fad]"
+                    : "text-[#445d80] hover:bg-[#f1f5f9] hover:text-[#173fad]"
+                }`
+              : `w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-start transition-colors min-h-[40px] focus:outline-none focus:bg-[#eef3ff] ${
+                  isSelected
+                    ? "bg-[#eef3ff] text-[#173fad] font-bold"
+                    : "text-[#2e4259] hover:bg-slate-50 hover:text-[#10253e] font-medium"
+                }`;
+
             return (
               <button
                 key={item.code}
@@ -162,22 +185,27 @@ export function LanguageSwitcher({
                     setIsOpen(false);
                   }
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-start transition-colors min-h-[40px] focus:outline-none focus:bg-[#eef3ff] ${
-                  isSelected
-                    ? "bg-[#eef3ff] text-[#173fad] font-bold"
-                    : "text-[#2e4259] hover:bg-slate-50 hover:text-[#10253e] font-medium"
-                }`}
+                className={buttonClass}
                 role="option"
                 aria-selected={isSelected}
               >
                 <span className="flex items-center gap-2.5">
                   <span className="text-base leading-none" aria-hidden="true">{item.flag}</span>
-                  <span className="flex flex-col text-start">
-                    <span className="font-bold">{item.nativeName}</span>
-                    <span className="text-[10px] text-[#71808a] font-normal">{item.label}</span>
+                  <span className="flex flex-col text-start gap-0.5">
+                    <span className={isDashboard ? "font-semibold text-sm text-[#10253e]" : "font-bold"}>
+                      {item.nativeName}
+                    </span>
+                    <span className={isDashboard ? "text-[11px] text-[#566983] font-medium" : "text-[10px] text-[#71808a] font-normal"}>
+                      {item.label}
+                    </span>
                   </span>
                 </span>
-                {isSelected && <Check size={14} className="text-[#173fad] flex-none" />}
+                {isSelected && (
+                  <Check 
+                    size={14} 
+                    className={`${isDashboard ? "text-[#173fad] stroke-[2.5]" : "text-[#173fad]"} flex-none`} 
+                  />
+                )}
               </button>
             );
           })}

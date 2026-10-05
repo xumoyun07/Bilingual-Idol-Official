@@ -114,6 +114,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const draggedKeyRef = useRef<FabId | null>(null);
   const dragStartYRef = useRef<number>(0);
   const dragOffsetYRef = useRef<number>(0);
+  const draggedTargetRef = useRef<HTMLElement | null>(null);
+  const draggedPointerIdRef = useRef<number | null>(null);
   const orderRef = useRef<FabId[]>(order);
   const hasDraggedRef = useRef<boolean>(false);
 
@@ -131,11 +133,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const handlePointerDown = (id: FabId, e: React.PointerEvent) => {
     if (e.button !== 0) return; // Left click only
     const target = e.currentTarget as HTMLElement;
-    target.setPointerCapture(e.pointerId);
 
     draggedKeyRef.current = id;
     dragStartYRef.current = e.clientY;
     dragOffsetYRef.current = 0;
+    draggedTargetRef.current = target;
+    draggedPointerIdRef.current = e.pointerId;
     hasDraggedRef.current = false;
 
     setDraggedKey(id);
@@ -149,7 +152,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     dragOffsetYRef.current = deltaY;
 
     if (Math.abs(deltaY) > 5) {
-      hasDraggedRef.current = true;
+      if (!hasDraggedRef.current) {
+        hasDraggedRef.current = true;
+        if (draggedTargetRef.current && draggedPointerIdRef.current !== null) {
+          try {
+            draggedTargetRef.current.setPointerCapture(draggedPointerIdRef.current);
+          } catch (err) {
+            // ignore
+          }
+        }
+      }
     }
 
     setDragOffsetY(deltaY);
@@ -185,13 +197,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (draggedKeyRef.current === null) return;
-    const target = e.currentTarget as HTMLElement;
-    try {
-      target.releasePointerCapture(e.pointerId);
-    } catch (err) {
-      // ignore
+    if (draggedTargetRef.current && draggedPointerIdRef.current !== null) {
+      try {
+        draggedTargetRef.current.releasePointerCapture(draggedPointerIdRef.current);
+      } catch (err) {
+        // ignore
+      }
     }
     draggedKeyRef.current = null;
+    draggedTargetRef.current = null;
+    draggedPointerIdRef.current = null;
     setDraggedKey(null);
     setDragOffsetY(0);
   };

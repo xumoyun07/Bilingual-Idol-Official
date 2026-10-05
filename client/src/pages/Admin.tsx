@@ -42,6 +42,7 @@ import {
   ChevronRight,
   CircleSlash,
   Crown,
+  FileImage,
   FileSpreadsheet,
   FileText,
   Filter,
@@ -50,10 +51,14 @@ import {
   LayoutDashboard,
   Loader2,
   Megaphone,
+  MessageSquare,
+  Newspaper,
   Pencil,
   Plus,
   RotateCcw,
   Search,
+  ScrollText,
+  Settings,
   Settings2,
   Shield,
   ShieldAlert,
@@ -87,6 +92,59 @@ const singularRoleLabels: Record<VisibleRole, string> = { user: "Legacy user", s
 const roleTone: Record<VisibleRole, string> = { user: "bg-[#edf0f4] text-[#596879]", student: "bg-[#e9eef8] text-[#325c95]", teacher: "bg-[#e8eeff] text-[#173fad]", marketing: "bg-[#fff0ed] text-[#a34732]", admin: "bg-[#f4eddd] text-[#705a30]", super_admin: "bg-[#efe8fb] text-[#6e4c9a]" };
 const categoryItems: { role: CategoryRole; icon: typeof UsersRound }[] = [
   { role: "student", icon: GraduationCap }, { role: "teacher", icon: UsersRound }, { role: "marketing", icon: Megaphone }, { role: "admin", icon: Shield }, { role: "super_admin", icon: ShieldCheck },
+];
+
+const STRATEGIC_PORTFOLIOS = [
+  {
+    id: "platform-gov",
+    label: "Platform & Governance",
+    icon: Crown,
+    tone: "bg-[#fff8e6] text-[#b47d00] border-[#ffd580]",
+    modules: [
+      { id: "founder-overview", title: "Overview", icon: LayoutDashboard, role: "founder" },
+      { id: "founder-users", title: "User Accounts", icon: UsersRound, role: "founder" },
+      { id: "founder-fields", title: "Profile Schema", icon: Settings2, role: "founder" },
+      { id: "founder-dossier", title: "Project Dossier", icon: ScrollText, role: "founder" },
+      { id: "founder-settings", title: "Platform Settings", icon: Settings2, role: "founder" },
+      { id: "founder-audit", title: "Audit & Security", icon: ScrollText, role: "founder" },
+    ],
+  },
+  {
+    id: "academic-ops",
+    label: "Academic Operations",
+    icon: GraduationCap,
+    tone: "bg-[#e8eeff] text-[#173fad] border-[#c0d4ff]",
+    modules: [
+      { id: "founder-students", title: "Student Directory", icon: GraduationCap, role: "founder" },
+      { id: "admin-schedule", title: "Class Timetable", icon: CalendarDays, role: "admin" },
+      { id: "teacher-attendance", title: "Attendance Tracking", icon: UsersRound, role: "teacher" },
+      { id: "teacher-grades", title: "Assessments & Grades", icon: FileText, role: "teacher" },
+      { id: "teacher-lessons", title: "Curriculum Plans", icon: BookOpen, role: "teacher" },
+    ],
+  },
+  {
+    id: "programs-dues",
+    label: "Programs & Dues",
+    icon: ScrollText,
+    tone: "bg-[#efe8fb] text-[#6e4c9a] border-[#d8c3f8]",
+    modules: [
+      { id: "admin-programs", title: "Language Programs", icon: BookOpen, role: "admin" },
+      { id: "admin-payments", title: "Tuition Dues & Payments", icon: ScrollText, role: "admin" },
+    ],
+  },
+  {
+    id: "growth-presence",
+    label: "Growth & Content",
+    icon: Megaphone,
+    tone: "bg-[#fff0ed] text-[#a34732] border-[#ffd1c7]",
+    modules: [
+      { id: "founder-news", title: "News Updates", icon: Newspaper, role: "founder" },
+      { id: "marketing-campaigns", title: "Campaigns & Promos", icon: Megaphone, role: "marketing" },
+      { id: "marketing-content", title: "CMS Content Blocks", icon: Settings2, role: "marketing" },
+      { id: "marketing-testimonials", title: "Verified Reviews", icon: MessageSquare, role: "marketing" },
+      { id: "founder-media", title: "Media Library", icon: FileImage, role: "founder" },
+    ],
+  },
 ];
 
 export default function Admin() {
@@ -182,80 +240,76 @@ function FounderConsole() {
     }
   };
 
-  const currentSection = FOUNDER_NAVIGATION_SECTIONS.find((sec) => sec.type === roleParam) || FOUNDER_NAVIGATION_SECTIONS[0];
+  const activePortfolio = STRATEGIC_PORTFOLIOS.find((port) =>
+    port.modules.some((m) => m.id === tabParam)
+  ) || STRATEGIC_PORTFOLIOS[0];
+
+  const activeModule = activePortfolio.modules.find((m) => m.id === tabParam) || activePortfolio.modules[0];
 
   return (
     <div id="admin-dashboard-container" data-page="admin" className={`workspace-page founder-command w-full space-y-6 ${isRTL ? "dir-rtl" : ""}`}>
-      {/* Top User Type Pill Navigator */}
-      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-2.5 sm:p-3 rounded-2xl border border-[#eee4d7] shadow-xs">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth pb-1 sm:pb-0 sm:flex-wrap">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#708098] px-2 shrink-0 hidden xs:inline">
-            {td("User Type Focus:")}
-          </span>
-          {FOUNDER_NAVIGATION_SECTIONS.map((sec) => {
-            const isSelected = roleParam === sec.type;
-            const SecIcon = sec.icon;
-            return (
-              <button
-                key={sec.type}
-                type="button"
-                onClick={() => navigateTo(sec.type, sec.modules[0].id)}
-                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
-                  isSelected
-                    ? "bg-[#10253e] text-white shadow-xs"
-                    : "bg-[#faf7f2] text-[#475569] hover:bg-[#eee4d7]/40 border border-[#dfd1bf]/60"
-                }`}
-              >
-                <SecIcon size={14} className={isSelected ? "text-amber-300" : "text-[#64748b]"} />
-                <span>{td(sec.label)}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-[#faf7f2] text-[#64748b]"}`}>
-                  {sec.modules.length}
-                </span>
-              </button>
-            );
-          })}
+      {/* 1. Desktop Breadcrumb Scope Header (Completely eliminates duplicate buttons next to sidebar) */}
+      <div className="hidden lg:flex items-center justify-between border-b border-[#edf2f5] pb-4 mb-2">
+        <div className="flex items-center gap-2 text-xs text-[#566983] font-semibold tracking-tight">
+          <span>{td("Platform Control Centre")}</span>
+          <span className="text-[#a1b0cb] font-normal">/</span>
+          <span className="text-[#566983] font-bold">{td(activePortfolio.label)}</span>
+          <span className="text-[#a1b0cb] font-normal">/</span>
+          <span className="text-[#173fad] font-extrabold">{td(activeModule.title)}</span>
         </div>
-
-        <div className="flex items-center justify-between sm:justify-end gap-2 px-1">
-          <span className="text-xs text-[#53657a] font-medium">
-            {td("Active:")} <strong className="text-[#10253e]">{td(currentSection?.label || "")}</strong>
-          </span>
+        <div className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider">
+          ● {td("Verified Founder Session")}
         </div>
       </div>
 
-      {/* Secondary Sub-Module Navigation Bar */}
-      {currentSection && currentSection.modules.length > 1 && (
-        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar scroll-smooth">
-          {currentSection.modules.map((mod) => {
-            const isModActive = tabParam === mod.id;
-            const ModIcon = mod.icon;
+      {/* 2. Mobile-Only Intelligent Portfolio & Module Selector (Consolidates 33 screens into 4 swipeable portfolios with inner dropdown) */}
+      <div className="lg:hidden space-y-3 bg-[#fbf8f2]/40 p-4 rounded-2xl border border-[#edf2f5] shadow-xs">
+        {/* Swipeable Portfolio Buttons */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth pb-0.5">
+          {STRATEGIC_PORTFOLIOS.map((port) => {
+            const isSelected = activePortfolio.id === port.id;
+            const PortIcon = port.icon;
             return (
               <button
-                key={mod.id}
+                key={port.id}
                 type="button"
-                onClick={() => navigateTo(currentSection.type, mod.id)}
-                className={`shrink-0 inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
-                  isModActive
-                    ? "bg-[#173fad] text-white shadow-xs"
-                    : "bg-white text-[#53657a] hover:bg-[#faf7f2] hover:text-[#10253e] border border-[#eee4d7]"
+                onClick={() => navigateTo(port.modules[0].role as PlatformUserType, port.modules[0].id)}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[38px] ${
+                  isSelected
+                    ? "bg-[#10253e] text-white"
+                    : "bg-white text-[#475569] border border-[#dfd1bf]/40 hover:bg-[#faf7f2]"
                 }`}
               >
-                <ModIcon size={14} className={isModActive ? "text-white" : "text-[#64748b]"} />
-                <span>{td(mod.title)}</span>
-                {mod.badge && (
-                  <span
-                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                      isModActive ? "bg-white/20 text-white" : "bg-[#faf7f2] text-[#53657a]"
-                    }`}
-                  >
-                    {td(mod.badge)}
-                  </span>
-                )}
+                <PortIcon size={13} className={isSelected ? "text-amber-300" : "text-[#64748b]"} />
+                <span>{td(port.label)}</span>
               </button>
             );
           })}
         </div>
-      )}
+
+        {/* Compact Sub-Module Dropdown Selector (Limits scroll and groups related functions) */}
+        <div className="flex items-center justify-between gap-3 border-t border-[#edf2f5] pt-3">
+          <span className="text-[11px] font-bold text-[#708098] uppercase tracking-wider shrink-0">
+            {td("Active Module:")}
+          </span>
+          <select
+            value={tabParam}
+            onChange={(e) => {
+              const selectedMod = activePortfolio.modules.find((m) => m.id === e.target.value);
+              if (selectedMod) {
+                navigateTo(selectedMod.role as PlatformUserType, selectedMod.id);
+              }
+            }}
+            className="flex-1 max-w-[220px] min-h-[36px] bg-white border border-[#dce4e7] rounded-xl text-xs font-bold text-[#10253e] px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+          >
+            {activePortfolio.modules.map((mod) => (
+              <option key={mod.id} value={mod.id}>
+                {td(mod.title)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <DashboardContentArea>
         {renderActiveModule()}
