@@ -109,7 +109,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [draggedKey, setDraggedKey] = useState<FabId | null>(null);
   const [dragOffsetY, setDragOffsetY] = useState<number>(0);
   const [isWaOpen, setIsWaOpen] = useState(false);
-  const [showBackButton, setShowBackButton] = useState(false);
+  const showBackButton = false;
 
   const draggedKeyRef = useRef<FabId | null>(null);
   const dragStartYRef = useRef<number>(0);
@@ -123,19 +123,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     localStorage.setItem("bilc_buttons_order_v3", JSON.stringify(order));
   }, [order]);
 
-  // Back button visibility condition: sub-pages and scroll threshold
-  useEffect(() => {
-    if (location === "/") {
-      setShowBackButton(false);
-      return;
-    }
-    const handleScroll = () => {
-      setShowBackButton(window.scrollY > 80);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [location]);
+
 
   const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -565,38 +553,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         aria-label={language === "ar" ? "إجراءات سريعة" : language === "ms" ? "Tindakan pantas" : "Quick actions"}
       >
         <div className="relative w-full h-full pointer-events-none">
-          {/* Render Page Back Button (Slot 0 if visible) */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              opacity: showBackButton ? 1 : 0,
-              scale: showBackButton ? 1 : 0.8,
-              pointerEvents: showBackButton ? "auto" : "none",
-              transition: prefersReducedMotion
-                ? "none"
-                : "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), scale 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-              zIndex: 5,
-            }}
-          >
-            <button
-              type="button"
-              className="floating-page-back-button w-12 h-12 flex items-center justify-center cursor-pointer"
-              onClick={() => {
-                if (window.history.length > 1) {
-                  window.history.back();
-                } else {
-                  window.location.href = "/";
-                }
-              }}
-              aria-label={language === "ar" ? "رجوع" : language === "ms" ? "Kembali" : "Back"}
-            >
-              <ArrowLeft size={22} className="floating-page-back-icon" aria-hidden="true" />
-            </button>
-          </div>
-
           {/* Render Draggable Visible Buttons */}
           {order.map((id, itemIdx) => {
             const isDragging = id === draggedKey;

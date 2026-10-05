@@ -1,9 +1,7 @@
-import { Compass, Home } from "lucide-react";
-import { useLocation } from "wouter";
+import { Compass } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function NotFound() {
-  const [, setLocation] = useLocation();
   const { language, isRTL } = useLanguage();
 
   return (
@@ -25,9 +23,6 @@ export default function NotFound() {
             ? "ربما تم نقل الصفحة أو لم تعد متوفرة. تفضل بالعودة إلى الصفحة الرئيسية للمتابعة."
             : "The page may have moved or no longer be available. Return to the website to continue."}
         </p>
-        <button onClick={() => setLocation("/")} className="compass-btn-primary mt-8 inline-flex items-center gap-2">
-          <Home size={16} /> {language === "ms" ? "Ke Laman Utama" : language === "ar" ? "الصفحة الرئيسية" : "Go Home"}
-        </button>
       </section>
     </main>
   );

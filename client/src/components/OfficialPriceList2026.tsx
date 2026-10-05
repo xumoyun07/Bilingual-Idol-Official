@@ -552,10 +552,6 @@ export function OfficialPriceList2026() {
                         <span>{durText} · {hrsText}</span>
                       </div>
                     </div>
-                    <div className="bilc-course-price">
-                      <span className="bilc-price-val"><bdi dir="ltr">{course.tuitionFee}</bdi></span>
-                      <span className="bilc-price-sub">{language === "ms" ? "Yuran Pengajian" : language === "ar" ? "الرسوم الدراسية" : "Tuition Fee"}</span>
-                    </div>
                     <div className="bilc-course-inclusions">
                       <p className="bilc-inclusions-title">
                         {language === "ms" ? "Pakej Termasuk:" : language === "ar" ? "الباقة تشمل:" : "Package Includes:"}
@@ -599,10 +595,6 @@ export function OfficialPriceList2026() {
                       </div>
                     </div>
                     <p className="bilc-camp-highlight">{hlText}</p>
-                    <div className="bilc-course-price">
-                      <span className="bilc-price-val"><bdi dir="ltr">{course.tuitionFee}</bdi></span>
-                      <span className="bilc-price-sub">{language === "ms" ? "Pakej Serba Lengkap" : language === "ar" ? "باقة شاملة متكاملة" : "All-inclusive Package"}</span>
-                    </div>
                     <div className="bilc-course-inclusions">
                       <p className="bilc-inclusions-title">
                         {language === "ms" ? "Pakej Termasuk:" : language === "ar" ? "الباقة تشمل:" : "Package Includes:"}
@@ -643,10 +635,6 @@ export function OfficialPriceList2026() {
                       <span>{hrsText} {language === "ms" ? "Bimbingan 1-sama-1" : language === "ar" ? "تدريس فردي مباشر" : "1-on-1 Instruction"}</span>
                     </div>
                   </div>
-                  <div className="bilc-course-price">
-                    <span className="bilc-price-val"><bdi dir="ltr">{course.tuitionFee}</bdi></span>
-                    <span className="bilc-price-sub">{language === "ms" ? "Bimbingan Peribadi" : language === "ar" ? "تدريب فردي مخصص" : "Personalized Coaching"}</span>
-                  </div>
                   <div className="bilc-course-inclusions">
                     <p className="bilc-inclusions-title">
                       {language === "ms" ? "Kelebihan Utama:" : language === "ar" ? "أبرز المزايا:" : "Highlights:"}
@@ -677,7 +665,6 @@ export function OfficialPriceList2026() {
             {EXECUTIVE_COURSES.map((course) => {
               const progText = course.programme[language] || course.programme.en;
               const durText = course.duration[language] || course.duration.en;
-              const feeText = course.tuitionFee[language] || course.tuitionFee.en;
               const descText = course.desc[language] || course.desc.en;
               return (
                 <div key={course.rawProgramme} className="bilc-course-card">
@@ -689,12 +676,6 @@ export function OfficialPriceList2026() {
                     </div>
                   </div>
                   <p className="bilc-camp-highlight">{descText}</p>
-                  <div className="bilc-course-price">
-                    <span className={`bilc-price-val ${feeText.includes("Request") || feeText.includes("Permintaan") || feeText.includes("الطلب") ? "is-text" : ""}`}>
-                      <bdi dir="ltr">{feeText}</bdi>
-                    </span>
-                    <span className="bilc-price-sub">{language === "ms" ? "Yuran Eksekutif" : language === "ar" ? "الرسوم التنفيذية" : "Executive Tuition"}</span>
-                  </div>
                   <div className="bilc-course-inclusions">
                     <p className="bilc-inclusions-title">
                       {language === "ms" ? "Ciri-ciri Program:" : language === "ar" ? "مميزات البرنامج:" : "Program Features:"}
@@ -740,15 +721,6 @@ export function OfficialPriceList2026() {
                   </div>
 
                   <p className="bilc-camp-highlight mt-2">{descText}</p>
-
-                  <div className="bilc-course-price">
-                    <span className="bilc-price-val is-text">
-                      {language === "ms" ? "Berdasarkan Permintaan" : language === "ar" ? "عند الطلب" : "Upon Request"}
-                    </span>
-                    <span className="bilc-price-sub">
-                      {language === "ms" ? "LALUAN PEMBELAJARAN TERSUAI" : language === "ar" ? "مسارات تعليمية مخصصة" : "TAILORED LEARNING PATHWAYS"}
-                    </span>
-                  </div>
 
                   <div className="bilc-course-inclusions">
                     <p className="bilc-inclusions-title">

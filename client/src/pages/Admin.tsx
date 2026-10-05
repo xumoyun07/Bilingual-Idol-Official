@@ -31,6 +31,7 @@ import { MarketingCampaignsModule } from "@/components/founder/MarketingCampaign
 import { MarketingContentModule } from "@/components/founder/MarketingContentModule";
 import { MarketingTestimonialsModule } from "@/components/founder/MarketingTestimonialsModule";
 import { MarketingAnalyticsModule } from "@/components/founder/MarketingAnalyticsModule";
+import { AdminPaymentsModule } from "@/components/dashboard/AdminPaymentsModule";
 import {
   AlertCircle,
   ArrowUpRight,
@@ -146,6 +147,10 @@ function FounderConsole() {
         return <ProjectDossierModule />;
       case "founder-settings":
         return <FounderSettingsModule />;
+      case "founder-payments":
+      case "superadmin-payments":
+      case "admin-payments":
+        return <AdminPaymentsModule />;
       case "superadmin-overview":
         return <SuperAdminOverviewModule />;
       case "admin-overview":

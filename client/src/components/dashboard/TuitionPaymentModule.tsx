@@ -1,29 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Landmark, Ticket, HelpCircle, Loader2, Award, CheckCircle, RefreshCw, AlertCircle, FileText } from "lucide-react";
+import { Landmark, Ticket, Loader2, Award, CheckCircle, AlertCircle } from "lucide-react";
 
 export function TuitionPaymentModule() {
-  const { language, isRTL } = useLanguage();
+  const { language } = useLanguage();
   
-  // Outstanding fees (Deposit and Level 1 course fees) in cents
-  const originalFee = 75000; // RM 750.00
-  const [feeAmount, setFeeAmount] = useState(originalFee);
+  // 1. Fetch backend payment gateway status
+  const { data: gatewayStatus, isLoading: isGatewayLoading } = trpc.payments.getGatewayStatus.useQuery();
+  
+  // 2. Fetch the current logged-in student's enrollments
+  const { data: myEnrollments, isLoading: isEnrollmentsLoading } = trpc.enrollments.myEnrollments.useQuery();
+  
+  // 3. Fetch past payment list to check if already paid
+  const { data: paymentsList, isLoading: isPaymentsLoading, refetch: refetchPayments } = trpc.payments.list.useQuery();
+
+  const activeEnrollment = myEnrollments?.find(e => e.status === "active");
+  
+  // Calculate dynamic fees on load
+  const originalFee = activeEnrollment 
+    ? (activeEnrollment.agreedPrice + activeEnrollment.registrationFee + activeEnrollment.placementTestFee + activeEnrollment.visaFee)
+    : 0;
+
+  const [feeAmount, setFeeAmount] = useState(0);
   const [promoCodeInput, setPromoCodeInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<any>(null);
   const [promoError, setPromoError] = useState("");
   const [promoSuccess, setPromoSuccess] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "creating" | "paying" | "completed" | "failed">("idle");
-  const [activePaymentId, setActivePaymentId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (originalFee > 0 && !appliedPromo) {
+      setFeeAmount(originalFee);
+    }
+  }, [originalFee, appliedPromo]);
 
   const promoMutation = trpc.promotions.validate.useMutation();
   const paymentCreateMutation = trpc.payments.create.useMutation();
-  const webhookSimulationMutation = trpc.payments.simulateToyyibpayWebhook.useMutation();
+
+  const isPaid = paymentsList?.some(p => p.status === "completed") || false;
+  const completedPayment = paymentsList?.find(p => p.status === "completed");
+
+  // Read checkout redirect URL parameters to show quick status
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentParam = params.get("payment");
+    if (paymentParam === "success") {
+      setPaymentStatus("completed");
+      refetchPayments();
+    } else if (paymentParam === "failed") {
+      setPaymentStatus("failed");
+    }
+  }, [refetchPayments]);
 
   const handleApplyPromo = async () => {
     setPromoError("");
     setPromoSuccess("");
-    if (!promoCodeInput.trim()) return;
+    if (!promoCodeInput.trim() || originalFee <= 0) return;
 
     try {
       const res = await promoMutation.mutateAsync({ code: promoCodeInput });
@@ -40,7 +73,6 @@ export function TuitionPaymentModule() {
               : `Promo applied successfully! Discounted ${res.discountValue}% off.`
           );
         } else {
-          // Fixed discount (e.g. value is in RM/dollars, convert to cents)
           const discountCents = res.discountValue * 100;
           setFeeAmount(Math.max(0, originalFee - discountCents));
           setPromoSuccess(
@@ -70,26 +102,16 @@ export function TuitionPaymentModule() {
   const handlePaymentCheckout = async () => {
     setPaymentStatus("creating");
     try {
-      // Create payment transaction reference on database
-      const payRecord = await paymentCreateMutation.mutateAsync({
-        amount: feeAmount,
-        currency: "MYR",
-        provider: "toyyibpay",
-        paymentMethod: "fpx_bank_transfer",
-      });
+      // Create payment transaction reference on database (and generate redirect payment URL)
+      const payRecord = await paymentCreateMutation.mutateAsync();
 
-      setActivePaymentId(payRecord.id);
-      setPaymentStatus("paying");
-
-      // Simulate webhook callbacks from Toyyibpay (payment provider) after 2 seconds
-      setTimeout(async () => {
-        await webhookSimulationMutation.mutateAsync({
-          id: payRecord.id,
-          status: "completed",
-        });
-        setPaymentStatus("completed");
-      }, 2000);
-
+      if (payRecord.url) {
+        setPaymentStatus("paying");
+        // Redirect browser to payment gateway
+        window.location.href = payRecord.url;
+      } else {
+        setPaymentStatus("failed");
+      }
     } catch (e) {
       console.error(e);
       setPaymentStatus("failed");
@@ -100,25 +122,22 @@ export function TuitionPaymentModule() {
     return `RM ${(cents / 100).toFixed(2)}`;
   };
 
-  if (paymentStatus === "paying") {
+  const isLoading = isGatewayLoading || isEnrollmentsLoading || isPaymentsLoading;
+
+  if (isLoading) {
     return (
-      <div className="p-6 sm:p-8 bg-white rounded-xl border border-[#d9cbb8] shadow-sm text-center">
-        <Loader2 size={36} className="text-[#173fad] animate-spin mx-auto mb-4" />
-        <h3 className="text-lg font-extrabold text-[#10253e]">
-          {language === "ms" ? "Menghubungkan ke Gateway ToyyibPay..." : language === "ar" ? "جاري الاتصال بـ ToyyibPay..." : "Connecting to ToyyibPay Gateway..."}
-        </h3>
-        <p className="text-sm text-[#53657a] mt-2">
-          {language === "ms" 
-            ? "Sila jangan tutup pelayar ini. Kami sedang memproses transaksi bank FPX anda dengan selamat." 
-            : language === "ar" 
-            ? "الرجاء عدم إغلاق هذه الصفحة. جاري معالجة المعاملة البنكية الآمنة (FPX) الخاصة بك." 
-            : "Please do not refresh. Securing FPX bank transfer pipeline and resolving credentials..."}
-        </p>
+      <div className="p-6 sm:p-8 bg-white rounded-xl border border-[#d9cbb8] shadow-sm flex items-center justify-center min-h-[200px]">
+        <Loader2 size={32} className="text-[#173fad] animate-spin" />
       </div>
     );
   }
 
-  if (paymentStatus === "completed") {
+  // If tuition has already been settled and verified on the server
+  if (isPaid || paymentStatus === "completed") {
+    const finalAmount = completedPayment ? completedPayment.amount : originalFee;
+    const finalReceipt = completedPayment ? completedPayment.receiptNumber : "BILC-REC-0226";
+    const finalMethod = completedPayment?.paymentMethod === "manual_admin" ? "Manual Verification" : "Billplz FPX Bank";
+
     return (
       <div className="p-6 sm:p-8 bg-white rounded-xl border border-emerald-100 bg-emerald-50/10 shadow-sm text-center">
         <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -134,15 +153,15 @@ export function TuitionPaymentModule() {
         <div className="my-6 max-w-sm mx-auto p-4 bg-slate-50 border border-dashed border-[#d9cbb8] rounded-xl text-start">
           <div className="flex justify-between text-xs text-[#708098] mb-1.5">
             <span>{language === "ms" ? "No. Bil / Resit" : language === "ar" ? "رقم الفاتورة" : "Receipt No."}</span>
-            <span className="font-bold text-[#10253e]"><bdi dir="ltr">BILC-REC-0226</bdi></span>
+            <span className="font-bold text-[#10253e]"><bdi dir="ltr">{finalReceipt}</bdi></span>
           </div>
           <div className="flex justify-between text-xs text-[#708098] mb-1.5">
             <span>{language === "ms" ? "Jumlah Dibayar" : language === "ar" ? "المبلغ المدفوع" : "Amount Paid"}</span>
-            <span className="font-bold text-emerald-600"><bdi dir="ltr">{formatCurrency(feeAmount)}</bdi></span>
+            <span className="font-bold text-emerald-600"><bdi dir="ltr">{formatCurrency(finalAmount)}</bdi></span>
           </div>
           <div className="flex justify-between text-xs text-[#708098] mb-1.5">
             <span>{language === "ms" ? "Kaedah Pembayaran" : language === "ar" ? "وسيلة الدفع" : "Method"}</span>
-            <span className="font-bold text-[#10253e]"><bdi dir="ltr">ToyyibPay FPX Bank</bdi></span>
+            <span className="font-bold text-[#10253e]"><bdi dir="ltr">{finalMethod}</bdi></span>
           </div>
           <div className="flex justify-between text-xs text-[#708098]">
             <span>{language === "ms" ? "Status Akun" : language === "ar" ? "الحالة" : "Status"}</span>
@@ -157,13 +176,6 @@ export function TuitionPaymentModule() {
             ? "تم تأكيد رسوم التسجيل والوديعة بالكامل. يمكنك الآن الدخول والالتحاق بفصولنا الدراسية." 
             : "Your registration deposit has been fully settled and updated in the CRM database. You can now access textbooks and virtual classrooms."}
         </p>
-
-        <button
-          onClick={() => setPaymentStatus("idle")}
-          className="mt-6 text-sm font-extrabold text-[#173fad] hover:underline min-h-[44px]"
-        >
-          {language === "ms" ? "Kembali ke Kewangan" : language === "ar" ? "العودة للقسم المالي" : "Return to Finance"}
-        </button>
       </div>
     );
   }
@@ -198,27 +210,43 @@ export function TuitionPaymentModule() {
             <h3 className="text-sm font-extrabold text-[#10253e] mb-4">
               {language === "ms" ? "Perincian Caj Semasa" : language === "ar" ? "تفاصيل الرسوم الحالية" : "Current Invoice Summary"}
             </h3>
-            <div className="space-y-2.5">
-              <div className="flex justify-between text-xs text-[#53657a]">
-                <span>{language === "ms" ? "Deposit Kemasukan Akademik" : language === "ar" ? "وديعة التسجيل والالتحاق" : "Registration Admission Deposit"}</span>
-                <span><bdi dir="ltr">RM 250.00</bdi></span>
-              </div>
-              <div className="flex justify-between text-xs text-[#53657a]">
-                <span>{language === "ms" ? "Yuran Buku Teks & Diagnostik" : language === "ar" ? "كتب دراسية ومواد تشخيصية" : "Course Materials & Diagnostics Book"}</span>
-                <span><bdi dir="ltr">RM 100.00</bdi></span>
-              </div>
-              <div className="flex justify-between text-xs text-[#53657a]">
-                <span>{language === "ms" ? "Yuran Pengajian Bulan Pertama (Level 1)" : language === "ar" ? "رسوم دراسية (الشهر الأول)" : "Level 1 Tuition Fee (Month 1)"}</span>
-                <span><bdi dir="ltr">RM 400.00</bdi></span>
-              </div>
-              
-              {appliedPromo && (
-                <div className="flex justify-between text-xs text-emerald-600 font-extrabold">
-                  <span>{language === "ms" ? "Diskaun Kempen Pintar" : language === "ar" ? "خصم العرض الترويجي" : "Promotional Discount"} ({appliedPromo.code})</span>
-                  <span><bdi dir="ltr">-{formatCurrency(originalFee - feeAmount)}</bdi></span>
+            {activeEnrollment ? (
+              <div className="space-y-2.5">
+                <div className="flex justify-between text-xs text-[#53657a]">
+                  <span>{language === "ms" ? "Yuran Pengajian Dipersetujui" : language === "ar" ? "الرسوم الدراسية المتفق عليها" : "Agreed Tuition Price"}</span>
+                  <span><bdi dir="ltr">{formatCurrency(activeEnrollment.agreedPrice)}</bdi></span>
                 </div>
-              )}
-            </div>
+                {activeEnrollment.registrationFee > 0 && (
+                  <div className="flex justify-between text-xs text-[#53657a]">
+                    <span>{language === "ms" ? "Yuran Pendaftaran" : language === "ar" ? "رسوم التسجيل" : "Registration Fee"}</span>
+                    <span><bdi dir="ltr">{formatCurrency(activeEnrollment.registrationFee)}</bdi></span>
+                  </div>
+                )}
+                {activeEnrollment.placementTestFee > 0 && (
+                  <div className="flex justify-between text-xs text-[#53657a]">
+                    <span>{language === "ms" ? "Yuran Ujian Penilaian" : language === "ar" ? "رسوم اختبار تحديد المستوى" : "Placement Test Fee"}</span>
+                    <span><bdi dir="ltr">{formatCurrency(activeEnrollment.placementTestFee)}</bdi></span>
+                  </div>
+                )}
+                {activeEnrollment.visaFee > 0 && (
+                  <div className="flex justify-between text-xs text-[#53657a]">
+                    <span>{language === "ms" ? "Yuran Pengurusan Visa" : language === "ar" ? "رسوم معالجة التأشيرة" : "Visa Management Fee"}</span>
+                    <span><bdi dir="ltr">{formatCurrency(activeEnrollment.visaFee)}</bdi></span>
+                  </div>
+                )}
+                
+                {appliedPromo && (
+                  <div className="flex justify-between text-xs text-emerald-600 font-extrabold">
+                    <span>{language === "ms" ? "Diskaun Kempen" : language === "ar" ? "خصم العرض" : "Promotional Discount"} ({appliedPromo.code})</span>
+                    <span><bdi dir="ltr">-{formatCurrency(originalFee - feeAmount)}</bdi></span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-amber-600 font-bold">
+                {language === "ms" ? "Tiada rekod pendaftaran aktif ditemui." : language === "ar" ? "لم يتم العثور على سجل تسجيل نشط." : "No active enrollment details available."}
+              </p>
+            )}
           </div>
 
           <div>
@@ -245,7 +273,7 @@ export function TuitionPaymentModule() {
             <div className="flex gap-2">
               <input
                 type="text"
-                disabled={appliedPromo !== null}
+                disabled={appliedPromo !== null || originalFee <= 0}
                 placeholder="e.g. MERDEKA2026"
                 value={promoCodeInput}
                 onChange={e => setPromoCodeInput(e.target.value)}
@@ -262,7 +290,7 @@ export function TuitionPaymentModule() {
               ) : (
                 <button
                   type="button"
-                  disabled={promoMutation.isPending || !promoCodeInput.trim()}
+                  disabled={promoMutation.isPending || !promoCodeInput.trim() || originalFee <= 0}
                   onClick={handleApplyPromo}
                   className="px-4 py-2 bg-[#173fad] hover:bg-[#102c7e] text-white text-xs font-extrabold rounded-lg disabled:opacity-35 min-h-[44px]"
                 >
@@ -290,22 +318,41 @@ export function TuitionPaymentModule() {
             </p>
           </div>
 
-          <button
-            onClick={handlePaymentCheckout}
-            disabled={paymentCreateMutation.isPending}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#173fad] hover:bg-[#102c7e] text-white font-extrabold rounded-lg shadow-md transition-all disabled:opacity-40 min-h-[44px]"
-          >
-            {paymentCreateMutation.isPending ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                {language === "ms" ? "Menghubungi Gateway..." : language === "ar" ? "جاري الاتصال بالبوابة..." : "Connecting..."}
-              </>
-            ) : (
-              <>
-                {language === "ms" ? "Bayar Deposit Kemasukan" : language === "ar" ? "سداد وديعة التسجيل والدراسة" : "Settle Fees with ToyyibPay"}
-              </>
-            )}
-          </button>
+          {/* Conditional Payment Gateway Button or Administrative message if disabled/no keys */}
+          {gatewayStatus?.isEnabled ? (
+            <button
+              onClick={handlePaymentCheckout}
+              disabled={paymentCreateMutation.isPending || originalFee <= 0}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#173fad] hover:bg-[#102c7e] text-white font-extrabold rounded-lg shadow-md transition-all disabled:opacity-40 min-h-[44px]"
+            >
+              {paymentCreateMutation.isPending || paymentStatus === "creating" ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  {language === "ms" ? "Menghubungi Gateway..." : language === "ar" ? "جاري الاتصال بالبوابة..." : "Connecting..."}
+                </>
+              ) : (
+                <>
+                  {language === "ms" ? "Selesaikan dengan Billplz" : language === "ar" ? "الدفع بواسطة Billplz" : "Settle Fees with Billplz"}
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-lg text-amber-900 text-xs leading-relaxed space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-amber-800 mb-1">
+                <AlertCircle size={15} />
+                <span>
+                  {language === "ms" ? "Pembayaran Dalam Talian Tidak Aktif" : language === "ar" ? "الدفع الإلكتروني غير متاح" : "Online Payment Offline"}
+                </span>
+              </div>
+              <p>
+                {language === "ms" 
+                  ? "Sila hubungi pejabat admisi akademik di info@bilc.my atau hubungi talian sokongan kami di +60 3-1234 5678 untuk memproses pengaktifan pendaftaran yuran anda secara manual."
+                  : language === "ar" 
+                  ? "يرجى التواصل مع مكتب القبول الأكاديمي عبر info@bilc.my أو الاتصال بخط الدعم على الرقم +60 3-1234 5678 لإتمام تفعيل تسجيلك ودفع الرسوم يدوياً."
+                  : "Please contact our academic admissions office at info@bilc.my or call our support hotline at +60 3-1234 5678 to settle your tuition manually with an administrative officer."}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

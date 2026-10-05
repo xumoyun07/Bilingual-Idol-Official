@@ -1461,11 +1461,23 @@ button:focus-visible {
 /* Custom Pricing Cards & Grids for Other Tabs (IELTS, Summer Camps, Private, Executive, Languages) */
 .bilc-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(310px, 380px));
+  grid-template-columns: 1fr;
   justify-content: center;
   align-items: start;
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .bilc-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .bilc-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .bilc-course-card {

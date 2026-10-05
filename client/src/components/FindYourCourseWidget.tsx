@@ -595,7 +595,7 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
                     )}
 
                     <a
-                      href={`https://wa.me/60367310449?text=${encodeURIComponent(`Hello Bilingual Idol, I used your Course Finder and would like information about: ${rec.title} (${rec.tuition}).`)}`}
+                      href={`https://wa.me/60367310449?text=${encodeURIComponent(`Hello Bilingual Idol, I used your Course Finder and would like information about: ${rec.title}.`)}`}
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center justify-center gap-1.5 py-2.5 px-3 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-300 transition-all text-center min-h-[40px]"
