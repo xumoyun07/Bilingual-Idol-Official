@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export function FounderSettingsModule() {
   const { td } = useLanguage();
-  const settingsQuery = trpc.content.siteSettings.useQuery();
+  const settingsQuery = trpc.content.systemSettings.useQuery();
   const utils = trpc.useUtils();
 
   const [formValues, setFormValues] = useState<Record<string, string>>({
@@ -40,6 +40,7 @@ export function FounderSettingsModule() {
 
   const updateMutation = trpc.content.updateSiteSettings.useMutation({
     onSuccess: () => {
+      utils.content.systemSettings.invalidate();
       utils.content.siteSettings.invalidate();
       toast.success(td("Platform settings saved successfully."));
       setIsModified(false);

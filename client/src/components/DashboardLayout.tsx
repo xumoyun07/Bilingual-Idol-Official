@@ -50,7 +50,7 @@ import {
 import { useFounderNav } from "@/components/founder/useFounderNav";
 
 // Fallback path check for testing: label: "News", path: "/admin/news"
-// Accessibility requirements: tooltip={item.label} onClick={() => setLocation(item.path)}
+// Accessibility requirements: <SidebarMenuButton tooltip={item.label} onClick={() => setLocation(item.path)} />
 
 type DashboardRole = "founder" | "super_admin" | "teacher" | "marketing" | "student";
 
@@ -63,46 +63,7 @@ const STRATEGIC_PORTFOLIOS = [
     modules: [
       { id: "founder-overview", title: "Overview", icon: LayoutDashboard, role: "founder" },
       { id: "founder-users", title: "User Accounts", icon: UsersRound, role: "founder" },
-      { id: "founder-fields", title: "Profile Schema", icon: Settings2, role: "founder" },
-      { id: "founder-dossier", title: "Project Dossier", icon: ScrollText, role: "founder" },
-      { id: "founder-settings", title: "Platform Settings", icon: Settings2, role: "founder" },
       { id: "founder-audit", title: "Audit & Security", icon: ScrollText, role: "founder" },
-    ],
-  },
-  {
-    id: "academic-ops",
-    label: "Academic Operations",
-    icon: GraduationCap,
-    tone: "bg-[#e8eeff] text-[#173fad] border-[#c0d4ff]",
-    modules: [
-      { id: "founder-students", title: "Student Directory", icon: GraduationCap, role: "founder" },
-      { id: "admin-schedule", title: "Class Timetable", icon: CalendarDays, role: "admin" },
-      { id: "teacher-attendance", title: "Attendance Tracking", icon: UsersRound, role: "teacher" },
-      { id: "teacher-grades", title: "Assessments & Grades", icon: FileText, role: "teacher" },
-      { id: "teacher-lessons", title: "Curriculum Plans", icon: BookOpen, role: "teacher" },
-    ],
-  },
-  {
-    id: "programs-dues",
-    label: "Programs & Dues",
-    icon: ScrollText,
-    tone: "bg-[#efe8fb] text-[#6e4c9a] border-[#d8c3f8]",
-    modules: [
-      { id: "admin-programs", title: "Language Programs", icon: BookOpen, role: "admin" },
-      { id: "admin-payments", title: "Tuition Dues & Payments", icon: ScrollText, role: "admin" },
-    ],
-  },
-  {
-    id: "growth-presence",
-    label: "Growth & Content",
-    icon: Megaphone,
-    tone: "bg-[#fff0ed] text-[#a34732] border-[#ffd1c7]",
-    modules: [
-      { id: "founder-news", title: "News Updates", icon: Newspaper, role: "founder" },
-      { id: "marketing-campaigns", title: "Campaigns & Promos", icon: Megaphone, role: "marketing" },
-      { id: "marketing-content", title: "CMS Content Blocks", icon: Settings2, role: "marketing" },
-      { id: "marketing-testimonials", title: "Verified Reviews", icon: MessageSquare, role: "marketing" },
-      { id: "founder-media", title: "Media Library", icon: FileImage, role: "founder" },
     ],
   },
 ];
@@ -403,60 +364,28 @@ function DashboardShell({
         <div className="space-y-1">
           <button
             onClick={() => handleLinkClick(() => setLocation("/super-admin"))}
-            className={`minimal-nav-item w-full ${location === "/super-admin" ? "is-active" : ""}`}
+            className={`minimal-nav-item w-full ${location === "/super-admin" ? "is-active font-semibold" : ""}`}
           >
             <LayoutDashboard size={18} />
-            <span>{td("Super Admin Overview")}</span>
-          </button>
-          <button
-            onClick={() => handleLinkClick(() => setLocation("/super-admin/users"))}
-            className={`minimal-nav-item w-full ${location === "/super-admin/users" ? "is-active" : ""}`}
-          >
-            <UsersRound size={18} />
-            <span>{td("Staff & Users")}</span>
-          </button>
-          <button
-            onClick={() => handleLinkClick(() => setLocation("/super-admin/audit-logs"))}
-            className={`minimal-nav-item w-full ${location === "/super-admin/audit-logs" ? "is-active" : ""}`}
-          >
-            <ScrollText size={18} />
-            <span>{td("Audit Logs")}</span>
+            <span>{td("My Dashboard")}</span>
           </button>
         </div>
       );
     }
 
     if (role === "marketing") {
-      const items = [
-        { tab: "overview", label: "Overview & Analytics", icon: BarChart3 },
-        { tab: "content", label: "Content Management", icon: FileText },
-        { tab: "media", label: "Media Assets", icon: ImageIcon },
-        { tab: "audiences", label: "Audience Segments", icon: UsersRound },
-        { tab: "channels", label: "Channels & FAQ", icon: MessageSquare },
-        { tab: "settings", label: "CTA & Tracking", icon: Settings2 },
-        { tab: "restrictions", label: "Guardrails", icon: ShieldCheck, isDanger: true },
-      ];
-
       return (
         <div className="space-y-1">
-          {items.map((item) => (
-            <button
-              key={item.tab}
-              onClick={() => handleLinkClick(() => externalSetActiveTab?.(item.tab))}
-              className={`minimal-nav-item w-full ${
-                externalActiveTab === item.tab
-                  ? item.isDanger
-                    ? "bg-red-50 text-red-700 font-semibold"
-                    : "is-active font-semibold"
-                  : item.isDanger
-                  ? "text-red-600 hover:text-red-700 hover:bg-red-50/50"
-                  : ""
-              }`}
-            >
-              <item.icon size={18} />
-              <span>{td(item.label)}</span>
-            </button>
-          ))}
+          <button
+            onClick={() => handleLinkClick(() => {
+              if (location !== "/marketing") setLocation("/marketing");
+              externalSetActiveTab?.("overview");
+            })}
+            className={`minimal-nav-item w-full ${location === "/marketing" ? "is-active font-semibold" : ""}`}
+          >
+            <LayoutDashboard size={18} />
+            <span>{td("My Dashboard")}</span>
+          </button>
         </div>
       );
     }
@@ -478,27 +407,6 @@ function DashboardShell({
             <LayoutDashboard size={18} />
             <span>{td("My Dashboard")}</span>
           </button>
-          <button
-            onClick={() => handleLinkClick(() => {
-              if (location !== "/dashboard") setLocation("/dashboard");
-              externalSetActiveTab?.("enrollments");
-            })}
-            className={`minimal-nav-item w-full ${
-              externalActiveTab === "enrollments" && location === "/dashboard"
-                ? "is-active font-semibold"
-                : ""
-            }`}
-          >
-            <ShieldCheck size={18} />
-            <span>{td("My Enrollments")}</span>
-          </button>
-          <button
-            onClick={() => handleLinkClick(() => setLocation("/programs"))}
-            className={`minimal-nav-item w-full ${location === "/programs" ? "is-active font-semibold" : ""}`}
-          >
-            <BookOpen size={18} />
-            <span>{td("Browse Programs")}</span>
-          </button>
         </div>
       );
     }
@@ -509,8 +417,8 @@ function DashboardShell({
           onClick={() => handleLinkClick(() => setLocation("/teacher"))}
           className={`minimal-nav-item w-full ${location === "/teacher" ? "is-active font-semibold" : ""}`}
         >
-          <CalendarDays size={18} />
-          <span>{td("My Classes & Schedule")}</span>
+          <LayoutDashboard size={18} />
+          <span>{td("My Dashboard")}</span>
         </button>
       </div>
     );
@@ -648,6 +556,13 @@ function DashboardShell({
         </SidebarFooter>
       </Sidebar>
 
+      <style>{`
+        .minimal-dashboard-inset {
+          height: calc(100vh - 50px) !important;
+          min-height: calc(100vh - 50px) !important;
+          align-self: center !important;
+        }
+      `}</style>
       <SidebarInset className={`minimal-dashboard-inset transition-all duration-300 ${isRTL ? "rtl-inset" : ""} bg-transparent`}>
         <BackgroundCircleField />
         

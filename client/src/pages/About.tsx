@@ -158,11 +158,11 @@ export default function About() {
                         ? "bg-[#173fad] border-[#173fad] text-white shadow-sm"
                         : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                     }`}
-                    style={{ direction: isRTL ? "rtl" : "ltr" }}
+                    dir={isRTL ? "rtl" : "ltr"}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <Icon size={15} className={`shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
-                      <span className="text-[11px] sm:text-xs text-left" style={{ textAlign: isRTL ? "right" : "left" }}>
+                      <span className={`text-[11px] sm:text-xs ${isRTL ? "text-right" : "text-left"}`}>
                         {title}
                       </span>
                     </div>
@@ -181,7 +181,7 @@ export default function About() {
             <div className="bg-white border border-slate-200/70 rounded-2xl p-5 mt-4 shadow-xs relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50/30 to-transparent pointer-events-none rounded-bl-3xl" />
               
-              <div className="flex items-center gap-2.5 mb-3" style={{ direction: isRTL ? "rtl" : "ltr" }}>
+              <div className="flex items-center gap-2.5 mb-3" dir={isRTL ? "rtl" : "ltr"}>
                 <div className="w-8 h-8 rounded-xl bg-blue-50/50 border border-blue-100 flex items-center justify-center text-[#173fad] shrink-0">
                   {(() => {
                     const ActiveIcon = approach[activeApproach].icon;
@@ -193,7 +193,7 @@ export default function About() {
                 </strong>
               </div>
               
-              <p className="text-slate-500 text-[12px] leading-relaxed" style={{ textAlign: isRTL ? "right" : "left" }}>
+              <p className={`text-slate-500 text-[12px] leading-relaxed ${isRTL ? "text-right" : "text-left"}`}>
                 {approach[activeApproach].body}
               </p>
             </div>

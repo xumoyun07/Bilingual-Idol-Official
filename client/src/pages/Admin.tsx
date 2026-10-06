@@ -103,46 +103,7 @@ const STRATEGIC_PORTFOLIOS = [
     modules: [
       { id: "founder-overview", title: "Overview", icon: LayoutDashboard, role: "founder" },
       { id: "founder-users", title: "User Accounts", icon: UsersRound, role: "founder" },
-      { id: "founder-fields", title: "Profile Schema", icon: Settings2, role: "founder" },
-      { id: "founder-dossier", title: "Project Dossier", icon: ScrollText, role: "founder" },
-      { id: "founder-settings", title: "Platform Settings", icon: Settings2, role: "founder" },
       { id: "founder-audit", title: "Audit & Security", icon: ScrollText, role: "founder" },
-    ],
-  },
-  {
-    id: "academic-ops",
-    label: "Academic Operations",
-    icon: GraduationCap,
-    tone: "bg-[#e8eeff] text-[#173fad] border-[#c0d4ff]",
-    modules: [
-      { id: "founder-students", title: "Student Directory", icon: GraduationCap, role: "founder" },
-      { id: "admin-schedule", title: "Class Timetable", icon: CalendarDays, role: "admin" },
-      { id: "teacher-attendance", title: "Attendance Tracking", icon: UsersRound, role: "teacher" },
-      { id: "teacher-grades", title: "Assessments & Grades", icon: FileText, role: "teacher" },
-      { id: "teacher-lessons", title: "Curriculum Plans", icon: BookOpen, role: "teacher" },
-    ],
-  },
-  {
-    id: "programs-dues",
-    label: "Programs & Dues",
-    icon: ScrollText,
-    tone: "bg-[#efe8fb] text-[#6e4c9a] border-[#d8c3f8]",
-    modules: [
-      { id: "admin-programs", title: "Language Programs", icon: BookOpen, role: "admin" },
-      { id: "admin-payments", title: "Tuition Dues & Payments", icon: ScrollText, role: "admin" },
-    ],
-  },
-  {
-    id: "growth-presence",
-    label: "Growth & Content",
-    icon: Megaphone,
-    tone: "bg-[#fff0ed] text-[#a34732] border-[#ffd1c7]",
-    modules: [
-      { id: "founder-news", title: "News Updates", icon: Newspaper, role: "founder" },
-      { id: "marketing-campaigns", title: "Campaigns & Promos", icon: Megaphone, role: "marketing" },
-      { id: "marketing-content", title: "CMS Content Blocks", icon: Settings2, role: "marketing" },
-      { id: "marketing-testimonials", title: "Verified Reviews", icon: MessageSquare, role: "marketing" },
-      { id: "founder-media", title: "Media Library", icon: FileImage, role: "founder" },
     ],
   },
 ];
@@ -172,10 +133,7 @@ function FounderConsole() {
 
   // Canonical paths
   if (location === "/admin/audit-logs") return <AuditLogs role="founder" />;
-  if (location === "/admin/news") return <NewsManager />;
-  if (location === "/admin/students") return <StudentsProfileList />;
-  const studentMatch = location.match(/^\/admin\/students\/(\d+)$/);
-  if (studentMatch) return <StudentProfileDetail studentId={Number(studentMatch[1])} />;
+  if (location === "/admin/users") return <UsersModule />;
 
   // Render module based on active Tab
   const renderActiveModule = () => {
@@ -185,58 +143,11 @@ function FounderConsole() {
       case "founder-users":
       case "superadmin-users":
         return <UsersModule />;
-      case "founder-fields":
-      case "superadmin-fields":
-        return <UserFieldBuilderStandalone />;
-      case "founder-students":
-      case "admin-students":
-        return <StudentsProfileList />;
-      case "founder-news":
-      case "superadmin-news":
-      case "admin-news":
-        return <NewsManager />;
-      case "founder-media":
-      case "marketing-media":
-        return <MediaLibrary />;
       case "founder-audit":
       case "superadmin-audit":
         return <AuditLogs role="founder" />;
-      case "founder-dossier":
-        return <ProjectDossierModule />;
-      case "founder-settings":
-        return <FounderSettingsModule />;
-      case "founder-payments":
-      case "superadmin-payments":
-      case "admin-payments":
-        return <AdminPaymentsModule />;
-      case "superadmin-overview":
-        return <SuperAdminOverviewModule />;
-      case "admin-overview":
-        return <AdminOverviewModule />;
-      case "admin-leads":
-      case "marketing-leads":
-        return <AdminLeadsModule />;
-      case "admin-programs":
-        return <AdminProgramsModule />;
-      case "admin-schedule":
-      case "teacher-schedule":
-        return <AdminScheduleModule />;
-      case "teacher-attendance":
-        return <TeacherAttendanceModule />;
-      case "teacher-grades":
-        return <TeacherGradesModule />;
-      case "teacher-lessons":
-        return <TeacherLessonsModule />;
-      case "marketing-overview":
-        return <MarketingAnalyticsModule />;
-      case "marketing-campaigns":
-        return <MarketingCampaignsModule />;
-      case "marketing-content":
-        return <MarketingContentModule />;
-      case "marketing-testimonials":
-        return <MarketingTestimonialsModule />;
       default:
-        return location === "/admin/users" ? <UsersModule /> : <DashboardModule />;
+        return <DashboardModule />;
     }
   };
 
@@ -551,45 +462,20 @@ function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string
 
 function DashboardModule() {
   const { td } = useLanguage();
-  const usersCount = trpc.users.list.useQuery({ page: 0, pageSize: 1 });
-  const studentsCount = trpc.students.list.useQuery({ page: 0, pageSize: 1, sortBy: "newest" });
 
-  return <>
-    <ModuleHeader eyebrow="Control centre · Dashboard" title="Manage centre access." description="Use this workspace to manage issued accounts, student records and audit evidence. Activity metrics appear only when a confirmed data source is connected." action={<Link href="/admin/users" className="compass-btn-primary inline-flex items-center gap-2"><UsersRound size={17} />{td("Open Users")}<ArrowUpRight size={16} /></Link>} />
-    <section className="founder-panel founder-panel-paper mt-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between p-6 sm:p-8 bg-white border border-[#dce4e7] rounded-2xl shadow-sm">
-      <div className="flex-1 space-y-3.5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-[#eef4ff] text-[#173fad]">
-            <ShieldCheck size={14} className="text-[#173fad]" />
-            {td("Core Directory")}
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#f0f4f8] text-[#53657a]">
-            {usersCount.data?.total !== undefined ? `${usersCount.data.total} ${td("registered accounts")}` : td("Database connected")}
-          </span>
-          {studentsCount.data?.total !== undefined ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#eef4ff] text-[#173fad]">
-              <GraduationCap size={13} />
-              {studentsCount.data.total} {td("student profiles")}
-            </span>
-          ) : null}
-        </div>
-        <div>
-          <h2 className="font-display text-2xl sm:text-3xl text-[#10253e] font-bold tracking-tight">{td("Manage issued accounts & permissions.")}</h2>
-          <p className="mt-2 max-w-2xl text-sm sm:text-base leading-relaxed text-[#53657a]">{td("Create, review, filter, update and safely remove accounts from one protected directory with fine-grained role-based access.")}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 pt-1 text-xs text-[#53657a]">
-          <span className="inline-flex items-center gap-1 bg-[#f7f9fa] px-2.5 py-1 rounded-md border border-[#e5ebed]"><UsersRound size={12} className="text-[#173fad]" /> {td("Staff & Teachers")}</span>
-          <span className="inline-flex items-center gap-1 bg-[#f7f9fa] px-2.5 py-1 rounded-md border border-[#e5ebed]"><GraduationCap size={12} className="text-[#325c95]" /> {td("Students")}</span>
-          <span className="inline-flex items-center gap-1 bg-[#f7f9fa] px-2.5 py-1 rounded-md border border-[#e5ebed]"><Shield size={12} className="text-[#705a30]" /> {td("Administrators")}</span>
-        </div>
+  return (
+    <div className="w-full min-h-[500px] flex flex-col justify-center items-center text-center p-8 bg-white border border-[#eee4d7] rounded-2xl shadow-sm">
+      <div className="p-4 rounded-full bg-[#faf7f2] border border-[#f0e6d6] text-[#708098] mb-4">
+        <LayoutDashboard size={32} />
       </div>
-      <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
-        <Link href="/admin/users" className="compass-btn-primary inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold shadow-sm transition-all hover:translate-y-[-1px] active:translate-y-[0px]"><UserPlus size={18} /><span>{td("Manage users")}</span><ChevronRight size={16} /></Link>
-        <Link href="/admin/students" className="compass-btn-secondary inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all hover:bg-[#f2f5f6]"><GraduationCap size={18} /><span>{td("Student profiles")}</span></Link>
-      </div>
-    </section>
-    <section className="founder-state founder-state-empty mt-6"><p className="font-semibold text-[#10253e]">{td("No live analytics are connected.")}</p><p className="mt-1 text-sm leading-6 text-[#53657a]">{td("The workspace can accept approved metrics later without changing the account-management flow.")}</p></section>
-  </>;
+      <h2 className="text-xl font-bold text-[#10253e] mb-2">
+        {td("Founder Dashboard")}
+      </h2>
+      <p className="text-sm text-[#53657a] max-w-sm leading-relaxed">
+        {td("Your founder command console is active and ready. This page is empty and prepared for future operational summaries and metrics.")}
+      </p>
+    </div>
+  );
 }
 
 function UsersModule() {

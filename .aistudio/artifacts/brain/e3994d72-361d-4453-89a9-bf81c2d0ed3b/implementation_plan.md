@@ -1,197 +1,113 @@
-# Architectural Implementation Plan: Authentication & Onboarding Workflows (Revised)
+# Comprehensive Dashboard Cleanup & Governance Isolation Plan
 
-This revised plan incorporates crucial feedback on single-use OTP burning at successful login, standardized storage in `passwordHash`, administrative password resets with RBAC, session-duration differentiation, and explicit audit trail constraints.
+This plan outlines the architecture, layout refactoring, and state simplification to perform a complete, uniform cleanup of all user dashboards on the BILC platform. All additional pages, widgets, analytics charts, and telemetry elements are stripped out for every user role, leaving a single, pristine dashboard page with a beautifully styled future-content placeholder. 
 
----
-
-## 💾 1. Database Schema Changes & Migration Plan
-
-We will add tracking columns to the existing `users` table to manage single-use OTP states, brute-force locking, and session versions. All monetary fields in `enrollments` are explicitly confirmed as stored in **sen** (cents), matching the `payments` table (e.g. 75000 for RM 750.00).
-
-### Proposed Drizzle Schema Changes (`/drizzle/schema.ts`)
-```typescript
-export const users = mysqlTable("users", {
-  id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
-  name: text("name"),
-  email: varchar("email", { length: 320 }), // Stores the generated login: nameMMYYYY@bilc.my (admin-editable)
-  passwordHash: text("passwordHash"), // Stores standard scrypt hash (set to NULL or disabled hash upon OTP burn)
-  isActive: boolean("isActive").default(true).notNull(),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "student", "teacher", "marketing", "admin", "super_admin", "founder"]).default("student").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-
-  // Secure Workflow Columns:
-  sessionVersion: int("sessionVersion").default(1).notNull(), // Incremented to atomically revoke previous sessions
-  isOtp: boolean("isOtp").default(false).notNull(), // Flag indicating if the password currently in passwordHash is an unburned single-use OTP
-  otpCreatedAt: timestamp("otpCreatedAt"), // Expiration limit tracking (7 days)
-  failedAttempts: int("failedAttempts").default(0).notNull(), // Sequential failed login attempts to lock account
-});
-
-export const enrollments = mysqlTable("enrollments", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  programId: int("programId").notNull(),
-  status: mysqlEnum("status", ["pending", "active", "completed", "suspended", "cancelled"]).default("pending").notNull(),
-  
-  // Monetary fields explicitly stored in sen (RM 1.00 = 100 sen)
-  agreedPrice: int("agreedPrice").default(0).notNull(), // amount in sen
-  registrationFee: int("registrationFee").default(0).notNull(), // amount in sen
-  placementTestFee: int("placementTestFee").default(0).notNull(), // amount in sen
-  visaFee: int("visaFee").default(0).notNull(), // amount in sen
-  
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-```
-
-### Raw SQL DDL Migration Statement
-```sql
-ALTER TABLE `users` 
-ADD COLUMN `sessionVersion` INT NOT NULL DEFAULT 1,
-ADD COLUMN `isOtp` TINYINT(1) NOT NULL DEFAULT 0,
-ADD COLUMN `otpCreatedAt` TIMESTAMP NULL DEFAULT NULL,
-ADD COLUMN `failedAttempts` INT NOT NULL DEFAULT 0;
-
-ALTER TABLE `enrollments`
-MODIFY COLUMN `agreedPrice` INT NOT NULL DEFAULT 0 COMMENT 'amount in sen',
-MODIFY COLUMN `registrationFee` INT NOT NULL DEFAULT 0 COMMENT 'amount in sen',
-MODIFY COLUMN `placementTestFee` INT NOT NULL DEFAULT 0 COMMENT 'amount in sen',
-MODIFY COLUMN `visaFee` INT NOT NULL DEFAULT 0 COMMENT 'amount in sen';
-```
-
-### Migration Impact on Existing Data
-* **No Downtime & Backward Compatibility**: Existing students, teachers, and founders will default to `sessionVersion = 1`, `isOtp = false`, and `failedAttempts = 0`. Their password hashes remain unchanged, and they will log in directly via the standard unrestricted 1-year flow.
+For the unique, non-duplicable **Founder** role, we preserve access to the critical **User Accounts** and **Audit Logs** governance modules, while leaving the founder's main dashboard screen empty.
 
 ---
 
-## 🛠 2. Implementation Modules
+## User Review & Critical Decisions
 
-### Module A: Server-Side Login Generator (`/server/db.ts`)
-* **Login Format**: `<latin_name><MM><YYYY>@bilc.my`, aligned to the `Asia/Kuala_Lumpur` timezone during the user creation transaction.
-* **Transliteration**: Standard transliteration rule maps non-Latin names to equivalent Latin characters.
-* **Collision Resolution**: Performs local uniqueness queries. If a collision is found, appends incremental suffixes (e.g., `_1`, `_2`).
-* **Credentials Flow**: This generated login is saved in `email` (as their login identity), while their actual target communication address is saved in `contactEmail` of the student profile.
-* **Admin Modification**: Administrators can edit the generated login if necessary.
-
-### Module B: Standardized OTP Storage, Burning, & Rate-Limiting (`/server/userAuth.ts`)
-* **Single Standard Storage**: OTPs are generated as strong temporary strings and saved *exclusively* inside the standard `passwordHash` field as a scrypt hash. No secondary column is used to store hashes.
-* **Atomic Burn at Login (CRITICAL)**: In the single database transaction where the user successfully authenticates using their OTP:
-  1. `isOtp` is updated to `false`.
-  2. `passwordHash` is set to `NULL` (or a deactivated stub hash).
-  * This burns the OTP atomically in the DB. Once authenticated, if they close their browser or sign out, they cannot log in again with the same temporary credential.
-* **Expiration**: Rejects the login attempt if `isOtp = true` and `otpCreatedAt` is older than 7 days.
-* **Rate-Limiting (Brute-Force Guard)**: Every failed login increments `failedAttempts`. If `failedAttempts >= 5`, any subsequent authentication attempt is blocked for 15 minutes. Successful login resets the counter to `0`.
-
-### Module C: Restricted Session Tokens & Lifespans
-* **Restricted Session**: Applies **ONLY** when logging in with a temporary OTP:
-  * Generates a restricted JWT token (`isRestricted: true` in payload).
-  * Forces maximum token expiration to **24 hours** (`24h`).
-  * Cookie Lifespan rules:
-    * Unchecked "Remember Me": Set without `maxAge` (Session Cookie, deleted on browser close).
-    * Checked "Remember Me": Set with `maxAge: 24h` (24 hours).
-* **Standard Session**: Standard logins retain their convenient **1-year session lifespan** (365 days) with normal cookie persistence.
-* **Authorization Guard (`/server/_core/trpc.ts`)**:
-  * If request context carries `user.isRestricted = true`, throws a `403 FORBIDDEN` for all endpoints EXCEPT:
-    * `auth.me` (to fetch session restriction state)
-    * `auth.logout`
-    * `users.formSchema` / onboarding-related schema helpers
-    * `auth.completeOnboarding` (Stage B onboarding + permanent password)
-
-### Module D: First Login Onboarding Submission
-* **Atomic Completion (`auth.completeOnboarding`)**:
-  1. Collects and validates the permanent password (must be strong, hashes using scrypt).
-  2. Persists Stage B profile fields.
-  3. Increments `sessionVersion` on the user record to atomically revoke other sessions.
-  4. Updates `passwordHash` with the permanent hash, clears OTP metadata.
-  5. Returns a standard unrestricted JWT session token.
-
-### Module E: Staff Password Reset Module (RBAC & Audit Logging)
-* **RBAC Controls**: Only authorized roles can invoke password resets:
-  * `founder` and `super_admin` can reset passwords of `admin`, `marketing`, `teacher`, `student`, and `user`.
-  * `admin` can reset passwords of `marketing`, `teacher`, `student`, and `user` (they cannot reset passwords of other `admin`s, `super_admin`s, or `founder`s).
-  * `marketing`, `teacher`, `student`, and `user` have no rights to reset passwords.
-* **Functional Reset Workflow**:
-  1. Generates a new random temporary password.
-  2. Commits scrypt hash of the new temporary password to `passwordHash`, sets `isOtp = true`, `otpCreatedAt = NOW()`, and resets `failedAttempts = 0`.
-  3. Increments target's `sessionVersion` to instantly invalidate all other active sessions for that user.
-  4. **Strict Audit Logging**: Records an entry in `auditLogs` containing the ID of the resetting staff member, target student/user, and a status message. **No plain text passwords or hashes are ever saved in logs or audit logs.**
-  5. **Rate-Limiting**: Restricts reset frequency to once every 30 seconds per target user to prevent staff double-click or DoS abuse.
-
-### Module F: Localized Email Delivery Stub
-* **EmailProvider Interface**: Standard stub logging during development. In production, raises a clear descriptive error if a real SMTP/API delivery provider is missing.
-* **Language Templates**: Supports `en`, `ms`, and `ar`. Inside Arabic templates, the Login and Password strings are wrapped inside `<bdi dir="ltr">` to guarantee correct directionality in RTL clients.
+> [!IMPORTANT]
+> The following decisions incorporate the user's interactive choices made during Phase 1:
+> 
+> *   **Founder Portfolio Retention**: The founder account will retain access to exactly **two functional modules** (User Accounts for global account management, and Audit & Security Logs for tamper-evident activity tracking) in the sidebar. All other sections (Settings, Dossier, Schema, news, media, timetables) are stripped out.
+> *   **Visual Posture of Cleared Dashboards**: All cleared dashboard screens will render a highly professional, visually cohesive zero-state placeholder stating that the page is prepared for subsequent content filling. This avoids completely blank screens while upholding the design constitution.
+> *   **Unified UI Elements**: Sidebar user profile identity cards, logout handlers, and the localized language switcher remain fully intact to ensure layout integrity and accessible navigation.
 
 ---
 
-## 📐 3. System Architecture & Flow Diagram
+## 1. Overview & Core Concept
+
+### What It Does
+This refactoring replaces several high-density operational pages with a uniform, low-elevation, single-page zero-state console. It prevents visual clutter and unifies the platform's focus towards its upcoming features.
+
+### Architecture & Menu Transition Diagram
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT                                    │
-│                                                                        │
-│  Standard Login Form (autoComplete="username")                        │
-│         │                                                              │
-│         ▼                                                              │
-│  [POST] /api/trpc/auth.login                                           │
-└─────────┬──────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                              SERVER                                    │
-│                                                                        │
-│  1. Check brute-force (failedAttempts >= 5)                           │
-│  2. Verify credentials using scrypt                                    │
-│  3. If user has isOtp === true:                                        │
-│     ┌────────────────────────────────────────────────────────────────┐ │
-│     │ TRANSACTION (Atomic Burn):                                     │ │
-│     │ - Set isOtp = false                                            │ │
-│     │ - Set passwordHash = NULL (burned)                             │ │
-│     └────────────────────────────────────────────────────────────────┘ │
-│  4. Generate restricted token (expires 24 hours, isRestricted: true)   │
-│  5. Set restricted cookies (maxAge: 24h or Session)                    │
-└─────────┬──────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                        ONBOARDING SCREEN (Stage B)                      │
-│                                                                        │
-│  - Fill Stage B Onboarding Form                                        │
-│  - Enter strong permanent password                                     │
-│  - Submit [POST] /api/trpc/auth.completeOnboarding                     │
-└─────────┬──────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                              SERVER                                    │
-│                                                                        │
-│  1. Save permanent password scrypt hash to passwordHash                │
-│  2. Save Stage B profile fields                                        │
-│  3. Increment sessionVersion to invalidate other restricted sessions    │
-│  4. Upgrade session cookie to unrestricted (1-year lifespan)           │
-└────────────────────────────────────────────────────────────────────────┘
+[All Non-Founder Users]
+        │
+        └──► Sidebar (Only 1 active link: "My Dashboard")
+                  │
+                  └──► Main Content Area (Clean layout placeholder)
+
+[Founder User]
+        │
+        ├──► Module 1: Dashboard (Prisine empty placeholder)
+        │
+        ├──► Module 2: User Accounts (Full functional CRUD modal directory)
+        │
+        └──► Module 3: Audit & Security Logs (Tamper-evident logs viewer)
 ```
 
 ---
 
-## 🧪 4. Verification & Testing Strategy
+## 2. User Experience & Visual Design
 
-To verify compliance with the security requirements, we will implement the following automated test cases without logging passwords or hashes:
+### Key User Flows
+1.  **Student, Teacher, Marketing, Admin, Super Admin Login**:
+    *   The user authenticates and redirects to their respective dashboard URL.
+    *   The sidebar renders exactly **one single active navigation control**: "My Dashboard". No nested collapsibles, accordion sections, or secondary links.
+    *   The main content displays a beautifully spaced off-white card containing a centered `LayoutDashboard` icon, a headline: *"Dashboard is ready for subsequent filling"*, and a descriptive body text.
+2.  **Founder Login**:
+    *   The founder logs in and lands on `/admin`.
+    *   The sidebar displays exactly **three options** (Dashboard, User Accounts, and Audit Logs) grouped under a single clean "Platform Governance" section.
+    *   The Dashboard view renders the same empty zero-state placeholder.
+    *   Clicking "User Accounts" displays the interactive, fully operational directory where the founder can search, filter, create, and manage staff and student accounts.
+    *   Clicking "Audit Logs" displays the secure, tamper-evident timeline of administrative events.
 
-1. **Login Generation Tests**:
-   * Verify transliteration of Cyrillic/Arabic names to Latin.
-   * Verify MMYYYY appended correctly using the current Asia/Kuala_Lumpur date of creation.
-   * Verify incremental suffixes (`_1`, `_2`) on suffix collision.
-2. **OTP Atomic Burn Test**:
-   * Verify that immediately following successful login with an OTP, the OTP is burned in the database, and any subsequent login attempts with that same OTP are rejected.
-3. **Session Restrictions Test**:
-   * Verify restricted token blocks access to billing, CRM, and scheduler routes (returning a `403 FORBIDDEN` error).
-4. **Differentiation of Sessions Test**:
-   * Verify restricted OTP-session lifespan is limited to 24 hours.
-   * Verify standard permanent password session lifespan remains 1 year.
-5. **Staff Reset & Audit Test**:
-   * Verify resetting user password increments target user's `sessionVersion`.
-   * Verify resetting user password records an audit entry containing target user's ID and actor's ID without plaintext password/hash leak.
-   * Verify rate-limiting blocks password reset requests on the same target if requested within 30 seconds.
+### Typography, Color & Spacing (3_saas_dashboard.md & frontend-design)
+*   **60-30-10 Color Posture**: 60% off-white grid canvas (`#f8faff`), 30% clean white cards with subtle hairline dividers (`border-neutral-200/60`), 10% dark navy action anchors (`#10253e` / `#173fad`).
+*   **Zero-Pill Restraint**: Visual hierarchy is created through type weight (Regular 400 vs. SemiBold 600) and unboxed text separation instead of candy-colored capsule badges.
+*   **Aesthetic Alignment**: Zero code-comment titles, zero ornamental footer engines, and zero artificial Innovations scoreboards.
+
+---
+
+## 3. Key Product Decisions & Trade-Offs
+
+### Decision 1: Keeping Separate Routing Pages vs. a Single Page
+*   **Chosen Approach**: Retain the separate pages (`UserDashboard.tsx`, `TeacherDashboard.tsx`, `MarketingDashboard.tsx`, `SuperAdmin.tsx`, `Admin.tsx`) but clean their internal markup to render the shared empty placeholder.
+*   **Why**: It maintains routing compatibility with existing wouter structures, keeps role-based redirects active, and allows future modular additions to be developed in isolation per role.
+
+### Decision 2: Retaining the Audit logs for Founder
+*   **Chosen Approach**: Keep the full, functional Audit logs alongside the User Accounts module in the founder's sidebar navigation.
+*   **Why**: Crucial for tracking operational changes, satisfying security constraints, and matching the explicit request of the user in Turn 1.
+
+---
+
+## 4. Technical Architecture & Data Strategy
+
+```
+                          ┌─────────────────────────┐
+                          │     Express Backend     │
+                          │   (server/_core/trpc)   │
+                          └────────────┬────────────┘
+                                       │
+                    tRPC APIs (users.list, audit.list)
+                                       │
+                                       ▼
+                       ┌───────────────────────────────┐
+                       │     DashboardLayout Context   │
+                       └───────────────┬───────────────┘
+                                       │
+                   Conditional Sidebar Menu Construction
+                                       │
+         ┌─────────────────────────────┼─────────────────────────────┐
+         │ (user.role === "founder")   │ (user.role !== "founder")   │
+         ▼                             ▼                             ▼
+  Strategic Portfolios           "My Dashboard"               "My Dashboard"
+   (Dashboard, Users, Audit)      (Only navigation link)      (Only navigation link)
+```
+
+### Component & State Mapping
+*   **DashboardLayout.tsx**:
+    *   Modify `STRATEGIC_PORTFOLIOS` to only contain two active modules: `founder-users` and `founder-audit`, plus an empty `founder-overview` overview module.
+    *   Restrict the super_admin, marketing, and student navigation links to a single, static "Dashboard" button.
+*   **Dashboard Pages (Student, Teacher, Marketing, SuperAdmin, Admin-Overview)**:
+    *   Strip out all child components (charts, calendars, test forms, CMS forms, and tables).
+    *   Render a standardized `<ModuleEmptyState>` inside a clean, centered container.
+*   **Founder Security Reinforcement**:
+    *   Ensure that client-side forms and API boundaries in `users.ts` strictly enforce the inability to choose "founder" as a managed role during user creation.
+    *   Verify that `updateManagedUser` and `deleteManagedUser` throw validation errors if any actions attempt to modify or delete the founder's account records.
+
+---

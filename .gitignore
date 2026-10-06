@@ -115,3 +115,5 @@ uploads/
 client/public/__manus__/version.json
 .project-config.json
 .translator_usage.json
+.temp_translator_usage_test.json
+*.temp_translator_usage_test.json
