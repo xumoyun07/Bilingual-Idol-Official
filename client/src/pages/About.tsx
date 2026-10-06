@@ -62,7 +62,8 @@ export default function About() {
         </header>
 
         <section id="about-story-section" className="simple-route-section about-story-section about-section--compact-spacing">
-          <div className="about-story-grid about-story-grid--surface md:!ml-0">
+          {/* DESKTOP VERSION (hidden md:grid) */}
+          <div className="about-story-grid about-story-grid--surface md:!ml-0 hidden md:grid">
             <div className="about-story-copy bg-white border border-slate-200/60 rounded-2xl p-6 sm:p-8 md:p-10 shadow-sm transition-all hover:shadow-md hover:border-slate-300/80">
               <p className="simple-eyebrow text-indigo-600/90 font-semibold tracking-wide uppercase">{t("about.storyEyebrow")}</p>
               <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 mb-4">{t("about.storyTitle")}</h2>
@@ -74,6 +75,40 @@ export default function About() {
             <figure className="about-feature-media about-story-media--spaced">
               <AboutImage media={classroomMedia} />
             </figure>
+          </div>
+
+          {/* MOBILE VERSION (block md:hidden) - Beautiful, Compact & Consolidated Story Card */}
+          <div className="block md:hidden px-4 py-2">
+            <div className="bg-white rounded-3xl border border-[#cbdcfc]/45 shadow-[0_8px_30px_rgba(23,63,173,0.05)] overflow-hidden transition-all duration-300">
+              {/* Top illustrative image nested inside the card with high-end editorial styling */}
+              <div className="h-44 w-full overflow-hidden relative">
+                <AboutImage media={classroomMedia} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+              </div>
+
+              {/* Clean, editorial content area with highly professional typography */}
+              <div className="p-5 space-y-4">
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-extrabold text-[#173fad] uppercase tracking-wider leading-none">
+                    {t("about.storyEyebrow")}
+                  </p>
+                  <h2 className="text-lg font-extrabold text-[#10253e] tracking-tight leading-tight">
+                    {t("about.storyTitle")}
+                  </h2>
+                </div>
+                
+                <p className="text-slate-500 text-xs leading-relaxed font-semibold">
+                  {t("about.storyBody")}
+                </p>
+
+                <div className="pt-2 border-t border-slate-50">
+                  <Link href="/programs" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#173fad] hover:text-[#173fad]/80 transition-colors">
+                    <span>{t("about.explorePrograms")}</span>
+                    <ChevronRight size={14} className={isRTL ? "rotate-180" : ""} />
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

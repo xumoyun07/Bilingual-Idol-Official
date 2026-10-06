@@ -7112,9 +7112,9 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
    ========================================================================== */
 .news-dialog {
   background: #ffffff !important;
-  border-radius: var(--bilc-radius-lg) !important;
-  border: 1px solid var(--bilc-line) !important;
-  box-shadow: var(--bilc-shadow-lg) !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(16, 37, 62, 0.08) !important;
+  box-shadow: 0 30px 60px -15px rgba(16, 37, 62, 0.15) !important;
   display: flex !important;
   flex-direction: column !important;
   padding: 0 !important;
@@ -7122,13 +7122,13 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 }
 
 .news-dialog-header {
-  padding: 2.5rem 2.25rem 1.5rem 2.25rem !important;
+  padding: 2.75rem 2.5rem 1.25rem 2.5rem !important;
   text-align: left !important;
-  border-bottom: 1px solid var(--bilc-line-subtle) !important;
-  background: var(--bilc-surface) !important;
+  border-bottom: none !important;
+  background: #ffffff !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 0.5rem !important;
+  gap: 0.375rem !important;
 }
 
 .is-rtl .news-dialog-header {
@@ -7136,22 +7136,26 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 }
 
 .news-dialog-header [data-slot="dialog-title"] {
-  font-size: 1.625rem !important;
-  font-weight: 800 !important;
-  color: var(--bilc-navy) !important;
-  line-height: 1.35 !important;
-  margin-top: 0.75rem !important;
+  font-family: var(--font-display, "DM Serif Display", serif) !important;
+  font-size: 1.875rem !important;
+  font-weight: 400 !important;
+  color: var(--bilc-navy, #10253e) !important;
+  line-height: 1.28 !important;
+  letter-spacing: -0.015em !important;
+  margin-top: 0.5rem !important;
 }
 
 .news-dialog-header [data-slot="dialog-description"] {
-  font-size: 0.975rem !important;
-  color: var(--bilc-muted) !important;
+  font-family: var(--font-body, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: 0.95rem !important;
+  color: var(--bilc-muted, #53657a) !important;
   line-height: 1.55 !important;
-  margin-top: 0.25rem !important;
+  margin-top: 0.15rem !important;
+  font-weight: 500 !important;
 }
 
 .news-dialog-body {
-  padding: 2.25rem !important;
+  padding: 0 2.5rem 2.5rem 2.5rem !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 1.5rem !important;
@@ -7160,33 +7164,40 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
 .news-dialog-body img {
   width: 100% !important;
-  max-height: 380px !important;
+  max-height: 340px !important;
   object-fit: cover !important;
-  border-radius: var(--bilc-radius) !important;
-  box-shadow: var(--bilc-shadow) !important;
-  border: 1px solid var(--bilc-line) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 30px rgba(16, 37, 62, 0.05) !important;
+  border: 1px solid rgba(16, 37, 62, 0.06) !important;
 }
 
 .news-dialog-copy {
   display: flex !important;
   flex-direction: column !important;
-  gap: 1.125rem !important;
+  gap: 1.25rem !important;
+  background: #fcfbfa !important; /* Premium paper-cream light card background */
+  border: 1px solid rgba(16, 37, 62, 0.05) !important;
+  border-radius: 16px !important;
+  padding: 1.75rem !important;
+  box-shadow: inset 0 2px 4px rgba(16, 37, 62, 0.02), 0 4px 12px rgba(16, 37, 62, 0.01) !important;
 }
 
 .news-dialog-copy p {
+  font-family: var(--font-body, "Plus Jakarta Sans", sans-serif) !important;
   font-size: 1rem !important;
-  color: var(--bilc-text) !important;
-  line-height: 1.65 !important;
+  color: #334155 !important; /* Premium warm charcoal for supreme reading comfort */
+  line-height: 1.75 !important;
   margin: 0 !important;
+  font-weight: 400 !important;
 }
 
 .news-dialog-actions {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  border-top: 1px solid var(--bilc-line-subtle) !important;
+  border-top: 1px dashed rgba(16, 37, 62, 0.09) !important;
   padding-top: 1.5rem !important;
-  margin-top: 0.5rem !important;
+  margin-top: 0.75rem !important;
 }
 
 .is-rtl .news-dialog-actions {
@@ -7197,22 +7208,23 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   display: inline-flex !important;
   align-items: center !important;
   gap: 0.5rem !important;
-  background: var(--bilc-blue-light) !important;
-  color: var(--bilc-blue) !important;
+  background: #173fad !important;
+  color: #ffffff !important;
   border: 1px solid transparent !important;
-  border-radius: var(--bilc-radius-sm) !important;
-  padding: 0.625rem 1.5rem !important;
-  font-weight: 700 !important;
-  font-size: 0.875rem !important;
+  border-radius: 12px !important;
+  padding: 0.675rem 1.5rem !important;
+  font-weight: 800 !important;
+  font-size: 0.8125rem !important;
   cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(23, 63, 173, 0.15) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .news-dialog-share:hover {
-  background: var(--bilc-blue) !important;
+  background: #10253e !important;
   color: #ffffff !important;
   transform: translateY(-2px) !important;
-  box-shadow: var(--bilc-shadow-sm) !important;
+  box-shadow: 0 6px 20px rgba(16, 37, 62, 0.2) !important;
 }
 
 .news-dialog-share:active {
@@ -7221,41 +7233,42 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
 /* Custom positioning for Radix Close button in the designed news-dialog */
 .news-dialog [data-slot="dialog-close"] {
-  top: 1.5rem !important;
-  right: 1.5rem !important;
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px !important;
-  min-height: 40px !important;
-  border-radius: 9999px !important;
-  background: #ffffff !important;
-  border: 1px solid var(--bilc-line) !important;
-  color: var(--bilc-muted) !important;
+  top: 1.75rem !important;
+  right: 1.75rem !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(16, 37, 62, 0.08) !important;
+  color: #10253e !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  box-shadow: var(--bilc-shadow-sm) !important;
-  opacity: 0.85 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 12px rgba(16, 37, 62, 0.06) !important;
+  opacity: 1 !important;
   padding: 0 !important;
 }
 
 .is-rtl .news-dialog [data-slot="dialog-close"] {
   right: auto !important;
-  left: 1.5rem !important;
+  left: 1.75rem !important;
 }
 
 .news-dialog [data-slot="dialog-close"]:hover {
-  background: var(--bilc-blue-light) !important;
-  color: var(--bilc-blue) !important;
-  border-color: var(--bilc-blue) !important;
-  transform: rotate(90deg) !important;
-  opacity: 1 !important;
+  background: #173fad !important;
+  color: #ffffff !important;
+  border-color: #173fad !important;
+  transform: scale(1.05) rotate(90deg) !important;
+  box-shadow: 0 6px 15px rgba(23, 63, 173, 0.2) !important;
 }
 
 .news-dialog [data-slot="dialog-close"] svg {
-  width: 18px !important;
-  height: 18px !important;
+  width: 16px !important;
+  height: 16px !important;
 }
 
 /* Transitions for selected Login page elements */
@@ -9393,15 +9406,6 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
     box-shadow: 0 -8px 40px rgba(10, 17, 40, 0.25) !important;
     animation: bilc-bottom-sheet-slide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
-
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1).bilc-wa-popup {
-    height: 410px !important;
-    width: 300px !important;
-    margin-left: -50px !important;
-    border-radius: 16px !important;
-    margin-top: 0px !important;
-    margin-bottom: 80px !important;
-  }
 }
 
 div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) {
@@ -9605,7 +9609,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-
 
 /* 3. Sidebar Container and Sub-sections: Perfect dimension flow */
 @media (min-width: 1024px) {
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+  .bilc-floating-sidebar {
     width: 270px !important;
     height: 100vh !important;
     min-height: 100vh !important;
@@ -9619,7 +9623,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-
     display: flex !important;
     flex-direction: column !important;
   }
-  html[dir="rtl"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
+  html[dir="rtl"] .bilc-floating-sidebar {
     right: 0 !important;
     left: auto !important;
     border-right: none !important;
@@ -9629,7 +9633,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-
 }
 
 /* 3b. Sidebar Footer Area Wrap - Expanded */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) {
+.bilc-floating-sidebar .minimal-sidebar-footer {
   width: 100% !important;
   height: auto !important;
   display: flex !important;
@@ -9642,7 +9646,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 }
 
 /* Sidebar Footer Area Wrap - Collapsed (Icon Mode) */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) {
+.bilc-floating-sidebar[data-state="collapsed"] .minimal-sidebar-footer {
   width: 100% !important;
   height: auto !important;
   padding: 12px 6px !important;
@@ -9655,8 +9659,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 }
 
 /* 4. Sidebar Action Target Button Override - Expanded */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1),
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) button {
+.bilc-floating-sidebar .minimal-sidebar-footer > button:nth-of-type(1),
+.bilc-floating-sidebar .minimal-sidebar-footer button {
   padding-left: 12px !important;
   padding-top: 9px !important;
   padding-right: 12px !important;
@@ -9677,8 +9681,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) button:hover {
+.bilc-floating-sidebar .minimal-sidebar-footer > button:nth-of-type(1):hover,
+.bilc-floating-sidebar .minimal-sidebar-footer button:hover {
   background-color: #fef2f2 !important;
   border-color: #fca5a5 !important;
   color: #dc2626 !important;
@@ -9686,8 +9690,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
 }
 
 /* Sidebar Action Target Button - Collapsed (Icon Mode) */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1),
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) button {
+.bilc-floating-sidebar[data-state="collapsed"] .minimal-sidebar-footer > button:nth-of-type(1),
+.bilc-floating-sidebar[data-state="collapsed"] .minimal-sidebar-footer button {
   padding: 8px !important;
   width: 36px !important;
   height: 36px !important;
@@ -9701,20 +9705,20 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-t
   transition: all 0.2s ease-in-out !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1):hover,
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)[data-state="collapsed"] > div:nth-of-type(1) > div:nth-of-type(3) button:hover {
+.bilc-floating-sidebar[data-state="collapsed"] .minimal-sidebar-footer > button:nth-of-type(1):hover,
+.bilc-floating-sidebar[data-state="collapsed"] .minimal-sidebar-footer button:hover {
   background-color: #fef2f2 !important;
   border-color: #fca5a5 !important;
   color: #dc2626 !important;
 }
 
 /* 5. Header quick-action button overrides for standard sizing */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1) {
+.bilc-floating-header .minimal-mobile-trigger {
   padding: 10px !important;
   border-radius: 8px !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1):hover {
+.bilc-floating-header .minimal-mobile-trigger:hover {
   background-color: rgba(16, 37, 62, 0.05) !important;
 }
 
@@ -10344,20 +10348,16 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
 /* Mobile-only overrides as requested by User and Element Selection */
 @media (max-width: 767px) {
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(5) {
-    margin-bottom: 90px !important;
-    width: 340px !important;
-    margin-left: 18px !important;
-    border-radius: 24px !important;
+  /* Ensure the desktop hero actions row is completely hidden on mobile viewports */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#home-hero-section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) {
+    display: none !important;
   }
 }
 
 /* Campus Facilities section border style override */
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(4) {
-  border-width: 1px !important;
-  border-style: solid !important;
-  border-color: var(--border) !important;
-  border-radius: 16px !important;
+  border-width: 0px !important;
+  border-radius: 0px !important;
 }
 
 /* Student Journey section mobile overrides */
@@ -10411,7 +10411,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 
 /* Specific desktop header width correction keeping layout and floating positioning intact */
 @media (min-width: 1024px) {
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) {
+  header.bilc-floating-header {
     width: 1080px !important;
     inset-inline-start: calc(var(--dashboard-sidebar-width) + 2rem) !important;
     inset-inline-end: 2rem !important;
@@ -10421,7 +10421,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 }
 
 /* Premium styling directly targeting the user's selected CSS Selector for the dropdown menu window */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
   width: 13.5rem !important;
   border-radius: 16px !important;
   border: 1px solid rgba(16, 37, 62, 0.08) !important;
@@ -10436,8 +10436,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-
 }
 
 /* Individual Option Button Style inside the selected container */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > button,
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > button,
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button {
   width: 100% !important;
   min-height: 44px !important;
   display: flex !important;
@@ -10452,64 +10452,65 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-
 }
 
 /* Option inner text labels styling */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.flex-col {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.flex-col {
   display: flex !important;
   flex-direction: column !important;
   gap: 2px !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-bold,
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-semibold {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-bold,
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-semibold {
   font-size: 13px !important;
   font-weight: 600 !important;
   color: #10253e !important;
   line-height: 1.2 !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.text-\[10px\],
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-medium {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.text-\[10px\],
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button span.font-medium {
   font-size: 11px !important;
   color: #566983 !important;
   font-weight: 500 !important;
 }
 
 /* Hover and selection transitions */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover {
   background-color: #f1f5f9 !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover span.font-bold,
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover span.font-semibold {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover span.font-bold,
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button:hover span.font-semibold {
   color: #173fad !important;
 }
 
 /* Selected option item */
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] {
   background-color: #e8eeff !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-bold,
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-semibold {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-bold,
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-semibold {
   color: #173fad !important;
   font-weight: 700 !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.text-\[10px\],
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-medium {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.text-\[10px\],
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button[aria-selected="true"] span.font-medium {
   color: #5571bd !important;
 }
 
-div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button svg {
+header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) button svg {
   color: #173fad !important;
   stroke-width: 2.5px !important;
 }
 
 /* Focus Mode: Desktop-only overrides for the selected elements */
 @media (min-width: 768px) {
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(5) {
-    /* No properties specified in CSS 1 */
+  .simple-public-shell > .bilc-wa-popup {
+    margin-bottom: 180px !important;
+    margin-right: 10px !important;
   }
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(6) {
+  .simple-public-shell > .bilc-wa-backdrop {
     margin-bottom: 160px !important;
     margin-right: 10px !important;
   }
@@ -10517,6 +10518,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-
 
 .bilc-background-ball {
   aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
   flex-shrink: 0 !important;
   box-sizing: border-box !important;
   border: 1px solid rgba(56, 189, 248, 0.25) !important;
@@ -10531,8 +10533,318 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-
   max-width: var(--ball-size, 100px) !important;
   max-height: var(--ball-size, 100px) !important;
   aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
   flex-shrink: 0 !important;
   box-sizing: border-box !important;
   border: 1px solid rgba(56, 189, 248, 0.25) !important;
   background: radial-gradient(circle, rgba(23, 63, 173, 0.28) 0%, rgba(56, 189, 248, 0.12) 70%, rgba(56, 189, 248, 0.02) 100%) !important;
+}
+
+@media (max-width: 767px) {
+  .simple-home-hero-actions-desktop {
+    display: none !important;
+  }
+  
+  /* Apply style changes to the selected element as requested by User and Element Selection */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(2) {
+    width: 335px !important;
+    margin-left: -15px !important;
+    background-color: #ffffff !important;
+    color: #10253e !important;
+  }
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(2) h3 {
+    color: #10253e !important;
+  }
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(2) p {
+    color: #53657a !important;
+  }
+  
+  /* Ensure the desktop contact grid disappears completely on mobile as requested by User */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(1) {
+    display: none !important;
+  }
+  
+  /* Ensure this change acts strictly in mobile mode as requested by User and Element Selection */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-details-section:nth-of-type(1) > div:nth-of-type(3) {
+    width: 335px !important;
+    margin-left: -15px !important;
+  }
+  
+  /* Ensure the duplicate contact enquiry text block is completely hidden on mobile viewports */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-enquiry-section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
+    display: none !important;
+  }
+  
+  /* Make the enquiry section compact on mobile as requested by User */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-enquiry-section:nth-of-type(2) {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  /* Optimize the form card spacing on mobile for superior comfort and compact layout */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#contact-page-container:nth-of-type(1) > section#contact-enquiry-section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) {
+    padding: 1.25rem !important;
+    border-radius: 20px !important;
+  }
+
+  /* ========================================== */
+  /* NEWS FEED MOBILE OPTIMIZATION              */
+  /* ========================================== */
+  
+  /* Make the news feed container compact */
+  section#news-feed-section {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  /* Redefine grid for compact horizontal rows on mobile */
+  .news-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.125rem !important;
+    margin-bottom: 1.75rem !important;
+  }
+
+  /* Convert the card to a modern horizontal row layout */
+  .news-card {
+    border-radius: 16px !important;
+    border-color: rgba(23, 63, 173, 0.08) !important;
+    box-shadow: 0 4px 15px rgba(23, 63, 173, 0.03) !important;
+  }
+
+  .news-card-trigger {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .is-rtl .news-card-trigger {
+    flex-direction: column !important;
+  }
+
+  /* Compact modern square thumbnail */
+  .news-card-image {
+    width: 100% !important;
+    height: 140px !important;
+    min-width: 100% !important;
+    min-height: 140px !important;
+    max-width: 100% !important;
+    max-height: 140px !important;
+    border-radius: 16px 16px 0 0 !important;
+    margin: 0 !important;
+    object-fit: cover !important;
+  }
+
+  .news-card-image-empty {
+    width: 100% !important;
+    height: 140px !important;
+    min-width: 100% !important;
+    min-height: 140px !important;
+    max-width: 100% !important;
+    max-height: 140px !important;
+    border-radius: 16px 16px 0 0 !important;
+    margin: 0 !important;
+    background: var(--bilc-blue-light) !important;
+  }
+
+  /* Align text layout compactly next to the thumbnail */
+  .news-card-content {
+    padding: 1rem !important;
+    gap: 0.375rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .is-rtl .news-card-content {
+    padding: 1rem !important;
+  }
+
+  /* Show a neat, clamped 2-line excerpt instead of hiding it */
+  .news-card-excerpt {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 0.775rem !important;
+    line-height: 1.4 !important;
+    color: var(--bilc-muted, #53657a) !important;
+    margin-top: 1px !important;
+    white-space: normal !important;
+  }
+  
+  /* Show compact read-more CTA */
+  .news-read-more {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    font-size: 0.775rem !important;
+    font-weight: 700 !important;
+    color: var(--bilc-blue) !important;
+    margin-top: 0.375rem !important;
+  }
+
+  /* Tighten title typography for high readability */
+  .news-card-trigger strong {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    color: var(--bilc-navy) !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    white-space: normal !important;
+    margin-top: 2px !important;
+  }
+
+  .news-card-meta {
+    font-size: 0.7rem !important;
+    margin-bottom: 1px !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Tighten pagination nav for easy thumb navigation on mobile */
+  .news-pagination {
+    gap: 0.25rem !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .news-page-number {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.8rem !important;
+    border-radius: 8px !important;
+  }
+
+  .news-pagination-arrow {
+    height: 34px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* ========================================== */
+  /* NEWS DETAIL POPUP DIALOG MOBILE SHEET      */
+  /* ========================================== */
+  .news-dialog {
+    max-height: 82vh !important;
+    max-width: 420px !important;
+    width: calc(100vw - 2.5rem) !important;
+    border-radius: 24px !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    bottom: auto !important;
+    right: auto !important;
+    margin: 0 !important;
+    animation: bilc-fade-in 0.25s ease-out forwards !important;
+    box-shadow: 0 20px 50px rgba(10, 17, 40, 0.2) !important;
+  }
+
+  .news-dialog-header {
+    padding: 2rem 1.5rem 1rem 1.5rem !important;
+    gap: 0.25rem !important;
+  }
+
+  .news-dialog-header [data-slot="dialog-title"] {
+    font-size: 1.15rem !important;
+    line-height: 1.35 !important;
+    margin-top: 0.5rem !important;
+  }
+
+  .news-dialog-header [data-slot="dialog-description"] {
+    font-size: 0.8rem !important;
+    line-height: 1.45 !important;
+    margin-top: 0.15rem !important;
+  }
+
+  .news-dialog-body {
+    padding: 0 1.5rem 2rem 1.5rem !important;
+    gap: 1rem !important;
+  }
+
+  .news-dialog-body img {
+    max-height: 200px !important;
+    border-radius: 12px !important;
+  }
+
+  .news-dialog-copy {
+    background: #fcfbfa !important;
+    border: 1px solid rgba(16, 37, 62, 0.05) !important;
+    border-radius: 12px !important;
+    padding: 1.125rem !important;
+    box-shadow: inset 0 2px 4px rgba(16, 37, 62, 0.02) !important;
+  }
+
+  .news-dialog-copy p {
+    font-size: 0.875rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .news-dialog-actions {
+    padding-top: 1rem !important;
+  }
+
+  .news-dialog-share {
+    padding: 0.5rem 1.25rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* Close button adjustment */
+  .news-dialog [data-slot="dialog-close"] {
+    top: 1rem !important;
+    right: 1rem !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+  
+  .is-rtl .news-dialog [data-slot="dialog-close"] {
+    right: auto !important;
+    left: 1rem !important;
+  }
+
+  /* Ensure the program detail main card is styled compactly strictly on mobile as requested by User */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#program-detail-page-container:nth-of-type(1) > div:nth-of-type(1) {
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    margin-bottom: 100px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Force specified elements to completely disappear in the mobile version of the project */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#program-detail-page-container:nth-of-type(1) > div:nth-of-type(2) {
+    display: none !important;
+  }
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#program-detail-page-container:nth-of-type(1) > section#program-detail-layout-section:nth-of-type(1) {
+    display: none !important;
+  }
+
+  /* Apply style changes to the selected element as requested by User and Element Selection */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#program-detail-page-container:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) {
+    width: 335px !important;
+    margin-left: -30px !important;
+  }
+
+  /* Force the about story desktop grid to completely disappear in the mobile version of the project as requested */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-story-section:nth-of-type(1) > div:nth-of-type(1) {
+    display: none !important;
+  }
+
+  /* Apply style changes to the selected element as requested by User and Element Selection */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#about-page-container:nth-of-type(1) > section#about-story-section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) {
+    width: 350px !important;
+    margin-left: -15px !important;
+  }
+}
+
+/* Premium Glassmorphic Dialog Overlay Blur globally */
+[data-slot="dialog-overlay"] {
+  background-color: rgba(10, 17, 40, 0.45) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  transition: opacity 0.3s ease !important;
 }

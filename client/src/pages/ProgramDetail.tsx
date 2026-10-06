@@ -78,7 +78,7 @@ export default function ProgramDetail() {
           </div>
         </header>
 
-        <section id="program-detail-layout-section" className="simple-route-section simple-detail-layout">
+        <section id="program-detail-layout-section" className="simple-route-section simple-detail-layout hidden md:grid">
           <aside id="program-detail-facts-aside">
             <h2>{language === "ms" ? "Maklumat Program" : language === "ar" ? "تفاصيل البرنامج" : "Programme details"}</h2>
             <dl className="simple-facts">
@@ -115,6 +115,60 @@ export default function ProgramDetail() {
             </div>
           </div>
         </section>
+
+        {/* Mobile Only: Beautiful Unified Floating Academic Hub Panel (Pure Light Theme & Consolidated) */}
+        <div className="block md:hidden px-4 mb-10">
+          <div className="bg-white rounded-[24px] border border-[#cbdcfc]/50 p-5 shadow-[0_12px_36px_rgba(23,63,173,0.07)] space-y-5">
+            {/* Header copy */}
+            <div className="space-y-1">
+              <h2 className="text-xs font-extrabold text-[#173fad] uppercase tracking-wider">
+                {language === "ms" ? "Maklumat & Panduan Program" : language === "ar" ? "معلومات ودليل البرنامج" : "Programme Hub & Guide"}
+              </h2>
+              <p className="text-[11px] text-slate-400 font-medium">
+                {language === "ms" ? "Butiran akademik dan langkah sebelum mendaftar" : language === "ar" ? "التفاصيل الأكاديمية والخطوات قبل التسجيل" : "Academic details and checklist before you apply"}
+              </p>
+            </div>
+
+            {/* Tight Vertical Academic Facts List (Consolidated order stacked vertically) */}
+            <div className="flex flex-col gap-y-4 py-4 border-t border-b border-slate-100">
+              {facts.map(({ icon: Icon, label, value }) => (
+                <div key={label} className="space-y-1">
+                  <span className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider leading-none">
+                    <Icon size={12} className="text-[#173fad] shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </span>
+                  <span className="text-xs font-bold text-[#10253e] block truncate pl-4 rtl:pl-0 rtl:pr-4">
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Checklist Guidelines and CTA Callout */}
+            <div className="space-y-3">
+              <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                {language === "ms" ? "Sediakan tahap semasa, matlamat bahasa & jadual pilihan anda." : language === "ar" ? "حدد مستواك الحالي وهدفك التعليمي والجدول المفضل." : "Prepare your level, language goal, and preferred schedule."}
+              </p>
+              
+              <ul className="space-y-2 text-[11px] font-extrabold text-[#10253e]">
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-500 font-black">✓</span>
+                  <span>{language === "ms" ? "Jadual & Yuran disahkan" : language === "ar" ? "تأكيد الرسوم والجدول" : "Confirmed schedule & fees"}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-500 font-black">✓</span>
+                  <span>{language === "ms" ? "Penetapan tahap yang sesuai" : language === "ar" ? "تحديد المستوى الأنسب لك" : "Appropriate level placement"}</span>
+                </li>
+              </ul>
+
+              {/* Direct Apply / Enquiry CTA inside card */}
+              <Link href="/contact" className="w-full h-11 rounded-xl bg-[#173fad] text-white flex items-center justify-center gap-2 text-xs font-extrabold active:scale-95 transition-all shadow-sm mt-3 cursor-pointer">
+                <span>{language === "ms" ? "Daftar Sekarang" : language === "ar" ? "سجل الآن" : "Apply Now"}</span>
+                <ArrowRight size={14} className={isRTL ? "rotate-180" : ""} />
+              </Link>
+            </div>
+          </div>
+        </div>
 
         {/* Elegant Mobile Sticky CTA Bar */}
         <div className="fixed bottom-0 left-0 right-0 z-30 h-16 border-t border-[#edf2f5]/90 bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] md:hidden flex items-center justify-between px-4">
