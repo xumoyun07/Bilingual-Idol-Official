@@ -1,104 +1,3777 @@
-{
-  "matchingElements": [
-    {
-      "type": "element",
-      "tagName": "div",
-      "id": "",
-      "className": "bilc-ambient-glow-orb absolute pointer-events-none rounded-full transform-gpu",
-      "parent": "div.absolute.inset-0.overflow-hidden.pointer-events-none.select-none.w-full.h-full.transform-gpu",
-      "getBoundingClientRect": {
-        "width": 61.84375,
-        "height": 900,
-        "x": 57.5,
-        "y": 453.5
-      },
-      "computedStyle": {
-        "width": "61.8438px",
-        "height": "900px",
-        "border-radius": "50%",
-        "background-image": "radial-gradient(circle, rgba(23, 63, 173, 0.28) 0%, rgba(56, 189, 248, 0.12) 70%, rgba(56, 189, 248, 0.02) 100%)",
-        "position": "fixed",
-        "margin": "0px"
-      },
-      "styleAttr": "will-change: transform; transform: translate3d(57.5px, 453.5px, 0px); width: 61.854px; height: 61.854px; min-width: 61.854px; min-height: 61.854px; max-width: 61.854px; max-height: 61.854px; border-radius: 50%; --ball-size: 61.853997708567476px;"
-    }
-  ],
-  "shellAudit": {
-    "allDirectChildren": [
+[
+  {
+    "file": "client/src/pages/Contact.tsx",
+    "count": 1,
+    "examples": [
       {
-        "index": 1,
-        "tagName": "div",
-        "id": "",
-        "className": "absolute inset-0 overflow-hidden pointer-events-none select-none w-full h-full transform-gpu"
-      },
-      {
-        "index": 2,
-        "tagName": "a",
-        "id": "",
-        "className": "simple-skip-link"
-      },
-      {
-        "index": 3,
-        "tagName": "header",
-        "id": "",
-        "className": "simple-public-header simple-public-header--refined transition-all duration-300 translate-y-0 opacity-100"
-      },
-      {
-        "index": 4,
-        "tagName": "main",
-        "id": "main-content",
-        "className": "simple-public-main pb-24 md:pb-0"
-      },
-      {
-        "index": 5,
-        "tagName": "footer",
-        "id": "",
-        "className": "simple-public-footer"
-      },
-      {
-        "index": 6,
-        "tagName": "div",
-        "id": "",
-        "className": "desktop-quick-actions-bar hidden md:flex flex-col items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] px-2 rounded-[32px] z-[999]"
-      },
-      {
-        "index": 7,
-        "tagName": "div",
-        "id": "",
-        "className": "desktop-scroll-top-wrap hidden md:block transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-      },
-      {
-        "index": 8,
-        "tagName": "div",
-        "id": "",
-        "className": "mobile-quick-actions-bar md:hidden flex items-center justify-between bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] rounded-full z-[999] flex-row"
+        "line": 103,
+        "text": "WhatsApp",
+        "type": "JSX text"
       }
-    ],
-    "directDivChildren": [
+    ]
+  },
+  {
+    "file": "client/src/pages/SuperAdmin.tsx",
+    "count": 62,
+    "examples": [
       {
-        "divIndex": 1,
-        "tagName": "div",
-        "id": "",
-        "className": "absolute inset-0 overflow-hidden pointer-events-none select-none w-full h-full transform-gpu"
+        "line": 75,
+        "text": "Open Users",
+        "type": "JSX text"
       },
       {
-        "divIndex": 2,
-        "tagName": "div",
-        "id": "",
-        "className": "desktop-quick-actions-bar hidden md:flex flex-col items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] px-2 rounded-[32px] z-[999]"
+        "line": 75,
+        "text": "title=\"Central Platform Administration & Governance\"",
+        "type": "Attribute"
       },
       {
-        "divIndex": 3,
-        "tagName": "div",
-        "id": "",
-        "className": "desktop-scroll-top-wrap hidden md:block transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        "line": 78,
+        "text": "Primary task",
+        "type": "JSX text"
       },
       {
-        "divIndex": 4,
-        "tagName": "div",
-        "id": "",
-        "className": "mobile-quick-actions-bar md:hidden flex items-center justify-between bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border border-[#cbdcfc]/45 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(23,63,173,0.08)] rounded-full z-[999] flex-row"
+        "line": 79,
+        "text": "Institutional User & Staff Directory",
+        "type": "JSX text"
+      },
+      {
+        "line": 80,
+        "text": "Search, review, issue, configure or remove administrator, marketing, instructor, and student accounts across the learning centre.",
+        "type": "JSX text"
+      },
+      {
+        "line": 82,
+        "text": "Manage users",
+        "type": "JSX text"
+      },
+      {
+        "line": 118,
+        "text": "New user",
+        "type": "JSX text"
+      },
+      {
+        "line": 118,
+        "text": "title=\"Central User & Staff Directory\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 119,
+        "text": "aria-label=\"User type modules\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 135,
+        "text": "Type",
+        "type": "JSX text"
+      },
+      {
+        "line": 168,
+        "text": "Reset all",
+        "type": "JSX text"
+      },
+      {
+        "line": 193,
+        "text": "title=\"Clear search\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 212,
+        "text": "All statuses",
+        "type": "JSX text"
+      },
+      {
+        "line": 213,
+        "text": "Active accounts",
+        "type": "JSX text"
+      },
+      {
+        "line": 214,
+        "text": "Paused / inactive",
+        "type": "JSX text"
+      },
+      {
+        "line": 304,
+        "text": "Account action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 308,
+        "text": "Open an account to view its authorised actions.",
+        "type": "JSX text"
+      },
+      {
+        "line": 340,
+        "text": "void; profileValues: Record",
+        "type": "JSX text"
+      },
+      {
+        "line": 340,
+        "text": "void; pending: boolean; error?: string; onSubmit: (event: React.FormEvent",
+        "type": "JSX text"
+      },
+      {
+        "line": 342,
+        "text": "create",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 342,
+        "text": "super_admin",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "Account profile",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Edit user",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Update profile, type, password or active status within your operational scope.",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Account action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "User type",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Account active",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Inactive accounts cannot sign in with their password.",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Delete account",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Delete this account?",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "This permanently removes the selected account.",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Keep account",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Delete account",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "Cancel",
+        "type": "JSX text"
+      },
+      {
+        "line": 343,
+        "text": "aria-label=\"Account active\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 343,
+        "text": "users-modal-form",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "border-b border-[#e6dccd] bg-white px-6 py-6 text-start",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "founder-command-eyebrow",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "font-display text-4xl text-[#10253e]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "max-w-xl text-[#53657a]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "px-6 py-6",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "destructive",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><AlertCircle className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><TextField label=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " hint=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><span><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><p><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><div className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><AlertDialog><AlertDialogTrigger asChild><Button type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " disabled={pending} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": "><Button type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " onClick={onClose} disabled={pending} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": " disabled={pending || !selected} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 343,
+        "text": ">{pending ? <Loader2 className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 381,
+        "text": "Account status",
+        "type": "JSX text"
+      },
+      {
+        "line": 388,
+        "text": "Email Verified",
+        "type": "JSX text"
+      },
+      {
+        "line": 428,
+        "text": "Configure Account",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/TeacherDashboard.tsx",
+    "count": 3,
+    "examples": [
+      {
+        "line": 15,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 116,
+        "text": "aria-label=\"Schedule date filter\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 281,
+        "text": "aria-label=\"Attendance students\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/Admin.tsx",
+    "count": 41,
+    "examples": [
+      {
+        "line": 334,
+        "text": "title=\"Dynamic Profile Schema\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 335,
+        "text": "title=\"User Profile Schema & Custom Attributes\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 399,
+        "text": "title=\"Core Operations Centre\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 400,
+        "text": "title=\"Super Administrator Operations\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 479,
+        "text": "title=\"Admissions & Academics\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 480,
+        "text": "title=\"Administrator Operational Dashboard\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 558,
+        "text": "title=\"Manage centre access.\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 630,
+        "text": "title=\"People, organised by responsibility.\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 631,
+        "text": "aria-label=\"User type modules\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 683,
+        "text": "title=\"Clear search\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 944,
+        "text": "void; profileFields: DynamicField[]; profileSections: DynamicSection[]; profileValues: Record",
+        "type": "JSX text"
+      },
+      {
+        "line": 944,
+        "text": "void; pending: boolean; error?: string; onSubmit: (event: React.FormEvent",
+        "type": "JSX text"
+      },
+      {
+        "line": 949,
+        "text": "aria-label=\"Account active\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 949,
+        "text": "users-modal-form",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "border-b border-[#e6dccd] bg-white px-4 py-4 sm:px-6 sm:py-6 text-start",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "founder-command-eyebrow",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "Issue new access",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "Account profile",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "font-display text-2xl sm:text-4xl text-[#10253e]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "Create user",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "Edit user",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "max-w-xl text-xs sm:text-sm text-[#53657a]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "px-4 py-4 sm:px-6 sm:py-6",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "destructive",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><AlertCircle className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " autoComplete=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " autoComplete=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><span><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><p><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><div className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><div>{!createMode ? <AlertDialog><AlertDialogTrigger asChild><Button type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " disabled={pending} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": "><Button type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " onClick={onClose} disabled={pending} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": " disabled={pending || (!createMode && !selected)} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 949,
+        "text": ">{pending ? <Loader2 className=",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/Home.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 222,
+        "text": "Pavilion Embassy",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/FounderLogin.tsx",
+    "count": 3,
+    "examples": [
+      {
+        "line": 58,
+        "text": "Bilingual Idol",
+        "type": "JSX text"
+      },
+      {
+        "line": 153,
+        "text": "text-xs font-semibold text-rose-500 bg-rose-50 border border-rose-100 rounded-lg p-3 text-center",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 153,
+        "text": "alert",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/UserDashboard.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 333,
+        "text": "aria-label=\"Local User Data Management\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/NewsManager.tsx",
+    "count": 30,
+    "examples": [
+      {
+        "line": 52,
+        "text": "Public website · News",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "Publish centre updates.",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "Write announcements, events and holiday notices. Published posts appear on the public News page in six-post pages; images are optional but require useful alt text.",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "New post",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Publishing status",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Public card pages display six published posts at a time. Drafts are never exposed to public visitors.",
+        "type": "JSX text"
+      },
+      {
+        "line": 54,
+        "text": "News action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 55,
+        "text": "Posts",
+        "type": "JSX text"
+      },
+      {
+        "line": 55,
+        "text": "Open a post to edit its public copy, publication state or card image.",
+        "type": "JSX text"
+      },
+      {
+        "line": 55,
+        "text": "Edit",
+        "type": "JSX text"
+      },
+      {
+        "line": 55,
+        "text": "No News posts yet",
+        "type": "JSX text"
+      },
+      {
+        "line": 55,
+        "text": "Create a real centre update when it is ready. No demo notices are shown publicly.",
+        "type": "JSX text"
+      },
+      {
+        "line": 55,
+        "text": "Create post",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Announcement",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Event",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Holiday",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Publication date is assigned automatically when this post is published and cannot be set manually.",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "JPG, WebP or PNG up to 3 MB. Leave empty to retain the current image.",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Publish to the public News page",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Drafts are visible only in this management list.",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Remove current card image",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "The post remains available with a neutral category image.",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "News action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Delete post",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Delete this News post?",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "This removes the post from the management list and public News page.",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Keep post",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Delete post",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "Cancel",
+        "type": "JSX text"
+      },
+      {
+        "line": 56,
+        "text": "placeholder=\"Describe the image for visitors using assistive technology\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/Programs.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 30,
+        "text": "aria-label=\"2026 fee guide\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/AuditLogs.tsx",
+    "count": 66,
+    "examples": [
+      {
+        "line": 73,
+        "text": "CSV",
+        "type": "JSX text"
+      },
+      {
+        "line": 73,
+        "text": "PDF",
+        "type": "JSX text"
+      },
+      {
+        "line": 76,
+        "text": "Audit operation completed",
+        "type": "JSX text"
+      },
+      {
+        "line": 76,
+        "text": "Dismiss",
+        "type": "JSX text"
+      },
+      {
+        "line": 76,
+        "text": "aria-label=\"Dismiss notice\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 77,
+        "text": "Audit operation needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 80,
+        "text": "aria-label=\"Audit log filters\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 83,
+        "text": "aria-label=\"Audit data source\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 114,
+        "text": "Select archived records to restore them.",
+        "type": "JSX text"
+      },
+      {
+        "line": 125,
+        "text": "Audit Log Filters",
+        "type": "JSX text"
+      },
+      {
+        "line": 126,
+        "text": "Search events by ID, description, actor role, action or client metadata",
+        "type": "JSX text"
+      },
+      {
+        "line": 143,
+        "text": "Reset all",
+        "type": "JSX text"
+      },
+      {
+        "line": 157,
+        "text": "placeholder=\"Search ID, description, IP, browser, action or object…\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 165,
+        "text": "title=\"Clear search\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 171,
+        "text": "aria-label=\"Search suggestions\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 193,
+        "text": "aria-label=\"Quick filter by result\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 196,
+        "text": "All results",
+        "type": "JSX text"
+      },
+      {
+        "line": 197,
+        "text": "Successful",
+        "type": "JSX text"
+      },
+      {
+        "line": 198,
+        "text": "Failed",
+        "type": "JSX text"
+      },
+      {
+        "line": 203,
+        "text": "title=\"Filter Audit Logs\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 293,
+        "text": "All results",
+        "type": "JSX text"
+      },
+      {
+        "line": 294,
+        "text": "Successful",
+        "type": "JSX text"
+      },
+      {
+        "line": 295,
+        "text": "Failed",
+        "type": "JSX text"
+      },
+      {
+        "line": 353,
+        "text": "10 records per page",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Audit logs are unavailable",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Refresh the page or try again shortly.",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "No matching audit records",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Try clearing or changing filters. The system does not invent events when none exist.",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Select for restore",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Local date / UTC",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "User ID / role",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Action",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Target object",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "IP address",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Browser / OS",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "Result",
+        "type": "JSX text"
+      },
+      {
+        "line": 354,
+        "text": "grid min-h-72 place-items-center",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "animate-spin text-[#173fad]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><Alert variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><AlertCircle className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><div><Filter className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><table className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><thead className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><tr>{isFounder && source === ",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": " ? <th className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": ">{isFounder && source === ",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": " ? <td className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "bg-[#fff0ed] text-[#a34732]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "Success",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 354,
+        "text": "Failed",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 355,
+        "text": "Previous",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "typeof item === \"number\" ?",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "Next",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "aria-label=\"Audit log page navigation\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 360,
+        "text": "Time",
+        "type": "JSX text"
+      },
+      {
+        "line": 360,
+        "text": "Actor",
+        "type": "JSX text"
+      },
+      {
+        "line": 360,
+        "text": "Client",
+        "type": "JSX text"
+      },
+      {
+        "line": 360,
+        "text": "Target role",
+        "type": "JSX text"
+      },
+      {
+        "line": 361,
+        "text": "index + 1); const current = currentPage + 1; const items: Array",
+        "type": "JSX text"
+      },
+      {
+        "line": 361,
+        "text": "3) items.push(\"leading-ellipsis\"); for (let page = Math.max(2, current - 1); page",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/MediaLibrary.tsx",
+    "count": 10,
+    "examples": [
+      {
+        "line": 116,
+        "text": "Public website · Assets",
+        "type": "JSX text"
+      },
+      {
+        "line": 183,
+        "text": "placeholder=\"Describe the learning scene without unnecessary detail…\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 287,
+        "text": "Promise",
+        "type": "JSX text"
+      },
+      {
+        "line": 288,
+        "text": "Promise",
+        "type": "JSX text"
+      },
+      {
+        "line": 294,
+        "text": "success",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 294,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 306,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 317,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 373,
+        "text": "title=\"Open full-resolution asset in new tab\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 443,
+        "text": "placeholder=\"Describe visual contents for screen readers and accessibility audits…\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/pages/StudentsProfile.tsx",
+    "count": 96,
+    "examples": [
+      {
+        "line": 82,
+        "text": "title=\"Every student, with their learning record in reach.\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 87,
+        "text": "Add student",
+        "type": "JSX text"
+      },
+      {
+        "line": 93,
+        "text": "aria-label=\"Student profile filters\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 101,
+        "text": "Search & Filters",
+        "type": "JSX text"
+      },
+      {
+        "line": 102,
+        "text": "Filter by student name, contact, level, or assigned course",
+        "type": "JSX text"
+      },
+      {
+        "line": 119,
+        "text": "Reset all",
+        "type": "JSX text"
+      },
+      {
+        "line": 134,
+        "text": "placeholder=\"Name, email, level or course…\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 141,
+        "text": "title=\"Clear search\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 154,
+        "text": "aria-label=\"Quick filter by status\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 157,
+        "text": "All statuses",
+        "type": "JSX text"
+      },
+      {
+        "line": 158,
+        "text": "Active only",
+        "type": "JSX text"
+      },
+      {
+        "line": 159,
+        "text": "Inactive only",
+        "type": "JSX text"
+      },
+      {
+        "line": 164,
+        "text": "title=\"Filter Students\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 180,
+        "text": "All statuses",
+        "type": "JSX text"
+      },
+      {
+        "line": 181,
+        "text": "Active only",
+        "type": "JSX text"
+      },
+      {
+        "line": 182,
+        "text": "Inactive only",
+        "type": "JSX text"
+      },
+      {
+        "line": 246,
+        "text": "Newest first",
+        "type": "JSX text"
+      },
+      {
+        "line": 297,
+        "text": "Student directory",
+        "type": "JSX text"
+      },
+      {
+        "line": 331,
+        "text": "title=\"Add student\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 353,
+        "text": "grid min-h-80 place-items-center",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 353,
+        "text": "animate-spin text-[#173fad]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 353,
+        "text": "workspace-page founder-command founder-workspace mx-auto max-w-[88rem] pb-10",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 355,
+        "text": "All students",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "Edit student",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "Delete student",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "Delete this student profile?",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "This removes the student record, document references and history from the application. Unreferenced stored document objects can no longer be reached.",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "Keep student",
+        "type": "JSX text"
+      },
+      {
+        "line": 355,
+        "text": "Delete student",
+        "type": "JSX text"
+      },
+      {
+        "line": 356,
+        "text": "Student profile action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 356,
+        "text": "destructive",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 356,
+        "text": "><AlertCircle className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 357,
+        "text": "Upload PDF, DOCX, JPG or PNG up to 5 MB. Images and PDFs have an in-page preview; DOCX files remain available as a secure file card and download link.",
+        "type": "JSX text"
+      },
+      {
+        "line": 357,
+        "text": "No documents uploaded yet.",
+        "type": "JSX text"
+      },
+      {
+        "line": 357,
+        "text": "No profile changes recorded yet.",
+        "type": "JSX text"
+      },
+      {
+        "line": 357,
+        "text": "title=\"Contact and profile\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 357,
+        "text": "title=\"Learning participation\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 357,
+        "text": "title=\"Current learning level\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 357,
+        "text": "title=\"Current course\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 357,
+        "text": "title=\"Student documents\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 357,
+        "text": "title=\"Recent profile changes\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 358,
+        "text": "title=\"Edit student\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 358,
+        "text": "Edit student",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 358,
+        "text": "Save changes",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 400,
+        "text": "Level",
+        "type": "JSX text"
+      },
+      {
+        "line": 404,
+        "text": "Course",
+        "type": "JSX text"
+      },
+      {
+        "line": 408,
+        "text": "Attendance",
+        "type": "JSX text"
+      },
+      {
+        "line": 422,
+        "text": "Student ID",
+        "type": "JSX text"
+      },
+      {
+        "line": 426,
+        "text": "Course Code",
+        "type": "JSX text"
+      },
+      {
+        "line": 444,
+        "text": "View Full Profile",
+        "type": "JSX text"
+      },
+      {
+        "line": 479,
+        "text": "Students Profile",
+        "type": "JSX text"
+      },
+      {
+        "line": 479,
+        "text": "Student profile action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 479,
+        "text": "Student record active",
+        "type": "JSX text"
+      },
+      {
+        "line": 479,
+        "text": "Inactive student records remain private but are excluded by the active filter.",
+        "type": "JSX text"
+      },
+      {
+        "line": 479,
+        "text": "Cancel",
+        "type": "JSX text"
+      },
+      {
+        "line": 479,
+        "text": "title=\"Information about student\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 479,
+        "text": "title=\"Attendance\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 479,
+        "text": "title=\"Level and course\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 479,
+        "text": "aria-label=\"Student record active\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 479,
+        "text": "border-b border-[#e6dccd] bg-white px-6 py-6 text-start",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "founder-command-eyebrow",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "font-display text-4xl text-[#10253e]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "max-w-xl text-[#53657a]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "space-y-6 px-6 py-6",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "destructive",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "h-4 w-4",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "Information about student",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "Student name",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "Student e-mail",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "email",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "Date of birth",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "><FormGrid><NumberInput label=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "><FormGrid><Input label=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "><span><span className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " aria-label=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": "><Button type=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " onClick={onClose} disabled={pending} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": " disabled={pending} className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 479,
+        "text": ">{pending ? <Loader2 className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 483,
+        "text": "DOCX file preview",
+        "type": "JSX text"
+      },
+      {
+        "line": 483,
+        "text": "Open",
+        "type": "JSX text"
+      },
+      {
+        "line": 483,
+        "text": "Remove",
+        "type": "JSX text"
+      },
+      {
+        "line": 485,
+        "text": "Previous",
+        "type": "JSX text"
+      },
+      {
+        "line": 485,
+        "text": "Next",
+        "type": "JSX text"
+      },
+      {
+        "line": 485,
+        "text": "aria-label=\"Student directory pages\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 493,
+        "text": "No students match this view",
+        "type": "JSX text"
+      },
+      {
+        "line": 493,
+        "text": "Adjust the search and filters, or add a student profile when a real record is ready.",
+        "type": "JSX text"
+      },
+      {
+        "line": 493,
+        "text": "Add student",
+        "type": "JSX text"
+      },
+      {
+        "line": 494,
+        "text": "Students Profile is unavailable",
+        "type": "JSX text"
+      },
+      {
+        "line": 494,
+        "text": "><Alert variant=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 494,
+        "text": "><AlertCircle className=",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 495,
+        "text": ")[1] ?? ",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/dashboard/TuitionPaymentModule.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 168,
+        "text": "Paid / Enrolled",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/dashboard/AdminPaymentsModule.tsx",
+    "count": 2,
+    "examples": [
+      {
+        "line": 110,
+        "text": "Billplz Malaysia FPX Integration",
+        "type": "JSX text"
+      },
+      {
+        "line": 306,
+        "text": "placeholder=\"Explain why this transaction was modified manually (e.g., student settled via cash on campus, bank slip verified, etc.)\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/dashboard/DiagnosticPlacementTest.tsx",
+    "count": 3,
+    "examples": [
+      {
+        "line": 203,
+        "text": "Diagnostic Level Audit",
+        "type": "JSX text"
+      },
+      {
+        "line": 328,
+        "text": "Assessment Completed",
+        "type": "JSX text"
+      },
+      {
+        "line": 375,
+        "text": "Retake Test",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/OfficialRegistryModal.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 26,
+        "text": "aria-label=\"Close modal\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/AdminLeadsModule.tsx",
+    "count": 43,
+    "examples": [
+      {
+        "line": 38,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 76,
+        "text": "Client account & active enrollment successfully created!",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 158,
+        "text": "New",
+        "type": "JSX text"
+      },
+      {
+        "line": 160,
+        "text": "Contacted",
+        "type": "JSX text"
+      },
+      {
+        "line": 162,
+        "text": "Enrolled",
+        "type": "JSX text"
+      },
+      {
+        "line": 164,
+        "text": "Closed",
+        "type": "JSX text"
+      },
+      {
+        "line": 173,
+        "text": "title=\"Student Admissions CRM\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 183,
+        "text": "placeholder=\"Search leads by name, email, phone or course...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 197,
+        "text": "Refresh Leads",
+        "type": "JSX text"
+      },
+      {
+        "line": 221,
+        "text": "Create Client Account",
+        "type": "JSX text"
+      },
+      {
+        "line": 231,
+        "text": "Fetching inbound submissions...",
+        "type": "JSX text"
+      },
+      {
+        "line": 236,
+        "text": "No leads found",
+        "type": "JSX text"
+      },
+      {
+        "line": 237,
+        "text": "There are no inbound leads matching your filter criteria.",
+        "type": "JSX text"
+      },
+      {
+        "line": 299,
+        "text": "Activate Account",
+        "type": "JSX text"
+      },
+      {
+        "line": 322,
+        "text": "Process Academic Lead",
+        "type": "JSX text"
+      },
+      {
+        "line": 331,
+        "text": "Applicant Info",
+        "type": "JSX text"
+      },
+      {
+        "line": 342,
+        "text": "Update Enrolment State",
+        "type": "JSX text"
+      },
+      {
+        "line": 350,
+        "text": "New Lead",
+        "type": "JSX text"
+      },
+      {
+        "line": 358,
+        "text": "Contacted",
+        "type": "JSX text"
+      },
+      {
+        "line": 366,
+        "text": "Enrolled",
+        "type": "JSX text"
+      },
+      {
+        "line": 374,
+        "text": "Close Enq.",
+        "type": "JSX text"
+      },
+      {
+        "line": 393,
+        "text": "Are you absolutely sure?",
+        "type": "JSX text"
+      },
+      {
+        "line": 399,
+        "text": "Cancel",
+        "type": "JSX text"
+      },
+      {
+        "line": 429,
+        "text": "Student Portal Active!",
+        "type": "JSX text"
+      },
+      {
+        "line": 482,
+        "text": "Student Full Name",
+        "type": "JSX text"
+      },
+      {
+        "line": 484,
+        "text": "placeholder=\"E.g., John Doe\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 492,
+        "text": "Contact Email",
+        "type": "JSX text"
+      },
+      {
+        "line": 495,
+        "text": "placeholder=\"student@example.com\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 503,
+        "text": "Phone Number",
+        "type": "JSX text"
+      },
+      {
+        "line": 505,
+        "text": "placeholder=\"E.g., +6012345678\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 513,
+        "text": "Academic Program",
+        "type": "JSX text"
+      },
+      {
+        "line": 520,
+        "text": "Select a program...",
+        "type": "JSX text"
+      },
+      {
+        "line": 532,
+        "text": "Custom Pricing & Academic Fees",
+        "type": "JSX text"
+      },
+      {
+        "line": 582,
+        "text": "Enrolment Source",
+        "type": "JSX text"
+      },
+      {
+        "line": 594,
+        "text": "Direct Call",
+        "type": "JSX text"
+      },
+      {
+        "line": 595,
+        "text": "WhatsApp",
+        "type": "JSX text"
+      },
+      {
+        "line": 604,
+        "text": "Link Submission",
+        "type": "JSX text"
+      },
+      {
+        "line": 611,
+        "text": "Select unlinked inquiry...",
+        "type": "JSX text"
+      },
+      {
+        "line": 627,
+        "text": "Link Registration",
+        "type": "JSX text"
+      },
+      {
+        "line": 634,
+        "text": "Select unlinked registration...",
+        "type": "JSX text"
+      },
+      {
+        "line": 650,
+        "text": "Enrolment Note / Remarks",
+        "type": "JSX text"
+      },
+      {
+        "line": 653,
+        "text": "placeholder=\"Any details regarding the customized pricing or special needs...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 674,
+        "text": "Activate Student & Enrolment",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/ProjectDossierModule.tsx",
+    "count": 21,
+    "examples": [
+      {
+        "line": 22,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 89,
+        "text": "title=\"Project Operations Dossier\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 119,
+        "text": "placeholder=\"Search audit trail by activity or target...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 136,
+        "text": "All Roles",
+        "type": "JSX text"
+      },
+      {
+        "line": 137,
+        "text": "Founder",
+        "type": "JSX text"
+      },
+      {
+        "line": 138,
+        "text": "Super Admin",
+        "type": "JSX text"
+      },
+      {
+        "line": 139,
+        "text": "Admin",
+        "type": "JSX text"
+      },
+      {
+        "line": 140,
+        "text": "Teacher",
+        "type": "JSX text"
+      },
+      {
+        "line": 141,
+        "text": "Student",
+        "type": "JSX text"
+      },
+      {
+        "line": 153,
+        "text": "Archive Logs",
+        "type": "JSX text"
+      },
+      {
+        "line": 162,
+        "text": "Sync",
+        "type": "JSX text"
+      },
+      {
+        "line": 172,
+        "text": "Security & Administration Logs",
+        "type": "JSX text"
+      },
+      {
+        "line": 179,
+        "text": "Loading operational dossier...",
+        "type": "JSX text"
+      },
+      {
+        "line": 184,
+        "text": "No operational audit logs found",
+        "type": "JSX text"
+      },
+      {
+        "line": 191,
+        "text": "Timestamp",
+        "type": "JSX text"
+      },
+      {
+        "line": 192,
+        "text": "Actor / Role",
+        "type": "JSX text"
+      },
+      {
+        "line": 193,
+        "text": "Action",
+        "type": "JSX text"
+      },
+      {
+        "line": 194,
+        "text": "Target",
+        "type": "JSX text"
+      },
+      {
+        "line": 195,
+        "text": "Result",
+        "type": "JSX text"
+      },
+      {
+        "line": 220,
+        "text": "Success",
+        "type": "JSX text"
+      },
+      {
+        "line": 222,
+        "text": "Failed",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/MarketingContentModule.tsx",
+    "count": 4,
+    "examples": [
+      {
+        "line": 38,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 67,
+        "text": "banner_term2_alert",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 215,
+        "text": "title=\"CMS Dynamic Content\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 216,
+        "text": "title=\"CMS Content Blocks\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/TeacherLessonsModule.tsx",
+    "count": 14,
+    "examples": [
+      {
+        "line": 39,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 190,
+        "text": "title=\"Curriculum Authoring\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 191,
+        "text": "title=\"Lesson Plans & Curriculum\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 216,
+        "text": "placeholder=\"Search lesson plans by topic, objectives, or course...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 227,
+        "text": "No lesson plans found",
+        "type": "JSX text"
+      },
+      {
+        "line": 228,
+        "text": "Click \"Create Lesson Plan\" to prepare a new session guide.",
+        "type": "JSX text"
+      },
+      {
+        "line": 340,
+        "text": "Learning Objectives",
+        "type": "JSX text"
+      },
+      {
+        "line": 345,
+        "text": "placeholder=\"Key competencies and language points students will master...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 352,
+        "text": "Materials & Resources",
+        "type": "JSX text"
+      },
+      {
+        "line": 357,
+        "text": "placeholder=\"Coursebook pages, audio tracks, digital worksheets...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 362,
+        "text": "Homework Assignment",
+        "type": "JSX text"
+      },
+      {
+        "line": 367,
+        "text": "placeholder=\"Take-home writing, workbook exercises, online drills...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 397,
+        "text": "Delete Lesson Plan?",
+        "type": "JSX text"
+      },
+      {
+        "line": 403,
+        "text": "Cancel",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/MarketingCampaignsModule.tsx",
+    "count": 5,
+    "examples": [
+      {
+        "line": 38,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 204,
+        "text": "title=\"Campaigns & Promos\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 205,
+        "text": "title=\"Marketing Campaigns & Promos\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 238,
+        "text": "aria-label=\"Filter campaigns by status\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 423,
+        "text": "aria-label=\"Campaign status\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/TeacherAttendanceModule.tsx",
+    "count": 37,
+    "examples": [
+      {
+        "line": 39,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 218,
+        "text": "title=\"Attendance Tracking\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 219,
+        "text": "title=\"Student Attendance Records\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 244,
+        "text": "placeholder=\"Search by student name, email, or course...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 252,
+        "text": "aria-label=\"Filter attendance by status\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 255,
+        "text": "All Statuses",
+        "type": "JSX text"
+      },
+      {
+        "line": 256,
+        "text": "Present",
+        "type": "JSX text"
+      },
+      {
+        "line": 257,
+        "text": "Late",
+        "type": "JSX text"
+      },
+      {
+        "line": 258,
+        "text": "Absent",
+        "type": "JSX text"
+      },
+      {
+        "line": 259,
+        "text": "Excused",
+        "type": "JSX text"
+      },
+      {
+        "line": 271,
+        "text": "No attendance entries found",
+        "type": "JSX text"
+      },
+      {
+        "line": 272,
+        "text": "Click \"Record Attendance\" to log a student session.",
+        "type": "JSX text"
+      },
+      {
+        "line": 317,
+        "text": "Present",
+        "type": "JSX text"
+      },
+      {
+        "line": 318,
+        "text": "Late",
+        "type": "JSX text"
+      },
+      {
+        "line": 319,
+        "text": "Absent",
+        "type": "JSX text"
+      },
+      {
+        "line": 320,
+        "text": "Excused",
+        "type": "JSX text"
+      },
+      {
+        "line": 339,
+        "text": "aria-label=\"Delete attendance entry\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 355,
+        "text": "Student",
+        "type": "JSX text"
+      },
+      {
+        "line": 356,
+        "text": "Course / Date",
+        "type": "JSX text"
+      },
+      {
+        "line": 357,
+        "text": "Attendance Status",
+        "type": "JSX text"
+      },
+      {
+        "line": 358,
+        "text": "Observation Notes",
+        "type": "JSX text"
+      },
+      {
+        "line": 359,
+        "text": "Actions",
+        "type": "JSX text"
+      },
+      {
+        "line": 385,
+        "text": "Present",
+        "type": "JSX text"
+      },
+      {
+        "line": 386,
+        "text": "Late",
+        "type": "JSX text"
+      },
+      {
+        "line": 387,
+        "text": "Absent",
+        "type": "JSX text"
+      },
+      {
+        "line": 388,
+        "text": "Excused",
+        "type": "JSX text"
+      },
+      {
+        "line": 445,
+        "text": "placeholder=\"Student full name\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 451,
+        "text": "Student Nickname / Email",
+        "type": "JSX text"
+      },
+      {
+        "line": 455,
+        "text": "placeholder=\"student@bilc.my\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 462,
+        "text": "Class Session",
+        "type": "JSX text"
+      },
+      {
+        "line": 470,
+        "text": "Session Date",
+        "type": "JSX text"
+      },
+      {
+        "line": 481,
+        "text": "Attendance Status",
+        "type": "JSX text"
+      },
+      {
+        "line": 485,
+        "text": "aria-label=\"Attendance status selection\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 496,
+        "text": "Observation Notes",
+        "type": "JSX text"
+      },
+      {
+        "line": 501,
+        "text": "placeholder=\"Lesson engagement, homework completion, or remarks...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 522,
+        "text": "Delete Attendance Entry?",
+        "type": "JSX text"
+      },
+      {
+        "line": 528,
+        "text": "Cancel",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/AdminScheduleModule.tsx",
+    "count": 7,
+    "examples": [
+      {
+        "line": 38,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 210,
+        "text": "title=\"Class Allocations\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 211,
+        "text": "title=\"Class Timetables & Schedules\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 244,
+        "text": "aria-label=\"Filter schedules by day\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 272,
+        "text": "aria-label=\"Clear search query\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 285,
+        "text": "aria-label=\"Clear day filter\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 500,
+        "text": "aria-label=\"Class status\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/TeacherGradesModule.tsx",
+    "count": 31,
+    "examples": [
+      {
+        "line": 38,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 222,
+        "text": "title=\"Evaluation & Feedback\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 223,
+        "text": "title=\"Assessments & Grading\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 248,
+        "text": "placeholder=\"Search by student name, assessment title, or course...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 256,
+        "text": "aria-label=\"Filter grades by category\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 259,
+        "text": "All Categories",
+        "type": "JSX text"
+      },
+      {
+        "line": 260,
+        "text": "Quizzes",
+        "type": "JSX text"
+      },
+      {
+        "line": 261,
+        "text": "Midterm Exams",
+        "type": "JSX text"
+      },
+      {
+        "line": 262,
+        "text": "Final Exams",
+        "type": "JSX text"
+      },
+      {
+        "line": 263,
+        "text": "Speaking Tests",
+        "type": "JSX text"
+      },
+      {
+        "line": 264,
+        "text": "Homework",
+        "type": "JSX text"
+      },
+      {
+        "line": 276,
+        "text": "No grading records found",
+        "type": "JSX text"
+      },
+      {
+        "line": 277,
+        "text": "Click \"Record Assessment\" to grade a student quiz or exam.",
+        "type": "JSX text"
+      },
+      {
+        "line": 370,
+        "text": "aria-label=\"Delete grade record\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 386,
+        "text": "Student",
+        "type": "JSX text"
+      },
+      {
+        "line": 387,
+        "text": "Assessment & Category",
+        "type": "JSX text"
+      },
+      {
+        "line": 388,
+        "text": "Score / Max",
+        "type": "JSX text"
+      },
+      {
+        "line": 389,
+        "text": "Teacher Feedback",
+        "type": "JSX text"
+      },
+      {
+        "line": 390,
+        "text": "Status",
+        "type": "JSX text"
+      },
+      {
+        "line": 391,
+        "text": "Actions",
+        "type": "JSX text"
+      },
+      {
+        "line": 490,
+        "text": "placeholder=\"Student full name\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 507,
+        "text": "Assessment Type",
+        "type": "JSX text"
+      },
+      {
+        "line": 511,
+        "text": "aria-label=\"Assessment type\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 514,
+        "text": "Quiz",
+        "type": "JSX text"
+      },
+      {
+        "line": 515,
+        "text": "Midterm Exam",
+        "type": "JSX text"
+      },
+      {
+        "line": 516,
+        "text": "Final Exam",
+        "type": "JSX text"
+      },
+      {
+        "line": 517,
+        "text": "Speaking Test",
+        "type": "JSX text"
+      },
+      {
+        "line": 518,
+        "text": "Homework",
+        "type": "JSX text"
+      },
+      {
+        "line": 549,
+        "text": "Teacher Pedagogical Feedback",
+        "type": "JSX text"
+      },
+      {
+        "line": 554,
+        "text": "placeholder=\"Specific guidance for the student on strengths and areas for improvement...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 583,
+        "text": "Cancel",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/MarketingAnalyticsModule.tsx",
+    "count": 3,
+    "examples": [
+      {
+        "line": 28,
+        "text": "title=\"Growth & Funnel Analytics\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 29,
+        "text": "title=\"Marketing Analytics & Lead Funnel\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 72,
+        "text": "RM 44.50",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/FounderSettingsModule.tsx",
+    "count": 6,
+    "examples": [
+      {
+        "line": 11,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 175,
+        "text": "placeholder=\"info@bilc.my\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 187,
+        "text": "placeholder=\"founder@bilc.my\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 201,
+        "text": "placeholder=\"+60 3-2789 1234\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 213,
+        "text": "placeholder=\"+60 12-345 6789\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 243,
+        "text": "placeholder=\"Street, Building, City, State, Postcode, Country\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/MarketingTestimonialsModule.tsx",
+    "count": 12,
+    "examples": [
+      {
+        "line": 38,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 180,
+        "text": "CRUD: Verified Student & Parent Reviews",
+        "type": "JSX text"
+      },
+      {
+        "line": 182,
+        "text": "Testimonials & Reviews",
+        "type": "JSX text"
+      },
+      {
+        "line": 216,
+        "text": "placeholder=\"Search testimonials by author name, relation, or quote...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 233,
+        "text": "No reviews found",
+        "type": "JSX text"
+      },
+      {
+        "line": 234,
+        "text": "Click \"Add Testimonial\" to create a new student feedback quote.",
+        "type": "JSX text"
+      },
+      {
+        "line": 319,
+        "text": "Author Relation / Background",
+        "type": "JSX text"
+      },
+      {
+        "line": 356,
+        "text": "placeholder=\"Share the student's learning experience, progress, and recommendations...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 363,
+        "text": "Approved For Public Display",
+        "type": "JSX text"
+      },
+      {
+        "line": 364,
+        "text": "Publish this review directly to the public home page.",
+        "type": "JSX text"
+      },
+      {
+        "line": 401,
+        "text": "Delete Review?",
+        "type": "JSX text"
+      },
+      {
+        "line": 407,
+        "text": "Cancel",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/founder/AdminProgramsModule.tsx",
+    "count": 5,
+    "examples": [
+      {
+        "line": 44,
+        "text": "sonner",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 195,
+        "text": "title=\"Course Catalogue\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 196,
+        "text": "title=\"Language Programmes & Courses\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 239,
+        "text": "aria-label=\"Filter courses by language\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 453,
+        "text": "placeholder=\"Detailed curriculum overview, focus areas, and learning outcomes...\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/LeadForm.tsx",
+    "count": 15,
+    "examples": [
+      {
+        "line": 104,
+        "text": "name-error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 113,
+        "text": "reasonType",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 114,
+        "text": "reasonType",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 114,
+        "text": "reasonType-error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 127,
+        "text": "programId",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 144,
+        "text": "email",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 145,
+        "text": "email",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 145,
+        "text": "email-error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 157,
+        "text": "phone",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 158,
+        "text": "phone",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 158,
+        "text": "phone-error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 174,
+        "text": "mt-3 min-h-5 text-xs text-[#b14e38]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 174,
+        "text": "alert",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 186,
+        "text": "compass-status-error mt-2 p-3 text-sm font-semibold text-red-600 bg-red-50 rounded-lg",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 186,
+        "text": "alert",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/VerifiedTestimonials.tsx",
+    "count": 2,
+    "examples": [
+      {
+        "line": 257,
+        "text": "aria-label=\"Previous testimonial\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 264,
+        "text": "aria-label=\"Next testimonial\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/BookingSystemModal.tsx",
+    "count": 5,
+    "examples": [
+      {
+        "line": 237,
+        "text": "placeholder=\"+60 12-345 6789\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 250,
+        "text": "placeholder=\"student@example.com\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 308,
+        "text": "telah didaftarkan.",
+        "type": "JSX text"
+      },
+      {
+        "line": 312,
+        "text": "has been registered.",
+        "type": "JSX text"
+      },
+      {
+        "line": 321,
+        "text": "B-25-07, Pavilion Embassy, Menara G-Vestor, Kuala Lumpur",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/ManusDialog.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 60,
+        "text": "alt=\"Dialog graphic\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/RegistrationForm.tsx",
+    "count": 23,
+    "examples": [
+      {
+        "line": 183,
+        "text": "fullName",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 186,
+        "text": "fullName",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 186,
+        "text": "text-xs text-red-500 mt-1 block",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 186,
+        "text": "fullName",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 195,
+        "text": "placeholder=\"name@example.com\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 196,
+        "text": "email",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 199,
+        "text": "email",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 199,
+        "text": "text-xs text-red-500 mt-1 block",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 199,
+        "text": "email",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 207,
+        "text": "placeholder=\"+6012345678\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 208,
+        "text": "phone",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 211,
+        "text": "phone",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 211,
+        "text": "text-xs text-red-500 mt-1 block",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 211,
+        "text": "phone",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 219,
+        "text": "programId",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 227,
+        "text": "programId",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 227,
+        "text": "text-xs text-red-500 mt-1 block",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 227,
+        "text": "programId",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 235,
+        "text": "applicantCategory",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 243,
+        "text": "applicantCategory",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 243,
+        "text": "text-xs text-red-500 mt-1 block",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 243,
+        "text": "applicantCategory",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 346,
+        "text": "aria-label=\"Remove uploaded file\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/UserFieldBuilder.tsx",
+    "count": 56,
+    "examples": [
+      {
+        "line": 42,
+        "text": "field.id === fieldId); const targetIndex = index + direction; if (index",
+        "type": "JSX text"
+      },
+      {
+        "line": 43,
+        "text": "field.id === targetId); if (fromIndex",
+        "type": "JSX text"
+      },
+      {
+        "line": 46,
+        "text": "Create form",
+        "type": "JSX text"
+      },
+      {
+        "line": 46,
+        "text": "Field Builder",
+        "type": "JSX text"
+      },
+      {
+        "line": 46,
+        "text": "Review every field used by the create form. Fields can be edited, hidden, removed, restored and organised into groups here.",
+        "type": "JSX text"
+      },
+      {
+        "line": 48,
+        "text": "Field Builder needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 48,
+        "text": "destructive",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 48,
+        "text": "h-4 w-4",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 49,
+        "text": "Form configuration",
+        "type": "JSX text"
+      },
+      {
+        "line": 49,
+        "text": "Every field is managed here. Use groups only when you choose to organise the form. Image uploads and arbitrary document collection are not part of this version.",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "Groups",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "Organise fields",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "Group title",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "Add group",
+        "type": "JSX text"
+      },
+      {
+        "line": 52,
+        "text": "No groups yet. Fields can remain without a group.",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Field details",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Type",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Text",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Notes",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Number",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Date",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Dropdown",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Checkbox",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Group",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "No group",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Options",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "one option per line",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Required",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Visible",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "Clear",
+        "type": "JSX text"
+      },
+      {
+        "line": 53,
+        "text": "aria-label=\"Required field\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 53,
+        "text": "aria-label=\"Visible field\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 58,
+        "text": "Done",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "Fields",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "Edit or remove any field",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "Assign a field to one of your groups, or leave it without a group. Delete hides a field from the create form; restore makes it visible again.",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "Label",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "Group",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "No group",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "Required",
+        "type": "JSX text"
+      },
+      {
+        "line": 66,
+        "text": "aria-label=\"Fields\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 68,
+        "text": "Fields",
+        "type": "JSX text"
+      },
+      {
+        "line": 68,
+        "text": "Configured fields",
+        "type": "JSX text"
+      },
+      {
+        "line": 68,
+        "text": "Drag a row by its handle to change its order. The order is saved immediately and applied to the create form. Arrow controls provide an accessible keyboard alternative.",
+        "type": "JSX text"
+      },
+      {
+        "line": 68,
+        "text": "Saving order",
+        "type": "JSX text"
+      },
+      {
+        "line": 68,
+        "text": "No configured fields yet. Create one above; it will appear here with edit, delete and reorder controls.",
+        "type": "JSX text"
+      },
+      {
+        "line": 68,
+        "text": "aria-label=\"Fields\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 68,
+        "text": "title=\"Drag to reorder\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 69,
+        "text": "Remove this section?",
+        "type": "JSX text"
+      },
+      {
+        "line": 69,
+        "text": "Its fields remain available and move to Other details. Field values are preserved.",
+        "type": "JSX text"
+      },
+      {
+        "line": 69,
+        "text": "Keep section",
+        "type": "JSX text"
+      },
+      {
+        "line": 69,
+        "text": "Remove section",
+        "type": "JSX text"
+      },
+      {
+        "line": 70,
+        "text": "Delete this field?",
+        "type": "JSX text"
+      },
+      {
+        "line": 70,
+        "text": "This removes only values for this optional profile field. Core user access data remains unchanged.",
+        "type": "JSX text"
+      },
+      {
+        "line": 70,
+        "text": "Keep field",
+        "type": "JSX text"
+      },
+      {
+        "line": 70,
+        "text": "Delete field",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/DashboardLayout.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 820,
+        "text": "Something went wrong",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/StudentOnboardingForm.tsx",
+    "count": 3,
+    "examples": [
+      {
+        "line": 28,
+        "text": "Loading profile setup...",
+        "type": "JSX text"
+      },
+      {
+        "line": 189,
+        "text": "text-sm font-semibold text-red-600 bg-red-50 p-3 rounded-lg",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 189,
+        "text": "alert",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/CentreMap.tsx",
+    "count": 2,
+    "examples": [
+      {
+        "line": 30,
+        "text": "Bilingual Idol Language Centre",
+        "type": "JSX text"
+      },
+      {
+        "line": 31,
+        "text": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kuala Lumpur",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/ErrorBoundary.tsx",
+    "count": 3,
+    "examples": [
+      {
+        "line": 24,
+        "text": "[ErrorBoundary caught an error]",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 40,
+        "text": "Something went wrong",
+        "type": "JSX text"
+      },
+      {
+        "line": 46,
+        "text": "error-boundary-reload-btn",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/LocalUserDataManager.tsx",
+    "count": 2,
+    "examples": [
+      {
+        "line": 170,
+        "text": "placeholder=\"name@example.com\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 182,
+        "text": "placeholder=\"+60 12 345 6789\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/AIChatBox.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 88,
+        "text": "Chat error:",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/PublicLayout.tsx",
+    "count": 2,
+    "examples": [
+      {
+        "line": 477,
+        "text": "Bilingual Idol",
+        "type": "JSX text"
+      },
+      {
+        "line": 513,
+        "text": "aria-label=\"Mobile navigation\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/OfficialPriceList2026.tsx",
+    "count": 1,
+    "examples": [
+      {
+        "line": 517,
+        "text": "Pavilion Embassy, KL",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/ConfigurableCreateUserModal.tsx",
+    "count": 8,
+    "examples": [
+      {
+        "line": 16,
+        "text": "void; profileValues: Record",
+        "type": "JSX text"
+      },
+      {
+        "line": 16,
+        "text": "void; pending: boolean; error?: string; onSubmit: (event: React.FormEvent",
+        "type": "JSX text"
+      },
+      {
+        "line": 16,
+        "text": "founder",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 27,
+        "text": "Issue new access",
+        "type": "JSX text"
+      },
+      {
+        "line": 28,
+        "text": "Create user",
+        "type": "JSX text"
+      },
+      {
+        "line": 38,
+        "text": "Account action needs attention",
+        "type": "JSX text"
+      },
+      {
+        "line": 84,
+        "text": "Unique username",
+        "type": "JSX text"
+      },
+      {
+        "line": 198,
+        "text": "Controls whether the issued account can sign in.",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/ResponsiveDataTransform.tsx",
+    "count": 32,
+    "examples": [
+      {
+        "line": 173,
+        "text": "Responsive Data Transform Engine",
+        "type": "JSX text"
+      },
+      {
+        "line": 182,
+        "text": "aria-label=\"Layout density mode\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 187,
+        "text": "title=\"Auto-responsive (CSS Container/Viewport driven)\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 190,
+        "text": "Auto",
+        "type": "JSX text"
+      },
+      {
+        "line": 196,
+        "text": "title=\"Force Desktop List/Table View\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 199,
+        "text": "List",
+        "type": "JSX text"
+      },
+      {
+        "line": 205,
+        "text": "title=\"Force Card Grid View\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 208,
+        "text": "Cards",
+        "type": "JSX text"
+      },
+      {
+        "line": 222,
+        "text": "placeholder=\"Search by title, role, tags, or details...\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 224,
+        "text": "aria-label=\"Search records\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 231,
+        "text": "aria-label=\"Clear search\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 245,
+        "text": "aria-label=\"Filter by status\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 247,
+        "text": "All Statuses",
+        "type": "JSX text"
+      },
+      {
+        "line": 248,
+        "text": "Active",
+        "type": "JSX text"
+      },
+      {
+        "line": 249,
+        "text": "Pending",
+        "type": "JSX text"
+      },
+      {
+        "line": 250,
+        "text": "Completed",
+        "type": "JSX text"
+      },
+      {
+        "line": 251,
+        "text": "Inactive",
+        "type": "JSX text"
+      },
+      {
+        "line": 268,
+        "text": "aria-label=\"Sort order\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 272,
+        "text": "Highest Progress",
+        "type": "JSX text"
+      },
+      {
+        "line": 273,
+        "text": "Lowest Progress",
+        "type": "JSX text"
+      },
+      {
+        "line": 274,
+        "text": "Status",
+        "type": "JSX text"
+      },
+      {
+        "line": 288,
+        "text": "Try refining your search terms or resetting the active status filters.",
+        "type": "JSX text"
+      },
+      {
+        "line": 312,
+        "text": "Student / Member",
+        "type": "JSX text"
+      },
+      {
+        "line": 317,
+        "text": "Role & Track",
+        "type": "JSX text"
+      },
+      {
+        "line": 325,
+        "text": "Progress / Score",
+        "type": "JSX text"
+      },
+      {
+        "line": 335,
+        "text": "Status",
+        "type": "JSX text"
+      },
+      {
+        "line": 340,
+        "text": "Actions",
+        "type": "JSX text"
+      },
+      {
+        "line": 406,
+        "text": "Role & Program",
+        "type": "JSX text"
+      },
+      {
+        "line": 428,
+        "text": "Progress",
+        "type": "JSX text"
+      },
+      {
+        "line": 466,
+        "text": "Edit",
+        "type": "JSX text"
+      },
+      {
+        "line": 476,
+        "text": "View",
+        "type": "JSX text"
+      },
+      {
+        "line": 487,
+        "text": "Remove",
+        "type": "JSX text"
+      }
+    ]
+  },
+  {
+    "file": "client/src/components/CampusFacilitiesShowcase.tsx",
+    "count": 6,
+    "examples": [
+      {
+        "line": 364,
+        "text": "PAVILION EMBASSY, KL",
+        "type": "JSX text"
+      },
+      {
+        "line": 400,
+        "text": "aria-label=\"Previous Facility\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 413,
+        "text": "aria-label=\"Next Facility\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 486,
+        "text": "PAVILION EMBASSY, KL",
+        "type": "JSX text"
+      },
+      {
+        "line": 504,
+        "text": "aria-label=\"Previous Facility\"",
+        "type": "Attribute"
+      },
+      {
+        "line": 528,
+        "text": "aria-label=\"Next Facility\"",
+        "type": "Attribute"
+      }
+    ]
+  },
+  {
+    "file": "client/src/lib/dynamicTranslator.ts",
+    "count": 4,
+    "examples": [
+      {
+        "line": 507,
+        "text": "private internal contact for escalation alerts",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 507,
+        "text": "Private internal contact for escalation alerts",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 507,
+        "text": "Hubungan dalaman peribadi untuk makluman eskalasi",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 507,
+        "text": "جهة اتصال داخلية خاصة لتنبيهات الطوارئ",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/lib/translations.ts",
+    "count": 3,
+    "examples": [
+      {
+        "line": 618,
+        "text": "Additional details or goals",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 945,
+        "text": "Butiran tambahan atau matlamat",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 1272,
+        "text": "تفاصيل أو أهداف إضافية",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/lib/localUserData.ts",
+    "count": 4,
+    "examples": [
+      {
+        "line": 107,
+        "text": "Failed to save local user data:",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 168,
+        "text": "Invalid JSON format",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 177,
+        "text": "User data imported successfully!",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 179,
+        "text": "Failed to read backup file",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/hooks/usePWAInstall.ts",
+    "count": 2,
+    "examples": [
+      {
+        "line": 4,
+        "text": "Promise",
+        "type": "JSX text"
+      },
+      {
+        "line": 62,
+        "text": "PWA install error:",
+        "type": "Toast/Validation/Alert"
+      }
+    ]
+  },
+  {
+    "file": "client/src/main.tsx",
+    "count": 9,
+    "examples": [
+      {
+        "line": 26,
+        "text": "updated",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 26,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 34,
+        "text": "updated",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 34,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 109,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 110,
+        "text": "object",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 118,
+        "text": "object",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 118,
+        "text": "error",
+        "type": "Toast/Validation/Alert"
+      },
+      {
+        "line": 118,
+        "text": "string",
+        "type": "Toast/Validation/Alert"
       }
     ]
   }
-}
+]

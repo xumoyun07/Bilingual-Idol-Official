@@ -94,7 +94,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as FabId[];
-        const DEFAULT_ORDER: FabId[] = ["promo", "phone", "whatsapp"];
+        const DEFAULT_ORDER: FabId[] = ["phone", "whatsapp"];
         if (Array.isArray(parsed) && parsed.every(k => DEFAULT_ORDER.includes(k))) {
           const missing = DEFAULT_ORDER.filter(k => !parsed.includes(k));
           return [...parsed, ...missing];
@@ -103,7 +103,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         // ignore
       }
     }
-    return ["promo", "phone", "whatsapp"];
+    return ["phone", "whatsapp"];
   });
 
   const [draggedKey, setDraggedKey] = useState<FabId | null>(null);
@@ -576,7 +576,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           right: isRTL ? "auto" : "1.5rem",
           left: isRTL ? "1.5rem" : "auto",
           width: "64px",
-          height: showBackButton ? "264px" : "200px",
+          height: showBackButton ? "200px" : "140px",
           transition: "height 0.3s cubic-bezier(0.16, 1, 0.3, 1), right 0.3s ease, left 0.3s ease",
           paddingTop: "12px",
           paddingBottom: "12px",
@@ -772,7 +772,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           right: "0",
           marginLeft: "auto",
           marginRight: "auto",
-          width: showScrollTop ? "244px" : "188px",
+          width: showScrollTop ? "188px" : "132px",
           paddingLeft: "14px",
           paddingRight: "14px",
           paddingTop: "0.6rem",
@@ -781,25 +781,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         }}
         aria-label={language === "ar" ? "إجراءات سريعة للجوال" : language === "ms" ? "Tindakan pantas mudah alih" : "Mobile quick actions"}
       >
-        {/* Button 1: Promotions / Gift Button with dynamic glow and active discount badge */}
-        <div className="w-11 h-11 flex items-center justify-center shrink-0">
-          <button
-            type="button"
-            className={`bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br ${promoTheme.bg} active:scale-95 text-white flex items-center justify-center ${promoTheme.shadow} border border-white/15 cursor-pointer relative shrink-0`}
-            onClick={() => setPromoOpen(true)}
-            aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
-          >
-            <span className="relative flex h-5 w-5 items-center justify-center">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
-              <Gift size={18} className="relative text-white" aria-hidden="true" />
-            </span>
-            {promoDiscount && (
-              <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
-                {promoDiscount}
-              </span>
-            )}
-          </button>
-        </div>
 
         {/* Button 2: Call/Phone Link */}
         <div className="w-11 h-11 flex items-center justify-center shrink-0">

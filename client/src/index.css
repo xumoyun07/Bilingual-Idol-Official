@@ -1474,7 +1474,7 @@ button:focus-visible {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .bilc-cards-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -10526,6 +10526,7 @@ header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-
 }
 
 .bilc-ambient-glow-orb {
+  position: absolute !important;
   width: var(--ball-size, 100px) !important;
   height: var(--ball-size, 100px) !important;
   min-width: var(--ball-size, 100px) !important;
