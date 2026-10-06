@@ -91,13 +91,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   // Persistent drag-and-drop state for the vertical side capsule buttons (desktop)
   const [order, setOrder] = useState<FabId[]>(() => {
     const saved = localStorage.getItem("bilc_buttons_order_v3");
+    const ALL_FABS: FabId[] = ["promo", "phone", "whatsapp"];
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as FabId[];
-        const DEFAULT_ORDER: FabId[] = ["phone", "whatsapp"];
-        if (Array.isArray(parsed) && parsed.every(k => DEFAULT_ORDER.includes(k))) {
-          const missing = DEFAULT_ORDER.filter(k => !parsed.includes(k));
-          return [...parsed, ...missing];
+        if (Array.isArray(parsed) && parsed.every(k => ALL_FABS.includes(k))) {
+          return Array.from(new Set(parsed));
         }
       } catch (e) {
         // ignore
@@ -106,10 +105,32 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     return ["phone", "whatsapp"];
   });
 
+  // Synchronize 'order' state with 'isPromoActive' when loading finishes
+  useEffect(() => {
+    if (isPromoLoading) return;
+
+    setOrder(prev => {
+      const hasPromo = prev.includes("promo");
+      if (isPromoActive && !hasPromo) {
+        // If promo is active but not in order, add it as the first item
+        const rest = prev.filter(k => k !== "promo");
+        return ["promo", ...rest];
+      } else if (!isPromoActive && hasPromo) {
+        // If promo is inactive but is in order, remove it
+        return prev.filter(k => k !== "promo");
+      }
+      return prev;
+    });
+  }, [isPromoActive, isPromoLoading]);
+
   const [draggedKey, setDraggedKey] = useState<FabId | null>(null);
   const [dragOffsetY, setDragOffsetY] = useState<number>(0);
   const [isWaOpen, setIsWaOpen] = useState(false);
   const showBackButton = false;
+  const slotsCount = order.length + (showBackButton ? 1 : 0);
+  const panelHeight = slotsCount === 4 ? "264px" : slotsCount === 3 ? "200px" : slotsCount === 2 ? "140px" : `${slotsCount * 60 + 20}px`;
+  const mobileVisibleCount = 2 + (isPromoActive ? 1 : 0) + (showScrollTop ? 1 : 0);
+  const mobilePanelWidth = `${mobileVisibleCount * 56 + 20}px`;
 
   const draggedKeyRef = useRef<FabId | null>(null);
   const dragStartYRef = useRef<number>(0);
@@ -576,7 +597,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           right: isRTL ? "auto" : "1.5rem",
           left: isRTL ? "1.5rem" : "auto",
           width: "64px",
-          height: showBackButton ? "200px" : "140px",
+          height: panelHeight,
           transition: "height 0.3s cubic-bezier(0.16, 1, 0.3, 1), right 0.3s ease, left 0.3s ease",
           paddingTop: "12px",
           paddingBottom: "12px",
@@ -772,7 +793,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           right: "0",
           marginLeft: "auto",
           marginRight: "auto",
-          width: showScrollTop ? "188px" : "132px",
+          width: mobilePanelWidth,
           paddingLeft: "14px",
           paddingRight: "14px",
           paddingTop: "0.6rem",
@@ -781,6 +802,27 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         }}
         aria-label={language === "ar" ? "إجراءات سريعة للجوال" : language === "ms" ? "Tindakan pantas mudah alih" : "Mobile quick actions"}
       >
+        {/* Button 1: Promo/Gift Button (conditional) */}
+        {isPromoActive && (
+          <div className="w-11 h-11 flex items-center justify-center shrink-0">
+            <button
+              type="button"
+              className={`bilc-quick-btn w-11 h-11 rounded-full bg-gradient-to-br ${promoTheme.bg} text-white flex items-center justify-center active:scale-95 border border-white/10 relative shrink-0`}
+              onClick={() => setPromoOpen(true)}
+              aria-label={language === "ar" ? "عرض العروض الترويجية النشطة" : language === "ms" ? "Papar Promosi Aktif" : "Show Active Promotions"}
+            >
+              <span className="relative flex h-5 w-5 items-center justify-center mx-auto">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
+                <Gift size={18} className="relative text-white" aria-hidden="true" />
+              </span>
+              {promoDiscount && (
+                <span className="absolute -top-1 -right-1 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+                  {promoDiscount}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Button 2: Call/Phone Link */}
         <div className="w-11 h-11 flex items-center justify-center shrink-0">

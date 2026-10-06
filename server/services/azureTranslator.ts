@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 export const BRANDS = ["Bilingual Idol", "BILC", "Pavilion Embassy", "IELTS", "MOHE", "WhatsApp"];
-const USAGE_FILE = path.resolve(".translator_usage.json");
+const USAGE_FILE = process.env.TRANSLATOR_USAGE_FILE || path.resolve(".translator_usage.json");
 
 // Quota monthly limit customizable via environment variable, defaulting to 1800000
 const MONTHLY_LIMIT = process.env.TRANSLATOR_MONTHLY_LIMIT 
@@ -24,6 +24,15 @@ export interface TranslationResultItem {
 
 export interface TranslateBatchResult {
   translations: Record<string, Record<string, TranslationResultItem>>;
+}
+
+export class AzureHttpError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "AzureHttpError";
+    this.status = status;
+  }
 }
 
 /**
@@ -59,15 +68,16 @@ function setLocalFileUsage(key: string, value: number) {
 
 /**
  * Decodes HTML Entities to normal characters (like &amp; to &)
+ * Note: &amp; is replaced last so that "&amp;lt;" correctly decodes to "&lt;"
  */
 export function decodeHtmlEntities(text: string): string {
   return text
-    .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
     .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&"); // Processed last!
 }
 
 /**
@@ -196,14 +206,14 @@ export async function canTranslate(charsToAdd: number): Promise<boolean> {
 
 /**
  * Chunk helper to split arrays into Azure compliant sub-batches
- * Source: Microsoft Azure AI Translator V3.0 limits documentation. Max count: 100, max total characters: 10,000.
  */
-function chunkTexts(texts: string[], maxCount = 100, maxChars = 10000): string[][] {
-  const chunks: string[][] = [];
-  let currentChunk: string[] = [];
+function chunkTextsWithIndex(protectedTexts: string[], maxCount = 100, maxChars = 10000): { text: string; originalIndex: number }[][] {
+  const chunks: { text: string; originalIndex: number }[][] = [];
+  let currentChunk: { text: string; originalIndex: number }[] = [];
   let currentChars = 0;
 
-  for (const text of texts) {
+  for (let i = 0; i < protectedTexts.length; i++) {
+    const text = protectedTexts[i];
     if (!text) continue; // Skip empty texts
 
     if (text.length > maxChars) {
@@ -212,7 +222,7 @@ function chunkTexts(texts: string[], maxCount = 100, maxChars = 10000): string[]
         currentChunk = [];
         currentChars = 0;
       }
-      chunks.push([text]);
+      chunks.push([{ text, originalIndex: i }]);
       continue;
     }
 
@@ -221,7 +231,7 @@ function chunkTexts(texts: string[], maxCount = 100, maxChars = 10000): string[]
       currentChunk = [];
       currentChars = 0;
     }
-    currentChunk.push(text);
+    currentChunk.push({ text, originalIndex: i });
     currentChars += text.length;
   }
   if (currentChunk.length > 0) {
@@ -236,39 +246,20 @@ function chunkTexts(texts: string[], maxCount = 100, maxChars = 10000): string[]
 async function fetchWithRetry(url: string, options: any, retries = 3, delay = 1000): Promise<any> {
   try {
     const res = await fetch(url, options);
-    
-    // Non-retry status code check (400, 401, 403, 404, etc.)
-    if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+    if (!res.ok) {
       const errText = await res.text();
-      
-      // Specifically catch Out of call volume quota (403) and log understandably
       if (res.status === 403 && errText.toLowerCase().includes("quota")) {
         console.error(`[AzureTranslator] Azure Translator Quota Exhausted! Please upgrade your F0 subscription tier.`);
       }
-      throw new Error(`Azure API error: ${res.status} ${res.statusText} - ${errText}`);
-    }
-
-    if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
-      if (retries > 0) {
-        console.warn(`[AzureTranslator] Response status ${res.status}, retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-        return fetchWithRetry(url, options, retries - 1, delay * 2);
-      }
-    }
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Azure API error: ${res.status} ${res.statusText} - ${errText}`);
+      throw new AzureHttpError(res.status, `Azure API error: ${res.status} ${res.statusText} - ${errText}`);
     }
     return await res.json();
   } catch (error) {
-    const msg = (error as any).message || "";
-    // Only retry on 429, 5xx, or actual network errors
-    const isNetworkError = error instanceof TypeError || msg.includes("fetch") || msg.includes("Network");
-    const isRetryableStatus = msg.includes("429") || msg.includes("500") || msg.includes("502") || msg.includes("503") || msg.includes("504");
+    const isNetworkError = !(error instanceof AzureHttpError);
+    const isRetryableStatus = error instanceof AzureHttpError && (error.status === 429 || (error.status >= 500 && error.status < 600));
 
     if (retries > 0 && (isNetworkError || isRetryableStatus)) {
-      console.warn(`[AzureTranslator] Retryable error: ${msg}, retrying in ${delay}ms...`);
+      console.warn(`[AzureTranslator] Retryable error: ${(error as any).message}, retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
       return fetchWithRetry(url, options, retries - 1, delay * 2);
     }
@@ -351,10 +342,10 @@ export async function translateBatch(
   const region = process.env.AZURE_TRANSLATOR_REGION;
   const endpoint = process.env.AZURE_TRANSLATOR_ENDPOINT || "https://api.cognitive.microsofttranslator.com";
 
-  const textChunks = chunkTexts(protectedTexts);
+  const chunkItems = chunkTextsWithIndex(protectedTexts);
   let charsSucceeded = 0;
 
-  for (const chunk of textChunks) {
+  for (const chunk of chunkItems) {
     // Construct Azure API URL
     const url = new URL("/translate", endpoint);
     url.searchParams.set("api-version", "3.0");
@@ -375,22 +366,20 @@ export async function translateBatch(
       const responseData = await fetchWithRetry(url.toString(), {
         method: "POST",
         headers,
-        body: JSON.stringify(chunk.map(text => ({ Text: text }))),
+        body: JSON.stringify(chunk.map(item => ({ Text: item.text }))),
       });
 
-      // Optional debug logging of response info
-      if (process.env.DEBUG_TRANSLATOR === "1") {
-        const totalChars = chunk.reduce((sum, text) => sum + text.length, 0);
-        console.log(`[AzureTranslator] DEBUG: Received raw response. Status: OK, Char Count: ${totalChars}, Elements: ${chunk.length}`);
-      }
+      // Sum characters of ALL elements in this chunk multiplied by all target languages on 200 OK
+      const chunkChars = chunk.reduce((sum, item) => sum + item.text.length, 0);
+      charsSucceeded += chunkChars;
 
-      // Map back to translations
+      // Map back to translations using stable indexes
       for (let i = 0; i < chunk.length; i++) {
-        const originalText = texts[texts.indexOf(unprotectContent(chunk[i]))];
+        const originalIdx = chunk[i].originalIndex;
+        const originalText = texts[originalIdx];
         if (!originalText) continue;
 
         const translationsList = responseData[i]?.translations || [];
-        let itemSucceeded = false;
 
         for (const tr of translationsList) {
           const rawTranslation = tr.text || "";
@@ -406,21 +395,17 @@ export async function translateBatch(
               status: "ok",
               text: cleanTranslation
             };
-            itemSucceeded = true;
           } else {
             console.warn(`[AzureTranslator] Fallback to EN for text "${originalText}" due to validation failure.`);
             translations[originalText][targetLang] = { status: "failed" };
           }
         }
-        if (itemSucceeded) {
-          charsSucceeded += chunk[i].length; // Azure Translator bills based on protected text length!
-        }
       }
     } catch (error) {
       console.error(`[AzureTranslator] Request batch failed:`, error);
-      // Fallback failed items
-      for (const pt of chunk) {
-        const originalText = unprotectContent(pt);
+      // Fallback failed items in this chunk
+      for (const item of chunk) {
+        const originalText = texts[item.originalIndex];
         for (const lang of targetLangs) {
           translations[originalText][lang] = { status: "failed" };
         }

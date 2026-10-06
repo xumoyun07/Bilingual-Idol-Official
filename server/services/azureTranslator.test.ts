@@ -8,18 +8,48 @@ import {
   extractHtmlTags,
   translateBatch,
   getTranslatorUsage,
-  decodeHtmlEntities
+  decodeHtmlEntities,
+  AzureHttpError
 } from "./azureTranslator";
+import { inMemoryStore } from "../db";
+import fs from "fs";
+import path from "path";
+import os from "os";
 
 describe("Azure Translator Advanced Auditing & Spacing", () => {
   let fetchSpy: any;
+  const tempUsageFile = path.join(os.tmpdir(), `temp_translator_usage_test_${Date.now()}.json`);
+  let originalUsageFileEnv: string | undefined;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(global, "fetch");
+    originalUsageFileEnv = process.env.TRANSLATOR_USAGE_FILE;
+    process.env.TRANSLATOR_USAGE_FILE = tempUsageFile;
+    
+    // Clear any test usage state in global inMemoryStore
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const usageKey = `translator_usage_${currentMonth}`;
+    inMemoryStore.siteSettings[usageKey] = "0";
+
+    if (fs.existsSync(tempUsageFile)) {
+      try {
+        fs.unlinkSync(tempUsageFile);
+      } catch (e) {
+        // ignore
+      }
+    }
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    process.env.TRANSLATOR_USAGE_FILE = originalUsageFileEnv;
+    if (fs.existsSync(tempUsageFile)) {
+      try {
+        fs.unlinkSync(tempUsageFile);
+      } catch (e) {
+        // ignore
+      }
+    }
   });
 
   it("should wrap exact items in exactly one span and avoid nested wrapping for emails and links", () => {
@@ -60,7 +90,7 @@ describe("Azure Translator Advanced Auditing & Spacing", () => {
       "https://bilc.my/contact?x=1",
       "{name}, welcome to Bilingual Idol (IELTS)",
       "e.g. 3.5 hours",
-      "مرحبا بك في منصة Bilingual Idol، {studentName}!"
+      "مرحبا بك в платформу Bilingual Idol, {studentName}!"
     ];
 
     for (const c of cases) {
@@ -86,34 +116,43 @@ describe("Azure Translator Advanced Auditing & Spacing", () => {
   });
 
   it("should only increment monthly quota for successful batches, not for failed ones", async () => {
-    const initialUsage = await getTranslatorUsage();
+    const key = process.env.AZURE_TRANSLATOR_KEY;
+    process.env.AZURE_TRANSLATOR_KEY = "test-mock-key"; // Force API path instead of simulation fallback
 
-    // Mock failure
-    fetchSpy.mockRejectedValueOnce(new Error("Fatal Error"));
-    await translateBatch(["UniqueFailedTextQuotaTest"], ["ms"]);
-    
-    const usageAfterFailure = await getTranslatorUsage();
-    expect(usageAfterFailure).toBe(initialUsage); // Quota did not grow!
+    try {
+      const initialUsage = await getTranslatorUsage();
 
-    // Mock success
-    fetchSpy.mockResolvedValueOnce({
-      status: 200,
-      ok: true,
-      json: async () => [
-        {
-          translations: [{ text: "Halo", to: "ms" }]
-        }
-      ]
-    } as Response);
+      // Mock failure
+      fetchSpy.mockRejectedValueOnce(new Error("Fatal Error"));
+      await translateBatch(["UniqueFailedTextQuotaTest"], ["ms"]);
+      
+      const usageAfterFailure = await getTranslatorUsage();
+      expect(usageAfterFailure).toBe(initialUsage); // Quota did not grow!
 
-    await translateBatch(["UniqueSuccessTextQuotaTest"], ["ms"]);
-    const usageAfterSuccess = await getTranslatorUsage();
-    expect(usageAfterSuccess).toBeGreaterThan(initialUsage); // Quota grew!
+      // Mock success
+      fetchSpy.mockResolvedValueOnce({
+        status: 200,
+        ok: true,
+        json: async () => [
+          {
+            translations: [{ text: "Halo", to: "ms" }]
+          }
+        ]
+      } as Response);
+
+      await translateBatch(["UniqueSuccessTextQuotaTest"], ["ms"]);
+      const usageAfterSuccess = await getTranslatorUsage();
+      expect(usageAfterSuccess).toBeGreaterThan(initialUsage); // Quota grew!
+    } finally {
+      process.env.AZURE_TRANSLATOR_KEY = key; // restore
+    }
   });
 
-  it("should run integration translation if real key is available, or skip gracefully", async () => {
+  it("should run integration translation only if RUN_INTEGRATION=1 is set", async () => {
     const key = process.env.AZURE_TRANSLATOR_KEY;
-    if (key) {
+    const runIntegration = process.env.RUN_INTEGRATION === "1" || process.env.RUN_INTEGRATION === "true";
+
+    if (key && runIntegration) {
       // Restore fetch spy so real network request is made
       fetchSpy.mockRestore();
       console.log("[Integration Test] Running real Azure Translator API call...");
@@ -127,7 +166,7 @@ describe("Azure Translator Advanced Auditing & Spacing", () => {
         console.warn("[Integration Test] Translation skipped (possibly quota limits).");
       }
     } else {
-      console.log("[Integration Test] No real Azure key available. Skipping real network integration check.");
+      console.log("[Integration Test] Skipped because RUN_INTEGRATION is not 1 or key is missing.");
     }
   });
 
@@ -146,59 +185,167 @@ describe("Azure Translator Advanced Auditing & Spacing", () => {
   });
 
   it("should strictly not retry on 401 Unauthorized errors and return failed items status", async () => {
-    fetchSpy.mockResolvedValue({
-      status: 401,
-      ok: false,
-      text: async () => "Unauthorized Key"
-    } as Response);
+    const key = process.env.AZURE_TRANSLATOR_KEY;
+    process.env.AZURE_TRANSLATOR_KEY = "test-mock-key"; // Force API path instead of simulation fallback
 
-    const res = await translateBatch(["Hello"], ["ms"]);
-    expect(res.translations["Hello"]["ms"].status).toBe("failed");
-    expect(fetchSpy).toHaveBeenCalledTimes(1); // Exactly 1 call, no retries!
+    try {
+      fetchSpy.mockResolvedValue({
+        status: 401,
+        ok: false,
+        text: async () => "Unauthorized Key"
+      } as Response);
+
+      const res = await translateBatch(["Hello"], ["ms"]);
+      expect(res.translations["Hello"]["ms"].status).toBe("failed");
+      expect(fetchSpy).toHaveBeenCalledTimes(1); // Exactly 1 call, no retries!
+    } finally {
+      process.env.AZURE_TRANSLATOR_KEY = key; // restore
+    }
   });
 
   it("should strictly not retry on 403 Forbidden errors and return failed items status", async () => {
-    fetchSpy.mockResolvedValue({
-      status: 403,
-      ok: false,
-      text: async () => "Out of call volume quota"
-    } as Response);
+    const key = process.env.AZURE_TRANSLATOR_KEY;
+    process.env.AZURE_TRANSLATOR_KEY = "test-mock-key"; // Force API path instead of simulation fallback
 
-    const res = await translateBatch(["Hello"], ["ms"]);
-    expect(res.translations["Hello"]["ms"].status).toBe("failed");
-    expect(fetchSpy).toHaveBeenCalledTimes(1); // Exactly 1 call, no retries!
+    try {
+      fetchSpy.mockResolvedValue({
+        status: 403,
+        ok: false,
+        text: async () => "Out of call volume quota"
+      } as Response);
+
+      const res = await translateBatch(["Hello"], ["ms"]);
+      expect(res.translations["Hello"]["ms"].status).toBe("failed");
+      expect(fetchSpy).toHaveBeenCalledTimes(1); // Exactly 1 call, no retries!
+    } finally {
+      process.env.AZURE_TRANSLATOR_KEY = key; // restore
+    }
   });
 
   it("should retry on 429 Too Many Requests errors with exponential backoff", async () => {
-    // Mock first call as 429, second as success
-    fetchSpy
-      .mockResolvedValueOnce({
-        status: 429,
-        ok: false,
-        text: async () => "Too Many Requests"
-      } as Response)
-      .mockResolvedValueOnce({
-        status: 200,
-        ok: true,
-        json: async () => [
-          {
-            translations: [{ text: "Halo", to: "ms" }]
-          }
-        ]
-      } as Response);
+    const key = process.env.AZURE_TRANSLATOR_KEY;
+    process.env.AZURE_TRANSLATOR_KEY = "test-mock-key"; // Force API path instead of simulation fallback
 
-    const res = await translateBatch(["Hello"], ["ms"]);
-    expect(res.translations["Hello"]["ms"].status).toBe("ok");
-    expect(res.translations["Hello"]["ms"].text).toBe("Halo");
-    expect(fetchSpy).toHaveBeenCalledTimes(2); // Retried once!
+    try {
+      // Mock first call as 429, second as success
+      fetchSpy
+        .mockResolvedValueOnce({
+          status: 429,
+          ok: false,
+          text: async () => "Too Many Requests"
+        } as Response)
+        .mockResolvedValueOnce({
+          status: 200,
+          ok: true,
+          json: async () => [
+            {
+              translations: [{ text: "Halo", to: "ms" }]
+            }
+          ]
+        } as Response);
+
+      const res = await translateBatch(["Hello"], ["ms"]);
+      expect(res.translations["Hello"]["ms"].status).toBe("ok");
+      expect(res.translations["Hello"]["ms"].text).toBe("Halo");
+      expect(fetchSpy).toHaveBeenCalledTimes(2); // Retried once!
+    } finally {
+      process.env.AZURE_TRANSLATOR_KEY = key; // restore
+    }
   });
 
   it("should return failed status on items when batch api request fails after retries", async () => {
-    fetchSpy.mockRejectedValue(new Error("Network Failure"));
+    const key = process.env.AZURE_TRANSLATOR_KEY;
+    process.env.AZURE_TRANSLATOR_KEY = "test-mock-key"; // Force API path instead of simulation fallback
 
-    const res = await translateBatch(["Hello"], ["ms"]);
-    expect(res.translations["Hello"]["ms"].status).toBe("failed");
-    expect(res.translations["Hello"]["ms"].text).toBeUndefined(); // Never returns original text as translation
-    expect(fetchSpy).toHaveBeenCalledTimes(4); // Initial call + 3 retries
+    try {
+      fetchSpy.mockRejectedValue(new Error("Network Failure"));
+
+      const res = await translateBatch(["Hello"], ["ms"]);
+      expect(res.translations["Hello"]["ms"].status).toBe("failed");
+      expect(res.translations["Hello"]["ms"].text).toBeUndefined(); // Never returns original text as translation
+      expect(fetchSpy).toHaveBeenCalledTimes(4); // Initial call + 3 retries
+    } finally {
+      process.env.AZURE_TRANSLATOR_KEY = key; // restore
+    }
   }, 15000); // 15s timeout to allow full backoff retry cycle
+
+  describe("Required Edge Case Tests", () => {
+    const testCases = [
+      {
+        description: "Terms & Conditions",
+        input: "Terms & Conditions",
+        expectedProtected: "Terms & Conditions",
+        azureResponse: "Syarat &amp; Syarat",
+        expectedOutput: "Syarat & Syarat"
+      },
+      {
+        description: "Don't miss out",
+        input: "Don't miss out",
+        expectedProtected: "Don't miss out",
+        azureResponse: "Jangan lepaskan peluang!",
+        expectedOutput: "Jangan lepaskan peluang!"
+      },
+      {
+        description: "5 < 10",
+        input: "5 < 10",
+        expectedProtected: "5 < 10",
+        azureResponse: "5 &lt; 10",
+        expectedOutput: "5 < 10"
+      },
+      {
+        description: "<b>Bold</b> text",
+        input: "<b>Bold</b> text",
+        expectedProtected: "<b>Bold</b> text",
+        azureResponse: "<b>Tebal</b> teks",
+        expectedOutput: "<b>Tebal</b> teks"
+      },
+      {
+        description: "Multiline text",
+        input: "Line 1\nLine 2",
+        expectedProtected: "Line 1\nLine 2",
+        azureResponse: "Baris 1\nBaris 2",
+        expectedOutput: "Baris 1\nBaris 2"
+      },
+      {
+        description: "&amp;lt;",
+        input: "&amp;lt;",
+        expectedProtected: "&amp;lt;",
+        azureResponse: "&amp;lt;",
+        expectedOutput: "&lt;"
+      }
+    ];
+
+    testCases.forEach(tc => {
+      it(`should correctly process case: "${tc.description}"`, async () => {
+        // Verify what goes to Azure (protectContent)
+        const pContent = protectContent(tc.input);
+        console.log(`[Test Edge Case - "${tc.description}"] Original: "${tc.input}" | Sent to Azure: "${pContent}"`);
+        
+        // Mock translateBatch with fetch
+        fetchSpy.mockResolvedValueOnce({
+          status: 200,
+          ok: true,
+          json: async () => [
+            {
+              translations: [{ text: tc.azureResponse, to: "ms" }]
+            }
+          ]
+        } as Response);
+
+        const key = process.env.AZURE_TRANSLATOR_KEY;
+        process.env.AZURE_TRANSLATOR_KEY = "test-mock-key"; // Force active state for test
+
+        try {
+          const res = await translateBatch([tc.input], ["ms"]);
+          const translatedVal = res.translations[tc.input]["ms"];
+          
+          expect(translatedVal.status).toBe("ok");
+          expect(translatedVal.text).toBe(tc.expectedOutput);
+          console.log(`[Test Edge Case - "${tc.description}"] Received from Azure: "${tc.azureResponse}" | Decoded/Validated: "${translatedVal.text}"`);
+        } finally {
+          process.env.AZURE_TRANSLATOR_KEY = key; // restore
+        }
+      });
+    });
+  });
 });

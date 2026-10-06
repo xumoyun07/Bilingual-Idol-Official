@@ -50,7 +50,37 @@ export const contentRouter = router({
   publicProgram: publicProcedure.input(z.object({ slug: z.string().min(1) })).query(({ input }) => db.getPublicProgram(input.slug)),
   publicTestimonials: publicProcedure.query(() => db.listPublicTestimonials()),
   publicTeamProfiles: publicProcedure.query(() => db.listPublicTeamProfiles()),
-  siteSettings: publicProcedure.query(() => db.listSiteSettings()),
+  siteSettings: publicProcedure.query(async () => {
+    const settings = await db.listSiteSettings();
+    const whitelist = [
+      "promo_active",
+      "promo_title",
+      "promo_text",
+      "promo_discount",
+      "promo_code",
+      "promo_cta_text",
+      "promo_cta_url",
+      "promo_color",
+      "centre_name",
+      "brand_tagline",
+      "registration_status",
+      "contact_email",
+      "emergency_contact",
+      "contact_phone",
+      "whatsapp_number",
+      "address",
+      "operating_hours",
+      "operatingHours"
+    ];
+    const filtered: Record<string, string> = {};
+    for (const key of whitelist) {
+      if (settings[key] !== undefined) {
+        filtered[key] = settings[key];
+      }
+    }
+    return filtered;
+  }),
+  systemSettings: founderProcedure.query(() => db.listSiteSettings()),
 
   // Admin / Founder CRUD: Programs
   listPrograms: adminProcedure.query(() => db.listPrograms()),
