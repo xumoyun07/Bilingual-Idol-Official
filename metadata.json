@@ -1,0 +1,8 @@
+{
+  "name": "Remix Bilingual-Idol-Official",
+  "description": "Imported from GitHub: xumoyun07/Bilingual-Idol-Official",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

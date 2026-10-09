@@ -1,0 +1,216 @@
+import { useState, useRef, useEffect } from "react";
+import { Check, ChevronDown, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Language } from "@/lib/translations";
+
+interface LanguageOption {
+  code: Language;
+  label: string;
+  nativeName: string;
+  flag: string;
+}
+
+const languages: LanguageOption[] = [
+  { code: "en", label: "English", nativeName: "English", flag: "🇬🇧" },
+  { code: "ms", label: "Malay", nativeName: "Bahasa Melayu", flag: "🇲🇾" },
+  { code: "ar", label: "Arabic", nativeName: "العربية", flag: "🇸🇦" },
+];
+
+export function LanguageSwitcher({
+  variant = "dropdown",
+  className = "",
+}: {
+  variant?: "dropdown" | "compact" | "inline";
+  className?: string;
+}) {
+  const { language, setLanguage, isRTL } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const optionsRef = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const currentLang = languages.find((l) => l.code === language) || languages[0];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // When dropdown opens, initialize focused option
+  useEffect(() => {
+    if (isOpen) {
+      const idx = languages.findIndex(l => l.code === language);
+      setFocusedIndex(idx >= 0 ? idx : 0);
+    } else {
+      setFocusedIndex(-1);
+    }
+  }, [isOpen, language]);
+
+  // Set keyboard focus on the current option when cycling
+  useEffect(() => {
+    if (isOpen && focusedIndex >= 0 && optionsRef.current[focusedIndex]) {
+      optionsRef.current[focusedIndex]?.focus();
+    }
+  }, [isOpen, focusedIndex]);
+
+  const handleSelect = (code: Language) => {
+    setLanguage(code);
+    setIsOpen(false);
+    buttonRef.current?.focus();
+  };
+
+  const isDashboard = className.includes("dashboard-lang-switcher");
+
+  if (variant === "inline") {
+    return (
+      <div
+        className={`flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#eef3ff] border border-[#d9e2f1] ${className}`}
+        role="group"
+        aria-label={language === "ar" ? "اختيار اللغة" : language === "ms" ? "Pilihan bahasa" : "Language selection"}
+      >
+        {languages.map((item) => {
+          const isSelected = item.code === language;
+          return (
+            <button
+              key={item.code}
+              type="button"
+              onClick={() => handleSelect(item.code)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
+                isSelected
+                  ? "bg-[#173fad] text-white shadow-sm"
+                  : "text-[#445d80] hover:bg-white hover:text-[#173fad]"
+              }`}
+              aria-pressed={isSelected}
+            >
+              <span className="text-sm leading-none">{item.flag}</span>
+              <span>{item.nativeName}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  const dropdownContainerClass = isDashboard
+    ? `absolute mt-2 w-54 rounded-2xl bg-white border border-[#edf2f6] shadow-[0_12px_30px_rgba(16,37,62,0.08),0_4px_12px_rgba(16,37,62,0.03)] p-1.5 z-[100] pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
+        isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
+      }`
+    : `absolute mt-1.5 w-48 rounded-xl bg-white border border-[#d9e2f1] shadow-2xl py-1.5 z-[100] pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200 ease-out will-change-transform ${
+        isRTL ? "left-0 origin-top-left" : "right-0 origin-top-right"
+      }`;
+
+  return (
+    <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setIsOpen(true);
+          }
+        }}
+        className={isDashboard 
+          ? "inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3.5 py-2 text-xs font-semibold text-[#10253e] bg-white/75 hover:bg-white border border-[#edf2f6] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 backdrop-blur-xs focus:outline-none focus:ring-2 focus:ring-[#173fad]/20 focus-visible:ring-[#173fad]"
+          : "inline-flex items-center justify-center gap-1.5 min-h-[38px] px-3 py-1.5 text-xs font-bold text-[#354c6d] bg-white hover:bg-[#eef3ff] hover:text-[#173fad] border border-[#d9e2f1] hover:border-[#b8cce9] rounded-xl shadow-xs transition-all duration-160 focus:outline-none focus:ring-2 focus:ring-[#173fad]/20 focus-visible:ring-[#173fad]"
+        }
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-label={
+          language === "ar"
+            ? `اللغة الحالية: ${currentLang.nativeName}. انقر لتغيير اللغة`
+            : language === "ms"
+            ? `Bahasa semasa: ${currentLang.nativeName}. Klik untuk menukar bahasa`
+            : `Current language: ${currentLang.nativeName}. Click to change language`
+        }
+      >
+        <Globe size={15} className="text-[#173fad]" aria-hidden="true" />
+        <span className="text-sm leading-none" aria-hidden="true">{currentLang.flag}</span>
+        <span className="font-semibold tracking-tight">{variant === "compact" ? currentLang.code.toUpperCase() : currentLang.nativeName}</span>
+        <ChevronDown
+          size={13}
+          className={`text-[#61727c] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          className={dropdownContainerClass}
+          role="listbox"
+          aria-label={language === "ar" ? "اختر اللغة" : language === "ms" ? "Pilih bahasa" : "Select language"}
+        >
+          {languages.map((item, index) => {
+            const isSelected = item.code === language;
+            const buttonClass = isDashboard
+              ? `w-full flex items-center justify-between px-3 py-2.5 text-xs text-start rounded-xl transition-all duration-150 min-h-[44px] focus:outline-none ${
+                  isSelected
+                    ? "bg-[#e8eeff] text-[#173fad]"
+                    : "text-[#445d80] hover:bg-[#f1f5f9] hover:text-[#173fad]"
+                }`
+              : `w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-start transition-colors min-h-[40px] focus:outline-none focus:bg-[#eef3ff] ${
+                  isSelected
+                    ? "bg-[#eef3ff] text-[#173fad] font-bold"
+                    : "text-[#2e4259] hover:bg-slate-50 hover:text-[#10253e] font-medium"
+                }`;
+
+            return (
+              <button
+                key={item.code}
+                ref={(el) => {
+                  optionsRef.current[index] = el;
+                }}
+                type="button"
+                onClick={() => handleSelect(item.code)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setFocusedIndex((prev) => (prev + 1) % languages.length);
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setFocusedIndex((prev) => (prev - 1 + languages.length) % languages.length);
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setIsOpen(false);
+                    buttonRef.current?.focus();
+                  } else if (e.key === "Tab") {
+                    setIsOpen(false);
+                  }
+                }}
+                className={buttonClass}
+                role="option"
+                aria-selected={isSelected}
+              >
+                <span className="flex items-center gap-2.5">
+                  <span className="text-base leading-none" aria-hidden="true">{item.flag}</span>
+                  <span className="flex flex-col text-start gap-0.5">
+                    <span className={isDashboard ? "font-semibold text-sm text-[#10253e]" : "font-bold"}>
+                      {item.nativeName}
+                    </span>
+                    <span className={isDashboard ? "text-[11px] text-[#566983] font-medium" : "text-[10px] text-[#71808a] font-normal"}>
+                      {item.label}
+                    </span>
+                  </span>
+                </span>
+                {isSelected && (
+                  <Check 
+                    size={14} 
+                    className={`${isDashboard ? "text-[#173fad] stroke-[2.5]" : "text-[#173fad]"} flex-none`} 
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

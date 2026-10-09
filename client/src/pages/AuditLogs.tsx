@@ -1,0 +1,361 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { trpc } from "@/lib/trpc";
+import { AlertCircle, ArchiveRestore, CalendarDays, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, Filter, History, Loader2, RotateCcw, Search, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { FilterDrawer } from "@/components/ui/FilterDrawer";
+
+type AuditRole = "founder" | "super_admin";
+type AuditSource = "active" | "archive";
+type AuditActorRole = "" | "founder" | "super_admin" | "admin" | "marketing" | "teacher" | "student" | "user";
+type AuditRow = { id: number; source: AuditSource; createdAt: Date; actorUserId: number | null; actorRole: string | null; action: string; targetType: string; targetId: string | null; targetRole: string | null; description: string; isSuccess: boolean; ipAddress: string | null; browser: string | null; operatingSystem: string | null; archivedAt?: Date; archivedByUserId?: number | null };
+const AUDIT_PAGE_SIZE = 10 as const;
+
+const actionOptions = [
+  ["", "All actions"], ["audit.view", "Viewed audit logs"], ["audit.search", "Searched audit logs"], ["audit.export_csv", "Exported CSV"], ["audit.export_pdf", "Exported PDF"], ["audit.archive", "Archived logs"], ["audit.restore", "Restored logs"],
+  ["user.create", "Created user"], ["user.update", "Updated user"], ["user.delete", "Deleted user"], ["student_profile.create", "Created student profile"], ["student_profile.update", "Updated student profile"], ["student_profile.delete", "Deleted student profile"], ["student_document.upload", "Uploaded student document"], ["student_document.delete", "Deleted student document"], ["user_group.create", "Created group"], ["user_group.update", "Updated group"], ["user_group.delete", "Deleted group"], ["user_field.create", "Created field"], ["user_field.update", "Updated field"], ["user_field.delete", "Deleted field"], ["user_field.reorder", "Reordered fields"], ["user_field.system_update", "Updated create form"],
+] as const;
+const targetOptions = [["", "All objects"], ["audit_log", "Audit log"], ["user", "User"], ["student_profile", "Student profile"], ["student_document", "Student document"], ["user_group", "User group"], ["user_field", "User field"], ["user_form", "User form"]] as const;
+const roleOptions: Record<AuditRole, readonly (readonly [string, string])[]> = {
+  founder: [["", "All roles"], ["founder", "Founder"], ["super_admin", "Super admin"], ["admin", "Admin"], ["marketing", "Marketing"], ["teacher", "Teacher"], ["student", "Student"], ["user", "Legacy user"]],
+  super_admin: [["", "All roles"], ["super_admin", "Super Admin"], ["admin", "Admin"], ["marketing", "Marketing"], ["teacher", "Teacher"], ["student", "Student"], ["user", "Legacy user"]],
+};
+
+function localDate(value: Date | string) { return new Date(value).toLocaleString(); }
+function labelAction(value: string) { return value.replace(/_/g, " ").replace(/\./g, " · "); }
+function downloadFile(content: BlobPart, filename: string, mimeType: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
+  const link = document.createElement("a"); link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+}
+function decodeBase64(value: string) { const binary = atob(value); const bytes = new Uint8Array(binary.length); for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index); return bytes; }
+
+export default function AuditLogs({ role }: { role: AuditRole }) {
+  const isFounder = role === "founder";
+  const utils = trpc.useUtils();
+  const [source, setSource] = useState<AuditSource>("active");
+  const [query, setQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [actorRole, setActorRole] = useState<AuditActorRole>("");
+  const [action, setAction] = useState("");
+  const [targetType, setTargetType] = useState("");
+  const [success, setSuccess] = useState("all");
+  const [page, setPage] = useState(0);
+  const [selectedArchiveIds, setSelectedArchiveIds] = useState<number[]>([]);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const filters = useMemo(() => ({ query: query.trim() || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, actorRole: actorRole || undefined, action: action || undefined, targetType: targetType || undefined, isSuccess: success === "all" ? undefined : success === "success", source }), [action, actorRole, dateFrom, dateTo, query, source, success, targetType]);
+  const input = useMemo(() => ({ ...filters, page, pageSize: AUDIT_PAGE_SIZE }), [filters, page]);
+  const list = trpc.audit.list.useQuery(input);
+  const suggestions = trpc.audit.suggestions.useQuery({ ...filters, query: query.trim() }, { enabled: query.trim().length >= 2 });
+  const refresh = async () => { await Promise.all([utils.audit.list.invalidate(), utils.audit.suggestions.invalidate()]); };
+  const exportCsv = trpc.audit.exportCsv.useMutation({ onSuccess: result => { downloadFile(result.data, result.filename, result.mimeType); setNotice("CSV export is ready."); refresh(); } });
+  const exportPdf = trpc.audit.exportPdf.useMutation({ onSuccess: result => { downloadFile(decodeBase64(result.dataBase64), result.filename, result.mimeType); setNotice("PDF export is ready."); refresh(); } });
+  const archive = trpc.audit.archive.useMutation({ onSuccess: async result => { setNotice(`Archived ${result.archived} record${result.archived === 1 ? "" : "s"} older than 12 months.`); await refresh(); } });
+  const restore = trpc.audit.restore.useMutation({ onSuccess: async result => { setNotice(`Restored ${result.restored} record${result.restored === 1 ? "" : "s"}.`); setSelectedArchiveIds([]); await refresh(); } });
+  const rows = (list.data?.rows ?? []) as AuditRow[];
+  const total = list.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / AUDIT_PAGE_SIZE));
+  const pageItems = paginationItems(totalPages, page);
+  const mutationError = exportCsv.error ?? exportPdf.error ?? archive.error ?? restore.error;
+  const isPending = exportCsv.isPending || exportPdf.isPending || archive.isPending || restore.isPending;
+
+  function resetFilters() { setQuery(""); setDateFrom(""); setDateTo(""); setActorRole(""); setAction(""); setTargetType(""); setSuccess("all"); setPage(0); setSelectedArchiveIds([]); }
+  function updateSource(next: AuditSource) { setSource(next); setPage(0); setSelectedArchiveIds([]); }
+  function selectSuggestion(value: string) { setQuery(value.startsWith("#") ? value.slice(1) : value); setPage(0); }
+  function toggleArchive(id: number) { setSelectedArchiveIds(ids => ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]); }
+  function goToPage(nextPage: number) { setPage(Math.min(Math.max(0, nextPage), totalPages - 1)); }
+
+  return <main id="auditlogs-container" data-page="auditlogs" className="workspace-page founder-command founder-workspace page-auditlogs mx-auto w-full min-w-0 max-w-[96rem] pb-10">
+    <header className="founder-command-header min-w-0">
+      <div className="min-w-0"><p className="founder-command-eyebrow">{isFounder ? "Control centre" : "Administration"} · Audit logs</p><h1 className="founder-command-title">{isFounder ? "Review sensitive activity with clear scope." : "Comprehensive Institutional Audit Trail"}</h1><p className="founder-command-description">{isFounder ? "UTC-based events are stored with indexed filters and rendered in your local time. You can also review archived records and restore selected entries." : "Institution-wide administrative, instructional, and operational audit trail with comprehensive event tracking and verifiable records."}</p></div>
+      <div className="founder-command-action flex shrink-0 flex-wrap gap-2"><Button type="button" variant="outline" disabled={isPending} onClick={() => exportCsv.mutate(filters)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><FileSpreadsheet size={16} />CSV</Button><Button type="button" variant="outline" disabled={isPending} onClick={() => exportPdf.mutate(filters)} className="min-h-12 border-[#d8cfbf] text-[#29415b] hover:bg-[#faf6ef]"><FileText size={16} />PDF</Button></div>
+    </header>
+
+    {notice ? <Alert className="mt-5 border-[#c8d9f8] bg-[#eef4ff] text-[#173fad]"><ShieldCheck className="h-4 w-4" /><AlertTitle>Audit operation completed</AlertTitle><AlertDescription className="flex items-center justify-between gap-3">{notice}<button type="button" onClick={() => setNotice(null)} className="min-h-10 rounded-lg px-2 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad]" aria-label="Dismiss notice">Dismiss</button></AlertDescription></Alert> : null}
+    {mutationError ? <Alert variant="destructive" className="mt-5"><AlertCircle className="h-4 w-4" /><AlertTitle>Audit operation needs attention</AlertTitle><AlertDescription>{mutationError.message}</AlertDescription></Alert> : null}
+
+    {/* UPGRADED MODERN AUDIT LOG FILTERS */}
+    <section className="founder-panel founder-panel-paper mt-6 rounded-2xl border border-[#dce4e7] bg-white p-5 sm:p-6 shadow-sm transition-all hover:border-[#cfd9de]" aria-label="Audit log filters">
+      {isFounder ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf2f4] pb-4 mb-4">
+          <div className="inline-flex rounded-xl border border-[#dce4e7] bg-[#f8fafb] p-1" role="tablist" aria-label="Audit data source">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={source === "active"}
+              onClick={() => updateSource("active")}
+              className={`min-h-10 rounded-lg px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${source === "active" ? "bg-[#10253e] text-white shadow-sm" : "text-[#53657a] hover:bg-white"}`}
+            >
+              Active records
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={source === "archive"}
+              onClick={() => updateSource("archive")}
+              className={`min-h-10 rounded-lg px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${source === "archive" ? "bg-[#10253e] text-white shadow-sm" : "text-[#53657a] hover:bg-white"}`}
+            >
+              Archive
+            </button>
+          </div>
+          {source === "active" ? (
+            <Button type="button" onClick={() => archive.mutate()} disabled={isPending} className="compass-btn-secondary min-h-11 text-xs">
+              <History size={15} />
+              Run 12-month archive
+            </Button>
+          ) : selectedArchiveIds.length ? (
+            <Button type="button" onClick={() => restore.mutate({ archiveIds: selectedArchiveIds })} disabled={isPending} className="compass-btn-primary min-h-11 text-xs">
+              <ArchiveRestore size={15} />
+              Restore selected ({selectedArchiveIds.length})
+            </Button>
+          ) : (
+            <p className="text-xs text-[#53657a]">Select archived records to restore them.</p>
+          )}
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf2f4] pb-4 mb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef4ff] text-[#173fad]">
+            <SlidersHorizontal size={16} />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-[#10253e] uppercase tracking-wider">Audit Log Filters</h2>
+            <p className="text-xs text-[#53657a]">Search events by ID, description, actor role, action or client metadata</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)) > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#eef4ff] px-2.5 py-0.5 text-xs font-semibold text-[#173fad]">
+              <Filter size={12} />
+              {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0))} active
+            </span>
+          )}
+          {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)) > 0 && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] px-3 py-1.5 text-xs font-bold text-[#b4563c] transition-colors hover:bg-[#fff0ed] hover:border-[#efc4b8]"
+            >
+              <RotateCcw size={13} />
+              <span>Reset all</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 md:gap-3">
+        {/* Search Query Inline */}
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#708098]" size={16} />
+          <input
+            value={query}
+            onChange={event => { setQuery(event.target.value); setPage(0); }}
+            className="h-11 w-full rounded-xl border border-[#dce4e7] bg-[#f8fafb] pl-10 pr-9 text-sm text-[#10253e] transition-all placeholder:text-[#8c9ba8] focus:border-[#173fad] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+            placeholder="Search ID, description, IP, browser, action or object…"
+            aria-describedby={suggestions.data?.length ? "audit-search-suggestions" : undefined}
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => { setQuery(""); setPage(0); }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#708098] hover:bg-[#edf2f4] hover:text-[#10253e]"
+              title="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
+          {suggestions.data?.length ? (
+            <div id="audit-search-suggestions" className="absolute z-20 mt-1 max-h-52 w-full overflow-auto rounded-xl border border-[#dce4e7] bg-white p-1 shadow-lg" role="listbox" aria-label="Search suggestions">
+              {suggestions.data.map((item: string) => (
+                <button
+                  key={item}
+                  type="button"
+                  role="option"
+                  onClick={() => selectSuggestion(item)}
+                  className="flex min-h-10 w-full items-center rounded-lg px-3 text-left text-xs font-medium text-[#29415b] hover:bg-[#eef4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad]"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Quick Execution Result filter for Desktop */}
+          <div className="hidden md:block">
+            <select
+              value={success}
+              onChange={event => { setSuccess(event.target.value); setPage(0); }}
+              aria-label="Quick filter by result"
+              className="h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dce4e7] bg-[#f8fafc] text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad] min-w-[150px]"
+            >
+              <option value="all">All results</option>
+              <option value="success">Successful</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
+
+          <FilterDrawer
+            title="Filter Audit Logs"
+            description="Select actor role, operations action, target object and UTC date ranges to audit."
+            activeCount={(dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)}
+            triggerLabel="Filters"
+            onReset={resetFilters}
+          >
+            {/* Filter 1: Actor Role */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Actor Role
+              </label>
+              <select
+                value={actorRole}
+                onChange={event => { setActorRole(event.target.value as AuditActorRole); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                {roleOptions[role].map(([key, copy]) => (
+                  <option key={key || "all"} value={key}>{copy}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filter 2: Action */}
+            <div className="space-y-1.5 pt-2 border-t border-[#edf2f5]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Operations Action
+              </label>
+              <select
+                value={action}
+                onChange={event => { setAction(event.target.value); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                {actionOptions.map(([key, copy]) => (
+                  <option key={key || "all"} value={key}>{copy}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filter 3: Target Object */}
+            <div className="space-y-1.5 pt-2 border-t border-[#edf2f5]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Target Object
+              </label>
+              <select
+                value={targetType}
+                onChange={event => { setTargetType(event.target.value); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                {targetOptions.map(([key, copy]) => (
+                  <option key={key || "all"} value={key}>{copy}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filter 4: UTC Date range */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#edf2f5]">
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#53657a]">
+                  UTC Date From
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={event => { setDateFrom(event.target.value); setPage(0); }}
+                  className="w-full h-11 px-3 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#53657a]">
+                  UTC Date To
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={event => { setDateTo(event.target.value); setPage(0); }}
+                  className="w-full h-11 px-3 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+                />
+              </div>
+            </div>
+
+            {/* Filter 5: Result (for mobile bottom sheet) */}
+            <div className="space-y-1.5 pt-2 border-t border-[#edf2f5] md:hidden">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#53657a]">
+                Result Status
+              </label>
+              <select
+                value={success}
+                onChange={event => { setSuccess(event.target.value); setPage(0); }}
+                className="w-full h-11 px-3.5 text-xs font-semibold rounded-xl border border-[#dfd1bf] bg-white text-[#10253e] focus:outline-none focus:ring-2 focus:ring-[#173fad]/20"
+              >
+                <option value="all">All results</option>
+                <option value="success">Successful</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+          </FilterDrawer>
+        </div>
+      </div>
+
+      {/* Applied Criteria Chips */}
+      {((query.trim() ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0) + (actorRole ? 1 : 0) + (action ? 1 : 0) + (targetType ? 1 : 0) + (success !== "all" ? 1 : 0)) > 0 && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#edf2f4] pt-3.5">
+          <span className="text-xs font-semibold text-[#708098]">Applied filters:</span>
+          {query.trim() && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>Query: <strong>"{query}"</strong></span>
+              <button type="button" onClick={() => { setQuery(""); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+          {actorRole && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>Role: <strong>{actorRole}</strong></span>
+              <button type="button" onClick={() => { setActorRole(""); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+          {action && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>Action: <strong>{labelAction(action)}</strong></span>
+              <button type="button" onClick={() => { setAction(""); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+          {targetType && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>Object: <strong>{targetType}</strong></span>
+              <button type="button" onClick={() => { setTargetType(""); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+          {dateFrom && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>From: <strong>{dateFrom}</strong></span>
+              <button type="button" onClick={() => { setDateFrom(""); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+          {dateTo && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>To: <strong>{dateTo}</strong></span>
+              <button type="button" onClick={() => { setDateTo(""); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+          {success !== "all" && (
+            <span className="inline-flex items-center gap-1 rounded-lg bg-[#f0f4f8] px-2.5 py-1 text-xs font-medium text-[#10253e]">
+              <span>Result: <strong>{success === "success" ? "Success" : "Failed"}</strong></span>
+              <button type="button" onClick={() => { setSuccess("all"); setPage(0); }} className="text-[#708098] hover:text-[#b4563c]"><X size={12} /></button>
+            </span>
+          )}
+        </div>
+      )}
+    </section>
+
+    <section className="founder-panel founder-panel-paper mt-6 min-w-0 overflow-hidden p-0" aria-live="polite">
+      <div className="flex min-w-0 flex-col gap-3 border-b border-[#eee4d7] px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-5"><div className="min-w-0"><p className="founder-command-eyebrow">{source === "archive" ? "Archived events" : "Current events"}</p><h2 className="mt-1 break-words font-display text-3xl text-[#10253e]">{list.isLoading ? "Loading records…" : `${total.toLocaleString()} matching event${total === 1 ? "" : "s"}`}</h2></div><p className="shrink-0 text-xs font-extrabold tracking-[.08em] text-[#708098] uppercase">10 records per page</p></div>
+      {list.isLoading ? <div className="grid min-h-72 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div> : list.error ? <div className="p-6"><Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertTitle>Audit logs are unavailable</AlertTitle><AlertDescription>Refresh the page or try again shortly.</AlertDescription></Alert></div> : !rows.length ? <div className="grid min-h-72 place-items-center px-6 text-center"><div><Filter className="mx-auto text-[#aab5c1]" size={30} /><h3 className="mt-4 font-display text-3xl text-[#10253e]">No matching audit records</h3><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#53657a]">Try clearing or changing filters. The system does not invent events when none exist.</p></div></div> : <><div className="space-y-3 p-3 2xl:hidden">{rows.map(row => <AuditLogCard key={`${row.source}-${row.id}`} row={row} selectable={isFounder && source === "archive"} selected={selectedArchiveIds.includes(row.id)} onToggle={() => toggleArchive(row.id)} />)}</div><div className="hidden 2xl:block"><table className="w-full table-fixed border-collapse text-left"><thead className="bg-[#f7f2e9] text-[11px] font-extrabold tracking-[.08em] text-[#53657a] uppercase"><tr>{isFounder && source === "archive" ? <th className="w-14 px-4 py-4"><span className="sr-only">Select for restore</span></th> : null}<th className="w-[17%] px-4 py-4">Local date / UTC</th><th className="w-[11%] px-4 py-4">User ID / role</th><th className="w-[20%] px-4 py-4">Action</th><th className="w-[14%] px-4 py-4">Target object</th><th className="w-[12%] px-4 py-4">IP address</th><th className="w-[16%] px-4 py-4">Browser / OS</th><th className="w-[10%] px-4 py-4">Result</th></tr></thead><tbody className="divide-y divide-[#f0e9df]">{rows.map(row => <tr key={`${row.source}-${row.id}`} className="bg-white align-top hover:bg-[#fcfaf5]">{isFounder && source === "archive" ? <td className="px-4 py-4"><Checkbox checked={selectedArchiveIds.includes(row.id)} onCheckedChange={() => toggleArchive(row.id)} aria-label={`Select archived audit record ${row.id} for restoration`} className="h-5 w-5 border-[#708098]" /></td> : null}<td className="break-words px-4 py-4 text-xs leading-5 text-[#53657a]"><span className="block font-bold text-[#29415b]">{localDate(row.createdAt)}</span><span className="block">{new Date(row.createdAt).toISOString()}</span></td><td className="break-words px-4 py-4 text-sm text-[#29415b]"><span className="block font-bold">{row.actorUserId ?? "System"}</span><span className="block text-xs text-[#708098]">{row.actorRole ?? "—"}</span></td><td className="break-words px-4 py-4"><span className="inline-flex max-w-full rounded-full bg-[#e9eef8] px-2.5 py-1 text-xs font-extrabold text-[#325c95] capitalize">{labelAction(row.action)}</span><p className="mt-2 break-words text-xs leading-5 text-[#53657a]">{row.description}</p></td><td className="break-words px-4 py-4 text-sm text-[#29415b]"><span className="block font-bold">{row.targetType}</span><span className="block text-xs text-[#708098]">{row.targetId ?? "—"}{row.targetRole ? ` · ${row.targetRole}` : ""}</span></td><td className="break-all px-4 py-4 font-mono text-xs text-[#53657a]">{row.ipAddress ?? "—"}</td><td className="break-words px-4 py-4 text-xs leading-5 text-[#53657a]"><span className="block font-semibold text-[#29415b]">{row.browser ?? "Unknown"}</span><span className="block">{row.operatingSystem ?? "Unknown"}</span></td><td className="px-4 py-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-extrabold ${row.isSuccess ? "bg-[#e8eeff] text-[#173fad]" : "bg-[#fff0ed] text-[#a34732]"}`}>{row.isSuccess ? "Success" : "Failed"}</span></td></tr>)}</tbody></table></div></>}
+      {rows.length ? <footer className="flex flex-col gap-4 border-t border-[#eee4d7] px-4 py-4 sm:px-5"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm text-[#53657a]">Showing {rows.length} of {total.toLocaleString()} records</p><p className="text-sm font-bold text-[#29415b]" aria-live="polite">Page {page + 1} of {totalPages}</p></div><nav className="flex flex-wrap items-center justify-center gap-2 sm:justify-between" aria-label="Audit log page navigation"><Button type="button" variant="outline" onClick={() => goToPage(page - 1)} disabled={page === 0 || list.isFetching} className="min-h-12 border-[#d8cfbf] text-[#29415b]"><ChevronLeft size={16} />Previous</Button><div className="flex flex-wrap justify-center gap-1" aria-label={`Pages 1 to ${totalPages}`}>{pageItems.map(item => typeof item === "number" ? <button key={item} type="button" onClick={() => goToPage(item - 1)} aria-current={item === page + 1 ? "page" : undefined} aria-label={`Page ${item}${item === page + 1 ? ", current page" : ""}`} className={`min-h-12 min-w-12 rounded-lg border px-3 text-sm font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173fad] ${item === page + 1 ? "border-[#10253e] bg-[#10253e] text-white" : "border-[#d8cfbf] bg-white text-[#29415b] hover:bg-[#faf6ef]"}`}>{item}</button> : <span key={item} aria-hidden="true" className="inline-flex min-h-12 min-w-8 items-center justify-center text-[#708098]">…</span>)}</div><Button type="button" variant="outline" onClick={() => goToPage(page + 1)} disabled={page + 1 >= totalPages || list.isFetching} className="min-h-12 border-[#d8cfbf] text-[#29415b]">Next<ChevronRight size={16} /></Button></nav></footer> : null}
+    </section>
+  </main>;
+}
+
+function AuditLogCard({ row, selectable, selected, onToggle }: { row: AuditRow; selectable: boolean; selected: boolean; onToggle: () => void }) { return <article data-testid="audit-log-card" className="min-w-0 rounded-xl border border-[#e5dacb] bg-white p-4 shadow-sm"><div className="flex min-w-0 items-start justify-between gap-3"><div className="min-w-0"><p className="break-words text-xs font-extrabold tracking-[.08em] text-[#708098] uppercase">{row.targetType} · #{row.targetId ?? row.id}</p><h3 className="mt-1 break-words text-sm font-extrabold text-[#29415b]">{labelAction(row.action)}</h3></div>{selectable ? <Checkbox checked={selected} onCheckedChange={onToggle} aria-label={`Select archived audit record ${row.id} for restoration`} className="mt-1 h-5 w-5 shrink-0 border-[#708098]" /> : <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-extrabold ${row.isSuccess ? "bg-[#e8eeff] text-[#173fad]" : "bg-[#fff0ed] text-[#a34732]"}`}>{row.isSuccess ? "Success" : "Failed"}</span>}</div><p className="mt-3 break-words text-sm leading-6 text-[#53657a]">{row.description}</p><dl className="mt-4 grid gap-x-4 gap-y-3 border-t border-[#eee4d7] pt-4 text-xs sm:grid-cols-2"><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Time</dt><dd className="mt-1 break-words font-semibold text-[#29415b]">{localDate(row.createdAt)}<span className="mt-0.5 block font-normal text-[#708098]">{new Date(row.createdAt).toISOString()}</span></dd></div><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Actor</dt><dd className="mt-1 font-semibold text-[#29415b]">{row.actorUserId ?? "System"}<span className="ml-1 font-normal text-[#708098]">{row.actorRole ?? "—"}</span></dd></div><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Client</dt><dd className="mt-1 break-words text-[#29415b]">{row.ipAddress ?? "—"}<span className="mt-0.5 block text-[#708098]">{row.browser ?? "Unknown"} · {row.operatingSystem ?? "Unknown"}</span></dd></div><div><dt className="font-extrabold tracking-[.08em] text-[#708098] uppercase">Target role</dt><dd className="mt-1 break-words text-[#29415b]">{row.targetRole ?? "—"}</dd></div></dl>{selectable ? <span className={`mt-4 inline-flex rounded-full px-2.5 py-1 text-xs font-extrabold ${row.isSuccess ? "bg-[#e8eeff] text-[#173fad]" : "bg-[#fff0ed] text-[#a34732]"}`}>{row.isSuccess ? "Success" : "Failed"}</span> : null}</article>; }
+function paginationItems(totalPages: number, currentPage: number): Array<number | string> { if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1); const current = currentPage + 1; const items: Array<number | string> = [1]; if (current > 3) items.push("leading-ellipsis"); for (let page = Math.max(2, current - 1); page <= Math.min(totalPages - 1, current + 1); page += 1) items.push(page); if (current < totalPages - 2) items.push("trailing-ellipsis"); items.push(totalPages); return items; }

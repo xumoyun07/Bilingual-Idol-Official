@@ -1,0 +1,6 @@
+{
+  "summary":  "Architectural Implementation Plan for the comprehensive platform dashboard cleanup. Restructures all user dashboards (student, teacher, marketing, admin, super_admin) to display exactly one main empty dashboard page with a beautifully styled zero-state placeholder, while preserving only the requested 'User Accounts' and 'Audit Logs' governance modules for the founder. It also validates that founder account creation and deletion remain strictly prohibited.",
+  "updatedAt":  "2026-10-06T04:51:41.518010608Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

@@ -1,0 +1,2231 @@
+import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
+import { randomUUID } from "node:crypto";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment, enrollments, Enrollment } from "../drizzle/schema";
+import { ENV } from "./_core/env";
+import { shouldGrantFounderRole } from "./founderIdentity";
+import { createUserPasswordHash } from "./userAuth";
+import { EmailProvider } from "./email";
+import { normaliseOptions, parseFieldOptions, type RuntimeUserField, type UserFieldType, validateProfileValues } from "./userFieldSchema";
+import { BILC_DOMAIN, generateBilcEmail, resolveLoginIdentifier, validateNickname } from "../shared/nickname";
+
+export function transliterate(text: string): string {
+  const mapping: Record<string, string> = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+    'ا': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh', 'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y', 'ء': 'a', 'ى': 'a', 'ة': 't',
+  };
+  return text.split('').map(char => mapping[char] ?? char).join('');
+}
+
+export async function generateUniqueUserLogin(fullName: string, createdAt: Date): Promise<string> {
+  const transliterated = transliterate(fullName);
+  let baseName = transliterated.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!baseName) {
+    baseName = "user";
+  }
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kuala_Lumpur",
+    year: "numeric",
+    month: "2-digit",
+  });
+  const parts = formatter.formatToParts(createdAt);
+  const mm = parts.find(p => p.type === "month")?.value || "10";
+  const yyyy = parts.find(p => p.type === "year")?.value || "2026";
+  const dateSuffix = `${mm}${yyyy}`;
+
+  const baseLogin = `${baseName}${dateSuffix}`;
+  let candidateEmail = `${baseLogin}@bilc.my`;
+  let suffix = 0;
+
+  while (true) {
+    const existing = await getUserByEmail(candidateEmail);
+    if (!existing) {
+      break;
+    }
+    suffix++;
+    candidateEmail = `${baseLogin}_${suffix}@bilc.my`;
+  }
+
+  return candidateEmail;
+}
+
+
+let _db: ReturnType<typeof drizzle> | null = null;
+
+export async function getDb() {
+  if (!_db && process.env.DATABASE_URL) {
+    try { _db = drizzle(process.env.DATABASE_URL); } catch (error) { console.warn("[Database] Failed to connect:", error); _db = null; }
+  }
+  return _db;
+}
+
+// In-Memory Data Store Fallbacks (active when DATABASE_URL is unconfigured or offline)
+export const inMemoryStore = {
+  users: [
+    {
+      id: 1,
+      openId: "founder:lektor@gmail.com",
+      name: "Founder",
+      email: "lektor@gmail.com",
+      passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
+      role: "founder" as const,
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 2,
+      openId: "issued:superadmin",
+      name: "Super Admin",
+      email: "superadmin@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "super_admin" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 3,
+      openId: "issued:admin",
+      name: "Admin Manager",
+      email: "admin@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "admin" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 4,
+      openId: "issued:marketing",
+      name: "Marketing Agent",
+      email: "marketing@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "marketing" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 5,
+      openId: "issued:teacher",
+      name: "Teacher Speaker",
+      email: "teacher@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "teacher" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+    {
+      id: 6,
+      openId: "issued:student",
+      name: "Student Learner",
+      email: "student@bilc.my",
+      passwordHash: createUserPasswordHash("lektor07xumoyun"),
+      role: "student" as const,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+    },
+  ] as User[],
+  submissions: [] as Submission[],
+  registrationSubmissions: [] as RegistrationSubmission[],
+  registrationSubmissionValues: [] as RegistrationSubmissionValue[],
+  applications: [] as Application[],
+  enrollments: [] as Enrollment[],
+  placementTests: [
+    {
+      id: 1,
+      title: "General English Placement Test",
+      language: "English",
+      isActive: true,
+      questionsJson: JSON.stringify([
+        { id: 1, text: "Which sentence is correct?", options: ["I has a dog.", "I have a dog.", "I having a dog."], answer: "I have a dog.", level: "A1" },
+        { id: 2, text: "What is the opposite of 'hot'?", options: ["cold", "warm", "boiling"], answer: "cold", level: "A1" },
+        { id: 3, text: "She _____ to the gym every evening.", options: ["go", "goes", "going"], answer: "goes", level: "A2" },
+        { id: 4, text: "Yesterday, we _____ a wonderful dinner.", options: ["have", "has", "had"], answer: "had", level: "A2" },
+        { id: 5, text: "If it rains tomorrow, we _____ the picnic.", options: ["will cancel", "would cancel", "cancelled"], answer: "will cancel", level: "B1" },
+        { id: 6, text: "I have been living here _____ five years.", options: ["since", "for", "during"], answer: "for", level: "B1" },
+        { id: 7, text: "He is looking forward _____ you next week.", options: ["to meet", "to meeting", "meeting"], answer: "to meeting", level: "B2" },
+        { id: 8, text: "She succeeded _____ passing the exam.", options: ["in", "on", "at"], answer: "in", level: "B2" },
+        { id: 9, text: "Had I known about the party, I _____ attended.", options: ["would have", "will have", "had"], answer: "would have", level: "C1" },
+        { id: 10, text: "The presentation was _____ received by the board.", options: ["favorably", "favor", "favorite"], answer: "favorably", level: "C1" }
+      ]),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ] as PlacementTest[],
+  placementTestAttempts: [] as PlacementTestAttempt[],
+  promotions: [
+    { id: 1, code: "MERDEKA2026", title: "Merdeka Special Discount", description: "Get 15% off all General English programs for a limited time to celebrate Independence Month!", discountType: "percentage" as const, discountValue: 15, scope: "all", usedCount: 0, isActive: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: 2, code: "WELCOME50", title: "Welcome New Student Offer", description: "Receive a RM 50 flat discount on your registration and assessment fees for any selected course.", discountType: "fixed" as const, discountValue: 50, scope: "all", usedCount: 0, isActive: true, createdAt: new Date(), updatedAt: new Date() }
+  ] as Promotion[],
+  payments: [] as Payment[],
+  programs: [
+    { id: 1, slug: "general-english", title: "General English", language: "English", category: "English", ageGroup: "Teens & adults", level: "Beginner to advanced", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Build everyday confidence across speaking, listening, reading, and writing through practical, interactive learning.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 2, slug: "kids-english", title: "Kids English", language: "English", category: "Kids", ageGroup: "Children", level: "Foundation to developing", duration: "Designed around your child's learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "A playful, supportive foundation for young learners to grow their English through communication and guided practice.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 3, slug: "speaking-conversation", title: "Speaking & Conversation", language: "English", category: "English", ageGroup: "Teens & adults", level: "Elementary to advanced", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "A speaking-first programme for learners who want their words to feel natural, clear, and ready for daily life.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 4, slug: "ielts-preparation", title: "IELTS Preparation", language: "English", category: "Professional", ageGroup: "Teens & adults", level: "Intermediate and above", duration: "Designed around your exam goals", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Focused preparation for learners planning to demonstrate their English proficiency for study, work, or migration.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 5, slug: "bahasa-melayu", title: "Bahasa Melayu", language: "Bahasa Melayu", category: "World Languages", ageGroup: "Teens & adults", level: "Beginner to advanced", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Connect more confidently with life in Malaysia through structured Bahasa Melayu language learning.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 6, slug: "mandarin", title: "Mandarin", language: "Mandarin", category: "World Languages", ageGroup: "Children, teens & adults", level: "Beginner to advanced", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "A clear pathway into Mandarin that supports communication, listening skills, and purposeful progression.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 7, slug: "arabic", title: "Arabic", language: "Arabic", category: "World Languages", ageGroup: "Teens & adults", level: "Beginner to advanced", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Learn Arabic through guided practice that supports meaningful communication and steady progress.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 8, slug: "japanese", title: "Japanese", language: "Japanese", category: "World Languages", ageGroup: "Teens & adults", level: "Beginner to developing", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Start your Japanese language journey with an approachable, well-paced programme built around your needs.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 9, slug: "korean", title: "Korean", language: "Korean", category: "World Languages", ageGroup: "Teens & adults", level: "Beginner to developing", duration: "Designed around your learning plan", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Learn Korean in a supportive environment that makes new vocabulary and expressions feel achievable.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 10, slug: "business-english", title: "Business English", language: "English", category: "Professional", ageGroup: "Professionals", level: "Intermediate to advanced", duration: "Designed around workplace needs", schedule: "Confirmed with the centre after consultation", fees: "Fee guidance available on enquiry", description: "Refine professional communication for meetings, presentations, correspondence, and international workplace settings.", isActive: true, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+  ] as Program[],
+  announcements: [
+    {
+      id: 1,
+      slug: "bilc-grand-redesign-transforming-language-learning",
+      title: "Bilingual Idol Language Centre Redesign: Transforming Language Learning",
+      excerpt: "Explore our newly designed spaces, interactive programmes, and the modern learning framework that redefines bilingual fluency.",
+      body: "We are absolutely thrilled to officially unveil the new, highly-polished experience of Bilingual Idol Language Centre! As a leading institution dedicated to nurturing language fluency across English, Bahasa Melayu, Mandarin, Arabic, Japanese, Korean, and more, our redesign brings a breath of fresh air to our campus, our digital presence, and our interactive classrooms.\n\n### What is New at Bilingual Idol?\n\n* **Premium Learning Spaces**: Our classrooms have been entirely redesigned with flexible seating, modern learning technology, and inspiring visual aids to keep you engaged.\n* **Interactive Programmes**: We have enhanced our curriculum to feature interactive dialogue-first methods, speaking circles, and real-life scenarios.\n* **Digital Hub & Live Student Portals**: Introducing advanced digital integrations for students and teachers to coordinate schedules, submit assignments, and track progress seamlessly.\n\n### Elevating Your Bilingual Journey\nWhether you are a beginner looking to take your first steps in Japanese or Arabic, or a professional aiming to perfect your IELTS score, Bilingual Idol offers tailored support and small-group environments to ensure you make rapid, steady progress.\n\nWe warmly invite you to explore our new website, get in touch with our friendly advisory team, or visit our physical centre for a personal tour. Your journey toward ultimate confidence and global fluency begins today!",
+      category: "announcement" as const,
+      imageUrl: "/media/about_hero.webp",
+      imageStorageKey: null,
+      imageAltText: "Modern classroom interior and engaging environment at Bilingual Idol Language Centre",
+      isPublished: true,
+      publishedAt: new Date("2026-09-20T12:00:00Z"),
+      createdAt: new Date("2026-09-20T12:00:00Z"),
+      updatedAt: new Date("2026-09-20T12:00:00Z"),
+    }
+  ] as Announcement[],
+  testimonials: [] as Testimonial[],
+  teamProfiles: [] as TeamProfile[],
+  publicMedia: [
+    { id: 1, slot: "home_hero_video", label: "Home Hero Video", kind: "video" as const, altText: "Language centre classroom in action with active student engagement.", mimeType: "video/mp4", fileSize: 536870, storageKey: "home_hero_video", publicUrl: "/media/hero_video.mp4", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 2, slot: "home_hero_poster", label: "Home Hero Poster", kind: "image" as const, altText: "Bright and modern language classroom at Bilingual Idol Language Centre.", mimeType: "image/webp", fileSize: 315874, storageKey: "home_hero_poster", publicUrl: "/media/hero_poster.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 3, slot: "home_task_programmes", label: "Home Task Programmes", kind: "image" as const, altText: "Classroom table with language study materials and coursework.", mimeType: "image/webp", fileSize: 266726, storageKey: "home_task_programmes", publicUrl: "/media/task_programmes.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 4, slot: "home_task_contact", label: "Home Task Contact", kind: "image" as const, altText: "Consultation and student advisory area at Bilingual Idol.", mimeType: "image/webp", fileSize: 293390, storageKey: "home_task_contact", publicUrl: "/media/task_contact.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 5, slot: "home_task_account", label: "Home Task Account", kind: "image" as const, altText: "Learner studying and preparing coursework.", mimeType: "image/webp", fileSize: 305966, storageKey: "home_task_account", publicUrl: "/media/task_account.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 6, slot: "programmes_listing", label: "Programmes Listing Hero", kind: "image" as const, altText: "Students taking part in an engaging language session.", mimeType: "image/webp", fileSize: 283728, storageKey: "programmes_listing", publicUrl: "/media/prog_general_english.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 7, slot: "programme_detail", label: "Programme Detail Header", kind: "image" as const, altText: "Small group conversation and guided practice in class.", mimeType: "image/webp", fileSize: 367748, storageKey: "programme_detail", publicUrl: "/media/prog_speaking.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 8, slot: "about_hero", label: "About Hero", kind: "image" as const, altText: "Contemporary classroom facilities at Bilingual Idol Language Centre.", mimeType: "image/webp", fileSize: 307538, storageKey: "about_hero", publicUrl: "/media/about_hero.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 9, slot: "about_method", label: "About Method", kind: "image" as const, altText: "Language-learning materials arranged for guided practice.", mimeType: "image/webp", fileSize: 199944, storageKey: "about_method", publicUrl: "/media/about_method.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 10, slot: "about_classroom", label: "About Classroom", kind: "image" as const, altText: "A bright, organised contemporary language classroom.", mimeType: "image/webp", fileSize: 307278, storageKey: "about_classroom", publicUrl: "/media/about_classroom.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 11, slot: "about_community", label: "About Community", kind: "image" as const, altText: "Learners collaborating around a table during a language activity.", mimeType: "image/webp", fileSize: 255964, storageKey: "about_community", publicUrl: "/media/about_community.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+    { id: 12, slot: "about_cta", label: "About CTA", kind: "image" as const, altText: "A welcoming consultation corner prepared for a conversation about learning.", mimeType: "image/webp", fileSize: 301962, storageKey: "about_cta", publicUrl: "/media/about_cta.webp", isPublished: true, createdByUserId: 1, createdAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-01") },
+  ] as PublicMedia[],
+  siteSettings: {} as Record<string, string>,
+  userFormSections: [] as any[],
+  userFormFields: [] as any[],
+  userProfileValues: [] as { userId: number; fieldId: number; value: string }[],
+  nextId: 100,
+};
+
+export async function upsertUser(user: InsertUser): Promise<void> {
+  if (!user.openId) throw new Error("User openId is required for upsert");
+  const db = await getDb();
+  if (db) {
+    const values: InsertUser = { openId: user.openId, lastSignedIn: user.lastSignedIn ?? new Date() };
+    const updateSet: Record<string, unknown> = { lastSignedIn: values.lastSignedIn };
+    for (const field of ["name", "email", "loginMethod", "passwordHash"] as const) if (user[field] !== undefined) { values[field] = user[field] ?? null; updateSet[field] = user[field] ?? null; }
+    if (shouldGrantFounderRole({ email: user.email, openId: user.openId, ownerOpenId: ENV.ownerOpenId })) { values.role = "founder"; updateSet.role = "founder"; } else if (user.role !== undefined) { values.role = user.role; updateSet.role = user.role; }
+    await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
+    return;
+  }
+
+  const existing = inMemoryStore.users.find(u => u.openId === user.openId || (user.email && u.email?.toLowerCase() === user.email.toLowerCase()));
+  const now = new Date();
+  const isFounder = shouldGrantFounderRole({ email: user.email, openId: user.openId, ownerOpenId: ENV.ownerOpenId });
+  const role = isFounder ? "founder" : (user.role ?? existing?.role ?? "student");
+
+  if (existing) {
+    if (user.name !== undefined) existing.name = user.name;
+    if (user.email !== undefined) existing.email = user.email;
+    if (user.loginMethod !== undefined) existing.loginMethod = user.loginMethod;
+    if (user.passwordHash !== undefined) existing.passwordHash = user.passwordHash;
+    existing.role = role;
+    existing.lastSignedIn = user.lastSignedIn ?? now;
+    existing.updatedAt = now;
+  } else {
+    inMemoryStore.users.push({
+      id: inMemoryStore.nextId++,
+      openId: user.openId,
+      name: user.name ?? "User",
+      email: user.email ?? null,
+      passwordHash: user.passwordHash ?? null,
+      role,
+      isActive: user.isActive ?? true,
+      loginMethod: user.loginMethod ?? "email_password",
+      createdAt: now,
+      updatedAt: now,
+      lastSignedIn: user.lastSignedIn ?? now,
+    });
+  }
+}
+
+export async function getUserByOpenId(openId: string) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.users.find(u => u.openId === openId);
+}
+
+export async function getUserByEmail(email: string) {
+  const normalised = email.trim().toLowerCase();
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(users).where(eq(users.email, normalised)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.users.find(u => u.email?.trim().toLowerCase() === normalised);
+}
+
+export async function recordUserSignIn(openId: string) {
+  const db = await getDb();
+  if (db) {
+    await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.openId, openId));
+  } else {
+    const existing = inMemoryStore.users.find(u => u.openId === openId);
+    if (existing) existing.lastSignedIn = new Date();
+  }
+}
+
+export const founderManagedRoles = ["student", "teacher", "marketing", "admin", "super_admin"] as const;
+export type FounderManagedRole = (typeof founderManagedRoles)[number];
+export const superAdminManagedRoles = ["student", "teacher", "marketing", "admin"] as const;
+export type SuperAdminManagedRole = (typeof superAdminManagedRoles)[number];
+export type ManagedUser = Omit<User, "passwordHash">;
+export type ManagedUserFilters = {
+  query?: string;
+  role?: User["role"];
+  isActive?: boolean;
+  createdFrom?: string;
+  createdTo?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+function safeManagedUser(row: User): ManagedUser {
+  const { passwordHash: _passwordHash, ...safe } = row;
+  return safe;
+}
+
+function normaliseEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+export async function listManagedUsers(filters: ManagedUserFilters = {}) {
+  const database = await getDb();
+  const pageSize = Math.min(Math.max(filters.pageSize ?? 25, 1), 100);
+  const page = Math.max(filters.page ?? 0, 0);
+
+  if (database) {
+    const conditions = [];
+    const query = filters.query?.trim();
+    if (query) {
+      const pattern = `%${query}%`;
+      conditions.push(or(like(users.name, pattern), like(users.email, pattern), like(users.openId, pattern), like(users.loginMethod, pattern)));
+    }
+    conditions.push(ne(users.role, "founder"));
+    if (filters.role) conditions.push(eq(users.role, filters.role));
+    if (filters.isActive !== undefined) conditions.push(eq(users.isActive, filters.isActive));
+    if (filters.createdFrom) conditions.push(gte(users.createdAt, new Date(`${filters.createdFrom}T00:00:00.000Z`)));
+    if (filters.createdTo) conditions.push(lte(users.createdAt, new Date(`${filters.createdTo}T23:59:59.999Z`)));
+    const whereClause = conditions.length ? and(...conditions) : undefined;
+    const [rows, countRows] = await Promise.all([
+      database.select().from(users).where(whereClause).orderBy(desc(users.createdAt)).limit(pageSize).offset(page * pageSize),
+      database.select({ count: sql<number>`count(*)` }).from(users).where(whereClause),
+    ]);
+    return { rows: rows.map(safeManagedUser), total: Number(countRows[0]?.count ?? 0), page, pageSize };
+  }
+
+  const filtered = inMemoryStore.users.filter(u => u.role !== "founder");
+  return { rows: filtered.slice(page * pageSize, (page + 1) * pageSize).map(safeManagedUser), total: filtered.length, page, pageSize };
+}
+
+export async function getManagedUser(id: number) {
+  const database = await getDb();
+  if (database) {
+    const row = (await database.select().from(users).where(eq(users.id, id)).limit(1))[0];
+    return row && row.role !== "founder" ? safeManagedUser(row) : undefined;
+  }
+  const user = inMemoryStore.users.find(u => u.id === id && u.role !== "founder");
+  return user ? safeManagedUser(user) : undefined;
+}
+
+export async function listSuperAdminManagedUsers(filters: ManagedUserFilters = {}) {
+  const database = await getDb();
+  const pageSize = Math.min(Math.max(filters.pageSize ?? 25, 1), 100);
+  const page = Math.max(filters.page ?? 0, 0);
+
+  if (database) {
+    const conditions = [ne(users.role, "founder"), ne(users.role, "super_admin")];
+    const query = filters.query?.trim();
+    if (query) {
+      const pattern = `%${query}%`;
+      const searchCondition = or(like(users.name, pattern), like(users.email, pattern), like(users.openId, pattern), like(users.loginMethod, pattern));
+      if (searchCondition) conditions.push(searchCondition);
+    }
+    if (filters.role && superAdminManagedRoles.includes(filters.role as SuperAdminManagedRole)) conditions.push(eq(users.role, filters.role));
+    if (filters.isActive !== undefined) conditions.push(eq(users.isActive, filters.isActive));
+    if (filters.createdFrom) conditions.push(gte(users.createdAt, new Date(`${filters.createdFrom}T00:00:00.000Z`)));
+    if (filters.createdTo) conditions.push(lte(users.createdAt, new Date(`${filters.createdTo}T23:59:59.999Z`)));
+    const whereClause = and(...conditions);
+    const [rows, countRows] = await Promise.all([
+      database.select().from(users).where(whereClause).orderBy(desc(users.createdAt)).limit(pageSize).offset(page * pageSize),
+      database.select({ count: sql<number>`count(*)` }).from(users).where(whereClause),
+    ]);
+    return { rows: rows.map(safeManagedUser), total: Number(countRows[0]?.count ?? 0), page, pageSize };
+  }
+
+  const filtered = inMemoryStore.users.filter(u => u.role !== "founder" && u.role !== "super_admin");
+  return { rows: filtered.slice(page * pageSize, (page + 1) * pageSize).map(safeManagedUser), total: filtered.length, page, pageSize };
+}
+
+export async function getSuperAdminManagedUser(id: number) {
+  const database = await getDb();
+  if (database) {
+    const row = (await database.select().from(users).where(and(eq(users.id, id), ne(users.role, "founder"), ne(users.role, "super_admin"))).limit(1))[0];
+    return row ? safeManagedUser(row) : undefined;
+  }
+  const user = inMemoryStore.users.find(u => u.id === id && u.role !== "founder" && u.role !== "super_admin");
+  return user ? safeManagedUser(user) : undefined;
+}
+
+type UserProfileValuesInput = Record<string, string>;
+export const userSystemFieldIds = ["name", "nickname", "role", "password", "isActive"] as const;
+export type UserSystemFieldId = (typeof userSystemFieldIds)[number];
+export type RuntimeUserSystemField = { id: UserSystemFieldId; label: string; inputType: "text" | "role" | "password" | "checkbox"; isRequired: boolean; isActive: boolean; sortOrder: number; sectionId: number | null };
+const systemFieldSettingsKey = "user_create_system_fields_v1";
+const defaultSystemFields: RuntimeUserSystemField[] = [
+  { id: "name", label: "Full name", inputType: "text", isRequired: true, isActive: true, sortOrder: 0, sectionId: null },
+  { id: "nickname", label: "Nickname", inputType: "text", isRequired: true, isActive: true, sortOrder: 1, sectionId: null },
+  { id: "role", label: "User type", inputType: "role", isRequired: true, isActive: true, sortOrder: 2, sectionId: null },
+  { id: "password", label: "Initial password", inputType: "password", isRequired: true, isActive: true, sortOrder: 3, sectionId: null },
+  { id: "isActive", label: "Account active", inputType: "checkbox", isRequired: false, isActive: true, sortOrder: 4, sectionId: null },
+];
+
+function normaliseSystemFields(raw: unknown): RuntimeUserSystemField[] {
+  const candidate = Array.isArray(raw) ? raw : [];
+  // Migrate legacy "email" system field id to "nickname" if present
+  const mappedCandidate = candidate.map(field => {
+    if (field && typeof field === "object" && (field as { id?: string }).id === "email") {
+      return { ...field, id: "nickname", label: "Nickname", inputType: "text" };
+    }
+    return field;
+  });
+  const configured = new Map(mappedCandidate.filter((field): field is Partial<RuntimeUserSystemField> & { id: UserSystemFieldId } => Boolean(field && typeof field === "object" && userSystemFieldIds.includes((field as { id?: string }).id as UserSystemFieldId))).map(field => [field.id, field]));
+  return defaultSystemFields.map(defaultField => {
+    const field = configured.get(defaultField.id);
+    return {
+      ...defaultField,
+      label: typeof field?.label === "string" && field.label.trim().length >= 2 ? field.label.trim().slice(0, 160) : defaultField.label,
+      isRequired: typeof field?.isRequired === "boolean" ? field.isRequired : defaultField.isRequired,
+      isActive: typeof field?.isActive === "boolean" ? field.isActive : defaultField.isActive,
+      sortOrder: typeof field?.sortOrder === "number" && Number.isInteger(field.sortOrder) && field.sortOrder >= 0 ? field.sortOrder : defaultField.sortOrder,
+      sectionId: typeof field?.sectionId === "number" && Number.isInteger(field.sectionId) && field.sectionId > 0 ? field.sectionId : null,
+    };
+  }).sort((a, b) => a.sortOrder - b.sortOrder || userSystemFieldIds.indexOf(a.id) - userSystemFieldIds.indexOf(b.id));
+}
+
+export async function getUserSystemFields() {
+  const database = await getDb();
+  if (!database) return defaultSystemFields;
+  const setting = (await database.select().from(siteSettings).where(eq(siteSettings.key, systemFieldSettingsKey)).limit(1))[0];
+  if (!setting) return defaultSystemFields;
+  try { return normaliseSystemFields(JSON.parse(setting.value)); } catch { return defaultSystemFields; }
+}
+
+export type UserSystemFieldInput = {
+  id: UserSystemFieldId | "email";
+  label: string;
+  isRequired: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  sectionId: number | null;
+};
+
+export async function updateUserSystemFields(fields: UserSystemFieldInput[]) {
+  const database = await getDb();
+  const mappedFields = fields.map(field => {
+    if (field.id === "email") {
+      return { ...field, id: "nickname" as const } as Omit<RuntimeUserSystemField, "inputType">;
+    }
+    return field as Omit<RuntimeUserSystemField, "inputType">;
+  });
+  const ids = mappedFields.map(field => field.id);
+  if (mappedFields.length !== userSystemFieldIds.length || new Set(ids).size !== userSystemFieldIds.length || userSystemFieldIds.some(id => !ids.includes(id))) throw new Error("The system field configuration must include each base field exactly once.");
+  const normalised = normaliseSystemFields(mappedFields);
+  if (database) {
+    await database.insert(siteSettings).values({ key: systemFieldSettingsKey, value: JSON.stringify(normalised) }).onDuplicateKeyUpdate({ set: { value: JSON.stringify(normalised) } });
+  } else {
+    inMemoryStore.siteSettings[systemFieldSettingsKey] = JSON.stringify(normalised);
+  }
+  return normalised;
+}
+
+function toRuntimeField(field: typeof userFormFields.$inferSelect): RuntimeUserField {
+  return { id: field.id, key: field.key, label: field.label, fieldType: field.fieldType, collectionStage: field.collectionStage, isRequired: field.isRequired, placeholder: field.placeholder, options: parseFieldOptions(field.optionsJson), sectionId: field.sectionId, sortOrder: field.sortOrder, isActive: field.isActive };
+}
+
+export async function getUserFormSchema(includeInactive = false) {
+  const database = await getDb();
+  if (!database) {
+    const systemFields = await getUserSystemFields();
+    const sections = includeInactive ? inMemoryStore.userFormSections : inMemoryStore.userFormSections.filter(s => s.isActive);
+    const fields = includeInactive ? inMemoryStore.userFormFields : inMemoryStore.userFormFields.filter(f => f.isActive);
+    return { sections, fields: fields.map(toRuntimeField), systemFields: includeInactive ? systemFields : systemFields.filter(field => field.isActive) };
+  }
+  const [sections, fields, systemFields] = await Promise.all([
+    database.select().from(userFormSections).where(includeInactive ? undefined : eq(userFormSections.isActive, true)).orderBy(asc(userFormSections.sortOrder), asc(userFormSections.id)),
+    database.select().from(userFormFields).where(includeInactive ? undefined : eq(userFormFields.isActive, true)).orderBy(asc(userFormFields.sortOrder), asc(userFormFields.id)),
+    getUserSystemFields(),
+  ]);
+  return { sections, fields: fields.map(toRuntimeField), systemFields: includeInactive ? systemFields : systemFields.filter(field => field.isActive) };
+}
+
+function safeFieldKey(label: string) {
+  const stem = label.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 55) || "custom_field";
+  return `${stem}_${randomUUID().replace(/-/g, "").slice(0, 12)}`;
+}
+
+export async function createUserFormSection(input: { title: string; icon?: string; sortOrder: number; isActive: boolean }) {
+  const database = await getDb();
+  if (!database) {
+    const section = { id: ++inMemoryStore.nextId, title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive, createdAt: new Date(), updatedAt: new Date() };
+    inMemoryStore.userFormSections.push(section);
+    return section;
+  }
+  const result = await database.insert(userFormSections).values({ title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive });
+  return (await database.select().from(userFormSections).where(eq(userFormSections.id, Number(result[0].insertId))).limit(1))[0];
+}
+
+export async function updateUserFormSection(id: number, input: { title: string; icon?: string; sortOrder: number; isActive: boolean }) {
+  const database = await getDb();
+  if (!database) {
+    const idx = inMemoryStore.userFormSections.findIndex(s => s.id === id);
+    if (idx !== -1) {
+      inMemoryStore.userFormSections[idx] = { ...inMemoryStore.userFormSections[idx], title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive, updatedAt: new Date() };
+      return inMemoryStore.userFormSections[idx];
+    }
+    throw new Error("Section not found.");
+  }
+  await database.update(userFormSections).set({ title: input.title.trim(), icon: input.icon?.trim() || "ClipboardList", sortOrder: input.sortOrder, isActive: input.isActive }).where(eq(userFormSections.id, id));
+  return (await database.select().from(userFormSections).where(eq(userFormSections.id, id)).limit(1))[0];
+}
+
+export async function deleteUserFormSection(id: number) {
+  const database = await getDb();
+  if (!database) {
+    inMemoryStore.userFormFields.forEach(f => { if (f.sectionId === id) f.sectionId = null; });
+    inMemoryStore.userFormSections = inMemoryStore.userFormSections.filter(s => s.id !== id);
+    return { success: true } as const;
+  }
+  await database.transaction(async tx => {
+    await tx.update(userFormFields).set({ sectionId: null }).where(eq(userFormFields.sectionId, id));
+    await tx.delete(userFormSections).where(eq(userFormSections.id, id));
+  });
+  return { success: true } as const;
+}
+
+type FormFieldInput = { label: string; fieldType: UserFieldType; isRequired: boolean; sortOrder: number; placeholder?: string; options?: string[]; sectionId?: number | null; isActive: boolean };
+
+export async function createUserFormField(input: FormFieldInput) {
+  const database = await getDb();
+  const options = normaliseOptions(input.fieldType, input.options);
+  if (!database) {
+    const field = { id: ++inMemoryStore.nextId, key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, createdAt: new Date(), updatedAt: new Date() };
+    inMemoryStore.userFormFields.push(field);
+    return toRuntimeField(field as any);
+  }
+  const result = await database.insert(userFormFields).values({ key: safeFieldKey(input.label), label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive });
+  const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, Number(result[0].insertId))).limit(1))[0];
+  return toRuntimeField(field);
+}
+
+export async function updateUserFormField(id: number, input: FormFieldInput) {
+  const database = await getDb();
+  const options = normaliseOptions(input.fieldType, input.options);
+  if (!database) {
+    const idx = inMemoryStore.userFormFields.findIndex(f => f.id === id);
+    if (idx !== -1) {
+      inMemoryStore.userFormFields[idx] = { ...inMemoryStore.userFormFields[idx], label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive, updatedAt: new Date() };
+      return toRuntimeField(inMemoryStore.userFormFields[idx] as any);
+    }
+    throw new Error("Field not found.");
+  }
+  await database.update(userFormFields).set({ label: input.label.trim(), fieldType: input.fieldType, isRequired: input.isRequired, sortOrder: input.sortOrder, placeholder: input.placeholder?.trim() || null, optionsJson: options.length ? JSON.stringify(options) : null, sectionId: input.sectionId ?? null, isActive: input.isActive }).where(eq(userFormFields.id, id));
+  const field = (await database.select().from(userFormFields).where(eq(userFormFields.id, id)).limit(1))[0];
+  if (!field) throw new Error("Field not found.");
+  return toRuntimeField(field);
+}
+
+export async function deleteUserFormField(id: number) {
+  const database = await getDb();
+  if (!database) {
+    inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(p => p.fieldId !== id);
+    inMemoryStore.userFormFields = inMemoryStore.userFormFields.filter(f => f.id !== id);
+    return { success: true } as const;
+  }
+  await database.transaction(async tx => {
+    await tx.delete(userProfileValues).where(eq(userProfileValues.fieldId, id));
+    await tx.delete(userFormFields).where(eq(userFormFields.id, id));
+  });
+  return { success: true } as const;
+}
+
+export async function reorderUserFormFields(fieldIds: number[]) {
+  const database = await getDb();
+  if (!database) {
+    for (let index = 0; index < fieldIds.length; index += 1) {
+      const field = inMemoryStore.userFormFields.find(f => f.id === fieldIds[index]);
+      if (field) field.sortOrder = index;
+    }
+    return getUserFormSchema(true);
+  }
+  const existing = await database.select({ id: userFormFields.id }).from(userFormFields);
+  const existingIds = existing.map(field => field.id).sort((a, b) => a - b);
+  const submittedIds = [...fieldIds].sort((a, b) => a - b);
+  if (existingIds.length !== submittedIds.length || existingIds.some((id, index) => id !== submittedIds[index])) throw new Error("The submitted field order must include every configured field exactly once.");
+  await database.transaction(async tx => {
+    for (let index = 0; index < fieldIds.length; index += 1) await tx.update(userFormFields).set({ sortOrder: index }).where(eq(userFormFields.id, fieldIds[index]));
+  });
+  return getUserFormSchema(true);
+}
+
+async function validatedProfileRows(values: UserProfileValuesInput) {
+  const { fields } = await getUserFormSchema(false);
+  return Object.entries(validateProfileValues(fields, values)).map(([fieldId, value]) => ({ fieldId: Number(fieldId), value }));
+}
+
+export async function createManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+  const database = await getDb();
+  const systemFields = await getUserSystemFields();
+  
+  // Extract supplied nickname or derive from supplied email if no @ present
+  const suppliedNickname = input.nickname?.trim() || (input.email && !input.email.includes("@") ? input.email.trim() : undefined);
+  const suppliedEmail = input.email && input.email.includes("@") ? normaliseEmail(input.email) : undefined;
+  
+  const supplied: Record<UserSystemFieldId, unknown> = {
+    name: input.name,
+    nickname: suppliedNickname || suppliedEmail,
+    role: input.role,
+    password: input.password,
+    isActive: input.isActive,
+  };
+  
+  for (const field of systemFields) {
+    if (field.isActive && field.isRequired && (supplied[field.id] === undefined || supplied[field.id] === "")) {
+      throw new Error(`${field.label} is required by the current create form.`);
+    }
+  }
+
+  let finalEmail: string;
+  let finalNickname: string | undefined;
+
+
+  if (suppliedNickname) {
+    const validation = validateNickname(suppliedNickname);
+    if (!validation.valid) {
+      throw new Error(validation.error || "Invalid nickname.");
+    }
+    finalNickname = validation.normalised;
+    finalEmail = generateBilcEmail(finalNickname);
+  } else if (suppliedEmail) {
+    finalEmail = suppliedEmail;
+  } else {
+    // Generate official BILC login identifier format: nameMMYYYY@bilc.my
+    const generatedLogin = await generateUniqueUserLogin(input.name || "user", new Date());
+    finalEmail = generatedLogin;
+    finalNickname = generatedLogin.split("@")[0];
+  }
+
+  const existing = await getUserByEmail(finalEmail);
+  if (existing) {
+    throw new Error(`An account with this email/nickname (${finalEmail}) already exists.`);
+  }
+
+  const credentialsIssued = Boolean((suppliedNickname || suppliedEmail || input.name) && input.password);
+  // Generate random 12-char OTP if password not specified
+  const password = input.password ?? "BILC$OTP$" + randomUUID().slice(0, 8);
+  const profileRows = await validatedProfileRows(input.profileValues ?? {});
+  
+  if (database) {
+    const result = await database.transaction(async tx => {
+      const created = await tx.insert(users).values({
+        openId: `issued:${randomUUID()}`,
+        name: input.name?.trim() || (finalNickname ? finalNickname : "Unnamed account"),
+        email: finalEmail,
+        passwordHash: createUserPasswordHash(password),
+        isActive: input.isActive ?? true,
+        loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
+        role: input.role ?? "student",
+        lastSignedIn: new Date(),
+        // OTP secure track:
+        isOtp: true,
+        otpCreatedAt: new Date(),
+        failedAttempts: 0,
+        sessionVersion: 1,
+      });
+      const userId = Number(created[0].insertId);
+      if (profileRows.length) await tx.insert(userProfileValues).values(profileRows.map(row => ({ userId, fieldId: row.fieldId, value: row.value })));
+      return created;
+    });
+    const created = await getManagedUser(Number(result[0].insertId));
+    if (!created) throw new Error("The account could not be created.");
+
+    // Extract dynamic contactEmail if specified in profileValues to send login info
+    const contactEmail = input.profileValues?.contactEmail || input.email;
+    if (contactEmail && contactEmail.includes("@")) {
+      try {
+        await EmailProvider.sendOtpEmail(contactEmail, finalEmail, password, "en");
+      } catch (err) {
+        console.error("[Email] Failed to dispatch OTP email:", err);
+      }
+    }
+
+    return { ...created, generatedEmail: finalEmail, nickname: finalNickname, tempPassword: password };
+  }
+
+  const now = new Date();
+  const userId = ++inMemoryStore.nextId;
+  const newUser: User = {
+    id: userId,
+    openId: `issued:${randomUUID()}`,
+    name: input.name?.trim() || (finalNickname ? finalNickname : "Unnamed account"),
+    email: finalEmail,
+    passwordHash: createUserPasswordHash(password),
+    isActive: input.isActive ?? true,
+    loginMethod: credentialsIssued ? "issued_by_founder" : "issued_by_founder_draft",
+    role: input.role ?? "student",
+    createdAt: now,
+    updatedAt: now,
+    lastSignedIn: now,
+    // OTP columns
+    isOtp: true,
+    otpCreatedAt: now,
+    failedAttempts: 0,
+    sessionVersion: 1,
+  } as any;
+  inMemoryStore.users.push(newUser);
+  for (const row of profileRows) {
+    inMemoryStore.userProfileValues.push({ userId, fieldId: row.fieldId, value: row.value });
+  }
+  const created = await getManagedUser(userId);
+  if (!created) throw new Error("The account could not be created.");
+
+  const contactEmail = input.profileValues?.contactEmail || input.email;
+  if (contactEmail && contactEmail.includes("@")) {
+    try {
+      await EmailProvider.sendOtpEmail(contactEmail, finalEmail, password, "en");
+    } catch (err) {
+      console.error("[Email] Failed to dispatch OTP email in memory:", err);
+    }
+  }
+
+  return { ...created, generatedEmail: finalEmail, nickname: finalNickname, tempPassword: password };
+}
+
+export async function createSuperAdminManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+  if (input.role && !superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
+  return createManagedUser(input);
+}
+
+export async function updateManagedUser(id: number, input: { name: string; nickname?: string; email?: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
+  const database = await getDb();
+  const existing = await getManagedUser(id);
+  if (!existing) throw new Error("Account not found.");
+  if (existing.role === "founder") throw new Error("Founder accounts cannot be changed in Users.");
+  
+  let email = existing.email ?? "";
+  if (input.nickname) {
+    const val = validateNickname(input.nickname);
+    if (!val.valid) throw new Error(val.error || "Invalid nickname.");
+    email = generateBilcEmail(val.normalised);
+  } else if (input.email) {
+    email = normaliseEmail(input.email);
+    if (!email.includes("@")) {
+      const val = validateNickname(email);
+      if (!val.valid) throw new Error(val.error || "Invalid nickname.");
+      email = generateBilcEmail(val.normalised);
+    }
+  }
+
+  const matchingEmail = await getUserByEmail(email);
+  if (matchingEmail && matchingEmail.id !== id) throw new Error(`An account with this email/nickname (${email}) already exists.`);
+  const values: Partial<InsertUser> = { name: input.name.trim(), email, role: input.role, isActive: input.isActive };
+  if (input.password) values.passwordHash = createUserPasswordHash(input.password);
+  
+  if (database) {
+    await database.update(users).set(values).where(eq(users.id, id));
+    const updated = await getManagedUser(id);
+    if (!updated) throw new Error("The account could not be updated.");
+    return { ...updated, generatedEmail: email };
+  }
+
+  const userIndex = inMemoryStore.users.findIndex(u => u.id === id);
+  if (userIndex !== -1) {
+    inMemoryStore.users[userIndex] = {
+      ...inMemoryStore.users[userIndex],
+      ...values,
+      updatedAt: new Date(),
+    };
+  }
+  const updated = await getManagedUser(id);
+  if (!updated) throw new Error("The account could not be updated.");
+  return { ...updated, generatedEmail: email };
+}
+
+export async function updateSuperAdminManagedUser(id: number, input: { name: string; nickname?: string; email?: string; password?: string; role: SuperAdminManagedRole; isActive: boolean }) {
+  if (!superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
+  if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
+  return updateManagedUser(id, input);
+}
+
+export async function deleteManagedUser(id: number) {
+  const database = await getDb();
+  const existing = await getManagedUser(id);
+  if (!existing) throw new Error("Account not found.");
+  if (existing.role === "founder") throw new Error("Founder accounts cannot be deleted in Users.");
+  
+  if (database) {
+    await database.transaction(async tx => {
+      await tx.delete(userProfileValues).where(eq(userProfileValues.userId, id));
+      await tx.delete(users).where(eq(users.id, id));
+    });
+    return { success: true } as const;
+  }
+
+  inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(p => p.userId !== id);
+  inMemoryStore.users = inMemoryStore.users.filter(u => u.id !== id);
+  return { success: true } as const;
+}
+
+export async function deleteSuperAdminManagedUser(id: number) {
+  if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
+  return deleteManagedUser(id);
+}
+
+export type SubmissionInput = {
+  type: "enrollment" | "inquiry";
+  studentName: string;
+  studentAge: number;
+  parentName: string;
+  parentEmail: string;
+  parentPhone: string;
+  programId?: number | null;
+  programInterest: string;
+  preferredSchedule: string;
+  message?: string;
+  source?: string;
+  reasonType?: "general" | "consultation" | "campusTour";
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+};
+
+export async function createSubmission(input: SubmissionInput) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(submissions).values({
+      ...input,
+      programId: input.programId || null,
+      message: input.message?.trim() || null,
+      source: input.source?.trim() || "website",
+      reasonType: input.reasonType || "general",
+      utmSource: input.utmSource || null,
+      utmMedium: input.utmMedium || null,
+      utmCampaign: input.utmCampaign || null,
+      utmTerm: input.utmTerm || null,
+      utmContent: input.utmContent || null,
+    });
+    return { id: Number(result[0].insertId) };
+  }
+  const id = ++inMemoryStore.nextId;
+  const newSubmission: Submission = {
+    id,
+    type: input.type,
+    studentName: input.studentName,
+    studentAge: input.studentAge,
+    parentName: input.parentName,
+    parentEmail: input.parentEmail,
+    parentPhone: input.parentPhone,
+    programId: input.programId || null,
+    programInterest: input.programInterest,
+    preferredSchedule: input.preferredSchedule,
+    reasonType: input.reasonType || "general",
+    message: input.message?.trim() || null,
+    source: input.source?.trim() || "website",
+    status: "new",
+    utmSource: input.utmSource || null,
+    utmMedium: input.utmMedium || null,
+    utmCampaign: input.utmCampaign || null,
+    utmTerm: input.utmTerm || null,
+    utmContent: input.utmContent || null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.submissions.unshift(newSubmission);
+  return { id };
+}
+
+export async function listSubmissions() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(submissions).orderBy(desc(submissions.createdAt));
+  }
+  return inMemoryStore.submissions;
+}
+
+export async function updateSubmissionStatus(id: number, status: "new" | "contacted" | "interested" | "enrolled" | "closed") {
+  const db = await getDb();
+  if (db) {
+    await db.update(submissions).set({ status }).where(eq(submissions.id, id));
+    return { success: true };
+  }
+  const sub = inMemoryStore.submissions.find(s => s.id === id);
+  if (sub) sub.status = status;
+  return { success: true };
+}
+
+export async function deleteSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(submissions).where(eq(submissions.id, id));
+    return { success: true };
+  }
+  inMemoryStore.submissions = inMemoryStore.submissions.filter(s => s.id !== id);
+  return { success: true };
+}
+
+export async function listPublicPrograms() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(programs).where(eq(programs.isActive, true)).orderBy(asc(programs.title));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.programs.filter(p => p.isActive);
+}
+
+export async function getPublicProgram(slug: string) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(programs).where(eq(programs.slug, slug)).limit(1);
+    if (result[0]) return result[0];
+  }
+  return inMemoryStore.programs.find(p => p.slug === slug);
+}
+
+export async function listPrograms() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(programs).orderBy(asc(programs.title));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.programs;
+}
+
+export async function createProgram(input: Omit<Program, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(programs).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+  const id = ++inMemoryStore.nextId;
+  const program: Program = { id, ...input, createdAt: new Date(), updatedAt: new Date() };
+  inMemoryStore.programs.push(program);
+  return { id };
+}
+
+export async function updateProgram(id: number, input: Omit<Program, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    await db.update(programs).set(input).where(eq(programs.id, id));
+    return { success: true };
+  }
+  const index = inMemoryStore.programs.findIndex(p => p.id === id);
+  if (index !== -1) inMemoryStore.programs[index] = { ...inMemoryStore.programs[index], ...input, updatedAt: new Date() };
+  return { success: true };
+}
+
+export async function deleteProgram(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(programs).where(eq(programs.id, id));
+    return { success: true };
+  }
+  inMemoryStore.programs = inMemoryStore.programs.filter(p => p.id !== id);
+  return { success: true };
+}
+
+export async function listPublicTestimonials() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(testimonials).where(eq(testimonials.approved, true)).orderBy(desc(testimonials.createdAt));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.testimonials.filter(t => t.approved);
+}
+
+export async function listTestimonials() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(testimonials).orderBy(desc(testimonials.createdAt));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.testimonials;
+}
+
+export async function createTestimonial(input: { authorName: string; relation: string; quote: string; rating: number; approved: boolean; consentConfirmed: boolean }) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(testimonials).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+  const id = ++inMemoryStore.nextId;
+  const test: Testimonial = { id, ...input, createdAt: new Date() };
+  inMemoryStore.testimonials.unshift(test);
+  return { id };
+}
+
+export async function updateTestimonial(id: number, input: { authorName: string; relation: string; quote: string; rating: number; approved: boolean; consentConfirmed: boolean }) {
+  const db = await getDb();
+  if (db) {
+    await db.update(testimonials).set(input).where(eq(testimonials.id, id));
+    return { success: true };
+  }
+  const index = inMemoryStore.testimonials.findIndex(t => t.id === id);
+  if (index !== -1) inMemoryStore.testimonials[index] = { ...inMemoryStore.testimonials[index], ...input };
+  return { success: true };
+}
+
+export async function deleteTestimonial(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(testimonials).where(eq(testimonials.id, id));
+    return { success: true };
+  }
+  inMemoryStore.testimonials = inMemoryStore.testimonials.filter(t => t.id !== id);
+  return { success: true };
+}
+
+export async function listPublicTeamProfiles() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(teamProfiles).where(eq(teamProfiles.isPublished, true)).orderBy(asc(teamProfiles.sortOrder), asc(teamProfiles.name));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.teamProfiles.filter(t => t.isPublished);
+}
+
+export async function listTeamProfiles() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(teamProfiles).orderBy(asc(teamProfiles.sortOrder), asc(teamProfiles.name));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.teamProfiles;
+}
+
+export async function createTeamProfile(input: Omit<TeamProfile, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(teamProfiles).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+  const id = ++inMemoryStore.nextId;
+  const profile: TeamProfile = { id, ...input, createdAt: new Date(), updatedAt: new Date() };
+  inMemoryStore.teamProfiles.push(profile);
+  return { id };
+}
+
+export async function updateTeamProfile(id: number, input: Omit<TeamProfile, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    await db.update(teamProfiles).set(input).where(eq(teamProfiles.id, id));
+    return { success: true };
+  }
+  const index = inMemoryStore.teamProfiles.findIndex(t => t.id === id);
+  if (index !== -1) inMemoryStore.teamProfiles[index] = { ...inMemoryStore.teamProfiles[index], ...input, updatedAt: new Date() };
+  return { success: true };
+}
+
+export async function deleteTeamProfile(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(teamProfiles).where(eq(teamProfiles.id, id));
+    return { success: true };
+  }
+  inMemoryStore.teamProfiles = inMemoryStore.teamProfiles.filter(t => t.id !== id);
+  return { success: true };
+}
+
+export async function listSiteSettings() {
+  const db = await getDb();
+  let settings: Record<string, string> = {};
+  if (db) {
+    const rows = await db.select().from(siteSettings);
+    settings = Object.fromEntries(rows.map(row => [row.key, row.value]));
+  } else {
+    settings = { ...inMemoryStore.siteSettings };
+  }
+
+  // Populate default promotional values if not already defined
+  if (settings.promo_active === undefined) {
+    settings.promo_active = "true";
+  }
+  if (settings.promo_title === undefined) {
+    settings.promo_title = "Special Promotional Offer";
+  }
+  if (settings.promo_text === undefined) {
+    settings.promo_text = "Get exclusive access to all bilingual academic language programmes with a limited-time intake discount! Apply now and claim your student starter package.";
+  }
+  if (settings.promo_discount === undefined) {
+    settings.promo_discount = "15% OFF";
+  }
+  if (settings.promo_code === undefined) {
+    settings.promo_code = "BILC15";
+  }
+  if (settings.promo_cta_text === undefined) {
+    settings.promo_cta_text = "View Programmes";
+  }
+  if (settings.promo_cta_url === undefined) {
+    settings.promo_cta_url = "/programs";
+  }
+  if (settings.promo_color === undefined) {
+    settings.promo_color = "red";
+  }
+
+  return settings;
+}
+
+export async function updateSiteSettings(values: Record<string, string>) {
+  const db = await getDb();
+  if (db) {
+    for (const [key, value] of Object.entries(values)) await db.insert(siteSettings).values({ key, value }).onDuplicateKeyUpdate({ set: { value } });
+    return { success: true };
+  }
+  Object.assign(inMemoryStore.siteSettings, values);
+  return { success: true };
+}
+
+export async function listPublicMedia() {
+  const database = await getDb();
+  if (database) {
+    const rows = await database.select({ slot: publicMedia.slot, kind: publicMedia.kind, altText: publicMedia.altText, publicUrl: publicMedia.publicUrl, mimeType: publicMedia.mimeType, fileSize: publicMedia.fileSize }).from(publicMedia).where(eq(publicMedia.isPublished, true)).orderBy(asc(publicMedia.slot));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.publicMedia.filter(m => m.isPublished).map(({ slot, kind, altText, publicUrl, mimeType, fileSize }) => ({ slot, kind, altText, publicUrl, mimeType, fileSize }));
+}
+
+export async function listManagedPublicMedia() {
+  const database = await getDb();
+  if (database) {
+    const rows = await database.select().from(publicMedia).orderBy(asc(publicMedia.slot));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.publicMedia;
+}
+
+export async function getManagedPublicMedia(id: number) {
+  const database = await getDb();
+  if (database) {
+    const row = (await database.select().from(publicMedia).where(eq(publicMedia.id, id)).limit(1))[0];
+    if (row) return row;
+  }
+  return inMemoryStore.publicMedia.find(m => m.id === id);
+}
+
+export async function upsertPublicMedia(input: Omit<PublicMedia, "id" | "createdAt" | "updatedAt">) {
+  const database = await getDb();
+  if (database) {
+    await database.insert(publicMedia).values(input).onDuplicateKeyUpdate({ set: { label: input.label, kind: input.kind, altText: input.altText, mimeType: input.mimeType, fileSize: input.fileSize, storageKey: input.storageKey, publicUrl: input.publicUrl, isPublished: input.isPublished, createdByUserId: input.createdByUserId } });
+    return (await database.select().from(publicMedia).where(eq(publicMedia.slot, input.slot)).limit(1))[0];
+  }
+  const existingIndex = inMemoryStore.publicMedia.findIndex(m => m.slot === input.slot);
+  const now = new Date();
+  if (existingIndex !== -1) {
+    const updated: PublicMedia = { ...inMemoryStore.publicMedia[existingIndex], ...input, updatedAt: now };
+    inMemoryStore.publicMedia[existingIndex] = updated;
+    return updated;
+  }
+  const newMedia: PublicMedia = { id: ++inMemoryStore.nextId, ...input, createdAt: now, updatedAt: now };
+  inMemoryStore.publicMedia.push(newMedia);
+  return newMedia;
+}
+
+export async function updatePublicMedia(id: number, input: Pick<PublicMedia, "label" | "altText" | "isPublished">) {
+  const database = await getDb();
+  if (database) {
+    await database.update(publicMedia).set(input).where(eq(publicMedia.id, id));
+    return getManagedPublicMedia(id);
+  }
+  const item = inMemoryStore.publicMedia.find(m => m.id === id);
+  if (item) Object.assign(item, input);
+  return item;
+}
+
+export async function deletePublicMedia(id: number) {
+  const database = await getDb();
+  if (database) {
+    await database.delete(publicMedia).where(eq(publicMedia.id, id));
+    return { success: true } as const;
+  }
+  inMemoryStore.publicMedia = inMemoryStore.publicMedia.filter(m => m.id !== id);
+  return { success: true } as const;
+}
+
+export type NewsPostInput = Pick<Announcement, "slug" | "title" | "excerpt" | "body" | "category" | "isPublished" | "publishedAt" | "imageUrl" | "imageStorageKey" | "imageAltText">;
+
+export async function listPublicAnnouncements() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(announcements).where(eq(announcements.isPublished, true)).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.announcements.filter(a => a.isPublished);
+}
+
+export async function listPublicAnnouncementsPage(input: { page?: number } = {}) {
+  const db = await getDb();
+  const pageSize = 6;
+  const page = Math.max(input.page ?? 0, 0);
+  if (db) {
+    const where = eq(announcements.isPublished, true);
+    let [rows, countRows] = await Promise.all([
+      db.select().from(announcements).where(where).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)).limit(pageSize).offset(page * pageSize),
+      db.select({ count: sql<number>`count(*)` }).from(announcements).where(where),
+    ]);
+    let total = Number(countRows[0]?.count ?? 0);
+    
+    if (total === 0 && rows.length === 0) {
+      try {
+        const demo = {
+          slug: "bilc-grand-redesign-transforming-language-learning",
+          title: "Bilingual Idol Language Centre Redesign: Transforming Language Learning",
+          excerpt: "Explore our newly designed spaces, interactive programmes, and the modern learning framework that redefines bilingual fluency.",
+          body: "We are absolutely thrilled to officially unveil the new, highly-polished experience of Bilingual Idol Language Centre! As a leading institution dedicated to nurturing language fluency across English, Bahasa Melayu, Mandarin, Arabic, Japanese, Korean, and more, our redesign brings a breath of fresh air to our campus, our digital presence, and our interactive classrooms.\n\n### What is New at Bilingual Idol?\n\n* **Premium Learning Spaces**: Our classrooms have been entirely redesigned with flexible seating, modern learning technology, and inspiring visual aids to keep you engaged.\n* **Interactive Programmes**: We have enhanced our curriculum to feature interactive dialogue-first methods, speaking circles, and real-life scenarios.\n* **Digital Hub & Live Student Portals**: Introducing advanced digital integrations for students and teachers to coordinate schedules, submit assignments, and track progress seamlessly.\n\n### Elevating Your Bilingual Journey\nWhether you are a beginner looking to take your first steps in Japanese or Arabic, or a professional aiming to perfect your IELTS score, Bilingual Idol offers tailored support and small-group environments to ensure you make rapid, steady progress.\n\nWe warmly invite you to explore our new website, get in touch with our friendly advisory team, or visit our physical centre for a personal tour. Your journey toward ultimate confidence and global fluency begins today!",
+          category: "announcement" as const,
+          imageUrl: "/media/about_hero.webp",
+          imageStorageKey: null,
+          imageAltText: "Modern classroom interior and engaging environment at Bilingual Idol Language Centre",
+          isPublished: true,
+          publishedAt: new Date(),
+        };
+        await db.insert(announcements).values(demo);
+        [rows, countRows] = await Promise.all([
+          db.select().from(announcements).where(where).orderBy(desc(announcements.publishedAt), desc(announcements.createdAt)).limit(pageSize).offset(page * pageSize),
+          db.select({ count: sql<number>`count(*)` }).from(announcements).where(where),
+        ]);
+        total = Number(countRows[0]?.count ?? 0);
+      } catch (err) {
+        console.error("Failed to auto-seed announcements:", err);
+      }
+    }
+
+    if (total > 0 || rows.length > 0) {
+      return { rows, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+    }
+  }
+  const published = inMemoryStore.announcements.filter(a => a.isPublished);
+  const total = published.length;
+  const rows = published.slice(page * pageSize, (page + 1) * pageSize);
+  return { rows, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+}
+
+export async function listAnnouncements() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(announcements).orderBy(desc(announcements.createdAt));
+    if (rows.length) return rows;
+  }
+  return inMemoryStore.announcements;
+}
+
+export async function getAnnouncement(id: number) {
+  const db = await getDb();
+  if (db) {
+    const row = (await db.select().from(announcements).where(eq(announcements.id, id)).limit(1))[0];
+    if (row) return row;
+  }
+  return inMemoryStore.announcements.find(a => a.id === id);
+}
+
+export async function createAnnouncement(input: NewsPostInput) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(announcements).values(input);
+    return getAnnouncement(Number(result[0].insertId));
+  }
+  const id = ++inMemoryStore.nextId;
+  const announcement: Announcement = { id, ...input, createdAt: new Date(), updatedAt: new Date() };
+  inMemoryStore.announcements.unshift(announcement);
+  return announcement;
+}
+
+export async function updateAnnouncement(id: number, input: NewsPostInput) {
+  const db = await getDb();
+  if (db) {
+    await db.update(announcements).set(input).where(eq(announcements.id, id));
+    return getAnnouncement(id);
+  }
+  const index = inMemoryStore.announcements.findIndex(a => a.id === id);
+  if (index !== -1) inMemoryStore.announcements[index] = { ...inMemoryStore.announcements[index], ...input, updatedAt: new Date() };
+  return inMemoryStore.announcements[index];
+}
+
+export async function updateAnnouncementPublishState(id: number, isPublished: boolean) {
+  const db = await getDb();
+  if (db) {
+    await db.update(announcements).set({ isPublished, publishedAt: isPublished ? new Date() : null }).where(eq(announcements.id, id));
+    return { success: true };
+  }
+  const announcement = inMemoryStore.announcements.find(a => a.id === id);
+  if (announcement) {
+    announcement.isPublished = isPublished;
+    announcement.publishedAt = isPublished ? new Date() : null;
+  }
+  return { success: true };
+}
+
+export async function deleteAnnouncement(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(announcements).where(eq(announcements.id, id));
+    return { success: true };
+  }
+  inMemoryStore.announcements = inMemoryStore.announcements.filter(a => a.id !== id);
+  return { success: true };
+}
+
+export async function seedDatabaseDefaultUsers() {
+  const db = await getDb();
+  if (!db) return;
+
+  const defaultUsers = [
+    {
+      openId: "issued:superadmin",
+      name: "Super Admin",
+      email: "superadmin@bilc.my",
+      role: "super_admin" as const,
+    },
+    {
+      openId: "issued:admin",
+      name: "Admin Manager",
+      email: "admin@bilc.my",
+      role: "admin" as const,
+    },
+    {
+      openId: "issued:marketing",
+      name: "Marketing Agent",
+      email: "marketing@bilc.my",
+      role: "marketing" as const,
+    },
+    {
+      openId: "issued:teacher",
+      name: "Teacher Speaker",
+      email: "teacher@bilc.my",
+      role: "teacher" as const,
+    },
+    {
+      openId: "issued:student",
+      name: "Student Learner",
+      email: "student@bilc.my",
+      role: "student" as const,
+    },
+  ];
+
+  for (const item of defaultUsers) {
+    try {
+      const existing = await db.select().from(users).where(eq(users.email, item.email)).limit(1);
+      if (!existing.length) {
+        const created = await db.insert(users).values({
+          openId: item.openId,
+          name: item.name,
+          email: item.email,
+          passwordHash: createUserPasswordHash("lektor07xumoyun"),
+          role: item.role,
+          isActive: true,
+          loginMethod: "issued_by_founder",
+          lastSignedIn: new Date(),
+        });
+        
+        // If it's a student, also create a student profile
+        if (item.role === "student") {
+          const userId = Number(created[0].insertId);
+          const { studentProfiles: spTable } = await import("../drizzle/schema");
+          const existingProfile = await db.select().from(spTable).where(eq(spTable.userId, userId)).limit(1);
+          if (!existingProfile.length) {
+            await db.insert(spTable).values({
+              userId,
+              guardianName: "Parent Learner",
+              guardianPhone: "+60123456789",
+              contactEmail: "guardian@bilc.my",
+              dateOfBirth: new Date("2010-05-15"),
+              address: "123 Learning Street, Kuala Lumpur",
+              notes: "Requires intermediate grammar support.",
+              attendedSessions: 18,
+              totalSessions: 20,
+              currentLevel: "Intermediate",
+              courseName: "General English",
+              courseCode: "GEN-ENG",
+              courseStartDate: new Date("2026-01-10"),
+              courseEndDate: new Date("2026-06-30"),
+            });
+          }
+        }
+        console.log(`[Seed] Created user in database: ${item.email}`);
+      }
+    } catch (e) {
+      console.error(`[Seed] Error seeding user ${item.email}:`, e);
+    }
+  }
+}
+
+// ==========================================
+// REGISTRATION SUBMISSIONS & APPLICATIONS WRAPPERS
+// ==========================================
+
+export async function createRegistrationSubmission(input: Omit<RegistrationSubmission, "id" | "status" | "createdAt" | "updatedAt">, fieldValues: Array<{ fieldId: number; value: string }>) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(registrationSubmissions).values(input);
+    const submissionId = Number(result[0].insertId);
+    if (fieldValues.length) {
+      await db.insert(registrationSubmissionValues).values(
+        fieldValues.map(v => ({ submissionId, fieldId: v.fieldId, value: v.value }))
+      );
+    }
+    return { id: submissionId };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newSubmission: RegistrationSubmission = {
+    id,
+    ...input,
+    status: "new",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.registrationSubmissions.unshift(newSubmission);
+  for (const v of fieldValues) {
+    inMemoryStore.registrationSubmissionValues.push({
+      id: ++inMemoryStore.nextId,
+      submissionId: id,
+      fieldId: v.fieldId,
+      value: v.value,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+  return { id };
+}
+
+export async function listRegistrationSubmissions() {
+  const db = await getDb();
+  if (db) {
+    const subs = await db.select().from(registrationSubmissions).orderBy(desc(registrationSubmissions.createdAt));
+    const vals = await db.select().from(registrationSubmissionValues);
+    return subs.map(s => ({
+      ...s,
+      values: vals.filter(v => v.submissionId === s.id),
+    }));
+  }
+
+  return inMemoryStore.registrationSubmissions.map(s => ({
+    ...s,
+    values: inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === s.id),
+  }));
+}
+
+export async function getUserProfileValues(userId: number) {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(userProfileValues).where(eq(userProfileValues.userId, userId));
+  }
+  return inMemoryStore.userProfileValues.filter(v => v.userId === userId);
+}
+
+export async function updateRegistrationSubmissionStatus(id: number, status: RegistrationSubmission["status"], assignedToUserId?: number | null) {
+  const db = await getDb();
+  if (db) {
+    await db.update(registrationSubmissions).set({ status, assignedToUserId: assignedToUserId ?? null }).where(eq(registrationSubmissions.id, id));
+    return { success: true };
+  }
+
+  const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
+  if (sub) {
+    sub.status = status;
+    if (assignedToUserId !== undefined) sub.assignedToUserId = assignedToUserId;
+  }
+  return { success: true };
+}
+
+export async function deleteRegistrationSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(registrationSubmissions).where(eq(registrationSubmissions.id, id));
+    await db.delete(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, id));
+    return { success: true };
+  }
+
+  inMemoryStore.registrationSubmissions = inMemoryStore.registrationSubmissions.filter(s => s.id !== id);
+  inMemoryStore.registrationSubmissionValues = inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId !== id);
+  return { success: true };
+}
+
+export async function createApplication(userId: number, status: Application["status"] = "submitted") {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(applications).values({ userId, status });
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newApp: Application = {
+    id,
+    userId,
+    status,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.applications.unshift(newApp);
+  return { id };
+}
+
+export async function listApplications(userId?: number) {
+  const db = await getDb();
+  if (db) {
+    if (userId) {
+      return db.select().from(applications).where(eq(applications.userId, userId)).orderBy(desc(applications.createdAt));
+    }
+    return db.select().from(applications).orderBy(desc(applications.createdAt));
+  }
+
+  if (userId) {
+    return inMemoryStore.applications.filter(a => a.userId === userId);
+  }
+  return inMemoryStore.applications;
+}
+
+export async function updateApplicationStatus(id: number, status: Application["status"]) {
+  const db = await getDb();
+  if (db) {
+    await db.update(applications).set({ status }).where(eq(applications.id, id));
+    return { success: true };
+  }
+
+  const app = inMemoryStore.applications.find(a => a.id === id);
+  if (app) app.status = status;
+  return { success: true };
+}
+
+export async function deleteApplication(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(applications).where(eq(applications.id, id));
+    return { success: true };
+  }
+
+  inMemoryStore.applications = inMemoryStore.applications.filter(a => a.id !== id);
+  return { success: true };
+}
+
+// ==========================================
+// PLACEMENT TESTS WRAPPERS
+// ==========================================
+
+export async function createPlacementTest(input: Omit<PlacementTest, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(placementTests).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newTest: PlacementTest = {
+    id,
+    ...input,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.placementTests.unshift(newTest);
+  return { id };
+}
+
+export async function listPlacementTests() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(placementTests);
+  }
+  return inMemoryStore.placementTests;
+}
+
+export async function getPlacementTest(id: number) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(placementTests).where(eq(placementTests.id, id)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.placementTests.find(t => t.id === id);
+}
+
+export async function deletePlacementTest(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(placementTests).where(eq(placementTests.id, id));
+    return { success: true };
+  }
+  inMemoryStore.placementTests = inMemoryStore.placementTests.filter(t => t.id !== id);
+  return { success: true };
+}
+
+export async function createPlacementTestAttempt(input: Omit<PlacementTestAttempt, "id" | "createdAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(placementTestAttempts).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newAttempt: PlacementTestAttempt = {
+    id,
+    ...input,
+    createdAt: new Date(),
+  };
+  inMemoryStore.placementTestAttempts.unshift(newAttempt);
+  return { id };
+}
+
+export async function listPlacementTestAttempts(userId?: number) {
+  const db = await getDb();
+  if (db) {
+    if (userId) {
+      return db.select().from(placementTestAttempts).where(eq(placementTestAttempts.userId, userId)).orderBy(desc(placementTestAttempts.createdAt));
+    }
+    return db.select().from(placementTestAttempts).orderBy(desc(placementTestAttempts.createdAt));
+  }
+
+  if (userId) {
+    return inMemoryStore.placementTestAttempts.filter(a => a.userId === userId);
+  }
+  return inMemoryStore.placementTestAttempts;
+}
+
+// ==========================================
+// PROMOTIONS WRAPPERS
+// ==========================================
+
+export async function createPromotion(input: Omit<Promotion, "id" | "usedCount" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(promotions).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newPromo: Promotion = {
+    id,
+    ...input,
+    usedCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.promotions.unshift(newPromo);
+  return { id };
+}
+
+export async function listPromotions() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(promotions).orderBy(desc(promotions.createdAt));
+  }
+  return inMemoryStore.promotions;
+}
+
+export async function getPromotionByCode(code: string) {
+  const normalised = code.trim().toUpperCase();
+  const db = await getDb();
+  if (db) {
+    const result = await db.select().from(promotions).where(eq(promotions.code, normalised)).limit(1);
+    return result[0];
+  }
+  return inMemoryStore.promotions.find(p => p.code.toUpperCase() === normalised);
+}
+
+export async function deletePromotion(id: number) {
+  const db = await getDb();
+  if (db) {
+    await db.delete(promotions).where(eq(promotions.id, id));
+    return { success: true };
+  }
+  inMemoryStore.promotions = inMemoryStore.promotions.filter(p => p.id !== id);
+  return { success: true };
+}
+
+export async function incrementPromotionUsedCount(code: string) {
+  const normalised = code.trim().toUpperCase();
+  const db = await getDb();
+  if (db) {
+    await db.update(promotions).set({ usedCount: sql`${promotions.usedCount} + 1` }).where(eq(promotions.code, normalised));
+    return { success: true };
+  }
+  const promo = inMemoryStore.promotions.find(p => p.code.toUpperCase() === normalised);
+  if (promo) promo.usedCount++;
+  return { success: true };
+}
+
+// ==========================================
+// PAYMENTS WRAPPERS
+// ==========================================
+
+export async function createPayment(input: Omit<Payment, "id" | "status" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(payments).values(input);
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newPayment: Payment = {
+    id,
+    ...input,
+    status: "pending",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.payments.unshift(newPayment);
+  return { id };
+}
+
+export async function listPayments(userId?: number) {
+  const db = await getDb();
+  if (db) {
+    if (userId) {
+      return db.select().from(payments).where(eq(payments.userId, userId)).orderBy(desc(payments.createdAt));
+    }
+    return db.select().from(payments).orderBy(desc(payments.createdAt));
+  }
+
+  if (userId) {
+    return inMemoryStore.payments.filter(p => p.userId === userId);
+  }
+  return inMemoryStore.payments;
+}
+
+export async function updatePaymentStatus(id: number, status: Payment["status"], reference?: string, method?: string) {
+  const db = await getDb();
+  if (db) {
+    const setClause: Partial<Payment> = { status };
+    if (reference) setClause.transactionReference = reference;
+    if (method) setClause.paymentMethod = method;
+    await db.update(payments).set(setClause).where(eq(payments.id, id));
+    return { success: true };
+  }
+
+  const pay = inMemoryStore.payments.find(p => p.id === id);
+  if (pay) {
+    pay.status = status;
+    if (reference) pay.transactionReference = reference;
+    if (method) pay.paymentMethod = method;
+  }
+  return { success: true };
+}
+
+// Dynamic CRM Form schemas and user profile value saving
+export async function getRegistrationFormSchema() {
+  const { sections, fields } = await getUserFormSchema(false);
+  const registrationFields = fields.filter(f => f.collectionStage === "atRegistration");
+  const activeSectionIds = new Set(registrationFields.map(f => f.sectionId).filter(Boolean));
+  const filteredSections = sections.filter(s => activeSectionIds.has(s.id));
+  return { sections: filteredSections, fields: registrationFields };
+}
+
+export async function getStudentOnboardingSchema(userId: number) {
+  const { sections, fields } = await getUserFormSchema(false);
+  const onboardingFields = fields.filter(f => f.collectionStage === "atFirstLogin");
+
+  const filledValues = await getUserProfileValues(userId);
+  const filledFieldIds = new Set(filledValues.map(v => v.fieldId));
+
+  const remainingFields = onboardingFields.filter(f => !filledFieldIds.has(f.id));
+  const remainingSectionIds = new Set(remainingFields.map(f => f.sectionId).filter(Boolean));
+  const filteredSections = sections.filter(s => remainingSectionIds.has(s.id));
+
+  return { sections: filteredSections, fields: remainingFields };
+}
+
+export async function saveUserProfileValues(userId: number, values: Record<string, string>) {
+  const database = await getDb();
+  const { fields } = await getUserFormSchema(false);
+  
+  const validated = validateProfileValues(fields, values);
+  const rows = Object.entries(validated).map(([fieldId, value]) => ({
+    userId,
+    fieldId: Number(fieldId),
+    value,
+  }));
+
+  if (rows.length === 0) return { success: true };
+
+  if (database) {
+    for (const row of rows) {
+      await database.insert(userProfileValues)
+        .values(row)
+        .onDuplicateKeyUpdate({ set: { value: row.value } });
+    }
+    return { success: true };
+  }
+
+  for (const row of rows) {
+    const existingIdx = inMemoryStore.userProfileValues.findIndex(
+      v => v.userId === row.userId && v.fieldId === row.fieldId
+    );
+    if (existingIdx !== -1) {
+      inMemoryStore.userProfileValues[existingIdx].value = row.value;
+    } else {
+      inMemoryStore.userProfileValues.push({
+        userId: row.userId,
+        fieldId: row.fieldId,
+        value: row.value,
+      });
+    }
+  }
+  return { success: true };
+}
+
+export async function getRegistrationSubmission(id: number) {
+  const db = await getDb();
+  if (db) {
+    const subs = await db.select().from(registrationSubmissions).where(eq(registrationSubmissions.id, id)).limit(1);
+    if (!subs.length) return undefined;
+    const sub = subs[0];
+    const vals = await db.select().from(registrationSubmissionValues).where(eq(registrationSubmissionValues.submissionId, id));
+    return {
+      ...sub,
+      values: vals,
+    };
+  }
+
+  const sub = inMemoryStore.registrationSubmissions.find(s => s.id === id);
+  if (!sub) return undefined;
+  return {
+    ...sub,
+    values: inMemoryStore.registrationSubmissionValues.filter(v => v.submissionId === id),
+  };
+}
+
+// ==========================================
+// ENROLLMENTS DB & BUSINESS LOGIC OPERATIONS
+// ==========================================
+
+export async function listEnrollments() {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(enrollments).orderBy(desc(enrollments.createdAt));
+  }
+  return inMemoryStore.enrollments;
+}
+
+export async function getEnrollmentsByUserId(userId: number) {
+  const db = await getDb();
+  if (db) {
+    return db.select().from(enrollments).where(eq(enrollments.userId, userId)).orderBy(desc(enrollments.createdAt));
+  }
+  return inMemoryStore.enrollments.filter(e => e.userId === userId);
+}
+
+export async function createEnrollment(input: Omit<Enrollment, "id" | "createdAt" | "updatedAt">) {
+  // Check if there is already an active enrollment for the student
+  const existing = await getEnrollmentsByUserId(input.userId);
+  const activeEnrollment = existing.find(e => e.status === "active");
+  if (activeEnrollment) {
+    throw new Error("Student already has an active enrollment. Close or cancel the current one first.");
+  }
+
+  const db = await getDb();
+  if (db) {
+    const result = await db.insert(enrollments).values({
+      ...input,
+      notes: input.notes?.trim() || null,
+      completedAt: null,
+    });
+    return { id: Number(result[0].insertId) };
+  }
+
+  const id = ++inMemoryStore.nextId;
+  const newEnrollment: Enrollment = {
+    id,
+    ...input,
+    notes: input.notes?.trim() || null,
+    completedAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  inMemoryStore.enrollments.unshift(newEnrollment);
+  return { id };
+}
+
+export async function closeEnrollment(enrollmentId: number, status: "completed" | "cancelled") {
+  const db = await getDb();
+  const completedAt = new Date();
+  if (db) {
+    await db.update(enrollments).set({ status, completedAt }).where(eq(enrollments.id, enrollmentId));
+    return { success: true };
+  }
+
+  const found = inMemoryStore.enrollments.find(e => e.id === enrollmentId);
+  if (found) {
+    found.status = status;
+    found.completedAt = completedAt;
+    found.updatedAt = completedAt;
+  }
+  return { success: true };
+}
+
+// Helper to map programInterest strings to proper DB program IDs
+export function matchProgramInterestToId(interest: string, programsList: Program[]) {
+  const norm = interest.toLowerCase().trim();
+  if (norm.includes("general") && norm.includes("english")) return programsList.find(p => p.slug === "general-english")?.id || null;
+  if (norm.includes("kids")) return programsList.find(p => p.slug === "kids-english")?.id || null;
+  if (norm.includes("speaking") || norm.includes("conversation")) return programsList.find(p => p.slug === "speaking-conversation")?.id || null;
+  if (norm.includes("ielts")) return programsList.find(p => p.slug === "ielts-preparation")?.id || null;
+  if (norm.includes("bahasa") || norm.includes("melayu")) return programsList.find(p => p.slug === "bahasa-melayu")?.id || null;
+  if (norm.includes("mandarin") || norm.includes("chinese")) return programsList.find(p => p.slug === "mandarin")?.id || null;
+  if (norm.includes("arabic")) return programsList.find(p => p.slug === "arabic")?.id || null;
+  if (norm.includes("japanese")) return programsList.find(p => p.slug === "japanese")?.id || null;
+  if (norm.includes("korean")) return programsList.find(p => p.slug === "korean")?.id || null;
+  if (norm.includes("business") && norm.includes("english")) return programsList.find(p => p.slug === "business-english")?.id || null;
+  return null;
+}
+
+// DB mapping data migration runner
+export async function migrateExistingSubmissionsToProgramId() {
+  const programsList = await listPrograms();
+  const db = await getDb();
+  if (db) {
+    try {
+      const subs = await db.select().from(submissions);
+      for (const sub of subs) {
+        if (!sub.programId && sub.programInterest) {
+          const matchedId = matchProgramInterestToId(sub.programInterest, programsList);
+          if (matchedId) {
+            await db.update(submissions).set({ programId: matchedId }).where(eq(submissions.id, sub.id));
+          }
+        }
+      }
+      const regSubs = await db.select().from(registrationSubmissions);
+      for (const reg of regSubs) {
+        if (!reg.programId && reg.programInterest) {
+          const matchedId = matchProgramInterestToId(reg.programInterest, programsList);
+          if (matchedId) {
+            await db.update(registrationSubmissions).set({ programId: matchedId }).where(eq(registrationSubmissions.id, reg.id));
+          }
+        }
+      }
+      console.log("[Migration] Successfully completed existing submissions to programId mapping");
+    } catch (err) {
+      console.warn("[Migration] Database mapping failed:", err);
+    }
+  } else {
+    for (const sub of inMemoryStore.submissions) {
+      if (!sub.programId && sub.programInterest) {
+        sub.programId = matchProgramInterestToId(sub.programInterest, programsList);
+      }
+    }
+    for (const reg of inMemoryStore.registrationSubmissions) {
+      if (!reg.programId && reg.programInterest) {
+        reg.programId = matchProgramInterestToId(reg.programInterest, programsList);
+      }
+    }
+    console.log("[Migration] Completed inMemoryStore mapping fallback successfully");
+  }
+}
+
+export async function createClientAccountAndEnrollment(input: {
+  name: string;
+  email: string;
+  phone: string;
+  programId: number;
+  agreedPrice: number;
+  registrationFee: number;
+  placementTestFee: number;
+  visaFee: number;
+  approvedByUserId: number;
+  source: "registration_form" | "enquiry_form" | "direct_call" | "whatsapp";
+  submissionId?: number | null;
+  registrationSubmissionId?: number | null;
+  notes?: string;
+}) {
+  const database = await getDb();
+  
+  // 1. Validate that forms have their respective submission links as required
+  if (input.source === "registration_form" && !input.registrationSubmissionId) {
+    throw new Error("A registration submission link is mandatory when registering from a registration form.");
+  }
+  if (input.source === "enquiry_form" && !input.submissionId) {
+    throw new Error("An enquiry submission link is mandatory when registering from an enquiry form.");
+  }
+
+  // 2. Validate/Normalize contact email
+  const contactEmail = input.email.trim().toLowerCase();
+
+  // Generate unique Latin login identifier e.g. ivansidorov102026@bilc.my
+  const loginEmail = await generateUniqueUserLogin(input.name, new Date());
+
+  // Generate a random temporary password OTP
+  const tempPassword = "BILC$Student$" + randomUUID().slice(0, 8);
+  const passwordHash = createUserPasswordHash(tempPassword);
+
+  let userId: number;
+
+  if (database) {
+    // Transactional creation
+    const result = await database.transaction(async tx => {
+      // Create user
+      const createdUser = await tx.insert(users).values({
+        openId: `issued:${randomUUID()}`,
+        name: input.name.trim(),
+        email: loginEmail, // User's login identifier
+        passwordHash,
+        isActive: true,
+        loginMethod: "issued_by_founder",
+        role: "student",
+        lastSignedIn: new Date(),
+        // Set OTP track columns:
+        isOtp: true,
+        otpCreatedAt: new Date(),
+        failedAttempts: 0,
+        sessionVersion: 1,
+      });
+      const uId = Number(createdUser[0].insertId);
+      
+      // Create student profile
+      await tx.insert(studentProfiles).values({
+        userId: uId,
+        contactEmail: contactEmail, // Student's actual communication email
+        guardianPhone: input.phone,
+        notes: input.notes?.trim() || null,
+      });
+
+      // Create enrollment
+      await tx.insert(enrollments).values({
+        userId: uId,
+        programId: input.programId,
+        agreedPrice: input.agreedPrice,
+        registrationFee: input.registrationFee,
+        placementTestFee: input.placementTestFee,
+        visaFee: input.visaFee,
+        approvedByUserId: input.approvedByUserId,
+        notes: input.notes?.trim() || null,
+        status: "active",
+        source: input.source,
+        submissionId: input.submissionId || null,
+        registrationSubmissionId: input.registrationSubmissionId || null,
+      });
+
+      // Update linked submission status
+      if (input.submissionId) {
+        await tx.update(submissions)
+          .set({ status: "account_created" })
+          .where(eq(submissions.id, input.submissionId));
+      }
+      if (input.registrationSubmissionId) {
+        await tx.update(registrationSubmissions)
+          .set({ status: "accountCreated" })
+          .where(eq(registrationSubmissions.id, input.registrationSubmissionId));
+      }
+
+      return uId;
+    });
+    userId = result;
+  } else {
+    // Fallback for inMemoryStore
+    const now = new Date();
+    userId = ++inMemoryStore.nextId;
+    
+    // Create user in inMemoryStore
+    inMemoryStore.users.push({
+      id: userId,
+      openId: `issued:${randomUUID()}`,
+      name: input.name.trim(),
+      email: loginEmail, // User's login identifier
+      passwordHash,
+      isActive: true,
+      loginMethod: "issued_by_founder",
+      role: "student",
+      createdAt: now,
+      updatedAt: now,
+      lastSignedIn: now,
+      // OTP columns
+      isOtp: true,
+      otpCreatedAt: now,
+      failedAttempts: 0,
+      sessionVersion: 1,
+    } as any);
+
+    // Create student profile
+    inMemoryStore.studentProfiles = inMemoryStore.studentProfiles || [];
+    inMemoryStore.studentProfiles.push({
+      id: ++inMemoryStore.nextId,
+      userId,
+      guardianName: null,
+      guardianPhone: input.phone,
+      contactEmail: contactEmail, // Student's actual communication email
+      dateOfBirth: null,
+      address: null,
+      notes: input.notes?.trim() || null,
+      attendedSessions: 0,
+      totalSessions: 0,
+      currentLevel: null,
+      courseName: null,
+      courseCode: null,
+      courseStartDate: null,
+      courseEndDate: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Create active enrollment
+    inMemoryStore.enrollments.unshift({
+      id: ++inMemoryStore.nextId,
+      userId,
+      programId: input.programId,
+      agreedPrice: input.agreedPrice,
+      registrationFee: input.registrationFee,
+      placementTestFee: input.placementTestFee,
+      visaFee: input.visaFee,
+      approvedByUserId: input.approvedByUserId,
+      approvedAt: now,
+      notes: input.notes?.trim() || null,
+      status: "active",
+      completedAt: null,
+      source: input.source,
+      submissionId: input.submissionId || null,
+      registrationSubmissionId: input.registrationSubmissionId || null,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Update linked submission status
+    if (input.submissionId) {
+      const sub = inMemoryStore.submissions.find(s => s.id === input.submissionId);
+      if (sub) sub.status = "account_created";
+    }
+    if (input.registrationSubmissionId) {
+      const sub = inMemoryStore.registrationSubmissions.find(s => s.id === input.registrationSubmissionId);
+      if (sub) sub.status = "accountCreated";
+    }
+  }
+
+  // Send single-use OTP credentials email to student's communication email address
+  try {
+    await EmailProvider.sendOtpEmail(contactEmail, loginEmail, tempPassword, "en");
+  } catch (err) {
+    console.error("[Email] Failed to dispatch initial OTP login email:", err);
+  }
+
+  return { userId, tempPassword, generatedLogin: loginEmail };
+}
+
+export async function getContactEmailForUser(userId: number, role: string, defaultEmail: string | null): Promise<string> {
+  const database = await getDb();
+  if (role === "student" || role === "user") {
+    if (database) {
+      const profile = (await database.select().from(studentProfiles).where(eq(studentProfiles.userId, userId)).limit(1))[0];
+      if (profile?.contactEmail) return profile.contactEmail;
+    } else {
+      const profile = (inMemoryStore.studentProfiles || []).find(p => p.userId === userId);
+      if (profile?.contactEmail) return profile.contactEmail;
+    }
+  }
+  return defaultEmail || "";
+}
+
+export async function resetUserPasswordAndSession(userId: number, passwordHash: string): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      passwordHash,
+      isOtp: true,
+      otpCreatedAt: new Date(),
+      failedAttempts: 0,
+      sessionVersion: sql`sessionVersion + 1`,
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.passwordHash = passwordHash;
+      user.isOtp = true;
+      user.otpCreatedAt = new Date();
+      user.failedAttempts = 0;
+      user.sessionVersion = (user.sessionVersion || 1) + 1;
+    }
+  }
+}
+
+export async function incrementFailedAttempts(userId: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      failedAttempts: sql`failedAttempts + 1`,
+      updatedAt: new Date()
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.failedAttempts = (user.failedAttempts || 0) + 1;
+      user.updatedAt = new Date();
+    }
+  }
+}
+
+export async function resetFailedAttempts(userId: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      failedAttempts: 0,
+      updatedAt: new Date(),
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.failedAttempts = 0;
+      user.updatedAt = new Date();
+    }
+  }
+}
+
+export async function burnOtp(userId: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({
+      isOtp: false,
+      passwordHash: null,
+      failedAttempts: 0,
+      updatedAt: new Date(),
+      lastSignedIn: new Date()
+    }).where(eq(users.id, userId));
+  } else {
+    const user = inMemoryStore.users.find(u => u.id === userId);
+    if (user) {
+      user.isOtp = false;
+      user.passwordHash = null;
+      user.failedAttempts = 0;
+      user.updatedAt = new Date();
+      user.lastSignedIn = new Date();
+    }
+  }
+}
+

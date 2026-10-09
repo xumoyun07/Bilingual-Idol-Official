@@ -1,0 +1,143 @@
+import { NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
+import type { TrpcContext } from "./context";
+
+const t = initTRPC.context<TrpcContext>().create({
+  transformer: superjson,
+});
+
+export const router = t.router;
+export const publicProcedure = t.procedure;
+
+const requireUser = t.middleware(async opts => {
+  const { ctx, next, path } = opts;
+
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
+  }
+
+  // Whitelisted endpoints for restricted sessions (onboarding)
+  const whitelistedPaths = [
+    "auth.me",
+    "auth.logout",
+    "auth.completeOnboarding",
+    "users.formSchema",
+    "superAdminUsers.formSchema"
+  ];
+
+  if ((ctx.user as any).isRestricted && !whitelistedPaths.includes(path)) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "This restricted session is limited to completing your first sign-in onboarding workflow."
+    });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+export const protectedProcedure = t.procedure.use(requireUser);
+
+/** Exact-role guard for teacher-only operational routes. */
+export const studentProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== "student") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+export const teacherProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== "teacher") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+export const adminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+
+    if (!ctx.user || !['admin', 'super_admin', 'founder'].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user: ctx.user,
+      },
+    });
+  }),
+);
+
+/**
+ * Shared access for site content management: Marketing is day-to-day editor;
+ * Admin, Super admin, and Founder retain full oversight and fallback access.
+ */
+export const contentManagerProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !['admin', 'marketing', 'super_admin', 'founder'].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is restricted to content managers." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
+export const marketingProcedure = contentManagerProcedure;
+
+export const founderProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+
+    if (!ctx.user || ctx.user.role !== 'founder') {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user: ctx.user,
+      },
+    });
+  }),
+);
+
+export const superAdminProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+
+    if (!ctx.user || ctx.user.role !== "super_admin") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user: ctx.user,
+      },
+    });
+  }),
+);
+
+/** Exact-role access for the shared audit workspace. Founder-only controls still use founderProcedure. */
+export const auditProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || !["founder", "super_admin"].includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
