@@ -44,7 +44,6 @@ import { Button } from "./ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  FOUNDER_NAVIGATION_SECTIONS,
   PlatformUserType,
 } from "@/components/founder/FounderNavTypes";
 import { useFounderNav } from "@/components/founder/useFounderNav";
@@ -181,8 +180,7 @@ function DashboardShell({
     if (role === "founder") {
       return (
         <div className="space-y-2.5">
-          {user?.role === "founder" && role === "founder" ? (
-            STRATEGIC_PORTFOLIOS.map((section) => {
+          {STRATEGIC_PORTFOLIOS.map((section) => {
               const isOpen = openPortfolios[section.id];
               const SectionIcon = section.icon;
               const hasActiveModule = section.modules.some((m) => m.id === activeTab);
@@ -258,103 +256,7 @@ function DashboardShell({
                   )}
                 </div>
               );
-            })
-          ) : (
-            FOUNDER_NAVIGATION_SECTIONS.filter((section) => {
-              if (user?.role === "founder") return true;
-              if (user?.role === "admin") {
-                return ["admin", "teacher", "marketing"].includes(section.type);
-              }
-              return section.type === user?.role;
-            }).map((section) => {
-              const isOpen = openSections[section.type];
-              const SectionIcon = section.icon;
-              const hasActiveModule = section.modules.some((m) => m.id === activeTab);
-
-              return (
-                <div
-                  key={section.type}
-                  className="rounded-xl border border-[#edf2f5] bg-white overflow-hidden shadow-xs"
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleSection(section.type)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors ${
-                      hasActiveModule
-                        ? "bg-[#f8fafc] text-[#10253e]"
-                        : "hover:bg-[#fafbfc] text-[#33475b]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-bold border ${section.tone}`}
-                      >
-                        <SectionIcon size={15} />
-                      </span>
-                      <div className="min-w-0">
-                        <span className="block text-xs font-bold text-[#10253e] truncate">
-                          {td(section.label)}
-                        </span>
-                        <span className="block text-[10px] text-[#708098] truncate">
-                          {td(section.roleBadge)} · {section.modules.length} {td("modules")}
-                        </span>
-                      </div>
-                    </div>
-
-                    <ChevronDown
-                      size={14}
-                      className={`text-[#708098] transition-transform duration-200 shrink-0 ${
-                        isOpen ? "rotate-180 text-[#173fad]" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {isOpen && (
-                    <div className="bg-[#fcfdfe] px-2 py-1.5 space-y-0.5 border-t border-[#edf2f5]">
-                      {section.modules.map((mod) => {
-                        const isModuleActive = activeTab === mod.id;
-                        const ModIcon = mod.icon;
-
-                        return (
-                          <button
-                            key={mod.id}
-                            type="button"
-                            onClick={() => {
-                              handleLinkClick(() => navigateTo(section.type, mod.id));
-                            }}
-                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                              isModuleActive
-                                ? "bg-[#173fad] text-white font-semibold shadow-xs"
-                                : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <ModIcon
-                                size={14}
-                                className={isModuleActive ? "text-white" : "text-[#64748b]"}
-                              />
-                              <span className="truncate">{td(mod.title)}</span>
-                            </div>
-                            {mod.badge && (
-                              <span
-                                className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                                  isModuleActive
-                                    ? "bg-white/20 text-white"
-                                    : "bg-[#edf2f7] text-[#475569]"
-                                }`}
-                              >
-                                {td(mod.badge)}
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
+            })}
         </div>
       );
     }
@@ -427,7 +329,7 @@ function DashboardShell({
   // Header Title
   const getHeaderTitle = () => {
     if (role === "founder") {
-      for (const section of FOUNDER_NAVIGATION_SECTIONS) {
+      for (const section of STRATEGIC_PORTFOLIOS) {
         const mod = section.modules.find((m) => m.id === activeTab);
         if (mod) return `${td(section.label)} · ${td(mod.title)}`;
       }
@@ -435,16 +337,7 @@ function DashboardShell({
     }
     if (role === "super_admin") return td("Super Admin Workspace");
     if (role === "teacher") return td("Teacher Workspace");
-    if (role === "marketing") {
-      if (externalActiveTab === "overview") return td("Marketing · Overview & Reports");
-      if (externalActiveTab === "content") return td("Marketing · Content & CMS");
-      if (externalActiveTab === "media") return td("Marketing · Media Library");
-      if (externalActiveTab === "audiences") return td("Marketing · Audience Segments");
-      if (externalActiveTab === "channels") return td("Marketing · Channels & FAQ");
-      if (externalActiveTab === "settings") return td("Marketing · Settings & Directory");
-      if (externalActiveTab === "restrictions") return td("Marketing · Guardrails");
-      return td("Marketing Console");
-    }
+    if (role === "marketing") return td("Marketing Console");
     return td("Student Portal");
   };
 

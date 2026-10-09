@@ -10,72 +10,37 @@ import { UserFieldBuilder } from "@/components/UserFieldBuilder";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AuditLogs from "./AuditLogs";
-import NewsManager from "./NewsManager";
-import { StudentProfileDetail, StudentsProfileList } from "./StudentsProfile";
-import MediaLibrary from "./MediaLibrary";
 import {
-  FOUNDER_NAVIGATION_SECTIONS,
   PlatformUserType,
 } from "@/components/founder/FounderNavTypes";
 import { useFounderNav } from "@/components/founder/useFounderNav";
-import { FounderSettingsModule } from "@/components/founder/FounderSettingsModule";
-import { ProjectDossierModule } from "@/components/founder/ProjectDossierModule";
-import { FounderModuleHeader } from "@/components/founder/FounderModuleHeader";
-import { AdminProgramsModule } from "@/components/founder/AdminProgramsModule";
-import { AdminLeadsModule } from "@/components/founder/AdminLeadsModule";
-import { AdminScheduleModule } from "@/components/founder/AdminScheduleModule";
-import { TeacherAttendanceModule } from "@/components/founder/TeacherAttendanceModule";
-import { TeacherGradesModule } from "@/components/founder/TeacherGradesModule";
-import { TeacherLessonsModule } from "@/components/founder/TeacherLessonsModule";
-import { MarketingCampaignsModule } from "@/components/founder/MarketingCampaignsModule";
-import { MarketingContentModule } from "@/components/founder/MarketingContentModule";
-import { MarketingTestimonialsModule } from "@/components/founder/MarketingTestimonialsModule";
-import { MarketingAnalyticsModule } from "@/components/founder/MarketingAnalyticsModule";
-import { AdminPaymentsModule } from "@/components/dashboard/AdminPaymentsModule";
 import {
   AlertCircle,
-  ArrowUpRight,
-  BookOpen,
-  Calendar,
   CalendarDays,
   Check,
   ChevronRight,
   CircleSlash,
   Crown,
-  FileImage,
-  FileSpreadsheet,
-  FileText,
   Filter,
   GraduationCap,
-  Layers,
   LayoutDashboard,
   Loader2,
   Megaphone,
-  MessageSquare,
-  Newspaper,
   Pencil,
   Plus,
   RotateCcw,
   Search,
   ScrollText,
-  Settings,
   Settings2,
   Shield,
-  ShieldAlert,
   ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
-  Tag,
   Trash2,
-  TrendingUp,
-  UserCheck,
-  UserPlus,
-  Users,
   UsersRound,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 
 const managedRoles = ["student", "teacher", "marketing", "admin", "super_admin"] as const;
 type ManagedRole = (typeof managedRoles)[number];
@@ -225,232 +190,6 @@ function FounderConsole() {
       <DashboardContentArea>
         {renderActiveModule()}
       </DashboardContentArea>
-    </div>
-  );
-}
-
-function UserFieldBuilderStandalone() {
-  const [open, setOpen] = useState(false);
-  const { td } = useLanguage();
-  const schema = trpc.users.formSchema.useQuery();
-  const fieldsCount = (schema.data?.fields ?? []).length;
-  const sectionsCount = (schema.data?.sections ?? []).length;
-
-  return (
-    <div className="space-y-6">
-      <FounderModuleHeader
-        badgeIcon={Settings2}
-        badgeLabel="Platform Schema"
-        badgeTone="bg-[#efe8fb] text-[#6e4c9a] border-[#ddcefa]"
-        subtitle="Dynamic Profile Schema"
-        title="User Profile Schema & Custom Attributes"
-        description="Configure registration fields, required metadata, dropdowns, and grouped sections across all user roles."
-        decorativeIcon={Settings2}
-        statusText="Active Schema"
-        actions={
-          <Button
-            onClick={() => setOpen(true)}
-            className="compass-btn-primary inline-flex items-center gap-2 min-h-11 px-5 shadow-xs w-full sm:w-auto"
-          >
-            <Settings2 size={16} />
-            {td("Launch Field Builder")}
-          </Button>
-        }
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Custom Dynamic Fields")}</span>
-          <div className="text-3xl font-bold text-[#10253e] mt-1">{fieldsCount}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Active form attributes")}</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Organisational Groups")}</span>
-          <div className="text-3xl font-bold text-[#173fad] mt-1">{sectionsCount}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Form category sections")}</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Schema Status")}</span>
-          <div className="text-3xl font-bold text-emerald-600 mt-1">{td("Synchronized")}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Applies to User Creation Modal")}</p>
-        </div>
-      </div>
-
-      <div className="p-8 rounded-2xl bg-white border border-[#dce4e7] text-center space-y-4 shadow-xs">
-        <div className="mx-auto w-12 h-12 rounded-2xl bg-[#efe8fb] text-[#6e4c9a] flex items-center justify-center">
-          <Settings2 size={24} />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-[#10253e]">{td("Manage Registration Schema & Field Ordering")}</h3>
-          <p className="text-sm text-[#53657a] max-w-lg mx-auto mt-1">
-            {td("Configure which fields are required, add custom text, number, date, or dropdown attributes, and organize them into grouped sections.")}
-          </p>
-        </div>
-        <Button onClick={() => setOpen(true)} className="compass-btn-primary px-6 py-2.5">
-          {td("Open Field Builder Editor")}
-        </Button>
-      </div>
-
-      <UserFieldBuilder open={open} onOpenChange={setOpen} />
-    </div>
-  );
-}
-
-function SuperAdminOverviewModule() {
-  const { td } = useLanguage();
-  const usersCount = trpc.users.list.useQuery({ page: 0, pageSize: 1 });
-  const auditCount = trpc.audit.list.useQuery({ page: 0, pageSize: 10 });
-
-  return (
-    <div className="space-y-6">
-      <FounderModuleHeader
-        badgeIcon={ShieldCheck}
-        badgeLabel="Super Admin"
-        badgeTone="bg-[#efe8fb] text-[#6e4c9a] border-[#ddcefa]"
-        subtitle="Core Operations Centre"
-        title="Super Administrator Operations"
-        description="Global user account permissions, security audit trails, and institutional policies."
-        decorativeIcon={ShieldCheck}
-        statusText="Operational"
-        actions={
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <Link href="/admin?role=super_admin&tab=superadmin-users" className="w-full sm:w-auto">
-              <Button variant="outline" className="min-h-11 border-[#dce4e7] gap-2 w-full sm:w-auto">
-                <UsersRound size={16} />
-                {td("Staff Directory")}
-              </Button>
-            </Link>
-            <Link href="/admin?role=super_admin&tab=superadmin-audit" className="w-full sm:w-auto">
-              <Button className="compass-btn-primary min-h-11 gap-2 shadow-xs w-full sm:w-auto">
-                <ShieldCheck size={16} />
-                {td("Audit Traces")}
-              </Button>
-            </Link>
-          </div>
-        }
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Total Staff & Managed Accounts")}</span>
-          <div className="text-3xl font-bold text-[#10253e] mt-1">{usersCount.data?.total ?? "..."}</div>
-          <p className="text-xs text-emerald-600 font-medium mt-1">{td("Active multi-role directory")}</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Recorded Security Events")}</span>
-          <div className="text-3xl font-bold text-[#173fad] mt-1">{auditCount.data?.total ?? "..."}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Tamper-evident logs")}</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Super Admin Authority")}</span>
-          <div className="text-3xl font-bold text-[#6e4c9a] mt-1">{td("Level 2")}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Governed under Founder")}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link href="/admin?role=super_admin&tab=superadmin-users" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-xs transition-all block group">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-[#efe8fb] text-[#6e4c9a]">
-              <UsersRound size={22} />
-            </span>
-            <div>
-              <h3 className="font-bold text-base text-[#10253e] group-hover:text-[#173fad]">{td("Manage Staff Directory")}</h3>
-              <p className="text-xs text-[#53657a] mt-0.5">{td("Create, update, toggle active status, and filter staff records.")}</p>
-            </div>
-          </div>
-        </Link>
-        <Link href="/admin?role=super_admin&tab=superadmin-audit" className="p-6 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-xs transition-all block group">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-[#efe8fb] text-[#6e4c9a]">
-              <ShieldAlert size={22} />
-            </span>
-            <div>
-              <h3 className="font-bold text-base text-[#10253e] group-hover:text-[#173fad]">{td("View Security Audit Logs")}</h3>
-              <p className="text-xs text-[#53657a] mt-0.5">{td("Inspect user logins, profile alterations, and administrative actions.")}</p>
-            </div>
-          </div>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function AdminOverviewModule() {
-  const { td } = useLanguage();
-  const studentsCount = trpc.students.list.useQuery({ page: 0, pageSize: 1, sortBy: "newest" });
-  const submissionsCount = trpc.submissions.list.useQuery();
-
-  return (
-    <div className="space-y-6">
-      <FounderModuleHeader
-        badgeIcon={Shield}
-        badgeLabel="Admin Console"
-        badgeTone="bg-[#f4eddd] text-[#705a30] border-[#e5d5b7]"
-        subtitle="Admissions & Academics"
-        title="Administrator Operational Dashboard"
-        description="Manage learner enrollments, language program catalogues, admissions pipeline, and class timetables."
-        decorativeIcon={Shield}
-        statusText="Admissions Open"
-        actions={
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <Link href="/admin?role=admin&tab=admin-students" className="w-full sm:w-auto">
-              <Button variant="outline" className="min-h-11 border-[#dce4e7] gap-2 w-full sm:w-auto">
-                <GraduationCap size={16} />
-                {td("Student Directory")}
-              </Button>
-            </Link>
-            <Link href="/admin?role=admin&tab=admin-leads" className="w-full sm:w-auto">
-              <Button className="compass-btn-primary min-h-11 gap-2 shadow-xs w-full sm:w-auto">
-                <Plus size={16} />
-                {td("Admissions Pipeline")}
-              </Button>
-            </Link>
-          </div>
-        }
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Enrolled Students")}</span>
-          <div className="text-3xl font-bold text-[#10253e] mt-1">{studentsCount.data?.total ?? "..."}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Active learner profiles")}</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Admissions Pipeline Leads")}</span>
-          <div className="text-3xl font-bold text-[#173fad] mt-1">{submissionsCount.data?.length ?? "..."}</div>
-          <p className="text-xs text-emerald-600 font-medium mt-1">{td("Awaiting review / contact")}</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-white border border-[#dce4e7] shadow-xs">
-          <span className="text-xs font-semibold text-[#53657a]">{td("Academic Timetable")}</span>
-          <div className="text-3xl font-bold text-[#705a30] mt-1">{td("Active")}</div>
-          <p className="text-xs text-[#53657a] mt-1">{td("Mon - Sat classes running")}</p>
-        </div>
-      </div>
-
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link href="/admin?role=admin&tab=admin-students" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
-          <GraduationCap className="text-[#325c95] size-6 mb-2" />
-          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">{td("Students Directory")}</h4>
-          <p className="text-xs text-[#53657a] mt-1">{td("Inspect profiles, CEFR tiers, and emergency contacts.")}</p>
-        </Link>
-        <Link href="/admin?role=admin&tab=admin-leads" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
-          <Users className="text-[#173fad] size-6 mb-2" />
-          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">{td("Admissions Leads")}</h4>
-          <p className="text-xs text-[#53657a] mt-1">{td("Process enrollments and update pipeline status.")}</p>
-        </Link>
-        <Link href="/admin?role=admin&tab=admin-programs" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
-          <BookOpen className="text-[#705a30] size-6 mb-2" />
-          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">{td("Language Programs")}</h4>
-          <p className="text-xs text-[#53657a] mt-1">{td("Create and configure courses, tuition, and CEFR levels.")}</p>
-        </Link>
-        <Link href="/admin?role=admin&tab=admin-schedule" className="p-5 rounded-2xl bg-white border border-[#dce4e7] hover:border-[#173fad] shadow-sm transition-all block group">
-          <Calendar className="text-[#a34732] size-6 mb-2" />
-          <h4 className="font-bold text-sm text-[#10253e] group-hover:text-[#173fad]">{td("Class Timetables")}</h4>
-          <p className="text-xs text-[#53657a] mt-1">{td("Manage classrooms, schedule slots, and teacher rosters.")}</p>
-        </Link>
-      </div>
     </div>
   );
 }

@@ -533,9 +533,52 @@ button:focus-visible {
   max-width: none !important;
 }
 
-.simple-public-footer > div:first-child {
+.simple-public-footer > div {
   max-width: 1216px;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bilc-social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bilc-social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.bilc-social-btn:active {
+  transform: scale(0.95);
+}
+
+.bilc-social-btn.bilc-social-fb:hover {
+  background: rgba(24, 119, 242, 0.2);
+  border-color: rgba(24, 119, 242, 0.6);
+  color: #1877f2;
+}
+
+.bilc-social-btn.bilc-social-tiktok:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(0, 242, 254, 0.6);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.25), 0 0 8px rgba(238, 29, 82, 0.25);
+}
+
+.bilc-social-btn.bilc-social-insta:hover {
+  background: rgba(228, 64, 95, 0.2);
+  border-color: rgba(228, 64, 95, 0.6);
+  color: #e4405f;
 }
 
 .simple-public-footer {
@@ -9027,10 +9070,13 @@ div#root > div > main#main-content > div#home-page-container > section#campus-fa
 
 /* Mobile responsive styles specifically for light theme */
 @media (max-width: 1024px) {
-  /* Force a pristine, high-contrast light background for the whole section on mobile */
-  div#root > div > main#main-content > div#home-page-container > section#campus-facilities-section {
-    background-color: #f8fafc !important;
-    background: #f8fafc !important;
+  /* Force a pristine transparent background for the whole section on mobile */
+  div#root > div > main#main-content > div#home-page-container > section#campus-facilities-section,
+  div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(4) {
+    background-color: transparent !important;
+    background: transparent !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
     padding-top: 2.5rem !important;
     padding-bottom: 2.5rem !important;
   }
@@ -9827,6 +9873,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-
 
 /* Global Mobile/Tablet/Desktop Transparent Background overrides for Campus Facilities Showcase */
 #campus-facilities-section,
+div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(4),
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(5) {
   background-color: transparent !important;
   background: transparent !important;
@@ -10358,6 +10405,10 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section:nth-of-type(4) {
   border-width: 0px !important;
   border-radius: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  background-color: transparent !important;
+  background: transparent !important;
 }
 
 /* Student Journey section mobile overrides */

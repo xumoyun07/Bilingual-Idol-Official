@@ -201,7 +201,8 @@ export default function About() {
         </section>
 
         <section id="about-community-section" className="simple-route-section simple-section-tint about-community-section">
-          <div className="about-community-grid">
+          {/* DESKTOP VERSION (hidden md:grid) */}
+          <div className="about-community-grid hidden md:grid">
             <figure className="about-feature-media about-community-media">
               <AboutImage media={communityMedia} />
               <figcaption>{t("about.communityCaption")}</figcaption>
@@ -221,9 +222,48 @@ export default function About() {
               </Link>
             </div>
           </div>
+
+          {/* MOBILE VERSION (block md:hidden) - Beautiful, Compact & Consolidated Community Card */}
+          <div className="block md:hidden px-0 py-2 mt-5">
+            <div className="bg-white rounded-3xl border border-[#cbdcfc]/45 shadow-[0_8px_30px_rgba(23,63,173,0.05)] overflow-hidden transition-all duration-300">
+              <div className="h-44 w-full overflow-hidden relative">
+                <AboutImage media={communityMedia} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
+                <span className="absolute bottom-3 start-3 text-[11px] font-semibold text-white/95 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-full border border-white/20 select-none">
+                  {t("about.communityCaption")}
+                </span>
+              </div>
+
+              <div className="p-5 space-y-4">
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-extrabold text-[#173fad] uppercase tracking-wider leading-none">
+                    {t("about.communityEyebrow")}
+                  </p>
+                  <h2 className="text-lg font-extrabold text-[#10253e] tracking-tight leading-tight">
+                    {t("about.communityTitle")}
+                  </h2>
+                </div>
+                
+                <p className="text-slate-500 text-xs leading-relaxed font-semibold">
+                  {language === "ms"
+                    ? "Persekitaran pembelajaran pusat ini menggabungkan komunikasi praktikal, kesedaran budaya dan sokongan untuk laluan pembelajaran berbeza."
+                    : language === "ar"
+                    ? "تجمع بيئة التعلم في المركز بين التواصل العملي، الوعي الثقافي والدعم المستمر لمختلف المسارات التعليمية."
+                    : "The centre’s learning environment brings together practical communication, cultural awareness and support for different learning routes."}
+                </p>
+
+                <div className="pt-2 border-t border-slate-50">
+                  <Link href="/contact" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#173fad] hover:text-[#173fad]/80 transition-colors">
+                    <span>{t("nav.contact")}</span>
+                    <ChevronRight size={14} className={isRTL ? "rotate-180" : ""} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing bg-gradient-to-b from-slate-50 to-white border border-slate-100 rounded-3xl p-6 sm:p-8 md:p-12 shadow-xs">
+        <section id="about-team-section" className="simple-route-section about-team-section about-section--compact-spacing bg-gradient-to-b from-slate-50 to-white border border-slate-100 rounded-3xl p-4 sm:p-6 md:p-12 shadow-xs">
           <div className="simple-section-heading about-team-heading--surface">
             <div>
               <p className="simple-eyebrow">{t("about.teamEyebrow")}</p>
@@ -234,41 +274,90 @@ export default function About() {
             </Link>
           </div>
           {team.data?.length ? (
-            <div className="about-team-grid">
-              {team.data.map((member) => {
-                const portrait =
-                  member.id === 1 ? "/media/team_elena.webp" :
-                  member.id === 2 ? "/media/team_marcus.webp" :
-                  "/media/team_aisyah.webp";
-                const langList = member.languages.split(",").map(l => l.trim()).filter(Boolean);
-                return (
-                  <article key={member.id} className="about-team-card">
-                    <div className="about-team-card-image-wrap">
-                      <img src={portrait} alt={`${member.name} - ${member.role}`} className="about-team-card-image" loading="lazy" decoding="async" />
-                      <span className="about-team-card-badge">{member.role}</span>
-                    </div>
-                    <div className="about-team-card-body">
-                      <div className="about-team-card-header">
-                        <strong className="about-team-card-name">{member.name}</strong>
+            <>
+              {/* DESKTOP VERSION (hidden md:grid) */}
+              <div className="about-team-grid hidden md:grid">
+                {team.data.map((member) => {
+                  const portrait =
+                    member.id === 1 ? "/media/team_elena.webp" :
+                    member.id === 2 ? "/media/team_marcus.webp" :
+                    "/media/team_aisyah.webp";
+                  const langList = member.languages.split(",").map(l => l.trim()).filter(Boolean);
+                  return (
+                    <article key={member.id} className="about-team-card">
+                      <div className="about-team-card-image-wrap">
+                        <img src={portrait} alt={`${member.name} - ${member.role}`} className="about-team-card-image" loading="lazy" decoding="async" />
+                        <span className="about-team-card-badge">{member.role}</span>
                       </div>
-                      <p className="about-team-card-bio">{member.bio}</p>
-                      <div className="about-team-card-languages">
-                        <span className="about-team-lang-label">
-                          {language === "ms" ? "Bahasa diajar & ditutur:" : language === "ar" ? "اللغات التي يتم تدريسها:" : "Languages taught & spoken:"}
-                        </span>
-                        <div className="about-team-lang-tags">
-                          {langList.map((lang) => (
-                            <span key={lang} className="about-team-lang-tag">
-                              {lang}
-                            </span>
-                          ))}
+                      <div className="about-team-card-body">
+                        <div className="about-team-card-header">
+                          <strong className="about-team-card-name">{member.name}</strong>
+                        </div>
+                        <p className="about-team-card-bio">{member.bio}</p>
+                        <div className="about-team-card-languages">
+                          <span className="about-team-lang-label">
+                            {language === "ms" ? "Bahasa diajar & ditutur:" : language === "ar" ? "اللغات التي يتم تدريسها:" : "Languages taught & spoken:"}
+                          </span>
+                          <div className="about-team-lang-tags">
+                            {langList.map((lang) => (
+                              <span key={lang} className="about-team-lang-tag">
+                                {lang}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              {/* MOBILE VERSION (block md:hidden) - Compact Horizontal Swipe Carousel */}
+              <div className="block md:hidden mt-4">
+                <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 no-scrollbar scroll-smooth">
+                  {team.data.map((member) => {
+                    const portrait =
+                      member.id === 1 ? "/media/team_elena.webp" :
+                      member.id === 2 ? "/media/team_marcus.webp" :
+                      "/media/team_aisyah.webp";
+                    const langList = member.languages.split(",").map(l => l.trim()).filter(Boolean);
+                    return (
+                      <article key={member.id} className="w-[82vw] max-w-[300px] shrink-0 snap-center bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+                        <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+                          <img src={portrait} alt={`${member.name} - ${member.role}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                          <span className="absolute bottom-2.5 start-2.5 bg-[#10253e]/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
+                            {member.role}
+                          </span>
+                        </div>
+                        <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                          <div>
+                            <strong className="block text-sm font-extrabold text-[#10253e]">{member.name}</strong>
+                            <p className="text-slate-500 text-xs leading-relaxed mt-1 line-clamp-3">{member.bio}</p>
+                          </div>
+                          <div className="pt-2 border-t border-slate-100">
+                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                              {language === "ms" ? "Bahasa:" : language === "ar" ? "اللغات:" : "Languages:"}
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {langList.map((lang) => (
+                                <span key={lang} className="text-[10px] font-semibold text-[#173fad] bg-[#eef3ff] px-2 py-0.5 rounded-md">
+                                  {lang}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center justify-center gap-1.5 pt-2">
+                  <span className="text-[11px] font-semibold text-slate-400">
+                    {language === "ms" ? "Leret untuk melihat pendidik lain →" : language === "ar" ? "اسحب للاستكشاف ←" : "Swipe to explore instructors →"}
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <div className="simple-empty-state">
               <p>
@@ -282,17 +371,45 @@ export default function About() {
           )}
         </section>
 
-        <section id="about-contact-panel-section" className="about-contact-panel about-contact-panel--light">
-          <div className="about-contact-copy about-contact-copy--light">
-            <p className="simple-eyebrow about-contact-eyebrow--light">{t("home.contactStripTitle")}</p>
-            <h2 className="about-contact-title--light">{t("about.heroTitle")}</h2>
-            <p className="about-contact-body--light">{t("contact.formSubtitle")}</p>
-            <Link href="/contact" className="simple-primary-link about-contact-link--light">
-              {t("nav.contact")}
-            </Link>
+        <section id="about-contact-panel-section" className="about-contact-panel about-contact-panel--light !p-0 md:!p-10 border-0 md:border md:border-slate-200/80 bg-transparent md:bg-white shadow-none md:shadow-sm">
+          {/* DESKTOP VERSION (hidden md:flex) */}
+          <div className="hidden md:flex items-center justify-between gap-8 w-full">
+            <div className="about-contact-copy about-contact-copy--light">
+              <p className="simple-eyebrow about-contact-eyebrow--light">{t("home.contactStripTitle")}</p>
+              <h2 className="about-contact-title--light">{t("about.heroTitle")}</h2>
+              <p className="about-contact-body--light">{t("contact.formSubtitle")}</p>
+              <Link href="/contact" className="simple-primary-link about-contact-link--light">
+                {t("nav.contact")}
+              </Link>
+            </div>
+            <div className="about-contact-media">
+              <AboutImage media={ctaMedia} />
+            </div>
           </div>
-          <div className="about-contact-media">
-            <AboutImage media={ctaMedia} />
+
+          {/* MOBILE VERSION (block md:hidden) - Unified, High-Converting Hero CTA Card */}
+          <div className="block md:hidden w-full bg-gradient-to-br from-[#10253e] to-[#173fad] text-white rounded-3xl p-6 shadow-md relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-36 h-36 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="relative z-10 space-y-3">
+              <span className="inline-block text-[10px] font-extrabold uppercase tracking-widest text-blue-200 bg-white/10 px-2.5 py-1 rounded-full">
+                {t("home.contactStripTitle")}
+              </span>
+              <h2 className="text-xl font-extrabold text-white leading-snug">
+                {language === "ms" ? "Mulakan Perjalanan Bahasa Anda di BILC" : language === "ar" ? "ابدأ رحلتك اللغوية في مركز BILC" : "Ready to Start Your Language Journey?"}
+              </h2>
+              <p className="text-blue-100/85 text-xs leading-relaxed max-w-sm">
+                {t("contact.formSubtitle")}
+              </p>
+              <div className="pt-2">
+                <Link
+                  href="/contact"
+                  className="w-full min-h-11 rounded-xl bg-white text-[#10253e] hover:bg-blue-50 font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs active:scale-98 transition-all"
+                >
+                  <span>{t("nav.contact")}</span>
+                  <ChevronRight size={15} className={isRTL ? "rotate-180" : ""} />
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       </div>

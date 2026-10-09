@@ -208,7 +208,7 @@ export function CampusFacilitiesShowcase() {
   }[language === "ms" ? "ms" : language === "ar" ? "ar" : "en"];
 
   return (
-    <section id="campus-facilities-section" className="relative bg-transparent py-12 sm:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-none">
+    <section id="campus-facilities-section" className="relative bg-transparent py-12 sm:py-16 px-0 sm:px-6 lg:px-8 overflow-hidden border-none">
       <style dangerouslySetInnerHTML={{ __html: `
         /* Applied to all versions including mobile */
         div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) > div#home-page-container:nth-of-type(1) > section#campus-facilities-section > div:nth-of-type(1) > div:nth-of-type(1),

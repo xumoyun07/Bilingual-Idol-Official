@@ -1,6 +1,8 @@
 {
-  "name": "Bilingual Idol Language Centre",
-  "description": "Official platform of Bilingual Idol Language Centre (WZ10104) at Pavilion Embassy Kuala Lumpur. Features accredited General English, IELTS preparation, Summer camps, Executive English, World languages, student portal, and administrative dashboard.",
+  "name": "Remix Bilingual-Idol-Official",
+  "description": "Imported from GitHub: xumoyun07/Bilingual-Idol-Official",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
