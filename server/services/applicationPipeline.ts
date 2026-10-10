@@ -201,7 +201,7 @@ export async function approveSubmission(input: { submissionId: number }, actor: 
   // createManagedUser (однократная выдача, как в superAdminUsers.create).
   const generatedPassword = randomUUID();
   const created = (await createManagedUser(
-    { name: fullName, email, role: "student", password: generatedPassword } as never,
+    { name: fullName, email, role: "student", password: generatedPassword, initialPassword: generatedPassword } as never,
     { id: actor.id, role: actor.role },
   )) as unknown as { id?: number; tempPassword?: string | null };
   const userId = Number(created.id);

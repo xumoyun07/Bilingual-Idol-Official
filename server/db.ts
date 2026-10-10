@@ -604,7 +604,7 @@ async function validatedProfileRows(values: UserProfileValuesInput) {
 }
 
 export async function createManagedUser(
-  input: { name?: string; nickname?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput },
+  input: { name?: string; nickname?: string; email?: string; password?: string; initialPassword?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput },
   actor?: PolicyActor,
   policyPath = "users.create",
 ) {
@@ -620,6 +620,8 @@ export async function createManagedUser(
     nickname: suppliedNickname || suppliedEmail,
     role: input.role,
     password: input.password,
+    // Форма создания использует поле с id initialPassword — пробрасываем оба имени.
+    initialPassword: input.initialPassword ?? input.password,
     isActive: input.isActive,
   };
   
