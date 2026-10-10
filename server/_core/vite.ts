@@ -4,8 +4,10 @@ import { type Server } from "http";
 import { nanoid } from "nanoid";
 import path from "path";
 import superjson from "superjson";
-import { createServer as createViteServer } from "vite";
-import viteConfig from "../../vite.config";
+// ВАЖНО: "vite" и "../../vite.config" импортируются ДИНАМИЧЕСКИ внутри setupVite().
+// Оба — devDependencies. Статический импорт делал production-бандл сервера
+// зависимым от них, и контейнер падал с:
+//   ERR_MODULE_NOT_FOUND: Cannot find package 'vite' imported from /app/dist/index.js
 
 function getCurrentBrowserHash(): string | null {
   try {
@@ -22,6 +24,10 @@ function getCurrentBrowserHash(): string | null {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Динамический импорт: выполняется только в режиме разработки.
+  const { createServer: createViteServer } = await import("vite");
+  const { default: viteConfig } = await import("../../vite.config");
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
