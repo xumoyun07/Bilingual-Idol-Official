@@ -382,7 +382,7 @@ function DashboardShell({
   return (
     <div
       style={{ "--dashboard-sidebar-width": sidebarWidth } as React.CSSProperties}
-      className={`min-h-screen w-full bg-transparent text-[#10253e] pb-12 transition-all duration-300 flex blue-workspace ${
+      className={`min-h-dvh w-full bg-transparent text-[#10253e] transition-all duration-300 flex blue-workspace ${
         isRTL ? "is-rtl" : ""
       }`}
     >
@@ -452,13 +452,7 @@ function DashboardShell({
         </SidebarFooter>
       </Sidebar>
 
-      <style>{`
-        .minimal-dashboard-inset {
-          height: calc(100vh - 50px) !important;
-          min-height: calc(100vh - 50px) !important;
-          align-self: center !important;
-        }
-      `}</style>
+
       <SidebarInset className={`minimal-dashboard-inset transition-all duration-300 ${isRTL ? "rtl-inset" : ""} bg-transparent`}>
         <BackgroundCircleField />
         

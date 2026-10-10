@@ -10312,12 +10312,9 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 .blue-workspace {
   --shell-gap: 1rem;
   --shell-sidebar-w: var(--dashboard-sidebar-width, 18.5rem);
-  /* Без этого вставка контента центрировалась по вертикали: корень выше
-     на pb-12, чем её min-height, и вся колонка «плыла» вниз на ~25px,
-     из-за чего верхний зазор топбара не совпадал с зазором сайдбара.
-     Задаём оба выравнивания: корень ведёт себя и как строка, и как колонка. */
-  align-items: stretch !important;
-  justify-content: flex-start !important;
+  /* Единственная переменная высоты топбара: мобильный отступ и sticky-смещение
+     считаются от неё, магических чисел в правилах больше нет. */
+  --shell-header-h: 4.5rem;
 }
 
 /* Плавающий сайдбар: зазор сверху равен зазору снизу и равен --shell-gap,
@@ -10326,10 +10323,10 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   .blue-workspace .bilc-floating-sidebar {
     position: fixed !important;
     inset-block-start: var(--shell-gap) !important;
-    inset-block-end: var(--shell-gap) !important;
     inset-inline-start: var(--shell-gap) !important;
     inset-inline-end: auto !important;
-    height: auto !important;
+    /* Высота сайдбара — от вьюпорта, а не от потока документа. */
+    height: calc(100dvh - 2 * var(--shell-gap)) !important;
     min-height: 0 !important;
     width: var(--shell-sidebar-w) !important;
     border-radius: 1rem !important;
@@ -10370,7 +10367,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 .blue-workspace .bilc-floating-header {
   position: sticky;
   inset-block-start: var(--shell-gap);
-  height: 4.5rem;
+  height: var(--shell-header-h);
   width: auto;
   margin: 0;
   border-radius: 1rem;
@@ -10385,14 +10382,14 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   padding-inline: 1.5rem;
 }
 
-/* Основная область не задаёт собственных горизонтальных отступов,
-   иначе карточка перестала бы совпадать краями с топбаром. */
-/* Прижимаем вставку к верху: без этого она центрировалась по вертикали
-   (высота корня 948 при min-height:100vh у вставки) и вся колонка
-   контента уезжала вниз на ~24px — верхний зазор топбара не совпадал
-   с зазором сайдбара. */
+/* Вставка SidebarInset: без собственной высоты и выравнивания. Раньше здесь
+   было height + align-self: center (в inline-<style>), из-за чего колонка
+   контента уезжала вниз на 25px. Теперь вставка растягивается по контейнеру,
+   а единственный источник зазоров — --shell-gap. */
 .blue-workspace > .minimal-dashboard-inset {
-  align-self: flex-start;
+  align-self: stretch;
+  height: auto !important;
+  min-height: 0 !important;
 }
 .blue-workspace .bilc-dashboard-main {
   padding: 0;
