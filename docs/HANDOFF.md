@@ -141,3 +141,4 @@ pm run dev. Если его нет — форма входа не отренде
 4. `$env:TEST_FIXTURES="1"; npm run e2e:console` → ожидается 0 failures
 5. `$env:TEST_FIXTURES="1"; npm run e2e:sheet-all` → ожидается 0 failures для admin и student
 6. `git push origin stage-3c-shell`
+- 2026-10-10 18:07: OWNER-FIX FILE1 done, committed 406fb32 — initialPassword в createManagedUser + pipeline.
