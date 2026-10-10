@@ -36,11 +36,20 @@ const MEASURE = [
   "var panel=signOut;",
   "while(panel.parentElement && !(getComputedStyle(panel).position==='fixed' && panel.getBoundingClientRect().height>250)) panel=panel.parentElement;",
   "var pb=rr(panel); var sb=rr(signOut);",
+  "var headerEl=panel.querySelector('header');",
+  "var profile=null;",
+  "var kidsAll=Array.prototype.slice.call(panel.children);",
+  "for(var q=0;q<kidsAll.length;q++){ if(kidsAll[q].getBoundingClientRect().height>40){ profile=kidsAll[q]; break; } }",
+  "var sheetHeaderBottom=headerEl?rr(headerEl).bottom:pb.top;",
+  "var profileTop=profile?rr(profile).top:null;",
+  "var profileGap=(profileTop!==null)?Math.round((profileTop-sheetHeaderBottom)*100)/100:null;",
+  "var shellGap=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--shell-gap'))||16;",
   "var opts=Array.prototype.slice.call(panel.querySelectorAll('[role=\"group\"] button'));",
   "var optData=opts.map(function(b){var r=rr(b);return{text:(b.textContent||'').replace(/\\s+/g,' ').trim(),pressed:b.getAttribute('aria-pressed'),top:r.top,bottom:r.bottom,h:r.h,clipTop:r.top<pb.top-0.5,clipBottom:r.bottom>pb.bottom+0.5,overlapsSignOut:!(r.bottom<=sb.top||r.top>=sb.bottom||r.right<=sb.left||r.left>=sb.right)};});",
   "var kids=Array.prototype.slice.call(panel.children).filter(function(c){return c.getBoundingClientRect().height>8;}).map(function(c){return{tag:c.tagName.toLowerCase(),cls:String(c.className).slice(0,42),top:Math.round(c.getBoundingClientRect().top),text:(c.textContent||'').replace(/\\s+/g,' ').trim().slice(0,58)};});",
   "return { found:true, panel:pb, scrollTop:panel.scrollTop, scrollHeight:panel.scrollHeight, clientHeight:panel.clientHeight,",
   "  signOut:sb, options:optData, order:kids, htmlLang:document.documentElement.lang, htmlDir:document.documentElement.dir,",
+  "  hasHeaderEl:!!headerEl, sheetHeaderBottom:sheetHeaderBottom, profileTop:profileTop, profileGap:profileGap, shellGap:shellGap,",
   "  signOutLabel:(signOut.textContent||'').replace(/\\s+/g,' ').trim(), navLabel:(function(){var b=panel.querySelector('[role=\"group\"]');var first=panel.querySelector('button');return first?(first.textContent||'').replace(/\\s+/g,' ').trim().slice(0,40):null;})() };",
   "})()",
 ].join("\n");
@@ -84,6 +93,12 @@ try {
     for (const o of m.options) console.log("   \"" + o.text + "\" top=" + o.top + " bottom=" + o.bottom + " h=" + o.h + " pressed=" + o.pressed + " clipTop=" + o.clipTop + " clipBottom=" + o.clipBottom + " overlapsSignOut=" + o.overlapsSignOut);
     console.log("   Sign out: top=" + m.signOut.top + " bottom=" + m.signOut.bottom + " подпись=\"" + m.signOutLabel + "\"");
     console.log("   панель: top=" + m.panel.top + " bottom=" + m.panel.bottom + " scrollTop=" + m.scrollTop + " scrollHeight=" + m.scrollHeight + " clientHeight=" + m.clientHeight);
+    const direction = m.htmlDir === "rtl" ? "RTL" : "LTR";
+    const gapPass = m.profileGap !== null && m.profileGap >= m.shellGap;
+    console.log("   КАРТОЧКА ПРОФИЛЯ [" + direction + "]: top=" + m.profileTop + " ; низ шапки шторки=" + m.sheetHeaderBottom +
+      (m.hasHeaderEl ? "" : " (элемента <header> в шторке нет — взят верхний край панели)") +
+      " ; зазор=" + m.profileGap + " ; --shell-gap=" + m.shellGap +
+      " ; нужно profile top >= sheetHeaderBottom + --shell-gap => " + (gapPass ? "PASS" : "FAIL"));
 
     fs.mkdirSync("e2e/screenshots", { recursive: true });
     await page.screenshot({ path: "e2e/screenshots/sheet-" + lang + "-top.png" });
@@ -115,6 +130,7 @@ try {
   for (const id of created) { try { await deleteManagedUser(id, { id: founder.id, role: "founder" } as any); removed += 1; } catch (e) { /* noop */ } }
   const all = await db!.select().from(users);
   const left = all.filter(function (u) { return typeof u.email === "string" && (u.email.indexOf("sheet-") === 0 || u.email.indexOf("mh-") === 0 || u.email.indexOf("shell-") === 0 || u.email.indexOf("probe-") === 0); });
-  console.log("\nудалено: " + removed + " из " + created.length + "; ОСТАЛОСЬ временных записей в БД: " + left.length);
+  console.log("\nудалено: " + removed + " из " + created.length);
+  console.log("ОСТАЛОСЬ временных записей в БД (запрос через модуль db приложения, не docker): " + left.length + " — должно быть 0");
   process.exit(process.exitCode ? 1 : 0);
 }

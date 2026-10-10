@@ -18,7 +18,7 @@
     "i18n:ping": "tsx server/services/azureTranslator.ping.ts",
     "i18n:sync": "tsx scripts/i18n-sync.ts",
     "founder:hash": "tsx scripts/founder-hash.ts",
-    "e2e:shell": "tsx e2e/run-shell-checks.ts"
+    "e2e:shell": "tsx e2e/diag-shell.ts && tsx e2e/mobile-header.ts && tsx e2e/sheet-proof.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
