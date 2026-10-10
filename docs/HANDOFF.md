@@ -150,3 +150,9 @@ pm run dev. Если его нет — форма входа не отренде
 - 2026-10-10 18:08: OWNER-FIX FILE3 done, committed 3507e0b — frontend-redesign.test выровнен.
 
 - 2026-10-10 18:09: OWNER-FIX FILE4 done, committed 4d4f856 — promotions возвращает usedCount.
+
+- 2026-10-10 18:09: OWNER-FIX e2e done, committed 4aeb294 — networkidle + ожидание #root.
+
+## Owner commands (дополнение)
+- One-time setup: `npx playwright install --with-deps chromium` (только если браузер ещё не установлен).
+- Precondition for e2e:sheet-all and e2e:console: `npm run dev` must be running in a separate terminal.
