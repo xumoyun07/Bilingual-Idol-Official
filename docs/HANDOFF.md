@@ -116,3 +116,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:45: OWNER-FIX G1 done, committed 61a6f9a — pipeline генерирует пароль внутри.
 
 - 2026-10-10 17:46: OWNER-FIX G2 done, committed 826a3e7 — импорт TRPCError.
+
+- 2026-10-10 17:46: OWNER-FIX G3 done, committed 1251c48 — dashboardPathForRole -> resolveHomeRoute; тест выровнен.
