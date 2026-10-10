@@ -15,6 +15,66 @@ import {
   initDynamicTranslationStorage,
   registerDynamicTranslation,
 } from "@/lib/dynamicTranslator";
+// Словари интерфейса. Источник — client/src/locales/*.json, которые
+// генерируются из lib/translations.ts скриптом `i18n:sync --migrate`
+// и наполняются переводами Azure. Здесь только чтение.
+import enLocale from "@/locales/en.json";
+import msLocale from "@/locales/ms.json";
+import arLocale from "@/locales/ar.json";
+
+type LocaleEntry = { value: string; sourceHash: string; reviewed: boolean };
+type LocaleUi = Record<string, LocaleEntry>;
+
+/** Плоские ключи вида "nav.home" — ровно как в файлах локалей. */
+const LOCALE_UI: Record<Language, LocaleUi> = {
+  en: (enLocale as unknown as { ui: LocaleUi }).ui,
+  ms: (msLocale as unknown as { ui: LocaleUi }).ui,
+  ar: (arLocale as unknown as { ui: LocaleUi }).ui,
+};
+
+/** Секция seed: переводы контента из БД по slug/id и полю. */
+type LocaleSeed = Record<string, any>;
+const LOCALE_SEED: Record<Language, LocaleSeed> = {
+  en: (enLocale as unknown as { seed: LocaleSeed }).seed,
+  ms: (msLocale as unknown as { seed: LocaleSeed }).seed,
+  ar: (arLocale as unknown as { seed: LocaleSeed }).seed,
+};
+
+const IS_DEV = (() => {
+  try {
+    return Boolean(import.meta.env?.DEV);
+  } catch {
+    return false;
+  }
+})();
+
+/**
+ * Перевод контента из БД: seed.<section>.<slug|id>.<field>.
+ * Возвращает undefined, если перевода нет — вызывающий код оставляет английский.
+ */
+export function lookupSeedTranslation(
+  language: Language,
+  path: string[],
+  fallbackValue: string
+): string {
+  const read = (tree: LocaleSeed): string | undefined => {
+    let node: any = tree;
+    for (const part of path) {
+      if (!node || typeof node !== "object" || !(part in node)) return undefined;
+      node = node[part];
+    }
+    return node && typeof node === "object" && typeof node.value === "string" ? node.value : undefined;
+  };
+
+  const translated = read(LOCALE_SEED[language]);
+  if (translated) return translated;
+
+  const english = read(LOCALE_SEED.en);
+  if (english) return english;
+
+  // Секция tests намеренно отсутствует в ms/ar — тест остаётся английским.
+  return fallbackValue;
+}
 
 interface LanguageContextType {
   language: Language;
@@ -23,6 +83,8 @@ interface LanguageContextType {
   isRTL: boolean;
   dict: TranslationDictionary;
   t: (keyPath: string, params?: Record<string, string | number>, fallback?: string) => string;
+  /** Перевод контента из БД: seed.<section>.<slug|id>.<field> с фоллбеком на английский */
+  seedText: (path: string[], fallbackValue: string) => string;
   td: (text: string | null | undefined, fallback?: string) => string;
   translateDynamic: (text: string | null | undefined, fallback?: string) => string;
   batchTranslate: (texts: string[]) => string[];
@@ -178,61 +240,43 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     (keyPath: string, params?: Record<string, string | number>, fallback?: string): string => {
       if (!keyPath) return fallback || "";
 
-      // 1. If keyPath doesn't contain dot, it might be a direct dynamic string
-      if (!keyPath.includes(".") && !keyPath.includes("/")) {
-        const dynamicRes = translateDynamic(keyPath, language, fallback);
-        if (dynamicRes !== keyPath) {
-          return dynamicRes;
-        }
-      }
+      // 1. Перевод запрошенного языка
+      let result = LOCALE_UI[language]?.[keyPath]?.value;
 
-      const parts = keyPath.split(".");
-      let current: any = dict;
-      for (const part of parts) {
-        if (current && typeof current === "object" && part in current) {
-          current = current[part];
-        } else {
-          // Fallback to English dict if missing in current language
-          let fallbackCurrent: any = translations.en;
-          for (const fbPart of parts) {
-            if (fallbackCurrent && typeof fallbackCurrent === "object" && fbPart in fallbackCurrent) {
-              fallbackCurrent = fallbackCurrent[fbPart];
-            } else {
-              fallbackCurrent = undefined;
-              break;
-            }
-          }
-          current = fallbackCurrent;
-          break;
-        }
-      }
-
-      // If resolved from static dictionary
-      if (typeof current === "string") {
-        let result = current;
-        if (params) {
-          for (const [k, v] of Object.entries(params)) {
-            result = result.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+      // 2. Фоллбек на английский
+      if (!result) {
+        const englishValue = LOCALE_UI.en[keyPath]?.value;
+        if (englishValue) {
+          result = englishValue;
+          if (IS_DEV) {
+            console.warn(`[i18n] нет перевода "${keyPath}" для языка "${language}" — показан английский`);
           }
         }
-        return result;
       }
 
-      // If fallback provided, try dynamic translation of fallback string
-      if (fallback) {
-        return translateDynamic(fallback, language, fallback);
+      // 3. Фоллбек на сам ключ
+      if (!result) {
+        if (IS_DEV) {
+          console.warn(`[i18n] ключ "${keyPath}" отсутствует в en.json (язык: ${language}) — показан сам ключ`);
+        }
+        return fallback ?? keyPath;
       }
 
-      // Format last part of key and pass through dynamic translator
-      const lastPart = parts[parts.length - 1] || keyPath;
-      const formatted = lastPart
-        .replace(/([A-Z])/g, " $1")
-        .replace(/[._-]/g, " ")
-        .trim();
-      const humanReadable = formatted ? (formatted.charAt(0).toUpperCase() + formatted.slice(1)) : keyPath;
-      return translateDynamic(humanReadable, language, humanReadable);
+      if (params) {
+        for (const [name, value] of Object.entries(params)) {
+          result = result.replace(new RegExp(`\\{${name}\\}`, "g"), String(value));
+        }
+      }
+      return result;
     },
-    [dict, language]
+    [language]
+  );
+
+  // Перевод контента из БД (программы, новости, промо) по slug/id и полю.
+  // Никаких регулярных выражений: либо есть готовая запись в seed, либо английский.
+  const seedText = useCallback(
+    (path: string[], fallbackValue: string): string => lookupSeedTranslation(language, path, fallbackValue),
+    [language]
   );
 
   const td = useCallback(
@@ -300,6 +344,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       isRTL,
       dict,
       t,
+      seedText,
       td,
       translateDynamic: td,
       batchTranslate: batchTranslateFn,
@@ -319,6 +364,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       isRTL,
       dict,
       t,
+      seedText,
       td,
       batchTranslateFn,
       translateObjectFn,

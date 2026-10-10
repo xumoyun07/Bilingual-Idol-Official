@@ -2,8 +2,11 @@ import { Language } from "./translations";
 
 export type SupportedLanguage = Language;
 
-// Persistent cache prefix
-const CACHE_PREFIX = "bilc_dyn_tr_v2_";
+// Persistent cache prefix.
+// v3: поднят с v2, потому что в v2 попали НЕПЕРЕВЕДЁННЫЕ строки — они
+// закреплялись в localStorage и переживали исправление перевода.
+// Старые ключи v2 игнорируются и постепенно вытесняются.
+const CACHE_PREFIX = "bilc_dyn_tr_v3_";
 const MEMORY_CACHE = new Map<string, string>();
 
 // Fast FNV-1a string hash for compact cache keys
@@ -673,32 +676,20 @@ export function translateDynamic(text: string | null | undefined, targetLang: La
     }
   }
 
-  // 4. Intelligent Compound Phrase Decomposer
-  // Translates combined sentences while preserving numbers, brackets, emails, and punctuation
-  let compound = trimmed;
-  let matchesFound = false;
+  // 4. Пословный разбор УДАЛЁН.
+  //
+  // Раньше здесь предложение разбивалось и каждый известный словарю фрагмент
+  // подменялся по отдельности. Это смешивало языки внутри одной фразы:
+  // «Your المؤسس command console is نشط and ready», «Security & تدقيق».
+  //
+  // Теперь перевод возможен только целиком: точное совпадение всей строки
+  // (пункты 2-3 выше) либо исходная строка без изменений (пункт 5 ниже).
+  // Частичный перевод предложения запрещён намеренно.
 
-  const sortedKeys = Object.keys(DYNAMIC_LEXICON).sort((a, b) => b.length - a.length);
-
-  for (const key of sortedKeys) {
-    if (key.length < 3) continue;
-    const targetVal = DYNAMIC_LEXICON[key][targetLang];
-    if (!targetVal) continue;
-
-    const regex = new RegExp(`\\b${key}\\b`, "gi");
-    if (regex.test(compound)) {
-      compound = compound.replace(regex, targetVal);
-      matchesFound = true;
-    }
-  }
-
-  if (matchesFound) {
-    persistDynamicTranslation(targetLang, hashString(trimmed), compound);
-    return compound;
-  }
-
-  // 5. Fallback cleanly to original text
-  persistDynamicTranslation(targetLang, hashString(trimmed), str);
+  // 5. Перевести не удалось.
+  // ВАЖНО: непереведённый результат НЕ кэшируем. Раньше сюда попадала
+  // английская строка и навсегда закреплялась в localStorage под ключом
+  // перевода — после появления настоящего перевода она бы уже не обновилась.
   return fallback || str;
 }
 

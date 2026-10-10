@@ -1,301 +1,2197 @@
 {
-  "nav.home": "الرئيسية",
-  "nav.about": "من نحن",
-  "nav.programs": "البرامج التعليمية",
-  "nav.news": "الأخبار",
-  "nav.contact": "اتصل بنا",
-  "nav.makeEnquiry": "تقديم استفسار",
-  "nav.signIn": "تسجيل الدخول",
-  "nav.signOut": "تسجيل الخروج",
-  "nav.skipToContent": "الانتقال إلى المحتوى",
-  "nav.menu": "القائمة",
-  "nav.close": "إغلاق",
-  "nav.workspace": "مساحة العمل",
-  "nav.accountActive": "الحساب نشط",
-  "nav.myClasses": "فصولي الدراسية",
-  "nav.overview": "نظرة عامة",
-  "nav.users": "المستخدمون",
-  "nav.students": "الطلاب",
-  "nav.media": "الوسائط",
-  "nav.auditLogs": "سجلات التدقيق",
-  "nav.switchLanguage": "اللغة",
-  "nav.contactUs": "اتصل بنا",
-  "nav.enrollNow": "سجل الآن",
-  "nav.bookTour": "حجز جولة في الحرم الجامعي",
-  "footer.centreName": "مركز بايلينجوال آيدول للغات",
-  "footer.location": "بافيليون إمباسي، كوالالمبور",
-  "footer.brandSubtitle": "مركز لغات",
-  "footer.allRightsReserved": "جميع الحقوق محفوظة",
-  "common.call": "اتصال هاتفي",
-  "common.whatsapp": "واتساب",
-  "common.email": "البريد الإلكتروني",
-  "common.openingHours": "ساعات العمل",
-  "common.backToHome": "العودة للرئيسية",
-  "common.viewDetails": "عرض التفاصيل",
-  "common.readMore": "قراءة المقال",
-  "common.learnMore": "معرفة المزيد",
-  "common.submit": "إرسال",
-  "common.loading": "جارٍ التحميل...",
-  "common.filter": "تصفية",
-  "common.all": "الكل",
-  "common.search": "بحث",
-  "common.thankYou": "شكراً لك",
-  "common.close": "إغلاق",
-  "common.requiredFields": "الحقول المميزة بعلامة (*) مطلوبة.",
-  "common.viewProgrammes": "استعراض البرامج",
-  "common.cancel": "إلغاء",
-  "common.next": "التالي",
-  "common.prev": "السابق",
-  "common.step": "خطوة",
-  "common.sendMessage": "إرسال الاستفسار",
-  "common.location": "الموقع",
-  "common.addressText": "B-25-07، مجمع بافيليون أمبانغ، برج جي-فيستور، 200، شارع أمبانغ، كامبونغ داتوك كيرامات، 50450 كوالالمبور، ماليزيا.",
-  "home.eyebrow": "الموسم الأكاديمي 2026 · بافيليون إمباسي، كوالالمبور",
-  "home.heroTitle": "مركز بايلينجوال آيدول للغات",
-  "home.heroSubtitle": "برامج لغوية منظمة، تحضير معتمد لاختبارات الآيلتس (IELTS) ومسارات لغات عالمية متميزة في بافيليون إمباسي، كوالالمبور.",
-  "home.ctaFindCourse": "ابحث عن دورتك",
-  "home.ctaEnquiry": "تقديم استفسار",
-  "home.ctaPlacement": "اختبار تحديد مستوى مجاني",
-  "home.ctaBooking": "حجز استشارة أكاديمية",
-  "home.taskPlacementTitle": "اختبار تحديد المستوى عبر الإنترنت",
-  "home.taskPlacementDesc": "قيّم مستواك اللغوي في 3 دقائق مع نتيجة فورية وتوصية بالدورة المناسبة.",
-  "home.taskConsultationTitle": "حجز استشارة في المقر",
-  "home.taskConsultationDesc": "احجز جولة خاصة وجلسة لتخطيط مسارك اللغوي وجهاً لوجه في بافيليون إمباسي.",
-  "home.taskProgramsTitle": "استعراض برامج 2026",
-  "home.taskProgramsDesc": "اللغة الإنجليزية العامة، الآيلتس، المخيمات الصيفية، برامج الشركات واللغات العالمية.",
-  "home.taskContactTitle": "تحدث مع مستشار تعليمي",
-  "home.taskContactDesc": "تواصل عبر الواتساب أو اتصل بفريق القبول مباشرة للحصول على إرشاد شخصي.",
-  "home.pricingEyebrow": "الرسوم الرسمية لعام 2026",
-  "home.pricingTitle": "البرامج الأكاديمية المعتمدة",
-  "home.pricingSubtitle": "استكشف دوراتنا الأكاديمية المعتمدة والمنظمة. تواصل مع قسم القبول للاستفسار عن التسجيل الجماعي، الجداول المخصصة والحملات الترويجية النشطة.",
-  "home.pricingTabGeneral": "الإنجليزية العامة",
-  "home.pricingTabIelts": "تحضير الآيلتس",
-  "home.pricingTabCamps": "المخيمات الصيفية والشتوية",
-  "home.pricingTabPrivate": "دروس خاصة 1-على-1",
-  "home.pricingTabExecutive": "برامج الشركات والتنفيذيين",
-  "home.pricingTabWorld": "اللغات العالمية",
-  "home.startHereEyebrow": "ابدأ من هنا",
-  "home.startHereTitle": "اختر مسارك نحو الطلاقة والتميز.",
-  "home.startHereDesc": "استكشف الدورات المعتمدة، احجز استشارة في المقر، أو سجل الدخول إلى حسابك.",
-  "home.admissionsTag": "القبول والتسجيل",
-  "home.taskPortalTitle": "بوابة الطلاب والأساتذة",
-  "home.taskPortalDesc": "سجل الدخول لعرض الجداول الدراسية وسجلات الحضور والموارد الأكاديمية.",
-  "home.facilitiesEyebrow": "مرافق المركز",
-  "home.facilitiesTitle": "مساحات تعليمية حديثة في بافيليون إمباسي",
-  "home.facilitiesSubtitle": "استمتع بقاعاتنا الدراسية المزودة بأحدث تقنيات الوسائط المتعددة، وصالات كبار الشخصيات، وقاعات الدراسة الهادئة.",
-  "home.journeyEyebrow": "رحلة الطالب",
-  "home.journeyTitle": "من أول استفسار وحتى الطلاقة اللغوية",
-  "home.journeySubtitle": "خارطة طريق مدروسة من 5 مراحل مصممة لاكتساب لغوي سريع، اندماج ثقافي وشهادات معتمدة.",
-  "home.testimonialsEyebrow": "تجارب الطلاب",
-  "home.testimonialsTitle": "ماذا يقول طلابنا عنا",
-  "home.testimonialsSubtitle": "آراء وانطباعات حقيقية من الطلاب الدوليين، المهنيين وأولياء الأمور الذين درسوا في المركز.",
-  "home.contactStripTitle": "هل أنت مستعد لبدء رحلتك اللغوية؟",
-  "home.contactStripSubtitle": "قم بزيارة مقرنا في بافيليون إمباسي بشارع أمبانغ أو تحدث مع مستشارنا التعليمي اليوم.",
-  "home.contactStripButton": "تواصل مع قسم القبول",
-  "home.languageBandTitle": "اللغات العالمية المتاحة",
-  "home.languageBandSubtitle": "الإنجليزية، الملايوية، الماندرين، العربية، اليابانية والكورية بإشراف أساتذة متخصصين.",
-  "about.eyebrow": "من نحن",
-  "about.heroTitle": "تعليم لغوي مبني على تقدم واضح ونتائج ملموسة.",
-  "about.heroSubtitle": "يدعم مركز بايلينجوال آيدول الطلاب في كوالالمبور بمسارات لغوية دقيقة واستشارات تركز على التواصل الواثق.",
-  "about.storyEyebrow": "انطلاقة مدروسة",
-  "about.storyTitle": "ما يقدمه المركز لطلابه",
-  "about.storyBody": "يوفر المركز بيئة تعليمية متكاملة تضم فصولاً تفاعلية، موارد تعليمية رقمية حديثة، وتوجيهاً لمسارات تعليمية مخصصة.",
-  "about.explorePrograms": "استكشف البرامج",
-  "about.approachEyebrow": "منهجية التعليم",
-  "about.approachTitle": "كيف ندعم تقدمك التعليمي",
-  "about.approachSubtitle": "خطوات واضحة، ممارسة عملية نشطة وبناء مستمر للثقة ترسم ملامح النهج التعليمي للمركز.",
-  "about.approach1Title": "البدء بأهداف الطالب",
-  "about.approach1Body": "تساعد الاستشارة وتحديد المستوى في اختيار المسار اللغوي الأنسب قبل التسجيل.",
-  "about.approach2Title": "ممارسة لغوية تفاعلية",
-  "about.approach2Body": "يعتمد المركز على التعليم التفاعلي المدعوم بأدوات الفصول الرقمية والممارسة الموجهة.",
-  "about.approach3Title": "بناء الثقة بثبات",
-  "about.approach3Body": "صممت مساراتنا لتجمع بين تطوير اللغة، الوعي الثقافي والقدرة على التواصل العملي اليومي.",
-  "about.communityEyebrow": "مجتمع وممارسة",
-  "about.communityTitle": "مكان مثالي للمضي قدماً في طموحاتك",
-  "about.communityCaption": "تتطور اللغة من خلال التبادل الهادف والممارسة اليومية المشتركة.",
-  "about.teamEyebrow": "الهيئة التدريسية والاستشارية",
-  "about.teamTitle": "مدربون مؤهلون مكرسون لنجاحك الأكاديمي",
-  "about.teamSubtitle": "يجمع كادرنا بين المؤهلات الدولية المعتمدة والأساليب التعليمية الحديثة والتوجيه المخلص.",
-  "programs.eyebrow": "البرامج التعليمية",
-  "programs.heroTitle": "اختر البرنامج الذي يناسب أهدافك وتطلعاتك.",
-  "programs.heroSubtitle": "استعرض دليل دورات عام 2026، ثم تواصل مع المركز لتأكيد الملاءمة، التوفر ومواعيد بدء الدورات.",
-  "programs.guideEyebrow": "دليل رسوم 2026",
-  "programs.guideTitle": "خيارات الدورات المتاحة",
-  "programs.guideSubtitle": "الرسوم استرشادية وفق قائمة 2026. يرجى تأكيد المبلغ الإجمالي وشروط التأشيرة مع المركز قبل التسجيل.",
-  "programs.feeGuideEyebrow": "هيكل الدورات والرسوم",
-  "programs.feeGuideTitle": "دليل البرامج والرسوم لعام 2026",
-  "programs.feeGuideSubtitle": "استكشف البرامج اللغوية المعتمدة المصممة للطلاب الدوليين والأطفال واليافعين والمهنيين.",
-  "programs.searchPlaceholder": "ابحث باللغة أو المستوى أو الفئة المستهدفة...",
-  "programs.filterLabel": "تصفية",
-  "programs.filterAll": "جميع الفئات",
-  "programs.countShown": "تم عرض {count} برنامج معتمد",
-  "programs.showingCount": "برامج متاحة",
-  "programs.noMatches": "لا توجد برامج مطابقة لبحثك الحالي. جرب تغيير الفئة أو كلمات البحث.",
-  "programs.emptyText": "لم يتم العثور على برامج تطابق معايير البحث.",
-  "programs.emptyCta": "تواصل معنا للحصول على خيارات دراسية مخصصة",
-  "programs.viewDetails": "عرض تفاصيل البرنامج",
-  "programs.catAll": "الكل",
-  "programs.catKids": "للأطفال واليافعين",
-  "programs.catEnglish": "اللغة الإنجليزية",
-  "programs.catWorldLanguages": "لغات عالمية",
-  "programs.catProfessional": "للشركات والمهنيين",
-  "programDetail.backLink": "العودة إلى قائمة البرامج",
-  "programDetail.overviewEyebrow": "نظرة عامة على البرنامج",
-  "programDetail.duration": "المدة",
-  "programDetail.schedule": "الجدول الزمني",
-  "programDetail.fees": "الرسوم",
-  "programDetail.level": "المستوى",
-  "programDetail.ageGroup": "الفئة المستهدفة",
-  "programDetail.outcomesTitle": "أبرز مخرجات التعلم",
-  "programDetail.ctaTitle": "هل أنت مهتم بهذا البرنامج؟",
-  "programDetail.ctaSubtitle": "أرسل استفسارك الآن للتحقق من المواعيد المتاحة ومناقشة تفاصيل الالتحاق.",
-  "programDetail.ctaButton": "تقديم استفسار الآن",
-  "contact.eyebrow": "اتصل بنا",
-  "contact.heroTitle": "تواصل مع فريق المركز.",
-  "contact.heroSubtitle": "اختر وسيلة التواصل الأنسب لك، أو أرسل استفساراً سريعاً عبر النموذج أدناه.",
-  "contact.call": "اتصال هاتفي",
-  "contact.whatsapp": "واتساب",
-  "contact.whatsappValue": "مراسلة المركز عبر واتساب",
-  "contact.email": "البريد الإلكتروني",
-  "contact.hours": "أوقات العمل",
-  "contact.openingHours": "من الاثنين إلى الأحد: 9:00 صباحاً – 9:00 مساءً",
-  "contact.address": "B-25-07، مجمع بافيليون أمبانغ، برج جي-فيستور، 200، شارع أمبانغ، كامبونغ داتوك كيرامات، 50450 كوالالمبور، ماليزيا.",
-  "contact.addressText": "B-25-07، مجمع بافيليون أمبانغ، برج جي-فيستور، 200، شارع أمبانغ، كامبونغ داتوك كيرامات، 50450 كوالالمبور، ماليزيا.",
-  "contact.formEyebrow": "إرسال استفسار",
-  "contact.formTitle": "أخبرنا بما يحتاجه الطالب.",
-  "contact.formSubtitle": "وصف موجز لهدف الطالب ومواعيده المفضلة كافٍ لبدء المساعدة والتوجيه.",
-  "contact.formCardTitle": "نموذج استفسارك",
-  "contact.submitButton": "إرسال الاستفسار",
-  "enroll.backLink": "العودة للرئيسية",
-  "enroll.eyebrow": "استفسار تعليمي",
-  "enroll.heroTitle": "أخبر المركز عن تفاصيل الطالب.",
-  "enroll.heroSubtitle": "أرسل البيانات التي تعرفها حالياً. تقديم الاستفسار لا يلزمك بالتسجيل الفوري.",
-  "enroll.nextStepsTitle": "ماذا يحدث بعد الإرسال؟",
-  "enroll.step1": "يقوم المستشار بمراجعة هدف الطالب اللغوي ومستواه الحالي.",
-  "enroll.step2": "يقترح المركز الخطوة التالية المناسبة أو يطرح أسئلة إضافية للمساعدة.",
-  "enroll.step3": "تتم معالجة بياناتك بكل خصوصية من قبل موظفي المركز المعتمدين.",
-  "enroll.formEyebrow": "بيانات الطالب",
-  "enroll.formTitle": "أخبرنا بما يحتاجه الطالب.",
-  "enroll.formSubtitle": "وصف موجز لهدف الطالب ومواعيده المفضلة كافٍ لبدء المساعدة والتوجيه.",
-  "enroll.studentNameLabel": "اسم الطالب *",
-  "enroll.studentNamePlaceholder": "مثال: سارة أحمد",
-  "enroll.studentAgeLabel": "عمر الطالب *",
-  "enroll.studentAgePlaceholder": "مثال: 16",
-  "enroll.programLabel": "البرنامج المطلوب *",
-  "enroll.programPlaceholder": "اختر البرنامج...",
-  "enroll.scheduleLabel": "الوقت المفضل *",
-  "enroll.schedulePlaceholder": "اختر الوقت المفضل...",
-  "enroll.parentNameLabel": "اسم ولي الأمر / المسؤول *",
-  "enroll.parentNamePlaceholder": "مثال: أحمد محمد",
-  "enroll.emailLabel": "البريد الإلكتروني *",
-  "enroll.emailPlaceholder": "مثال: guardian@example.com",
-  "enroll.phoneLabel": "رقم الهاتف / واتساب *",
-  "enroll.phonePlaceholder": "مثال: +60 12-345 6789",
-  "enroll.messageLabel": "ملاحظات أو أسئلة إضافية",
-  "enroll.messagePlaceholder": "شارك أي أهداف لغوية أو المستوى الحالي أو متطلبات خاصة...",
-  "enroll.submitButton": "إرسال طلب الاستفسار",
-  "enroll.requiredNote": "الحقول المشار إليها بعلامة (*) مطلوبة.",
-  "enroll.successTitle": "تم إرسال استفسارك بنجاح",
-  "enroll.successSubtitle": "شكراً لك. سيقوم المستشار الأكاديمي بمراجعة تفاصيل الطالب والتواصل معك خلال 24 ساعة.",
-  "enroll.submitAnother": "إرسال استفسار آخر",
-  "news.eyebrow": "تحديثات وإعلانات",
-  "news.heroTitle": "أخبار وإعلانات المركز.",
-  "news.heroSubtitle": "تابع آخر المستجدات، جداول العطلات الرسمية والمواعيد الأكاديمية الصادرة عن المركز.",
-  "news.searchPlaceholder": "البحث في الأخبار والمقالات...",
-  "news.allCategories": "جميع الفئات",
-  "news.readMore": "قراءة المقال",
-  "news.readUpdate": "قراءة التحديث كاملاً",
-  "news.previous": "السابق",
-  "news.next": "التالي",
-  "news.noUpdates": "لا توجد إعلانات منشورة بعد.",
-  "news.noUpdatesText": "يرجى المتابعة لاحقاً لمعرفة التحديثات حول التقويم الأكاديمي وورش العمل والفعاليات.",
-  "login.eyebrow": "بوابة الدخول",
-  "login.heroTitle": "تسجيل الدخول إلى حسابك.",
-  "login.heroSubtitle": "الوصول إلى لوحة التحكم، جداول الحصص الدراسية وموارد المركز التعليمية.",
-  "login.emailLabel": "تسجيل الدخول",
-  "login.emailPlaceholder": {
-    "value": "nickname@bilc.my",
-    "__TODO__": true
+  "ui": {
+    "nav.home": {
+      "value": "الرئيسية",
+      "sourceHash": "8cf04a97",
+      "reviewed": false
+    },
+    "nav.about": {
+      "value": "من نحن",
+      "sourceHash": "8f7f4c1c",
+      "reviewed": false
+    },
+    "nav.programs": {
+      "value": "البرامج التعليمية",
+      "sourceHash": "b9ad95ed",
+      "reviewed": false
+    },
+    "nav.news": {
+      "value": "الأخبار",
+      "sourceHash": "dd1ba187",
+      "reviewed": false
+    },
+    "nav.contact": {
+      "value": "اتصل بنا",
+      "sourceHash": "bbaff128",
+      "reviewed": false
+    },
+    "nav.makeEnquiry": {
+      "value": "تقديم استفسار",
+      "sourceHash": "03f1e936",
+      "reviewed": false
+    },
+    "nav.signIn": {
+      "value": "تسجيل الدخول",
+      "sourceHash": "b6d4223e",
+      "reviewed": false
+    },
+    "nav.signOut": {
+      "value": "تسجيل الخروج",
+      "sourceHash": "c87aacf5",
+      "reviewed": false
+    },
+    "nav.skipToContent": {
+      "value": "الانتقال إلى المحتوى",
+      "sourceHash": "b58273f2",
+      "reviewed": false
+    },
+    "nav.menu": {
+      "value": "القائمة",
+      "sourceHash": "b6154120",
+      "reviewed": true
+    },
+    "nav.close": {
+      "value": "إغلاق",
+      "sourceHash": "d3d2e617",
+      "reviewed": false
+    },
+    "nav.workspace": {
+      "value": "مساحة العمل",
+      "sourceHash": "03a21915",
+      "reviewed": false
+    },
+    "nav.accountActive": {
+      "value": "الحساب نشط",
+      "sourceHash": "2e68e5a8",
+      "reviewed": false
+    },
+    "nav.myClasses": {
+      "value": "فصولي الدراسية",
+      "sourceHash": "183b8339",
+      "reviewed": false
+    },
+    "nav.overview": {
+      "value": "نظرة عامة",
+      "sourceHash": "3b878279",
+      "reviewed": false
+    },
+    "nav.users": {
+      "value": "المستخدمون",
+      "sourceHash": "f9aae5fd",
+      "reviewed": false
+    },
+    "nav.students": {
+      "value": "الطلاب",
+      "sourceHash": "aba064f8",
+      "reviewed": false
+    },
+    "nav.media": {
+      "value": "الوسائط",
+      "sourceHash": "3b563524",
+      "reviewed": true
+    },
+    "nav.auditLogs": {
+      "value": "سجلات التدقيق",
+      "sourceHash": "85400d27",
+      "reviewed": false
+    },
+    "nav.switchLanguage": {
+      "value": "اللغة",
+      "sourceHash": "4994a8ff",
+      "reviewed": false
+    },
+    "nav.contactUs": {
+      "value": "اتصل بنا",
+      "sourceHash": "02d4482d",
+      "reviewed": false
+    },
+    "nav.enrollNow": {
+      "value": "سجل الآن",
+      "sourceHash": "e3b2ff6d",
+      "reviewed": false
+    },
+    "nav.bookTour": {
+      "value": "حجز جولة في الحرم الجامعي",
+      "sourceHash": "7f301d66",
+      "reviewed": false
+    },
+    "footer.centreName": {
+      "value": "مركز بايلينجوال آيدول للغات",
+      "sourceHash": "57a62f3a",
+      "reviewed": false
+    },
+    "footer.location": {
+      "value": "بافيليون إمباسي، كوالالمبور",
+      "sourceHash": "dfd78557",
+      "reviewed": true
+    },
+    "footer.brandSubtitle": {
+      "value": "مركز لغات",
+      "sourceHash": "bf9f13e5",
+      "reviewed": false
+    },
+    "footer.allRightsReserved": {
+      "value": "جميع الحقوق محفوظة",
+      "sourceHash": "5db707f7",
+      "reviewed": false
+    },
+    "common.call": {
+      "value": "اتصال هاتفي",
+      "sourceHash": "c3755e61",
+      "reviewed": false
+    },
+    "common.whatsapp": {
+      "value": "واتساب",
+      "sourceHash": "8b777ebc",
+      "reviewed": true
+    },
+    "common.email": {
+      "value": "البريد الإلكتروني",
+      "sourceHash": "ce8ae9da",
+      "reviewed": false
+    },
+    "common.openingHours": {
+      "value": "ساعات العمل",
+      "sourceHash": "80a0c205",
+      "reviewed": false
+    },
+    "common.backToHome": {
+      "value": "العودة للرئيسية",
+      "sourceHash": "6110e369",
+      "reviewed": false
+    },
+    "common.viewDetails": {
+      "value": "عرض التفاصيل",
+      "sourceHash": "6e978337",
+      "reviewed": false
+    },
+    "common.readMore": {
+      "value": "قراءة المقال",
+      "sourceHash": "3c6262b6",
+      "reviewed": false
+    },
+    "common.learnMore": {
+      "value": "معرفة المزيد",
+      "sourceHash": "d59048f2",
+      "reviewed": false
+    },
+    "common.submit": {
+      "value": "إرسال",
+      "sourceHash": "a4d3b161",
+      "reviewed": false
+    },
+    "common.loading": {
+      "value": "جارٍ التحميل...",
+      "sourceHash": "8524de96",
+      "reviewed": false
+    },
+    "common.filter": {
+      "value": "تصفية",
+      "sourceHash": "d7778d0c",
+      "reviewed": false
+    },
+    "common.all": {
+      "value": "الكل",
+      "sourceHash": "b1c94ca2",
+      "reviewed": false
+    },
+    "common.search": {
+      "value": "بحث",
+      "sourceHash": "13348442",
+      "reviewed": false
+    },
+    "common.thankYou": {
+      "value": "شكراً لك",
+      "sourceHash": "7a7c46aa",
+      "reviewed": false
+    },
+    "common.close": {
+      "value": "إغلاق",
+      "sourceHash": "d3d2e617",
+      "reviewed": false
+    },
+    "common.requiredFields": {
+      "value": "الحقول المميزة بعلامة (*) مطلوبة.",
+      "sourceHash": "54672197",
+      "reviewed": false
+    },
+    "common.viewProgrammes": {
+      "value": "استعراض البرامج",
+      "sourceHash": "54db3622",
+      "reviewed": false
+    },
+    "common.cancel": {
+      "value": "إلغاء",
+      "sourceHash": "ea478870",
+      "reviewed": false
+    },
+    "common.next": {
+      "value": "التالي",
+      "sourceHash": "10ac3d04",
+      "reviewed": false
+    },
+    "common.prev": {
+      "value": "السابق",
+      "sourceHash": "0557fa92",
+      "reviewed": false
+    },
+    "common.step": {
+      "value": "خطوة",
+      "sourceHash": "48c7c41b",
+      "reviewed": false
+    },
+    "common.sendMessage": {
+      "value": "إرسال الاستفسار",
+      "sourceHash": "61a5c5eb",
+      "reviewed": false
+    },
+    "common.location": {
+      "value": "الموقع",
+      "sourceHash": "ce5bf551",
+      "reviewed": false
+    },
+    "common.addressText": {
+      "value": "B-25-07، مجمع بافيليون أمبانغ، برج جي-فيستور، 200، شارع أمبانغ، كامبونغ داتوك كيرامات، 50450 كوالالمبور، ماليزيا.",
+      "sourceHash": "e92f61e4",
+      "reviewed": true
+    },
+    "home.eyebrow": {
+      "value": "الموسم الأكاديمي 2026 · بافيليون إمباسي، كوالالمبور",
+      "sourceHash": "21d3f3e3",
+      "reviewed": false
+    },
+    "home.heroTitle": {
+      "value": "مركز بايلينجوال آيدول للغات",
+      "sourceHash": "57a62f3a",
+      "reviewed": false
+    },
+    "home.heroSubtitle": {
+      "value": "برامج لغوية منظمة، تحضير معتمد لاختبارات الآيلتس (IELTS) ومسارات لغات عالمية متميزة في بافيليون إمباسي، كوالالمبور.",
+      "sourceHash": "0556fa8f",
+      "reviewed": false
+    },
+    "home.ctaFindCourse": {
+      "value": "ابحث عن دورتك",
+      "sourceHash": "d1f73a13",
+      "reviewed": false
+    },
+    "home.ctaEnquiry": {
+      "value": "تقديم استفسار",
+      "sourceHash": "03f1e936",
+      "reviewed": false
+    },
+    "home.ctaPlacement": {
+      "value": "اختبار تحديد مستوى مجاني",
+      "sourceHash": "6e1fc7e6",
+      "reviewed": false
+    },
+    "home.ctaBooking": {
+      "value": "حجز استشارة أكاديمية",
+      "sourceHash": "49a10f52",
+      "reviewed": false
+    },
+    "home.taskPlacementTitle": {
+      "value": "اختبار تحديد المستوى عبر الإنترنت",
+      "sourceHash": "ea2e1ea2",
+      "reviewed": false
+    },
+    "home.taskPlacementDesc": {
+      "value": "قيّم مستواك اللغوي في 3 دقائق مع نتيجة فورية وتوصية بالدورة المناسبة.",
+      "sourceHash": "29bdd454",
+      "reviewed": false
+    },
+    "home.taskConsultationTitle": {
+      "value": "حجز استشارة في المقر",
+      "sourceHash": "3402c556",
+      "reviewed": false
+    },
+    "home.taskConsultationDesc": {
+      "value": "احجز جولة خاصة وجلسة لتخطيط مسارك اللغوي وجهاً لوجه في بافيليون إمباسي.",
+      "sourceHash": "8604dde2",
+      "reviewed": false
+    },
+    "home.taskProgramsTitle": {
+      "value": "استعراض برامج 2026",
+      "sourceHash": "42ad52b7",
+      "reviewed": false
+    },
+    "home.taskProgramsDesc": {
+      "value": "اللغة الإنجليزية العامة، الآيلتس، المخيمات الصيفية، برامج الشركات واللغات العالمية.",
+      "sourceHash": "01db7fc6",
+      "reviewed": false
+    },
+    "home.taskContactTitle": {
+      "value": "تحدث مع مستشار تعليمي",
+      "sourceHash": "724492b4",
+      "reviewed": false
+    },
+    "home.taskContactDesc": {
+      "value": "تواصل عبر الواتساب أو اتصل بفريق القبول مباشرة للحصول على إرشاد شخصي.",
+      "sourceHash": "16882d8c",
+      "reviewed": false
+    },
+    "home.pricingEyebrow": {
+      "value": "الرسوم الرسمية لعام 2026",
+      "sourceHash": "e3b5b750",
+      "reviewed": false
+    },
+    "home.pricingTitle": {
+      "value": "البرامج الأكاديمية المعتمدة",
+      "sourceHash": "2ead2678",
+      "reviewed": false
+    },
+    "home.pricingSubtitle": {
+      "value": "استكشف دوراتنا الأكاديمية المعتمدة والمنظمة. تواصل مع قسم القبول للاستفسار عن التسجيل الجماعي، الجداول المخصصة والحملات الترويجية النشطة.",
+      "sourceHash": "bb8e5a00",
+      "reviewed": false
+    },
+    "home.pricingTabGeneral": {
+      "value": "الإنجليزية العامة",
+      "sourceHash": "ecc38a00",
+      "reviewed": false
+    },
+    "home.pricingTabIelts": {
+      "value": "تحضير الآيلتس",
+      "sourceHash": "f6dc473c",
+      "reviewed": false
+    },
+    "home.pricingTabCamps": {
+      "value": "المخيمات الصيفية والشتوية",
+      "sourceHash": "9fbbe6dd",
+      "reviewed": false
+    },
+    "home.pricingTabPrivate": {
+      "value": "دروس خاصة 1-على-1",
+      "sourceHash": "145c80f2",
+      "reviewed": false
+    },
+    "home.pricingTabExecutive": {
+      "value": "برامج الشركات والتنفيذيين",
+      "sourceHash": "8e57bfeb",
+      "reviewed": false
+    },
+    "home.pricingTabWorld": {
+      "value": "اللغات العالمية",
+      "sourceHash": "b393c6a5",
+      "reviewed": false
+    },
+    "home.startHereEyebrow": {
+      "value": "ابدأ من هنا",
+      "sourceHash": "8b6db1ec",
+      "reviewed": false
+    },
+    "home.startHereTitle": {
+      "value": "اختر مسارك نحو الطلاقة والتميز.",
+      "sourceHash": "73699bd0",
+      "reviewed": false
+    },
+    "home.startHereDesc": {
+      "value": "استكشف الدورات المعتمدة، احجز استشارة في المقر، أو سجل الدخول إلى حسابك.",
+      "sourceHash": "d68a3278",
+      "reviewed": false
+    },
+    "home.admissionsTag": {
+      "value": "القبول والتسجيل",
+      "sourceHash": "fff3e55e",
+      "reviewed": false
+    },
+    "home.taskPortalTitle": {
+      "value": "بوابة الطلاب والأساتذة",
+      "sourceHash": "18acf850",
+      "reviewed": false
+    },
+    "home.taskPortalDesc": {
+      "value": "سجل الدخول لعرض الجداول الدراسية وسجلات الحضور والموارد الأكاديمية.",
+      "sourceHash": "35bae672",
+      "reviewed": false
+    },
+    "home.facilitiesEyebrow": {
+      "value": "مرافق المركز",
+      "sourceHash": "569db595",
+      "reviewed": false
+    },
+    "home.facilitiesTitle": {
+      "value": "مساحات تعليمية حديثة في بافيليون إمباسي",
+      "sourceHash": "ed6600d2",
+      "reviewed": false
+    },
+    "home.facilitiesSubtitle": {
+      "value": "استمتع بقاعاتنا الدراسية المزودة بأحدث تقنيات الوسائط المتعددة، وصالات كبار الشخصيات، وقاعات الدراسة الهادئة.",
+      "sourceHash": "9935a39c",
+      "reviewed": false
+    },
+    "home.journeyEyebrow": {
+      "value": "رحلة الطالب",
+      "sourceHash": "dea18be7",
+      "reviewed": false
+    },
+    "home.journeyTitle": {
+      "value": "من أول استفسار وحتى الطلاقة اللغوية",
+      "sourceHash": "b2c0cca6",
+      "reviewed": false
+    },
+    "home.journeySubtitle": {
+      "value": "خارطة طريق مدروسة من 5 مراحل مصممة لاكتساب لغوي سريع، اندماج ثقافي وشهادات معتمدة.",
+      "sourceHash": "3381b10b",
+      "reviewed": false
+    },
+    "home.testimonialsEyebrow": {
+      "value": "تجارب الطلاب",
+      "sourceHash": "336e09f8",
+      "reviewed": false
+    },
+    "home.testimonialsTitle": {
+      "value": "ماذا يقول طلابنا عنا",
+      "sourceHash": "0af93cb6",
+      "reviewed": false
+    },
+    "home.testimonialsSubtitle": {
+      "value": "آراء وانطباعات حقيقية من الطلاب الدوليين، المهنيين وأولياء الأمور الذين درسوا في المركز.",
+      "sourceHash": "61b3af61",
+      "reviewed": false
+    },
+    "home.contactStripTitle": {
+      "value": "هل أنت مستعد لبدء رحلتك اللغوية؟",
+      "sourceHash": "00be4420",
+      "reviewed": false
+    },
+    "home.contactStripSubtitle": {
+      "value": "قم بزيارة مقرنا في بافيليون إمباسي بشارع أمبانغ أو تحدث مع مستشارنا التعليمي اليوم.",
+      "sourceHash": "de553de6",
+      "reviewed": false
+    },
+    "home.contactStripButton": {
+      "value": "تواصل مع قسم القبول",
+      "sourceHash": "2a9f7ad3",
+      "reviewed": false
+    },
+    "home.languageBandTitle": {
+      "value": "اللغات العالمية المتاحة",
+      "sourceHash": "711d8f56",
+      "reviewed": false
+    },
+    "home.languageBandSubtitle": {
+      "value": "الإنجليزية، الملايوية، الماندرين، العربية، اليابانية والكورية بإشراف أساتذة متخصصين.",
+      "sourceHash": "bd5a7cad",
+      "reviewed": false
+    },
+    "about.eyebrow": {
+      "value": "من نحن",
+      "sourceHash": "8f7f4c1c",
+      "reviewed": false
+    },
+    "about.heroTitle": {
+      "value": "تعليم لغوي مبني على تقدم واضح ونتائج ملموسة.",
+      "sourceHash": "6abfa2b1",
+      "reviewed": false
+    },
+    "about.heroSubtitle": {
+      "value": "يدعم مركز بايلينجوال آيدول الطلاب في كوالالمبور بمسارات لغوية دقيقة واستشارات تركز على التواصل الواثق.",
+      "sourceHash": "c969ef51",
+      "reviewed": false
+    },
+    "about.storyEyebrow": {
+      "value": "انطلاقة مدروسة",
+      "sourceHash": "ab920abc",
+      "reviewed": false
+    },
+    "about.storyTitle": {
+      "value": "ما يقدمه المركز لطلابه",
+      "sourceHash": "311a9915",
+      "reviewed": false
+    },
+    "about.storyBody": {
+      "value": "يوفر المركز بيئة تعليمية متكاملة تضم فصولاً تفاعلية، موارد تعليمية رقمية حديثة، وتوجيهاً لمسارات تعليمية مخصصة.",
+      "sourceHash": "ac8c0f39",
+      "reviewed": false
+    },
+    "about.explorePrograms": {
+      "value": "استكشف البرامج",
+      "sourceHash": "4b561635",
+      "reviewed": false
+    },
+    "about.approachEyebrow": {
+      "value": "منهجية التعليم",
+      "sourceHash": "8fd17cb1",
+      "reviewed": false
+    },
+    "about.approachTitle": {
+      "value": "كيف ندعم تقدمك التعليمي",
+      "sourceHash": "03657eab",
+      "reviewed": false
+    },
+    "about.approachSubtitle": {
+      "value": "خطوات واضحة، ممارسة عملية نشطة وبناء مستمر للثقة ترسم ملامح النهج التعليمي للمركز.",
+      "sourceHash": "c262d720",
+      "reviewed": false
+    },
+    "about.approach1Title": {
+      "value": "البدء بأهداف الطالب",
+      "sourceHash": "59580ee1",
+      "reviewed": false
+    },
+    "about.approach1Body": {
+      "value": "تساعد الاستشارة وتحديد المستوى في اختيار المسار اللغوي الأنسب قبل التسجيل.",
+      "sourceHash": "e52a882c",
+      "reviewed": false
+    },
+    "about.approach2Title": {
+      "value": "ممارسة لغوية تفاعلية",
+      "sourceHash": "c74e6993",
+      "reviewed": false
+    },
+    "about.approach2Body": {
+      "value": "يعتمد المركز على التعليم التفاعلي المدعوم بأدوات الفصول الرقمية والممارسة الموجهة.",
+      "sourceHash": "18eee3eb",
+      "reviewed": false
+    },
+    "about.approach3Title": {
+      "value": "بناء الثقة بثبات",
+      "sourceHash": "7ac8715e",
+      "reviewed": false
+    },
+    "about.approach3Body": {
+      "value": "صممت مساراتنا لتجمع بين تطوير اللغة، الوعي الثقافي والقدرة على التواصل العملي اليومي.",
+      "sourceHash": "f93de579",
+      "reviewed": false
+    },
+    "about.communityEyebrow": {
+      "value": "مجتمع وممارسة",
+      "sourceHash": "526ad7c2",
+      "reviewed": false
+    },
+    "about.communityTitle": {
+      "value": "مكان مثالي للمضي قدماً في طموحاتك",
+      "sourceHash": "2ab54d31",
+      "reviewed": false
+    },
+    "about.communityCaption": {
+      "value": "تتطور اللغة من خلال التبادل الهادف والممارسة اليومية المشتركة.",
+      "sourceHash": "42af180d",
+      "reviewed": false
+    },
+    "about.teamEyebrow": {
+      "value": "الهيئة التدريسية والاستشارية",
+      "sourceHash": "642d91cc",
+      "reviewed": false
+    },
+    "about.teamTitle": {
+      "value": "مدربون مؤهلون مكرسون لنجاحك الأكاديمي",
+      "sourceHash": "fcc8ed5f",
+      "reviewed": false
+    },
+    "about.teamSubtitle": {
+      "value": "يجمع كادرنا بين المؤهلات الدولية المعتمدة والأساليب التعليمية الحديثة والتوجيه المخلص.",
+      "sourceHash": "4d266101",
+      "reviewed": false
+    },
+    "programs.eyebrow": {
+      "value": "البرامج التعليمية",
+      "sourceHash": "b9ad95ed",
+      "reviewed": false
+    },
+    "programs.heroTitle": {
+      "value": "اختر البرنامج الذي يناسب أهدافك وتطلعاتك.",
+      "sourceHash": "ff0047d0",
+      "reviewed": false
+    },
+    "programs.heroSubtitle": {
+      "value": "استعرض دليل دورات عام 2026، ثم تواصل مع المركز لتأكيد الملاءمة، التوفر ومواعيد بدء الدورات.",
+      "sourceHash": "45acb221",
+      "reviewed": false
+    },
+    "programs.guideEyebrow": {
+      "value": "دليل رسوم 2026",
+      "sourceHash": "1995be43",
+      "reviewed": false
+    },
+    "programs.guideTitle": {
+      "value": "خيارات الدورات المتاحة",
+      "sourceHash": "107bb3df",
+      "reviewed": false
+    },
+    "programs.guideSubtitle": {
+      "value": "الرسوم استرشادية وفق قائمة 2026. يرجى تأكيد المبلغ الإجمالي وشروط التأشيرة مع المركز قبل التسجيل.",
+      "sourceHash": "181afbe6",
+      "reviewed": false
+    },
+    "programs.feeGuideEyebrow": {
+      "value": "هيكل الدورات والرسوم",
+      "sourceHash": "d01bd510",
+      "reviewed": false
+    },
+    "programs.feeGuideTitle": {
+      "value": "دليل البرامج والرسوم لعام 2026",
+      "sourceHash": "09de748b",
+      "reviewed": false
+    },
+    "programs.feeGuideSubtitle": {
+      "value": "استكشف البرامج اللغوية المعتمدة المصممة للطلاب الدوليين والأطفال واليافعين والمهنيين.",
+      "sourceHash": "386e0ced",
+      "reviewed": false
+    },
+    "programs.searchPlaceholder": {
+      "value": "ابحث باللغة أو المستوى أو الفئة المستهدفة...",
+      "sourceHash": "a09a67f6",
+      "reviewed": false
+    },
+    "programs.filterLabel": {
+      "value": "تصفية",
+      "sourceHash": "d7778d0c",
+      "reviewed": false
+    },
+    "programs.filterAll": {
+      "value": "جميع الفئات",
+      "sourceHash": "a6a2a55b",
+      "reviewed": false
+    },
+    "programs.countShown": {
+      "value": "تم عرض {count} برنامج معتمد",
+      "sourceHash": "8ff06a7a",
+      "reviewed": false
+    },
+    "programs.showingCount": {
+      "value": "برامج متاحة",
+      "sourceHash": "5226d7d0",
+      "reviewed": false
+    },
+    "programs.noMatches": {
+      "value": "لا توجد برامج مطابقة لبحثك الحالي. جرب تغيير الفئة أو كلمات البحث.",
+      "sourceHash": "dd6484f2",
+      "reviewed": false
+    },
+    "programs.emptyText": {
+      "value": "لم يتم العثور على برامج تطابق معايير البحث.",
+      "sourceHash": "2d0f67ab",
+      "reviewed": false
+    },
+    "programs.emptyCta": {
+      "value": "تواصل معنا للحصول على خيارات دراسية مخصصة",
+      "sourceHash": "496a8f2e",
+      "reviewed": false
+    },
+    "programs.viewDetails": {
+      "value": "عرض تفاصيل البرنامج",
+      "sourceHash": "c6311b5c",
+      "reviewed": false
+    },
+    "programs.catAll": {
+      "value": "الكل",
+      "sourceHash": "b1c94ca2",
+      "reviewed": false
+    },
+    "programs.catKids": {
+      "value": "للأطفال واليافعين",
+      "sourceHash": "eb73ee66",
+      "reviewed": false
+    },
+    "programs.catEnglish": {
+      "value": "اللغة الإنجليزية",
+      "sourceHash": "78463a38",
+      "reviewed": false
+    },
+    "programs.catWorldLanguages": {
+      "value": "لغات عالمية",
+      "sourceHash": "b393c6a5",
+      "reviewed": false
+    },
+    "programs.catProfessional": {
+      "value": "للشركات والمهنيين",
+      "sourceHash": "9e8b1602",
+      "reviewed": false
+    },
+    "programDetail.backLink": {
+      "value": "العودة إلى قائمة البرامج",
+      "sourceHash": "60508e2d",
+      "reviewed": false
+    },
+    "programDetail.overviewEyebrow": {
+      "value": "نظرة عامة على البرنامج",
+      "sourceHash": "466dd5c0",
+      "reviewed": false
+    },
+    "programDetail.duration": {
+      "value": "المدة",
+      "sourceHash": "e02d2ae0",
+      "reviewed": false
+    },
+    "programDetail.schedule": {
+      "value": "الجدول الزمني",
+      "sourceHash": "25f73472",
+      "reviewed": false
+    },
+    "programDetail.fees": {
+      "value": "الرسوم",
+      "sourceHash": "006300ef",
+      "reviewed": false
+    },
+    "programDetail.level": {
+      "value": "المستوى",
+      "sourceHash": "a0db49ba",
+      "reviewed": false
+    },
+    "programDetail.ageGroup": {
+      "value": "الفئة المستهدفة",
+      "sourceHash": "1f6a4e9b",
+      "reviewed": false
+    },
+    "programDetail.outcomesTitle": {
+      "value": "أبرز مخرجات التعلم",
+      "sourceHash": "da420a67",
+      "reviewed": false
+    },
+    "programDetail.ctaTitle": {
+      "value": "هل أنت مهتم بهذا البرنامج؟",
+      "sourceHash": "7f9f1f7a",
+      "reviewed": false
+    },
+    "programDetail.ctaSubtitle": {
+      "value": "أرسل استفسارك الآن للتحقق من المواعيد المتاحة ومناقشة تفاصيل الالتحاق.",
+      "sourceHash": "f7ccc364",
+      "reviewed": false
+    },
+    "programDetail.ctaButton": {
+      "value": "تقديم استفسار الآن",
+      "sourceHash": "03f1e936",
+      "reviewed": false
+    },
+    "contact.eyebrow": {
+      "value": "اتصل بنا",
+      "sourceHash": "bbaff128",
+      "reviewed": false
+    },
+    "contact.heroTitle": {
+      "value": "تواصل مع فريق المركز.",
+      "sourceHash": "32e0db28",
+      "reviewed": false
+    },
+    "contact.heroSubtitle": {
+      "value": "اختر وسيلة التواصل الأنسب لك، أو أرسل استفساراً سريعاً عبر النموذج أدناه.",
+      "sourceHash": "68ac39ff",
+      "reviewed": false
+    },
+    "contact.call": {
+      "value": "اتصال هاتفي",
+      "sourceHash": "c3755e61",
+      "reviewed": false
+    },
+    "contact.whatsapp": {
+      "value": "واتساب",
+      "sourceHash": "8b777ebc",
+      "reviewed": true
+    },
+    "contact.whatsappValue": {
+      "value": "مراسلة المركز عبر واتساب",
+      "sourceHash": "b23f30e1",
+      "reviewed": false
+    },
+    "contact.email": {
+      "value": "البريد الإلكتروني",
+      "sourceHash": "ce8ae9da",
+      "reviewed": false
+    },
+    "contact.hours": {
+      "value": "أوقات العمل",
+      "sourceHash": "80a0c205",
+      "reviewed": false
+    },
+    "contact.openingHours": {
+      "value": "من الاثنين إلى الأحد: 9:00 صباحاً – 9:00 مساءً",
+      "sourceHash": "39f29d7b",
+      "reviewed": false
+    },
+    "contact.address": {
+      "value": "B-25-07، مجمع بافيليون أمبانغ، برج جي-فيستور، 200، شارع أمبانغ، كامبونغ داتوك كيرامات، 50450 كوالالمبور، ماليزيا.",
+      "sourceHash": "e92f61e4",
+      "reviewed": true
+    },
+    "contact.addressText": {
+      "value": "B-25-07، مجمع بافيليون أمبانغ، برج جي-فيستور، 200، شارع أمبانغ، كامبونغ داتوك كيرامات، 50450 كوالالمبور، ماليزيا.",
+      "sourceHash": "ac70f47f",
+      "reviewed": true
+    },
+    "contact.formEyebrow": {
+      "value": "إرسال استفسار",
+      "sourceHash": "6beffcc3",
+      "reviewed": false
+    },
+    "contact.formTitle": {
+      "value": "أخبرنا بما يحتاجه الطالب.",
+      "sourceHash": "9bc2ccb4",
+      "reviewed": false
+    },
+    "contact.formSubtitle": {
+      "value": "وصف موجز لهدف الطالب ومواعيده المفضلة كافٍ لبدء المساعدة والتوجيه.",
+      "sourceHash": "efa02180",
+      "reviewed": false
+    },
+    "contact.formCardTitle": {
+      "value": "نموذج استفسارك",
+      "sourceHash": "2078a6e9",
+      "reviewed": false
+    },
+    "contact.submitButton": {
+      "value": "إرسال الاستفسار",
+      "sourceHash": "61a5c5eb",
+      "reviewed": false
+    },
+    "enroll.backLink": {
+      "value": "العودة للرئيسية",
+      "sourceHash": "6110e369",
+      "reviewed": false
+    },
+    "enroll.eyebrow": {
+      "value": "استفسار تعليمي",
+      "sourceHash": "bcfb3883",
+      "reviewed": false
+    },
+    "enroll.heroTitle": {
+      "value": "أخبر المركز عن تفاصيل الطالب.",
+      "sourceHash": "1cd743b5",
+      "reviewed": false
+    },
+    "enroll.heroSubtitle": {
+      "value": "أرسل البيانات التي تعرفها حالياً. تقديم الاستفسار لا يلزمك بالتسجيل الفوري.",
+      "sourceHash": "ea5150de",
+      "reviewed": false
+    },
+    "enroll.nextStepsTitle": {
+      "value": "ماذا يحدث بعد الإرسال؟",
+      "sourceHash": "a273f1bc",
+      "reviewed": false
+    },
+    "enroll.step1": {
+      "value": "يقوم المستشار بمراجعة هدف الطالب اللغوي ومستواه الحالي.",
+      "sourceHash": "6dfbe60e",
+      "reviewed": false
+    },
+    "enroll.step2": {
+      "value": "يقترح المركز الخطوة التالية المناسبة أو يطرح أسئلة إضافية للمساعدة.",
+      "sourceHash": "f14768e9",
+      "reviewed": false
+    },
+    "enroll.step3": {
+      "value": "تتم معالجة بياناتك بكل خصوصية من قبل موظفي المركز المعتمدين.",
+      "sourceHash": "55f0ea9d",
+      "reviewed": false
+    },
+    "enroll.formEyebrow": {
+      "value": "بيانات الطالب",
+      "sourceHash": "3078d791",
+      "reviewed": false
+    },
+    "enroll.formTitle": {
+      "value": "أخبرنا بما يحتاجه الطالب.",
+      "sourceHash": "9bc2ccb4",
+      "reviewed": false
+    },
+    "enroll.formSubtitle": {
+      "value": "وصف موجز لهدف الطالب ومواعيده المفضلة كافٍ لبدء المساعدة والتوجيه.",
+      "sourceHash": "efa02180",
+      "reviewed": false
+    },
+    "enroll.studentNameLabel": {
+      "value": "اسم الطالب *",
+      "sourceHash": "24a50e0b",
+      "reviewed": false
+    },
+    "enroll.studentNamePlaceholder": {
+      "value": "مثال: سارة أحمد",
+      "sourceHash": "a372f852",
+      "reviewed": false
+    },
+    "enroll.studentAgeLabel": {
+      "value": "عمر الطالب *",
+      "sourceHash": "402ee026",
+      "reviewed": false
+    },
+    "enroll.studentAgePlaceholder": {
+      "value": "مثال: 16",
+      "sourceHash": "21a76ec8",
+      "reviewed": false
+    },
+    "enroll.programLabel": {
+      "value": "البرنامج المطلوب *",
+      "sourceHash": "df535e7a",
+      "reviewed": false
+    },
+    "enroll.programPlaceholder": {
+      "value": "اختر البرنامج...",
+      "sourceHash": "3d36a278",
+      "reviewed": false
+    },
+    "enroll.scheduleLabel": {
+      "value": "الوقت المفضل *",
+      "sourceHash": "b6c54d80",
+      "reviewed": false
+    },
+    "enroll.schedulePlaceholder": {
+      "value": "اختر الوقت المفضل...",
+      "sourceHash": "8dfb38bb",
+      "reviewed": false
+    },
+    "enroll.parentNameLabel": {
+      "value": "اسم ولي الأمر / المسؤول *",
+      "sourceHash": "f34ac7c9",
+      "reviewed": false
+    },
+    "enroll.parentNamePlaceholder": {
+      "value": "مثال: أحمد محمد",
+      "sourceHash": "57ee97ca",
+      "reviewed": false
+    },
+    "enroll.emailLabel": {
+      "value": "البريد الإلكتروني *",
+      "sourceHash": "2baf1487",
+      "reviewed": false
+    },
+    "enroll.emailPlaceholder": {
+      "value": "مثال: guardian@example.com",
+      "sourceHash": "6e6c43bc",
+      "reviewed": true
+    },
+    "enroll.phoneLabel": {
+      "value": "رقم الهاتف / واتساب *",
+      "sourceHash": "a6000211",
+      "reviewed": false
+    },
+    "enroll.phonePlaceholder": {
+      "value": "مثال: +60 12-345 6789",
+      "sourceHash": "3c011b8b",
+      "reviewed": true
+    },
+    "enroll.messageLabel": {
+      "value": "ملاحظات أو أسئلة إضافية",
+      "sourceHash": "90dfc9cd",
+      "reviewed": false
+    },
+    "enroll.messagePlaceholder": {
+      "value": "شارك أي أهداف لغوية أو المستوى الحالي أو متطلبات خاصة...",
+      "sourceHash": "99060564",
+      "reviewed": false
+    },
+    "enroll.submitButton": {
+      "value": "إرسال طلب الاستفسار",
+      "sourceHash": "ffbd292b",
+      "reviewed": false
+    },
+    "enroll.requiredNote": {
+      "value": "الحقول المشار إليها بعلامة (*) مطلوبة.",
+      "sourceHash": "54672197",
+      "reviewed": false
+    },
+    "enroll.successTitle": {
+      "value": "تم إرسال استفسارك بنجاح",
+      "sourceHash": "e1a20036",
+      "reviewed": false
+    },
+    "enroll.successSubtitle": {
+      "value": "شكراً لك. سيقوم المستشار الأكاديمي بمراجعة تفاصيل الطالب والتواصل معك خلال 24 ساعة.",
+      "sourceHash": "8497eefd",
+      "reviewed": false
+    },
+    "enroll.submitAnother": {
+      "value": "إرسال استفسار آخر",
+      "sourceHash": "c157cdcb",
+      "reviewed": false
+    },
+    "news.eyebrow": {
+      "value": "تحديثات وإعلانات",
+      "sourceHash": "0471bc5d",
+      "reviewed": false
+    },
+    "news.heroTitle": {
+      "value": "أخبار وإعلانات المركز.",
+      "sourceHash": "41fd931f",
+      "reviewed": false
+    },
+    "news.heroSubtitle": {
+      "value": "تابع آخر المستجدات، جداول العطلات الرسمية والمواعيد الأكاديمية الصادرة عن المركز.",
+      "sourceHash": "d547e1d1",
+      "reviewed": false
+    },
+    "news.searchPlaceholder": {
+      "value": "البحث في الأخبار والمقالات...",
+      "sourceHash": "b3874d6f",
+      "reviewed": false
+    },
+    "news.allCategories": {
+      "value": "جميع الفئات",
+      "sourceHash": "62f5d708",
+      "reviewed": false
+    },
+    "news.readMore": {
+      "value": "قراءة المقال",
+      "sourceHash": "3c6262b6",
+      "reviewed": false
+    },
+    "news.readUpdate": {
+      "value": "قراءة التحديث كاملاً",
+      "sourceHash": "9f63675f",
+      "reviewed": false
+    },
+    "news.previous": {
+      "value": "السابق",
+      "sourceHash": "dd1f775e",
+      "reviewed": false
+    },
+    "news.next": {
+      "value": "التالي",
+      "sourceHash": "10ac3d04",
+      "reviewed": false
+    },
+    "news.noUpdates": {
+      "value": "لا توجد إعلانات منشورة بعد.",
+      "sourceHash": "cc076580",
+      "reviewed": false
+    },
+    "news.noUpdatesText": {
+      "value": "يرجى المتابعة لاحقاً لمعرفة التحديثات حول التقويم الأكاديمي وورش العمل والفعاليات.",
+      "sourceHash": "c71eca79",
+      "reviewed": false
+    },
+    "login.eyebrow": {
+      "value": "بوابة الدخول",
+      "sourceHash": "505340fc",
+      "reviewed": false
+    },
+    "login.heroTitle": {
+      "value": "تسجيل الدخول إلى حسابك.",
+      "sourceHash": "9e869198",
+      "reviewed": false
+    },
+    "login.heroSubtitle": {
+      "value": "الوصول إلى لوحة التحكم، جداول الحصص الدراسية وموارد المركز التعليمية.",
+      "sourceHash": "5db92499",
+      "reviewed": false
+    },
+    "login.emailLabel": {
+      "value": "تسجيل الدخول",
+      "sourceHash": "99dea780",
+      "reviewed": false
+    },
+    "login.emailPlaceholder": {
+      "value": "nickname@bilc.my",
+      "sourceHash": "63480603",
+      "reviewed": true
+    },
+    "login.passwordLabel": {
+      "value": "كلمة المرور",
+      "sourceHash": "dc647eb6",
+      "reviewed": false
+    },
+    "login.passwordPlaceholder": {
+      "value": "أدخل كلمة المرور",
+      "sourceHash": "e8d28194",
+      "reviewed": false
+    },
+    "login.showPassword": {
+      "value": "إظهار كلمة المرور",
+      "sourceHash": "a1cc7ba8",
+      "reviewed": false
+    },
+    "login.hidePassword": {
+      "value": "إخفاء كلمة المرور",
+      "sourceHash": "3f5b7abc",
+      "reviewed": false
+    },
+    "login.submitButton": {
+      "value": "تسجيل الدخول",
+      "sourceHash": "b6d4223e",
+      "reviewed": false
+    },
+    "login.signingIn": {
+      "value": "جارٍ تسجيل الدخول...",
+      "sourceHash": "4381b667",
+      "reviewed": false
+    },
+    "login.helpTitle": {
+      "value": "هل تحتاج إلى حساب؟",
+      "sourceHash": "03ebe524",
+      "reviewed": false
+    },
+    "login.helpText": {
+      "value": "سجّل الدخول باستخدام حسابك nickname@bilc.my وكلمة المرور. تواصل مع إدارة المركز إذا احتجت إلى بيانات الدخول.",
+      "sourceHash": "6bf8627a",
+      "reviewed": false
+    },
+    "userDashboard.welcome": {
+      "value": "أهلاً بك",
+      "sourceHash": "83218ac3",
+      "reviewed": false
+    },
+    "userDashboard.roleStudent": {
+      "value": "حساب طالب",
+      "sourceHash": "60e7aba1",
+      "reviewed": false
+    },
+    "userDashboard.roleTeacher": {
+      "value": "حساب معلم",
+      "sourceHash": "9b247d4c",
+      "reviewed": false
+    },
+    "userDashboard.roleMember": {
+      "value": "حساب عضو",
+      "sourceHash": "bd29eb3f",
+      "reviewed": false
+    },
+    "userDashboard.subtitle": {
+      "value": "حسابك جاهز. ستظهر المعلومات المخصصة لدورك هنا بمجرد نشرها من قبل إدارة المركز.",
+      "sourceHash": "8227f1be",
+      "reviewed": false
+    },
+    "userDashboard.nextStepTitle": {
+      "value": "البحث عن برنامج تعليمي",
+      "sourceHash": "f61cabad",
+      "reviewed": false
+    },
+    "userDashboard.nextStepText": {
+      "value": "استعرض البرامج المتاحة حالياً أو تواصل مع إدارة المركز لمساعدتك في اختيار المسار الأفضل.",
+      "sourceHash": "43654ce5",
+      "reviewed": false
+    },
+    "userDashboard.nextStepButton": {
+      "value": "استعراض البرامج",
+      "sourceHash": "54db3622",
+      "reviewed": false
+    },
+    "userDashboard.attendanceTitle": {
+      "value": "سجل الحضور والغياب",
+      "sourceHash": "76efd780",
+      "reviewed": false
+    },
+    "userDashboard.attendanceLoading": {
+      "value": "سجل الحضور: جارٍ التحميل",
+      "sourceHash": "93d446f0",
+      "reviewed": false
+    },
+    "userDashboard.attendanceLoadingText": {
+      "value": "يتم تجهيز ملخص حضورك الأخير.",
+      "sourceHash": "8fe7200b",
+      "reviewed": false
+    },
+    "userDashboard.attendanceScore": {
+      "value": "نسبة الحضور: {percentage}%",
+      "sourceHash": "f9e63420",
+      "reviewed": false
+    },
+    "userDashboard.attendanceScoreText": {
+      "value": "تم حضور {attended} من أصل {total} حصة مسجلة. يشمل الحضور علامات التأخير والحضور المنتظم.",
+      "sourceHash": "3b7a2a69",
+      "reviewed": false
+    },
+    "userDashboard.attendanceNotAvailable": {
+      "value": "بيانات الحضور غير متوفرة بعد.",
+      "sourceHash": "611af932",
+      "reviewed": false
+    },
+    "userDashboard.attendanceNotAvailableText": {
+      "value": "ستظهر نسبة حضورك تلقائياً بعد أن يقوم المركز بتسجيل الحصص المكتملة لحسابك.",
+      "sourceHash": "8c3843fc",
+      "reviewed": false
+    },
+    "userDashboard.signOut": {
+      "value": "تسجيل الخروج",
+      "sourceHash": "c87aacf5",
+      "reviewed": false
+    },
+    "userDashboard.preparing": {
+      "value": "جاري تجهيز مساحة العمل",
+      "sourceHash": "255a077b",
+      "reviewed": false
+    },
+    "userDashboard.preparingText": {
+      "value": "يرجى الانتظار بينما يتم التحقق من صلاحيات حسابك.",
+      "sourceHash": "f178445c",
+      "reviewed": false
+    },
+    "userDashboard.placeholderText": {
+      "value": "لوحة التحكم الخاصة بك جاهزة تماماً للمحتوى الأكاديمي القادم.",
+      "sourceHash": "b2f5cac0",
+      "reviewed": false
+    },
+    "userDashboard.greeting": {
+      "value": "أهلاً بك، {name}.",
+      "sourceHash": "03ef00d6",
+      "reviewed": false
+    },
+    "role.student": {
+      "value": "طالب",
+      "sourceHash": "f5c0a1c9",
+      "reviewed": false
+    },
+    "role.teacher": {
+      "value": "معلّم",
+      "sourceHash": "8ab7bbdf",
+      "reviewed": false
+    },
+    "role.marketing": {
+      "value": "التسويق",
+      "sourceHash": "7cb15e41",
+      "reviewed": false
+    },
+    "role.admin": {
+      "value": "مسؤول",
+      "sourceHash": "e3afed00",
+      "reviewed": false
+    },
+    "role.superAdmin": {
+      "value": "المسؤول الأعلى",
+      "sourceHash": "dbf36ff3",
+      "reviewed": false
+    },
+    "role.founder": {
+      "value": "المؤسس",
+      "sourceHash": "ad5b1a22",
+      "reviewed": false
+    },
+    "role.user": {
+      "value": "مستخدم",
+      "sourceHash": "8f9bfe9d",
+      "reviewed": false
+    },
+    "account.status": {
+      "value": "حساب {role}",
+      "sourceHash": "3b1ad4fa",
+      "reviewed": false
+    },
+    "shell.myDashboard": {
+      "value": "لوحتي",
+      "sourceHash": "cc9c45ed",
+      "reviewed": false
+    },
+    "shell.toggleSidebar": {
+      "value": "إظهار الشريط الجانبي",
+      "sourceHash": "7f8e313f",
+      "reviewed": false
+    },
+    "shell.attendancePending": {
+      "value": "سجل الحضور غير متاح بعد.",
+      "sourceHash": "611af932",
+      "reviewed": false
+    },
+    "shell.studentPortal": {
+      "value": "بوابة الطالب",
+      "sourceHash": "57032670",
+      "reviewed": false
+    },
+    "shell.learningCentreAdmin": {
+      "value": "إدارة المركز التعليمي",
+      "sourceHash": "91f59c22",
+      "reviewed": false
+    },
+    "form.studentName": {
+      "value": "اسم الطالب الثلاثي *",
+      "sourceHash": "0cb0914b",
+      "reviewed": false
+    },
+    "form.studentNamePlaceholder": {
+      "value": "مثال: أحمد عبد الله",
+      "sourceHash": "ce5ae217",
+      "reviewed": false
+    },
+    "form.studentAge": {
+      "value": "عمر الطالب *",
+      "sourceHash": "f860db47",
+      "reviewed": false
+    },
+    "form.studentAgePlaceholder": {
+      "value": "مثال: 16",
+      "sourceHash": "21a76ec8",
+      "reviewed": false
+    },
+    "form.parentName": {
+      "value": "اسم ولي الأمر / الوصي *",
+      "sourceHash": "037874d3",
+      "reviewed": false
+    },
+    "form.parentNamePlaceholder": {
+      "value": "مثال: عبد الله محمد",
+      "sourceHash": "78f89cb9",
+      "reviewed": false
+    },
+    "form.parentEmail": {
+      "value": "البريد الإلكتروني للتواصل *",
+      "sourceHash": "a71b9662",
+      "reviewed": false
+    },
+    "form.parentEmailPlaceholder": {
+      "value": "name@example.com",
+      "sourceHash": "a130ced3",
+      "reviewed": true
+    },
+    "form.parentPhone": {
+      "value": "رقم الهاتف (مع مفتاح الدولة) *",
+      "sourceHash": "34317617",
+      "reviewed": false
+    },
+    "form.parentPhonePlaceholder": {
+      "value": "+966 50 123 4567",
+      "sourceHash": "5a28e52e",
+      "reviewed": true
+    },
+    "form.programInterest": {
+      "value": "البرنامج المطلوب *",
+      "sourceHash": "96a706b2",
+      "reviewed": false
+    },
+    "form.selectProgram": {
+      "value": "اختر البرنامج...",
+      "sourceHash": "3d36a278",
+      "reviewed": false
+    },
+    "form.preferredSchedule": {
+      "value": "الموعد والجدول المفضل *",
+      "sourceHash": "49930df2",
+      "reviewed": false
+    },
+    "form.selectSchedule": {
+      "value": "اختر الموعد...",
+      "sourceHash": "eac1d155",
+      "reviewed": false
+    },
+    "form.weekdayMorning": {
+      "value": "الفترة الصباحية خلال الأسبوع (9:00 ص - 12:00 م)",
+      "sourceHash": "8b355e35",
+      "reviewed": false
+    },
+    "form.weekdayAfternoon": {
+      "value": "فترة بعد الظهر خلال الأسبوع (2:00 م - 5:00 م)",
+      "sourceHash": "9aa8cd80",
+      "reviewed": false
+    },
+    "form.weekdayEvening": {
+      "value": "الفترة المسائية خلال الأسبوع (6:30 م - 9:00 م)",
+      "sourceHash": "d48c9918",
+      "reviewed": false
+    },
+    "form.weekendIntensive": {
+      "value": "مكثف نهاية الأسبوع (السبت والأحد)",
+      "sourceHash": "8e48d04d",
+      "reviewed": false
+    },
+    "form.flexiblePrivate": {
+      "value": "دروس خاصة مرنة 1-على-1",
+      "sourceHash": "39011325",
+      "reviewed": false
+    },
+    "form.message": {
+      "value": "تفاصيل أو أهداف إضافية",
+      "sourceHash": "1ec3c40b",
+      "reviewed": false
+    },
+    "form.messagePlaceholder": {
+      "value": "أخبرنا عن مستواك الحالي، الخطة الزمنية أو أي متطلبات خاصة...",
+      "sourceHash": "0c50b4fb",
+      "reviewed": false
+    },
+    "form.submitEnquiry": {
+      "value": "إرسال الاستفسار",
+      "sourceHash": "105625ae",
+      "reviewed": false
+    },
+    "form.sending": {
+      "value": "جارٍ الإرسال...",
+      "sourceHash": "f39bda51",
+      "reviewed": false
+    },
+    "form.successTitle": {
+      "value": "شكراً لك — تم استلام بياناتك بنجاح.",
+      "sourceHash": "13ac8fd5",
+      "reviewed": false
+    },
+    "form.successText": {
+      "value": "سيتواصل معك فريق القبول لدينا خلال 24 ساعة لمناقشة أفضل خطوة تالية لمسيرتك التعليمية.",
+      "sourceHash": "28b0ad02",
+      "reviewed": false
+    },
+    "form.submitAnother": {
+      "value": "إرسال استفسار آخر",
+      "sourceHash": "eaf36858",
+      "reviewed": false
+    },
+    "form.kicker": {
+      "value": "تواصل معنا",
+      "sourceHash": "cce862dd",
+      "reviewed": false
+    },
+    "form.stepInfo": {
+      "value": "بيانات الطالب",
+      "sourceHash": "a5df11a7",
+      "reviewed": false
+    },
+    "form.stepTrack": {
+      "value": "المسار الدراسي",
+      "sourceHash": "48e15f17",
+      "reviewed": false
+    },
+    "form.stepContact": {
+      "value": "ولي الأمر والتواصل",
+      "sourceHash": "88d09ade",
+      "reviewed": false
+    },
+    "placementModal.title": {
+      "value": "تقييم اللغة الإنجليزية المجاني عبر الإنترنت (3 دقائق)",
+      "sourceHash": "9367f065",
+      "reviewed": false
+    },
+    "placementModal.subtitle": {
+      "value": "أجب عن 8 أسئلة سريعة لتحديد مستواك وفق الإطار الأوروبي المشترك (CEFR) والحصول على توصية بالدورة المناسبة.",
+      "sourceHash": "b2164a9a",
+      "reviewed": false
+    },
+    "placementModal.questionNumber": {
+      "value": "السؤال {current} من {total}",
+      "sourceHash": "d9e19ee5",
+      "reviewed": false
+    },
+    "placementModal.completeBtn": {
+      "value": "عرض تقييمي والمسار الموصى به",
+      "sourceHash": "b749b660",
+      "reviewed": false
+    },
+    "placementModal.resultTitle": {
+      "value": "نتيجة تقييم مستواك في اللغة الإنجليزية",
+      "sourceHash": "21487bc0",
+      "reviewed": false
+    },
+    "placementModal.yourLevel": {
+      "value": "المستوى التقديري (CEFR)",
+      "sourceHash": "e0e9a663",
+      "reviewed": false
+    },
+    "placementModal.diagnosticScore": {
+      "value": "الدرجة التشخيصية: {score}/8 ({pct}%)",
+      "sourceHash": "6e71ad7f",
+      "reviewed": false
+    },
+    "placementModal.recommendedCourse": {
+      "value": "المسار التعليمي الموصى به:",
+      "sourceHash": "0a398bfd",
+      "reviewed": false
+    },
+    "placementModal.enrollWithScore": {
+      "value": "التسجيل بهذه النتيجة",
+      "sourceHash": "f60cf754",
+      "reviewed": false
+    },
+    "placementModal.retake": {
+      "value": "إعادة الاختبار",
+      "sourceHash": "04f9c5dd",
+      "reviewed": false
+    },
+    "onlineTest.badge": {
+      "value": "اختبار تحديد المستوى المجاني عبر الإنترنت",
+      "sourceHash": "6dd52e24",
+      "reviewed": false
+    },
+    "onlineTest.title": {
+      "value": "مقياس مستوى اللغة الإنجليزية السريع",
+      "sourceHash": "19035f39",
+      "reviewed": false
+    },
+    "onlineTest.description": {
+      "value": "أجب عن 5 أسئلة سريعة في القواعد والمفردات لمعرفة مستواك التقديري وفق الإطار الأوروبي (CEFR) والمسار الأكاديمي الموصى به.",
+      "sourceHash": "56ad72ca",
+      "reviewed": false
+    },
+    "onlineTest.progress": {
+      "value": "السؤال {current} من {total}",
+      "sourceHash": "d9e19ee5",
+      "reviewed": false
+    },
+    "onlineTest.previous": {
+      "value": "السابق",
+      "sourceHash": "dd1f775e",
+      "reviewed": false
+    },
+    "onlineTest.next": {
+      "value": "السؤال التالي",
+      "sourceHash": "caf05a4c",
+      "reviewed": false
+    },
+    "onlineTest.getResults": {
+      "value": "عرض نتيجة التقييم",
+      "sourceHash": "4d0291f0",
+      "reviewed": false
+    },
+    "onlineTest.score": {
+      "value": "النتيجة",
+      "sourceHash": "5dd135d1",
+      "reviewed": false
+    },
+    "onlineTest.complete": {
+      "value": "اكتمل التقييم",
+      "sourceHash": "5b0e7759",
+      "reviewed": false
+    },
+    "onlineTest.estimatedLevel": {
+      "value": "المستوى التقديري:",
+      "sourceHash": "7885d996",
+      "reviewed": false
+    },
+    "onlineTest.recommendedForYou": {
+      "value": "موصى به لك",
+      "sourceHash": "dd6aba38",
+      "reviewed": false
+    },
+    "onlineTest.whatsappCta": {
+      "value": "💬 إرسال النتيجة عبر واتساب إلى القبول",
+      "sourceHash": "fdb52033",
+      "reviewed": false
+    },
+    "onlineTest.whatsappMessage": {
+      "value": "مرحباً بايلينجوال آيدول! أكملت اختبار تحديد المستوى المجاني عبر الإنترنت. نتيجتي هي {score}/{total} ({level}). أود حجز تقييم رسمي.",
+      "sourceHash": "c494f040",
+      "reviewed": false
+    },
+    "onlineTest.closeLabel": {
+      "value": "إغلاق اختبار تحديد المستوى",
+      "sourceHash": "37948cca",
+      "reviewed": false
+    },
+    "onlineTest.bookClass": {
+      "value": "احجز صفك الدراسي",
+      "sourceHash": "4c514b08",
+      "reviewed": false
+    },
+    "onlineTest.disclaimer": {
+      "value": "* ملاحظة: هذا التقييم السريع عبر الإنترنت يوفر تقديراً أولياً. يتم تأكيد تحديد المستوى الرسمي لتوزيع الفصول حضورياً في بافيليون إمباسي أو عبر اختبار زووم مباشر مع هيئتنا التدريسية الأكاديمية.",
+      "sourceHash": "966fc276",
+      "reviewed": false
+    },
+    "category.english": {
+      "value": "الإنجليزية",
+      "sourceHash": "78463a38",
+      "reviewed": false
+    },
+    "category.kids": {
+      "value": "الأطفال",
+      "sourceHash": "eb73ee66",
+      "reviewed": false
+    },
+    "category.professional": {
+      "value": "احترافي",
+      "sourceHash": "9e8b1602",
+      "reviewed": false
+    },
+    "category.worldLanguages": {
+      "value": "اللغات العالمية",
+      "sourceHash": "b393c6a5",
+      "reviewed": false
+    },
+    "languageName.english": {
+      "value": "الإنجليزية",
+      "sourceHash": "78463a38",
+      "reviewed": false
+    },
+    "languageName.bahasaMelayu": {
+      "value": "البهاسا الملايوية",
+      "sourceHash": "0339d3bb",
+      "reviewed": true
+    },
+    "languageName.mandarin": {
+      "value": "الماندرين",
+      "sourceHash": "76c06512",
+      "reviewed": true
+    },
+    "languageName.arabic": {
+      "value": "العربية",
+      "sourceHash": "272ccb85",
+      "reviewed": false
+    },
+    "languageName.japanese": {
+      "value": "اليابانية",
+      "sourceHash": "f32ced6a",
+      "reviewed": false
+    },
+    "languageName.korean": {
+      "value": "الكورية",
+      "sourceHash": "d0bdb3cd",
+      "reviewed": false
+    },
+    "newsCategory.announcement": {
+      "value": "إعلان",
+      "sourceHash": "feb4d2df",
+      "reviewed": false
+    },
+    "newsCategory.event": {
+      "value": "فعالية",
+      "sourceHash": "a4ecfc70",
+      "reviewed": false
+    },
+    "newsCategory.holiday": {
+      "value": "عطلة",
+      "sourceHash": "84b8343a",
+      "reviewed": false
+    },
+    "promo.buttonLabel": {
+      "value": "عرض العروض النشطة",
+      "sourceHash": "d6045519",
+      "reviewed": false
+    },
+    "promo.badge": {
+      "value": "عرض حصري",
+      "sourceHash": "bc38fded",
+      "reviewed": false
+    },
+    "promo.off": {
+      "value": "الخصم ساري",
+      "sourceHash": "41d3e77a",
+      "reviewed": false
+    },
+    "promo.codeLabel": {
+      "value": "رمز الخصم",
+      "sourceHash": "d69e2085",
+      "reviewed": false
+    },
+    "promo.copyCode": {
+      "value": "نسخ الرمز",
+      "sourceHash": "d0562a57",
+      "reviewed": false
+    },
+    "promo.dismiss": {
+      "value": "ربما لاحقاً",
+      "sourceHash": "91b27835",
+      "reviewed": false
+    },
+    "promo.discountPercent": {
+      "value": "خصم {percent}%",
+      "sourceHash": "9a578ac4",
+      "reviewed": false
+    },
+    "promo.discountActive": {
+      "value": "{discount} الخصم ساري",
+      "sourceHash": "51c8f525",
+      "reviewed": false
+    },
+    "bookingModal.title": {
+      "value": "حجز استشارة أكاديمية واختبار مستوى في المقر",
+      "sourceHash": "91f48bda",
+      "reviewed": false
+    },
+    "bookingModal.subtitle": {
+      "value": "قابل مستشارنا الأكاديمي في بافيليون إمباسي، كوالالمبور للحصول على خطة دراسية مخصصة.",
+      "sourceHash": "b8574755",
+      "reviewed": false
+    },
+    "bookingModal.selectDate": {
+      "value": "اختر التاريخ المفضل *",
+      "sourceHash": "4897de59",
+      "reviewed": false
+    },
+    "bookingModal.selectTime": {
+      "value": "اختر الوقت المفضل *",
+      "sourceHash": "5750d050",
+      "reviewed": false
+    },
+    "bookingModal.consultationReason": {
+      "value": "هدف الاستشارة *",
+      "sourceHash": "68c7827a",
+      "reviewed": false
+    },
+    "bookingModal.bookBtn": {
+      "value": "تأكيد موعد الزيارة",
+      "sourceHash": "fa8a575b",
+      "reviewed": false
+    },
+    "bookingModal.successTitle": {
+      "value": "تم تأكيد موعدك بنجاح!",
+      "sourceHash": "2b5745cc",
+      "reviewed": false
+    },
+    "bookingModal.successDesc": {
+      "value": "قام فريق القبول بحجز موعدك. أرسلنا تفاصيل الموعد إلى وسيلة التواصل الخاصة بك.",
+      "sourceHash": "3a0d4349",
+      "reviewed": false
+    },
+    "chat.widgetTitle": {
+      "value": "مساعد القبول والتسجيل",
+      "sourceHash": "3f62cca1",
+      "reviewed": false
+    },
+    "chat.welcome": {
+      "value": "أهلاً بك! مرحباً بك في مركز بايلينجوال آيدول للغات في بافيليون إمباسي. كيف يمكنني مساعدتك اليوم؟",
+      "sourceHash": "04699e6e",
+      "reviewed": false
+    },
+    "chat.placeholder": {
+      "value": "اسأل عن الدورات، الآيلتس، الرسوم، المواعيد...",
+      "sourceHash": "e90b02bf",
+      "reviewed": false
+    },
+    "chat.send": {
+      "value": "إرسال",
+      "sourceHash": "94966d90",
+      "reviewed": false
+    }
   },
-  "login.passwordLabel": "كلمة المرور",
-  "login.passwordPlaceholder": "أدخل كلمة المرور",
-  "login.showPassword": "إظهار كلمة المرور",
-  "login.hidePassword": "إخفاء كلمة المرور",
-  "login.submitButton": "تسجيل الدخول",
-  "login.signingIn": "جارٍ تسجيل الدخول...",
-  "login.helpTitle": "هل تحتاج إلى حساب؟",
-  "login.helpText": "سجّل الدخول باستخدام حسابك nickname@bilc.my وكلمة المرور. تواصل مع إدارة المركز إذا احتجت إلى بيانات الدخول.",
-  "userDashboard.welcome": "أهلاً بك",
-  "userDashboard.roleStudent": "حساب طالب",
-  "userDashboard.roleTeacher": "حساب معلم",
-  "userDashboard.roleMember": "حساب عضو",
-  "userDashboard.subtitle": "حسابك جاهز. ستظهر المعلومات المخصصة لدورك هنا بمجرد نشرها من قبل إدارة المركز.",
-  "userDashboard.nextStepTitle": "البحث عن برنامج تعليمي",
-  "userDashboard.nextStepText": "استعرض البرامج المتاحة حالياً أو تواصل مع إدارة المركز لمساعدتك في اختيار المسار الأفضل.",
-  "userDashboard.nextStepButton": "استعراض البرامج",
-  "userDashboard.attendanceTitle": "سجل الحضور والغياب",
-  "userDashboard.attendanceLoading": "سجل الحضور: جارٍ التحميل",
-  "userDashboard.attendanceLoadingText": "يتم تجهيز ملخص حضورك الأخير.",
-  "userDashboard.attendanceScore": "نسبة الحضور: {percentage}%",
-  "userDashboard.attendanceScoreText": "تم حضور {attended} من أصل {total} حصة مسجلة. يشمل الحضور علامات التأخير والحضور المنتظم.",
-  "userDashboard.attendanceNotAvailable": "بيانات الحضور غير متوفرة بعد.",
-  "userDashboard.attendanceNotAvailableText": "ستظهر نسبة حضورك تلقائياً بعد أن يقوم المركز بتسجيل الحصص المكتملة لحسابك.",
-  "userDashboard.signOut": "تسجيل الخروج",
-  "userDashboard.preparing": "جاري تجهيز مساحة العمل",
-  "userDashboard.preparingText": "يرجى الانتظار بينما يتم التحقق من صلاحيات حسابك.",
-  "form.studentName": "اسم الطالب الثلاثي *",
-  "form.studentNamePlaceholder": "مثال: أحمد عبد الله",
-  "form.studentAge": "عمر الطالب *",
-  "form.studentAgePlaceholder": "مثال: 16",
-  "form.parentName": "اسم ولي الأمر / الوصي *",
-  "form.parentNamePlaceholder": "مثال: عبد الله محمد",
-  "form.parentEmail": "البريد الإلكتروني للتواصل *",
-  "form.parentEmailPlaceholder": {
-    "value": "name@example.com",
-    "__TODO__": true
-  },
-  "form.parentPhone": "رقم الهاتف (مع مفتاح الدولة) *",
-  "form.parentPhonePlaceholder": "+966 50 123 4567",
-  "form.programInterest": "البرنامج المطلوب *",
-  "form.selectProgram": "اختر البرنامج...",
-  "form.preferredSchedule": "الموعد والجدول المفضل *",
-  "form.selectSchedule": "اختر الموعد...",
-  "form.weekdayMorning": "الفترة الصباحية خلال الأسبوع (9:00 ص - 12:00 م)",
-  "form.weekdayAfternoon": "فترة بعد الظهر خلال الأسبوع (2:00 م - 5:00 م)",
-  "form.weekdayEvening": "الفترة المسائية خلال الأسبوع (6:30 م - 9:00 م)",
-  "form.weekendIntensive": "مكثف نهاية الأسبوع (السبت والأحد)",
-  "form.flexiblePrivate": "دروس خاصة مرنة 1-على-1",
-  "form.message": "تفاصيل أو أهداف إضافية",
-  "form.messagePlaceholder": "أخبرنا عن مستواك الحالي، الخطة الزمنية أو أي متطلبات خاصة...",
-  "form.submitEnquiry": "إرسال الاستفسار",
-  "form.sending": "جارٍ الإرسال...",
-  "form.successTitle": "شكراً لك — تم استلام بياناتك بنجاح.",
-  "form.successText": "سيتواصل معك فريق القبول لدينا خلال 24 ساعة لمناقشة أفضل خطوة تالية لمسيرتك التعليمية.",
-  "form.submitAnother": "إرسال استفسار آخر",
-  "form.kicker": "تواصل معنا",
-  "form.stepInfo": "بيانات الطالب",
-  "form.stepTrack": "المسار الدراسي",
-  "form.stepContact": "ولي الأمر والتواصل",
-  "placementModal.title": "تقييم اللغة الإنجليزية المجاني عبر الإنترنت (3 دقائق)",
-  "placementModal.subtitle": "أجب عن 8 أسئلة سريعة لتحديد مستواك وفق الإطار الأوروبي المشترك (CEFR) والحصول على توصية بالدورة المناسبة.",
-  "placementModal.questionNumber": "السؤال {current} من {total}",
-  "placementModal.completeBtn": "عرض تقييمي والمسار الموصى به",
-  "placementModal.resultTitle": "نتيجة تقييم مستواك في اللغة الإنجليزية",
-  "placementModal.yourLevel": "المستوى التقديري (CEFR)",
-  "placementModal.diagnosticScore": "الدرجة التشخيصية: {score}/8 ({pct}%)",
-  "placementModal.recommendedCourse": "المسار التعليمي الموصى به:",
-  "placementModal.enrollWithScore": "التسجيل بهذه النتيجة",
-  "placementModal.retake": "إعادة الاختبار",
-  "bookingModal.title": "حجز استشارة أكاديمية واختبار مستوى في المقر",
-  "bookingModal.subtitle": "قابل مستشارنا الأكاديمي في بافيليون إمباسي، كوالالمبور للحصول على خطة دراسية مخصصة.",
-  "bookingModal.selectDate": "اختر التاريخ المفضل *",
-  "bookingModal.selectTime": "اختر الوقت المفضل *",
-  "bookingModal.consultationReason": "هدف الاستشارة *",
-  "bookingModal.bookBtn": "تأكيد موعد الزيارة",
-  "bookingModal.successTitle": "تم تأكيد موعدك بنجاح!",
-  "bookingModal.successDesc": "قام فريق القبول بحجز موعدك. أرسلنا تفاصيل الموعد إلى وسيلة التواصل الخاصة بك.",
-  "chat.widgetTitle": "مساعد القبول والتسجيل",
-  "chat.welcome": "أهلاً بك! مرحباً بك في مركز بايلينجوال آيدول للغات في بافيليون إمباسي. كيف يمكنني مساعدتك اليوم؟",
-  "chat.placeholder": "اسأل عن الدورات، الآيلتس، الرسوم، المواعيد...",
-  "chat.send": "إرسال"
+  "seed": {
+    "programs": {
+      "general-english": {
+        "title": {
+          "value": "الإنجليزية العامة",
+          "sourceHash": "ecc38a00",
+          "reviewed": false
+        },
+        "description": {
+          "value": "ابن ثقة يومية عبر التحدث، والاستماع، والقراءة، والكتابة من خلال التعلم العملي والتفاعلي.",
+          "sourceHash": "39bbfa62",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المبتدئ إلى المتقدم",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "kids-english": {
+        "title": {
+          "value": "الأطفال الإنجليزية",
+          "sourceHash": "bdd54a47",
+          "reviewed": false
+        },
+        "description": {
+          "value": "أساس مرح وداعم للمتعلمين الصغار لتنمية لغتهم الإنجليزية من خلال التواصل والممارسة الموجهة.",
+          "sourceHash": "2c160fe2",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "الأبناء",
+          "sourceHash": "64e4aca4",
+          "reviewed": false
+        },
+        "level": {
+          "value": "الأساس إلى التطوير",
+          "sourceHash": "26472e8a",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة تعلم طفلك",
+          "sourceHash": "4efd5890",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "speaking-conversation": {
+        "title": {
+          "value": "التحدث والحوار",
+          "sourceHash": "e4ef63f1",
+          "reviewed": false
+        },
+        "description": {
+          "value": "برنامج يركز على التحدث أولا للمتعلمين الذين يريدون أن تبدو كلماتهم طبيعية وواضحة وجاهزة للحياة اليومية.",
+          "sourceHash": "98148347",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من الابتدائي إلى المتقدم",
+          "sourceHash": "15f6ce94",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "ielts-preparation": {
+        "title": {
+          "value": "IELTS التحضير",
+          "sourceHash": "9692a9a5",
+          "reviewed": false
+        },
+        "description": {
+          "value": "إعداد مركز للمتعلمين الذين يخططون لإثبات إتقانهم للغة الإنجليزية للدراسة أو العمل أو الهجرة.",
+          "sourceHash": "ace5939f",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "المستوى المتوسط وما فوق",
+          "sourceHash": "e34cebf1",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول أهداف امتحانك",
+          "sourceHash": "f4ee056c",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "bahasa-melayu": {
+        "title": {
+          "value": "الماليزية",
+          "sourceHash": "0339d3bb",
+          "reviewed": true
+        },
+        "description": {
+          "value": "تواصل بثقة أكبر مع الحياة في ماليزيا من خلال تعلم اللغة الميلايو المنظم باللغة البهاسا.",
+          "sourceHash": "ec633926",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المبتدئ إلى المتقدم",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "mandarin": {
+        "title": {
+          "value": "الماندرين",
+          "sourceHash": "76c06512",
+          "reviewed": true
+        },
+        "description": {
+          "value": "مسار واضح للتعلم في اللغة الماندرين يدعم التواصل، ومهارات الاستماع، والتقدم الهادف.",
+          "sourceHash": "f2b71591",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "الأطفال والمراهقون والبالغون",
+          "sourceHash": "14a34e89",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المبتدئ إلى المتقدم",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "arabic": {
+        "title": {
+          "value": "العربية",
+          "sourceHash": "272ccb85",
+          "reviewed": false
+        },
+        "description": {
+          "value": "تعلم العربية من خلال ممارسة موجهة تدعم التواصل الهادف والتقدم المستمر.",
+          "sourceHash": "41c1e3f6",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المبتدئ إلى المتقدم",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "japanese": {
+        "title": {
+          "value": "ياباني",
+          "sourceHash": "f32ced6a",
+          "reviewed": false
+        },
+        "description": {
+          "value": "ابدأ رحلتك في اللغة اليابانية ببرنامج سهل المنال ومنظم الوتيرة يتناسب مع احتياجاتك.",
+          "sourceHash": "d9053f08",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المبتدئ إلى التطوير",
+          "sourceHash": "43d0ab34",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "korean": {
+        "title": {
+          "value": "الكورية",
+          "sourceHash": "d0bdb3cd",
+          "reviewed": false
+        },
+        "description": {
+          "value": "تعلم الكورية في بيئة داعمة تجعل المفردات والتعبيرات الجديدة تبدو قابلة للتحقيق.",
+          "sourceHash": "56799fa2",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المراهقون والبالغون",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المبتدئ إلى التطوير",
+          "sourceHash": "43d0ab34",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصمم حول خطة التعلم الخاصة بك",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "business-english": {
+        "title": {
+          "value": "الإنجليزية التجارية",
+          "sourceHash": "66a33006",
+          "reviewed": false
+        },
+        "description": {
+          "value": "صقل التواصل المهني للاجتماعات، والعروض، والمراسلات، وأماكن العمل الدولية.",
+          "sourceHash": "d411a764",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "المحترفون",
+          "sourceHash": "06b4423e",
+          "reviewed": false
+        },
+        "level": {
+          "value": "من المتوسط إلى المتقدم",
+          "sourceHash": "7942e1cc",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "مصممة حول احتياجات مكان العمل",
+          "sourceHash": "82795ca5",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "تم التأكيد من المركز بعد التشاور",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "إرشادات الرسوم متاحة عند الاستفسار",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      }
+    },
+    "news": {
+      "bilc-grand-redesign-transforming-language-learning": {
+        "title": {
+          "value": "Bilingual Idol إعادة تصميم مركز اللغات: تحويل تعلم اللغة",
+          "sourceHash": "8953befd",
+          "reviewed": false
+        },
+        "excerpt": {
+          "value": "استكشف مساحاتنا المصممة حديثا، وبرامجنا التفاعلية، وإطار التعلم الحديث الذي يعيد تعريف طلاقة اللغة الثنائية.",
+          "sourceHash": "3cb32cb8",
+          "reviewed": false
+        },
+        "body": {
+          "value": "نحن متحمسون للغاية للكشف رسميا عن تجربة مركز لغات Bilingual Idol الجديد المصقول للغاية! بصفتنا مؤسسة رائدة مكرسة لتعزيز الطلاقة اللغوية في الإنجليزية، وبهاسا ميلايو، والماندرين، والعربية، واليابانية، والكورية، وغيرها، فإن إعادة تصميمنا تجلب نسمة هواء منعش إلى حرمنا الجامعي، وحضورنا الرقمي، وفصولنا الدراسية التفاعلية. \n\n### ما الجديد في Bilingual Idol؟ \n\n* **مساحات التعلم المميزة**: تم إعادة تصميم فصولنا بالكامل بمقاعد مرنة، وتقنيات تعلم حديثة، ووسائل بصرية ملهمة لإبقائك مندمغا. \n* **البرامج التفاعلية**: قمنا بتحسين منهجنا ليشمل أساليب تفاعلية تعتمد على الحوار أولا، ودوائر حديثة، وسيناريوهات واقعية. \n* **المركز الرقمي وبوابات الطلاب الحية**: تقديم تكاملات رقمية متقدمة للطلاب والمعلمين لتنسيق الجداول، وتقديم الواجبات، وتتبع التقدم بسلاسة. \n\n### رفع رحلتك الثنائية اللغة\nسواء كنت مبتدئا يبحث عن خطواته الأولى في اللغة اليابانية أو العربية، أو محترفا يسعى لتحسين درجتك IELTS، فإن Bilingual Idol تقدم دعما مخصصا وبيئات مجموعات صغيرة لضمان تقدمك السريع والثابت. \n\nندعوك بحرارة لاستكشاف موقعنا الجديد، والتواصل مع فريقنا الاستشاري الودود، أو زيارة مركزنا الطبي لجولة شخصية. تبدأ رحلتك نحو الثقة القصوى والطلاقة العالمية اليوم!",
+          "sourceHash": "86643b39",
+          "reviewed": false
+        },
+        "imageAltText": {
+          "value": "الداخل الحديث للفصول الدراسية وبيئة جذابة في مركز Bilingual Idol للغات",
+          "sourceHash": "5a575204",
+          "reviewed": false
+        }
+      }
+    },
+    "promo": {
+      "MERDEKA2026": {
+        "title": {
+          "value": "خصم ميرديكا الخاص",
+          "sourceHash": "d937bdda",
+          "reviewed": false
+        },
+        "description": {
+          "value": "احصل على خصم 15٪ على جميع برامج اللغة الإنجليزية العامة لفترة محدودة للاحتفال بشهر الاستقلال!",
+          "sourceHash": "6f26e364",
+          "reviewed": false
+        }
+      },
+      "WELCOME50": {
+        "title": {
+          "value": "مرحبا بعرض الطالب الجديد",
+          "sourceHash": "6df46781",
+          "reviewed": false
+        },
+        "description": {
+          "value": "احصل على خصم ثابت قدره 50 رينجيت ماليزي على رسوم التسجيل والتقييم لأي مقرر مختار.",
+          "sourceHash": "79eef383",
+          "reviewed": false
+        }
+      }
+    },
+    "settings": {
+      "promo_title": {
+        "value": "عرض ترويجي خاص",
+        "sourceHash": "2b2cdc5f",
+        "reviewed": false
+      },
+      "promo_text": {
+        "value": "احصل على وصول حصري لجميع برامج اللغات الأكاديمية ثنائية اللغة مع خصم محدود على القبول! قدم الآن واستلم باقة المبتدئين للطلاب.",
+        "sourceHash": "d2853158",
+        "reviewed": false
+      },
+      "promo_cta_text": {
+        "value": "عرض البرامج",
+        "sourceHash": "1b142959",
+        "reviewed": false
+      },
+      "promo_discount": {
+        "value": "خصم 15٪",
+        "sourceHash": "21885ff4",
+        "reviewed": false
+      },
+      "cta.apply_now.text": {
+        "value": "قدم الآن",
+        "sourceHash": "739dda5d",
+        "reviewed": false
+      },
+      "cta.placement_test.text": {
+        "value": "اختبار تحديد مكان الكتاب",
+        "sourceHash": "bd3e12d3",
+        "reviewed": false
+      },
+      "cta.book_visit.text": {
+        "value": "احجز زيارة للحرم الجامعي",
+        "sourceHash": "48b20321",
+        "reviewed": false
+      },
+      "cta.consultation.text": {
+        "value": "طلب الاستشارة",
+        "sourceHash": "cba12d6c",
+        "reviewed": false
+      }
+    },
+    "faq": {},
+    "cms": {}
+  }
 }

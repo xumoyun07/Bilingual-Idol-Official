@@ -265,6 +265,34 @@ export interface TranslationDictionary {
     signOut: string;
     preparing: string;
     preparingText: string;
+    /** Раньше ключа не было, а дефолтный текст передавался в t() вторым
+     *  аргументом (params вместо fallback) — на экран попадал сам ключ. */
+    placeholderText: string;
+    /** Единая строка приветствия: запятая и точка задаются переводом,
+     *  а не подставляются в JSX. */
+    greeting: string;
+  };
+  /** Роли пользователей для бейджей и чипов статуса. */
+  role: {
+    student: string;
+    teacher: string;
+    marketing: string;
+    admin: string;
+    superAdmin: string;
+    founder: string;
+    user: string;
+  };
+  account: {
+    /** Один параметризованный ключ вместо склейки "{role} Account". */
+    status: string;
+  };
+  /** Оболочка дашборда: сайдбар, топбар, служебные подписи. */
+  shell: {
+    myDashboard: string;
+    toggleSidebar: string;
+    attendancePending: string;
+    studentPortal: string;
+    learningCentreAdmin: string;
   };
   form: {
     studentName: string;
@@ -325,6 +353,60 @@ export interface TranslationDictionary {
     welcome: string;
     placeholder: string;
     send: string;
+  };
+  /** Обрамление онлайн-теста (OnlinePlacementTestModal). Сами вопросы и варианты
+   *  остаются английскими — тест измеряет английскую грамматику. */
+  onlineTest: {
+    badge: string;
+    title: string;
+    description: string;
+    progress: string;
+    previous: string;
+    next: string;
+    getResults: string;
+    score: string;
+    complete: string;
+    estimatedLevel: string;
+    recommendedForYou: string;
+    whatsappCta: string;
+    whatsappMessage: string;
+    closeLabel: string;
+    bookClass: string;
+    disclaimer: string;
+  };
+  /** Подписи технических enum-значений из БД. Сами значения остаются сырыми
+   *  для логики и фильтров — переводится только то, что видит пользователь. */
+  category: {
+    english: string;
+    kids: string;
+    professional: string;
+    worldLanguages: string;
+  };
+  languageName: {
+    english: string;
+    bahasaMelayu: string;
+    mandarin: string;
+    arabic: string;
+    japanese: string;
+    korean: string;
+  };
+  newsCategory: {
+    announcement: string;
+    event: string;
+    holiday: string;
+  };
+  /** Промо-окно и плавающий бейдж. Раньше эти ключи отсутствовали, и текст
+   *  держался только на динамическом переводчике — теперь заданы явно. */
+  promo: {
+    buttonLabel: string;
+    badge: string;
+    off: string;
+    codeLabel: string;
+    copyCode: string;
+    dismiss: string;
+    discountPercent: string;
+    /** Единая строка подзаголовка вместо конкатенации "{discount} " + t("promo.off") */
+    discountActive: string;
   };
 }
 
@@ -594,6 +676,27 @@ export const translations: Record<Language, TranslationDictionary> = {
       signOut: "Sign out",
       preparing: "Preparing your workspace",
       preparingText: "Please wait while your account access is confirmed.",
+      placeholderText: "Your dashboard is fully active and ready for future academic content.",
+      greeting: "Welcome, {name}.",
+    },
+    role: {
+      student: "Student",
+      teacher: "Teacher",
+      marketing: "Marketing",
+      admin: "Admin",
+      superAdmin: "Super Admin",
+      founder: "Founder",
+      user: "User",
+    },
+    account: {
+      status: "{role} Account",
+    },
+    shell: {
+      myDashboard: "My Dashboard",
+      toggleSidebar: "Toggle Sidebar",
+      attendancePending: "Attendance is not available yet.",
+      studentPortal: "Student Portal",
+      learningCentreAdmin: "Learning Centre Admin",
     },
     form: {
       studentName: "Student full name *",
@@ -638,6 +741,53 @@ export const translations: Record<Language, TranslationDictionary> = {
       recommendedCourse: "Recommended Course Track:",
       enrollWithScore: "Enroll with this score",
       retake: "Retake test",
+    },
+    onlineTest: {
+      badge: "Free Online Placement Test · Fast Evaluation",
+      title: "Quick English Level Evaluator",
+      description: "Answer 5 quick grammar & vocabulary questions to see your estimated CEFR level and recommended study pathway.",
+      progress: "Question {current} of {total}",
+      previous: "Previous",
+      next: "Next Question",
+      getResults: "Get Evaluation Results",
+      score: "Score",
+      complete: "Evaluation Complete",
+      estimatedLevel: "Estimated Level:",
+      recommendedForYou: "Recommended For You",
+      whatsappCta: "💬 WhatsApp Results to Admissions",
+      whatsappMessage: "Hello Bilingual Idol! I completed your free Online Placement Test. My score is {score}/{total} ({level}). I'd like to book my official evaluation.",
+      closeLabel: "Close Placement Test",
+      bookClass: "Book Your Class",
+      disclaimer: "* Note: This quick online evaluation provides an initial estimate. Official placement for class allocation is verified in person at Pavilion Embassy or via live Zoom test with our academic faculty.",
+    },
+    category: {
+      english: "English",
+      kids: "Kids",
+      professional: "Professional",
+      worldLanguages: "World Languages",
+    },
+    languageName: {
+      english: "English",
+      bahasaMelayu: "Bahasa Melayu",
+      mandarin: "Mandarin",
+      arabic: "Arabic",
+      japanese: "Japanese",
+      korean: "Korean",
+    },
+    newsCategory: {
+      announcement: "Announcement",
+      event: "Event",
+      holiday: "Holiday",
+    },
+    promo: {
+      buttonLabel: "Show Active Promotions",
+      badge: "EXCLUSIVE OFFER",
+      off: "Discount Active",
+      codeLabel: "PROMO CODE",
+      copyCode: "Copy Code",
+      dismiss: "Maybe Later",
+      discountPercent: "{percent}% OFF",
+      discountActive: "{discount} — offer active",
     },
     bookingModal: {
       title: "Book a Campus Consultation & Level Audit",
@@ -921,6 +1071,27 @@ export const translations: Record<Language, TranslationDictionary> = {
       signOut: "Log keluar",
       preparing: "Menyediakan ruang kerja anda",
       preparingText: "Sila tunggu sebentar sementara akses akaun anda disahkan.",
+      placeholderText: "Papan pemuka anda telah aktif sepenuhnya dan sedia untuk kandungan akademik akan datang.",
+      greeting: "Selamat kembali, {name}.",
+    },
+    role: {
+      student: "Pelajar",
+      teacher: "Guru",
+      marketing: "Pemasaran",
+      admin: "Pentadbir",
+      superAdmin: "Pentadbir Utama",
+      founder: "Pengasas",
+      user: "Pengguna",
+    },
+    account: {
+      status: "Akaun {role}",
+    },
+    shell: {
+      myDashboard: "Papan Pemuka Saya",
+      toggleSidebar: "Tukar Bar Sisi",
+      attendancePending: "Kehadiran belum tersedia lagi.",
+      studentPortal: "Portal Pelajar",
+      learningCentreAdmin: "Pentadbir Pusat Pembelajaran",
     },
     form: {
       studentName: "Nama penuh pelajar *",
@@ -965,6 +1136,53 @@ export const translations: Record<Language, TranslationDictionary> = {
       recommendedCourse: "Laluan Kursus Disyorkan:",
       enrollWithScore: "Daftar dengan skor ini",
       retake: "Ambil semula ujian",
+    },
+    onlineTest: {
+      badge: "Ujian Penempatan Dalam Talian Percuma",
+      title: "Penilai Tahap Bahasa Inggeris Pantas",
+      description: "Jawab 5 soalan tatabahasa & perbendaharaan kata untuk melihat anggaran tahap CEFR dan laluan pengajian yang disyorkan.",
+      progress: "Soalan {current} daripada {total}",
+      previous: "Sebelumnya",
+      next: "Soalan Seterusnya",
+      getResults: "Dapatkan Keputusan",
+      score: "Skor",
+      complete: "Penilaian Selesai",
+      estimatedLevel: "Anggaran Tahap:",
+      recommendedForYou: "Disyorkan Untuk Anda",
+      whatsappCta: "💬 Hantar Keputusan ke WhatsApp Kemasukan",
+      whatsappMessage: "Salam Bilingual Idol! Saya telah melengkapkan Ujian Penempatan dalam talian. Skor saya ialah {score}/{total} ({level}). Saya ingin menempah sesi penilaian rasmi.",
+      closeLabel: "Tutup Ujian Penempatan",
+      bookClass: "Tempah Kelas Anda",
+      disclaimer: "* Nota: Penilaian pantas dalam talian ini memberikan anggaran awal. Penempatan rasmi untuk peruntukan kelas disahkan secara bersemuka di Pavilion Embassy atau melalui ujian Zoom bersama fakulti akademik kami.",
+    },
+    category: {
+      english: "Bahasa Inggeris",
+      kids: "Kanak-kanak",
+      professional: "Profesional",
+      worldLanguages: "Bahasa Dunia",
+    },
+    languageName: {
+      english: "Bahasa Inggeris",
+      bahasaMelayu: "Bahasa Melayu",
+      mandarin: "Mandarin",
+      arabic: "Arab",
+      japanese: "Jepun",
+      korean: "Korea",
+    },
+    newsCategory: {
+      announcement: "Pengumuman",
+      event: "Acara",
+      holiday: "Cuti",
+    },
+    promo: {
+      buttonLabel: "Tunjukkan Promosi Aktif",
+      badge: "TAWARAN EKSKLUSIF",
+      off: "Diskaun Aktif",
+      codeLabel: "KOD PROMO",
+      copyCode: "Salin Kod",
+      dismiss: "Mungkin Nanti",
+      discountPercent: "Diskaun {percent}%",
+      discountActive: "{discount} — tawaran aktif",
     },
     bookingModal: {
       title: "Tempah Perundingan Kampus & Audit Tahap",
@@ -1248,6 +1466,27 @@ export const translations: Record<Language, TranslationDictionary> = {
       signOut: "تسجيل الخروج",
       preparing: "جاري تجهيز مساحة العمل",
       preparingText: "يرجى الانتظار بينما يتم التحقق من صلاحيات حسابك.",
+      placeholderText: "لوحة التحكم الخاصة بك جاهزة تماماً للمحتوى الأكاديمي القادم.",
+      greeting: "أهلاً بك، {name}.",
+    },
+    role: {
+      student: "طالب",
+      teacher: "معلّم",
+      marketing: "التسويق",
+      admin: "مسؤول",
+      superAdmin: "المسؤول الأعلى",
+      founder: "المؤسس",
+      user: "مستخدم",
+    },
+    account: {
+      status: "حساب {role}",
+    },
+    shell: {
+      myDashboard: "لوحتي",
+      toggleSidebar: "إظهار الشريط الجانبي",
+      attendancePending: "سجل الحضور غير متاح بعد.",
+      studentPortal: "بوابة الطالب",
+      learningCentreAdmin: "إدارة المركز التعليمي",
     },
     form: {
       studentName: "اسم الطالب الثلاثي *",
@@ -1292,6 +1531,53 @@ export const translations: Record<Language, TranslationDictionary> = {
       recommendedCourse: "المسار التعليمي الموصى به:",
       enrollWithScore: "التسجيل بهذه النتيجة",
       retake: "إعادة الاختبار",
+    },
+    onlineTest: {
+      badge: "اختبار تحديد المستوى المجاني عبر الإنترنت",
+      title: "مقياس مستوى اللغة الإنجليزية السريع",
+      description: "أجب عن 5 أسئلة سريعة في القواعد والمفردات لمعرفة مستواك التقديري وفق الإطار الأوروبي (CEFR) والمسار الأكاديمي الموصى به.",
+      progress: "السؤال {current} من {total}",
+      previous: "السابق",
+      next: "السؤال التالي",
+      getResults: "عرض نتيجة التقييم",
+      score: "النتيجة",
+      complete: "اكتمل التقييم",
+      estimatedLevel: "المستوى التقديري:",
+      recommendedForYou: "موصى به لك",
+      whatsappCta: "💬 إرسال النتيجة عبر واتساب إلى القبول",
+      whatsappMessage: "مرحباً بايلينجوال آيدول! أكملت اختبار تحديد المستوى المجاني عبر الإنترنت. نتيجتي هي {score}/{total} ({level}). أود حجز تقييم رسمي.",
+      closeLabel: "إغلاق اختبار تحديد المستوى",
+      bookClass: "احجز صفك الدراسي",
+      disclaimer: "* ملاحظة: هذا التقييم السريع عبر الإنترنت يوفر تقديراً أولياً. يتم تأكيد تحديد المستوى الرسمي لتوزيع الفصول حضورياً في بافيليون إمباسي أو عبر اختبار زووم مباشر مع هيئتنا التدريسية الأكاديمية.",
+    },
+    category: {
+      english: "الإنجليزية",
+      kids: "الأطفال",
+      professional: "احترافي",
+      worldLanguages: "اللغات العالمية",
+    },
+    languageName: {
+      english: "الإنجليزية",
+      bahasaMelayu: "البهاسا الملايوية",
+      mandarin: "الماندرين",
+      arabic: "العربية",
+      japanese: "اليابانية",
+      korean: "الكورية",
+    },
+    newsCategory: {
+      announcement: "إعلان",
+      event: "فعالية",
+      holiday: "عطلة",
+    },
+    promo: {
+      buttonLabel: "عرض العروض النشطة",
+      badge: "عرض حصري",
+      off: "الخصم ساري",
+      codeLabel: "رمز الخصم",
+      copyCode: "نسخ الرمز",
+      dismiss: "ربما لاحقاً",
+      discountPercent: "خصم {percent}%",
+      discountActive: "{discount} — العرض ساري",
     },
     bookingModal: {
       title: "حجز استشارة أكاديمية واختبار مستوى في المقر",

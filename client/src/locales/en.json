@@ -1,0 +1,2448 @@
+{
+  "ui": {
+    "nav.home": {
+      "value": "Home",
+      "sourceHash": "8cf04a97",
+      "reviewed": true
+    },
+    "nav.about": {
+      "value": "About",
+      "sourceHash": "8f7f4c1c",
+      "reviewed": true
+    },
+    "nav.programs": {
+      "value": "Programmes",
+      "sourceHash": "b9ad95ed",
+      "reviewed": true
+    },
+    "nav.news": {
+      "value": "News",
+      "sourceHash": "dd1ba187",
+      "reviewed": true
+    },
+    "nav.contact": {
+      "value": "Contact",
+      "sourceHash": "bbaff128",
+      "reviewed": true
+    },
+    "nav.makeEnquiry": {
+      "value": "Make an enquiry",
+      "sourceHash": "03f1e936",
+      "reviewed": true
+    },
+    "nav.signIn": {
+      "value": "Sign in",
+      "sourceHash": "b6d4223e",
+      "reviewed": true
+    },
+    "nav.signOut": {
+      "value": "Sign out",
+      "sourceHash": "c87aacf5",
+      "reviewed": true
+    },
+    "nav.skipToContent": {
+      "value": "Skip to content",
+      "sourceHash": "b58273f2",
+      "reviewed": true
+    },
+    "nav.menu": {
+      "value": "Menu",
+      "sourceHash": "b6154120",
+      "reviewed": true
+    },
+    "nav.close": {
+      "value": "Close",
+      "sourceHash": "d3d2e617",
+      "reviewed": true
+    },
+    "nav.workspace": {
+      "value": "Workspace",
+      "sourceHash": "03a21915",
+      "reviewed": true
+    },
+    "nav.accountActive": {
+      "value": "Account active",
+      "sourceHash": "2e68e5a8",
+      "reviewed": true
+    },
+    "nav.myClasses": {
+      "value": "My classes",
+      "sourceHash": "183b8339",
+      "reviewed": true
+    },
+    "nav.overview": {
+      "value": "Overview",
+      "sourceHash": "3b878279",
+      "reviewed": true
+    },
+    "nav.users": {
+      "value": "Users",
+      "sourceHash": "f9aae5fd",
+      "reviewed": true
+    },
+    "nav.students": {
+      "value": "Students",
+      "sourceHash": "aba064f8",
+      "reviewed": true
+    },
+    "nav.media": {
+      "value": "Media",
+      "sourceHash": "3b563524",
+      "reviewed": true
+    },
+    "nav.auditLogs": {
+      "value": "Audit logs",
+      "sourceHash": "85400d27",
+      "reviewed": true
+    },
+    "nav.switchLanguage": {
+      "value": "Language",
+      "sourceHash": "4994a8ff",
+      "reviewed": true
+    },
+    "nav.contactUs": {
+      "value": "Contact us",
+      "sourceHash": "02d4482d",
+      "reviewed": true
+    },
+    "nav.enrollNow": {
+      "value": "Enroll now",
+      "sourceHash": "e3b2ff6d",
+      "reviewed": true
+    },
+    "nav.bookTour": {
+      "value": "Book Campus Tour",
+      "sourceHash": "7f301d66",
+      "reviewed": true
+    },
+    "footer.centreName": {
+      "value": "Bilingual Idol Language Centre",
+      "sourceHash": "57a62f3a",
+      "reviewed": true
+    },
+    "footer.location": {
+      "value": "Pavilion Embassy, Kuala Lumpur",
+      "sourceHash": "dfd78557",
+      "reviewed": true
+    },
+    "footer.brandSubtitle": {
+      "value": "Language Centre",
+      "sourceHash": "bf9f13e5",
+      "reviewed": true
+    },
+    "footer.allRightsReserved": {
+      "value": "All rights reserved",
+      "sourceHash": "5db707f7",
+      "reviewed": true
+    },
+    "common.call": {
+      "value": "Call",
+      "sourceHash": "c3755e61",
+      "reviewed": true
+    },
+    "common.whatsapp": {
+      "value": "WhatsApp",
+      "sourceHash": "8b777ebc",
+      "reviewed": true
+    },
+    "common.email": {
+      "value": "Email",
+      "sourceHash": "ce8ae9da",
+      "reviewed": true
+    },
+    "common.openingHours": {
+      "value": "Opening hours",
+      "sourceHash": "80a0c205",
+      "reviewed": true
+    },
+    "common.backToHome": {
+      "value": "Back to home",
+      "sourceHash": "6110e369",
+      "reviewed": true
+    },
+    "common.viewDetails": {
+      "value": "View details",
+      "sourceHash": "6e978337",
+      "reviewed": true
+    },
+    "common.readMore": {
+      "value": "Read article",
+      "sourceHash": "3c6262b6",
+      "reviewed": true
+    },
+    "common.learnMore": {
+      "value": "Learn more",
+      "sourceHash": "d59048f2",
+      "reviewed": true
+    },
+    "common.submit": {
+      "value": "Submit",
+      "sourceHash": "a4d3b161",
+      "reviewed": true
+    },
+    "common.loading": {
+      "value": "Loading...",
+      "sourceHash": "8524de96",
+      "reviewed": true
+    },
+    "common.filter": {
+      "value": "Filter",
+      "sourceHash": "d7778d0c",
+      "reviewed": true
+    },
+    "common.all": {
+      "value": "All",
+      "sourceHash": "b1c94ca2",
+      "reviewed": true
+    },
+    "common.search": {
+      "value": "Search",
+      "sourceHash": "13348442",
+      "reviewed": true
+    },
+    "common.thankYou": {
+      "value": "Thank you",
+      "sourceHash": "7a7c46aa",
+      "reviewed": true
+    },
+    "common.close": {
+      "value": "Close",
+      "sourceHash": "d3d2e617",
+      "reviewed": true
+    },
+    "common.requiredFields": {
+      "value": "Fields marked with an asterisk are required.",
+      "sourceHash": "54672197",
+      "reviewed": true
+    },
+    "common.viewProgrammes": {
+      "value": "View programmes",
+      "sourceHash": "54db3622",
+      "reviewed": true
+    },
+    "common.cancel": {
+      "value": "Cancel",
+      "sourceHash": "ea478870",
+      "reviewed": true
+    },
+    "common.next": {
+      "value": "Next",
+      "sourceHash": "10ac3d04",
+      "reviewed": true
+    },
+    "common.prev": {
+      "value": "Back",
+      "sourceHash": "0557fa92",
+      "reviewed": true
+    },
+    "common.step": {
+      "value": "Step",
+      "sourceHash": "48c7c41b",
+      "reviewed": true
+    },
+    "common.sendMessage": {
+      "value": "Send enquiry",
+      "sourceHash": "61a5c5eb",
+      "reviewed": true
+    },
+    "common.location": {
+      "value": "Location",
+      "sourceHash": "ce5bf551",
+      "reviewed": true
+    },
+    "common.addressText": {
+      "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur.",
+      "sourceHash": "e92f61e4",
+      "reviewed": true
+    },
+    "home.eyebrow": {
+      "value": "2026 Academic Season · Pavilion Embassy, KL",
+      "sourceHash": "21d3f3e3",
+      "reviewed": true
+    },
+    "home.heroTitle": {
+      "value": "Bilingual Idol Language Centre",
+      "sourceHash": "57a62f3a",
+      "reviewed": true
+    },
+    "home.heroSubtitle": {
+      "value": "Structured language programmes, international IELTS preparation and immersive world language pathways at Pavilion Embassy, Kuala Lumpur.",
+      "sourceHash": "0556fa8f",
+      "reviewed": true
+    },
+    "home.ctaFindCourse": {
+      "value": "Find your course",
+      "sourceHash": "d1f73a13",
+      "reviewed": true
+    },
+    "home.ctaEnquiry": {
+      "value": "Make an enquiry",
+      "sourceHash": "03f1e936",
+      "reviewed": true
+    },
+    "home.ctaPlacement": {
+      "value": "Free placement test",
+      "sourceHash": "6e1fc7e6",
+      "reviewed": true
+    },
+    "home.ctaBooking": {
+      "value": "Book consultation",
+      "sourceHash": "49a10f52",
+      "reviewed": true
+    },
+    "home.taskPlacementTitle": {
+      "value": "Online placement test",
+      "sourceHash": "ea2e1ea2",
+      "reviewed": true
+    },
+    "home.taskPlacementDesc": {
+      "value": "Evaluate your level in 3 minutes with instant score and course recommendation.",
+      "sourceHash": "29bdd454",
+      "reviewed": true
+    },
+    "home.taskConsultationTitle": {
+      "value": "Book a consultation",
+      "sourceHash": "3402c556",
+      "reviewed": true
+    },
+    "home.taskConsultationDesc": {
+      "value": "Schedule a private tour and 1-on-1 language roadmap session at Pavilion Embassy.",
+      "sourceHash": "8604dde2",
+      "reviewed": true
+    },
+    "home.taskProgramsTitle": {
+      "value": "Browse 2026 programmes",
+      "sourceHash": "42ad52b7",
+      "reviewed": true
+    },
+    "home.taskProgramsDesc": {
+      "value": "General English, IELTS, Summer Camp, Corporate & World Languages.",
+      "sourceHash": "01db7fc6",
+      "reviewed": true
+    },
+    "home.taskContactTitle": {
+      "value": "Speak with an advisor",
+      "sourceHash": "724492b4",
+      "reviewed": true
+    },
+    "home.taskContactDesc": {
+      "value": "WhatsApp or call our admissions team directly for personalized guidance.",
+      "sourceHash": "16882d8c",
+      "reviewed": true
+    },
+    "home.pricingEyebrow": {
+      "value": "Official 2026 Tuition",
+      "sourceHash": "e3b5b750",
+      "reviewed": true
+    },
+    "home.pricingTitle": {
+      "value": "Accredited Academic Programmes",
+      "sourceHash": "2ead2678",
+      "reviewed": true
+    },
+    "home.pricingSubtitle": {
+      "value": "Explore our structured certified courses. Contact admissions for group enrolments, customized timetables and active intake promotions.",
+      "sourceHash": "bb8e5a00",
+      "reviewed": true
+    },
+    "home.pricingTabGeneral": {
+      "value": "General English",
+      "sourceHash": "ecc38a00",
+      "reviewed": true
+    },
+    "home.pricingTabIelts": {
+      "value": "IELTS Prep",
+      "sourceHash": "f6dc473c",
+      "reviewed": true
+    },
+    "home.pricingTabCamps": {
+      "value": "Holiday Camps",
+      "sourceHash": "9fbbe6dd",
+      "reviewed": true
+    },
+    "home.pricingTabPrivate": {
+      "value": "1-on-1 Private",
+      "sourceHash": "145c80f2",
+      "reviewed": true
+    },
+    "home.pricingTabExecutive": {
+      "value": "Corporate & Executive",
+      "sourceHash": "8e57bfeb",
+      "reviewed": true
+    },
+    "home.pricingTabWorld": {
+      "value": "World Languages",
+      "sourceHash": "b393c6a5",
+      "reviewed": true
+    },
+    "home.startHereEyebrow": {
+      "value": "Start here",
+      "sourceHash": "8b6db1ec",
+      "reviewed": true
+    },
+    "home.startHereTitle": {
+      "value": "Choose your pathway to fluency.",
+      "sourceHash": "73699bd0",
+      "reviewed": true
+    },
+    "home.startHereDesc": {
+      "value": "Explore accredited courses, book a campus consultation, or access your active student account.",
+      "sourceHash": "d68a3278",
+      "reviewed": true
+    },
+    "home.admissionsTag": {
+      "value": "Admissions",
+      "sourceHash": "fff3e55e",
+      "reviewed": true
+    },
+    "home.taskPortalTitle": {
+      "value": "Student & Staff Portal",
+      "sourceHash": "18acf850",
+      "reviewed": true
+    },
+    "home.taskPortalDesc": {
+      "value": "Sign in to view class timetables, attendance records, study resources, and grades.",
+      "sourceHash": "35bae672",
+      "reviewed": true
+    },
+    "home.facilitiesEyebrow": {
+      "value": "Campus Facilities",
+      "sourceHash": "569db595",
+      "reviewed": true
+    },
+    "home.facilitiesTitle": {
+      "value": "Modern Learning Spaces at Pavilion Embassy",
+      "sourceHash": "ed6600d2",
+      "reviewed": true
+    },
+    "home.facilitiesSubtitle": {
+      "value": "Experience our state-of-the-art multimedia classrooms, executive lounges, private study suites, and student breakout zones.",
+      "sourceHash": "9935a39c",
+      "reviewed": true
+    },
+    "home.journeyEyebrow": {
+      "value": "Student Journey",
+      "sourceHash": "dea18be7",
+      "reviewed": true
+    },
+    "home.journeyTitle": {
+      "value": "From First Enquiry to Language Fluency",
+      "sourceHash": "b2c0cca6",
+      "reviewed": true
+    },
+    "home.journeySubtitle": {
+      "value": "A structured 5-stage roadmap designed for rapid language acquisition, cultural immersion, and certified progression.",
+      "sourceHash": "3381b10b",
+      "reviewed": true
+    },
+    "home.testimonialsEyebrow": {
+      "value": "Student Stories",
+      "sourceHash": "336e09f8",
+      "reviewed": true
+    },
+    "home.testimonialsTitle": {
+      "value": "What Our Learners Say",
+      "sourceHash": "0af93cb6",
+      "reviewed": true
+    },
+    "home.testimonialsSubtitle": {
+      "value": "Real feedback from international students, professionals, and parents who studied at Bilingual Idol.",
+      "sourceHash": "61b3af61",
+      "reviewed": true
+    },
+    "home.contactStripTitle": {
+      "value": "Ready to start your language journey?",
+      "sourceHash": "00be4420",
+      "reviewed": true
+    },
+    "home.contactStripSubtitle": {
+      "value": "Visit our campus at Pavilion Embassy, Ampang or speak with an education consultant today.",
+      "sourceHash": "de553de6",
+      "reviewed": true
+    },
+    "home.contactStripButton": {
+      "value": "Contact admissions",
+      "sourceHash": "2a9f7ad3",
+      "reviewed": true
+    },
+    "home.languageBandTitle": {
+      "value": "World Languages Offered",
+      "sourceHash": "711d8f56",
+      "reviewed": true
+    },
+    "home.languageBandSubtitle": {
+      "value": "English, Bahasa Melayu, Mandarin, Arabic, Japanese and Korean taught by dedicated language specialists.",
+      "sourceHash": "bd5a7cad",
+      "reviewed": true
+    },
+    "about.eyebrow": {
+      "value": "About",
+      "sourceHash": "8f7f4c1c",
+      "reviewed": true
+    },
+    "about.heroTitle": {
+      "value": "Language learning built around clear progress.",
+      "sourceHash": "6abfa2b1",
+      "reviewed": true
+    },
+    "about.heroSubtitle": {
+      "value": "Bilingual Idol Language Centre supports learners in Kuala Lumpur with language pathways, consultation and a focus on confident communication.",
+      "sourceHash": "c969ef51",
+      "reviewed": true
+    },
+    "about.storyEyebrow": {
+      "value": "A considered start",
+      "sourceHash": "ab920abc",
+      "reviewed": true
+    },
+    "about.storyTitle": {
+      "value": "What the centre supports",
+      "sourceHash": "311a9915",
+      "reviewed": true
+    },
+    "about.storyBody": {
+      "value": "The centre describes a learning environment with interactive classrooms, digital learning resources, placement guidance and personalised language routes.",
+      "sourceHash": "ac8c0f39",
+      "reviewed": true
+    },
+    "about.explorePrograms": {
+      "value": "Explore programmes",
+      "sourceHash": "4b561635",
+      "reviewed": true
+    },
+    "about.approachEyebrow": {
+      "value": "Learning approach",
+      "sourceHash": "8fd17cb1",
+      "reviewed": true
+    },
+    "about.approachTitle": {
+      "value": "How learning is supported",
+      "sourceHash": "03657eab",
+      "reviewed": true
+    },
+    "about.approachSubtitle": {
+      "value": "Clear next steps, active practice and steady confidence-building shape the centre’s public learning approach.",
+      "sourceHash": "c262d720",
+      "reviewed": true
+    },
+    "about.approach1Title": {
+      "value": "Start with the learner’s goal",
+      "sourceHash": "59580ee1",
+      "reviewed": true
+    },
+    "about.approach1Body": {
+      "value": "Consultation and placement guidance help identify an appropriate language route before enrolment.",
+      "sourceHash": "e52a882c",
+      "reviewed": true
+    },
+    "about.approach2Title": {
+      "value": "Practise actively",
+      "sourceHash": "c74e6993",
+      "reviewed": true
+    },
+    "about.approach2Body": {
+      "value": "The centre describes interactive learning supported by digital classroom tools and guided practice.",
+      "sourceHash": "18eee3eb",
+      "reviewed": true
+    },
+    "about.approach3Title": {
+      "value": "Build confidence steadily",
+      "sourceHash": "7ac8715e",
+      "reviewed": true
+    },
+    "about.approach3Body": {
+      "value": "Learning pathways are designed around language development, cultural awareness and practical communication.",
+      "sourceHash": "f93de579",
+      "reviewed": true
+    },
+    "about.communityEyebrow": {
+      "value": "People and practice",
+      "sourceHash": "526ad7c2",
+      "reviewed": true
+    },
+    "about.communityTitle": {
+      "value": "A place to keep moving forward",
+      "sourceHash": "2ab54d31",
+      "reviewed": true
+    },
+    "about.communityCaption": {
+      "value": "Language grows through meaningful exchange and shared practice.",
+      "sourceHash": "42af180d",
+      "reviewed": true
+    },
+    "about.teamEyebrow": {
+      "value": "Advisory & Teaching",
+      "sourceHash": "642d91cc",
+      "reviewed": true
+    },
+    "about.teamTitle": {
+      "value": "Qualified instructors dedicated to your growth",
+      "sourceHash": "fcc8ed5f",
+      "reviewed": true
+    },
+    "about.teamSubtitle": {
+      "value": "Our faculty combines certified international credentials, communicative pedagogy, and dedicated mentorship.",
+      "sourceHash": "4d266101",
+      "reviewed": true
+    },
+    "programs.eyebrow": {
+      "value": "Programmes",
+      "sourceHash": "b9ad95ed",
+      "reviewed": true
+    },
+    "programs.heroTitle": {
+      "value": "Find a programme that fits the learner.",
+      "sourceHash": "ff0047d0",
+      "reviewed": true
+    },
+    "programs.heroSubtitle": {
+      "value": "Explore the published 2026 course guide, then contact the centre to confirm suitability, availability and intake schedules.",
+      "sourceHash": "45acb221",
+      "reviewed": true
+    },
+    "programs.guideEyebrow": {
+      "value": "2026 fee guide",
+      "sourceHash": "1995be43",
+      "reviewed": true
+    },
+    "programs.guideTitle": {
+      "value": "Published course options",
+      "sourceHash": "107bb3df",
+      "reviewed": true
+    },
+    "programs.guideSubtitle": {
+      "value": "Fees are guidance from the 2026 list. Confirm the current total, visa requirements and intake with the centre before enrolment.",
+      "sourceHash": "181afbe6",
+      "reviewed": true
+    },
+    "programs.feeGuideEyebrow": {
+      "value": "Course Structure & Fees",
+      "sourceHash": "d01bd510",
+      "reviewed": true
+    },
+    "programs.feeGuideTitle": {
+      "value": "Published 2026 Programme Guide",
+      "sourceHash": "09de748b",
+      "reviewed": true
+    },
+    "programs.feeGuideSubtitle": {
+      "value": "Explore certified language programmes designed for international students, kids, teens, and professionals.",
+      "sourceHash": "386e0ced",
+      "reviewed": true
+    },
+    "programs.searchPlaceholder": {
+      "value": "Search by language, level or learner group",
+      "sourceHash": "a09a67f6",
+      "reviewed": true
+    },
+    "programs.filterLabel": {
+      "value": "Filter",
+      "sourceHash": "d7778d0c",
+      "reviewed": true
+    },
+    "programs.filterAll": {
+      "value": "All Categories",
+      "sourceHash": "a6a2a55b",
+      "reviewed": true
+    },
+    "programs.countShown": {
+      "value": "{count} confirmed programme(s) shown",
+      "sourceHash": "8ff06a7a",
+      "reviewed": true
+    },
+    "programs.showingCount": {
+      "value": "programme(s) available",
+      "sourceHash": "5226d7d0",
+      "reviewed": true
+    },
+    "programs.noMatches": {
+      "value": "No programmes match the current search. Try changing the category or search keywords.",
+      "sourceHash": "dd6484f2",
+      "reviewed": true
+    },
+    "programs.emptyText": {
+      "value": "No programmes found matching your search criteria.",
+      "sourceHash": "2d0f67ab",
+      "reviewed": true
+    },
+    "programs.emptyCta": {
+      "value": "Contact us for customised course options",
+      "sourceHash": "496a8f2e",
+      "reviewed": true
+    },
+    "programs.viewDetails": {
+      "value": "View programme details",
+      "sourceHash": "c6311b5c",
+      "reviewed": true
+    },
+    "programs.catAll": {
+      "value": "All",
+      "sourceHash": "b1c94ca2",
+      "reviewed": true
+    },
+    "programs.catKids": {
+      "value": "Kids",
+      "sourceHash": "eb73ee66",
+      "reviewed": true
+    },
+    "programs.catEnglish": {
+      "value": "English",
+      "sourceHash": "78463a38",
+      "reviewed": true
+    },
+    "programs.catWorldLanguages": {
+      "value": "World Languages",
+      "sourceHash": "b393c6a5",
+      "reviewed": true
+    },
+    "programs.catProfessional": {
+      "value": "Professional",
+      "sourceHash": "9e8b1602",
+      "reviewed": true
+    },
+    "programDetail.backLink": {
+      "value": "Back to programmes",
+      "sourceHash": "60508e2d",
+      "reviewed": true
+    },
+    "programDetail.overviewEyebrow": {
+      "value": "Programme overview",
+      "sourceHash": "466dd5c0",
+      "reviewed": true
+    },
+    "programDetail.duration": {
+      "value": "Duration",
+      "sourceHash": "e02d2ae0",
+      "reviewed": true
+    },
+    "programDetail.schedule": {
+      "value": "Schedule",
+      "sourceHash": "25f73472",
+      "reviewed": true
+    },
+    "programDetail.fees": {
+      "value": "Fees",
+      "sourceHash": "006300ef",
+      "reviewed": true
+    },
+    "programDetail.level": {
+      "value": "Level",
+      "sourceHash": "a0db49ba",
+      "reviewed": true
+    },
+    "programDetail.ageGroup": {
+      "value": "Target Group",
+      "sourceHash": "1f6a4e9b",
+      "reviewed": true
+    },
+    "programDetail.outcomesTitle": {
+      "value": "Key Learning Outcomes",
+      "sourceHash": "da420a67",
+      "reviewed": true
+    },
+    "programDetail.ctaTitle": {
+      "value": "Interested in this programme?",
+      "sourceHash": "7f9f1f7a",
+      "reviewed": true
+    },
+    "programDetail.ctaSubtitle": {
+      "value": "Submit a learning enquiry to check current availability and discuss your placement.",
+      "sourceHash": "f7ccc364",
+      "reviewed": true
+    },
+    "programDetail.ctaButton": {
+      "value": "Make an enquiry",
+      "sourceHash": "03f1e936",
+      "reviewed": true
+    },
+    "contact.eyebrow": {
+      "value": "Contact",
+      "sourceHash": "bbaff128",
+      "reviewed": true
+    },
+    "contact.heroTitle": {
+      "value": "Get in touch with the centre.",
+      "sourceHash": "32e0db28",
+      "reviewed": true
+    },
+    "contact.heroSubtitle": {
+      "value": "Choose the contact method that works best for you, or send a short enquiry below.",
+      "sourceHash": "68ac39ff",
+      "reviewed": true
+    },
+    "contact.call": {
+      "value": "Call",
+      "sourceHash": "c3755e61",
+      "reviewed": true
+    },
+    "contact.whatsapp": {
+      "value": "WhatsApp",
+      "sourceHash": "8b777ebc",
+      "reviewed": true
+    },
+    "contact.whatsappValue": {
+      "value": "Message the centre",
+      "sourceHash": "b23f30e1",
+      "reviewed": true
+    },
+    "contact.email": {
+      "value": "Email",
+      "sourceHash": "ce8ae9da",
+      "reviewed": true
+    },
+    "contact.hours": {
+      "value": "Opening hours",
+      "sourceHash": "80a0c205",
+      "reviewed": true
+    },
+    "contact.openingHours": {
+      "value": "Monday – Sunday: 9:00 AM – 9:00 PM",
+      "sourceHash": "39f29d7b",
+      "reviewed": true
+    },
+    "contact.address": {
+      "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur.",
+      "sourceHash": "e92f61e4",
+      "reviewed": true
+    },
+    "contact.addressText": {
+      "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia.",
+      "sourceHash": "ac70f47f",
+      "reviewed": true
+    },
+    "contact.formEyebrow": {
+      "value": "Send an enquiry",
+      "sourceHash": "6beffcc3",
+      "reviewed": true
+    },
+    "contact.formTitle": {
+      "value": "Tell us what the learner needs.",
+      "sourceHash": "9bc2ccb4",
+      "reviewed": true
+    },
+    "contact.formSubtitle": {
+      "value": "A short description of the learner’s language goal and preferred timing is enough to begin.",
+      "sourceHash": "efa02180",
+      "reviewed": true
+    },
+    "contact.formCardTitle": {
+      "value": "Your enquiry",
+      "sourceHash": "2078a6e9",
+      "reviewed": true
+    },
+    "contact.submitButton": {
+      "value": "Send enquiry",
+      "sourceHash": "61a5c5eb",
+      "reviewed": true
+    },
+    "enroll.backLink": {
+      "value": "Back to home",
+      "sourceHash": "6110e369",
+      "reviewed": true
+    },
+    "enroll.eyebrow": {
+      "value": "Learning enquiry",
+      "sourceHash": "bcfb3883",
+      "reviewed": true
+    },
+    "enroll.heroTitle": {
+      "value": "Tell the centre about the learner.",
+      "sourceHash": "1cd743b5",
+      "reviewed": true
+    },
+    "enroll.heroSubtitle": {
+      "value": "Submit the details you already know. An enquiry does not commit you to a course.",
+      "sourceHash": "ea5150de",
+      "reviewed": true
+    },
+    "enroll.nextStepsTitle": {
+      "value": "What happens next",
+      "sourceHash": "a273f1bc",
+      "reviewed": true
+    },
+    "enroll.step1": {
+      "value": "The centre reviews the learner’s language goal and current stage.",
+      "sourceHash": "6dfbe60e",
+      "reviewed": true
+    },
+    "enroll.step2": {
+      "value": "The centre can recommend a relevant next step or ask a follow-up question.",
+      "sourceHash": "f14768e9",
+      "reviewed": true
+    },
+    "enroll.step3": {
+      "value": "Your information is handled by authorised centre staff.",
+      "sourceHash": "55f0ea9d",
+      "reviewed": true
+    },
+    "enroll.formEyebrow": {
+      "value": "Learner details",
+      "sourceHash": "3078d791",
+      "reviewed": true
+    },
+    "enroll.formTitle": {
+      "value": "Tell us what the learner needs.",
+      "sourceHash": "9bc2ccb4",
+      "reviewed": true
+    },
+    "enroll.formSubtitle": {
+      "value": "A short description of the learner’s language goal and preferred timing is enough to begin.",
+      "sourceHash": "efa02180",
+      "reviewed": true
+    },
+    "enroll.studentNameLabel": {
+      "value": "Student Name *",
+      "sourceHash": "24a50e0b",
+      "reviewed": true
+    },
+    "enroll.studentNamePlaceholder": {
+      "value": "e.g. Sara Lee",
+      "sourceHash": "a372f852",
+      "reviewed": true
+    },
+    "enroll.studentAgeLabel": {
+      "value": "Student Age *",
+      "sourceHash": "402ee026",
+      "reviewed": true
+    },
+    "enroll.studentAgePlaceholder": {
+      "value": "e.g. 16",
+      "sourceHash": "21a76ec8",
+      "reviewed": true
+    },
+    "enroll.programLabel": {
+      "value": "Programme of Interest *",
+      "sourceHash": "df535e7a",
+      "reviewed": true
+    },
+    "enroll.programPlaceholder": {
+      "value": "Select a programme...",
+      "sourceHash": "3d36a278",
+      "reviewed": true
+    },
+    "enroll.scheduleLabel": {
+      "value": "Preferred Schedule *",
+      "sourceHash": "b6c54d80",
+      "reviewed": true
+    },
+    "enroll.schedulePlaceholder": {
+      "value": "Select preferred timing...",
+      "sourceHash": "8dfb38bb",
+      "reviewed": true
+    },
+    "enroll.parentNameLabel": {
+      "value": "Parent / Guardian Name *",
+      "sourceHash": "f34ac7c9",
+      "reviewed": true
+    },
+    "enroll.parentNamePlaceholder": {
+      "value": "e.g. David Lee",
+      "sourceHash": "57ee97ca",
+      "reviewed": true
+    },
+    "enroll.emailLabel": {
+      "value": "Email Address *",
+      "sourceHash": "2baf1487",
+      "reviewed": true
+    },
+    "enroll.emailPlaceholder": {
+      "value": "e.g. guardian@example.com",
+      "sourceHash": "6e6c43bc",
+      "reviewed": true
+    },
+    "enroll.phoneLabel": {
+      "value": "Phone / WhatsApp Number *",
+      "sourceHash": "a6000211",
+      "reviewed": true
+    },
+    "enroll.phonePlaceholder": {
+      "value": "e.g. +60 12-345 6789",
+      "sourceHash": "3c011b8b",
+      "reviewed": true
+    },
+    "enroll.messageLabel": {
+      "value": "Additional Notes or Questions",
+      "sourceHash": "90dfc9cd",
+      "reviewed": true
+    },
+    "enroll.messagePlaceholder": {
+      "value": "Share any language goals, current level, or special requirements...",
+      "sourceHash": "99060564",
+      "reviewed": true
+    },
+    "enroll.submitButton": {
+      "value": "Submit learning enquiry",
+      "sourceHash": "ffbd292b",
+      "reviewed": true
+    },
+    "enroll.requiredNote": {
+      "value": "Fields marked with an asterisk are required.",
+      "sourceHash": "54672197",
+      "reviewed": true
+    },
+    "enroll.successTitle": {
+      "value": "Enquiry Submitted Successfully",
+      "sourceHash": "e1a20036",
+      "reviewed": true
+    },
+    "enroll.successSubtitle": {
+      "value": "Thank you. Our academic counsellor will review the learner's requirements and contact you within 24 hours.",
+      "sourceHash": "8497eefd",
+      "reviewed": true
+    },
+    "enroll.submitAnother": {
+      "value": "Submit another enquiry",
+      "sourceHash": "c157cdcb",
+      "reviewed": true
+    },
+    "news.eyebrow": {
+      "value": "Updates & Notices",
+      "sourceHash": "0471bc5d",
+      "reviewed": true
+    },
+    "news.heroTitle": {
+      "value": "Centre news and announcements.",
+      "sourceHash": "41fd931f",
+      "reviewed": true
+    },
+    "news.heroSubtitle": {
+      "value": "Read recent notices, holiday schedules and academic updates from Bilingual Idol.",
+      "sourceHash": "d547e1d1",
+      "reviewed": true
+    },
+    "news.searchPlaceholder": {
+      "value": "Search news articles...",
+      "sourceHash": "b3874d6f",
+      "reviewed": true
+    },
+    "news.allCategories": {
+      "value": "All categories",
+      "sourceHash": "62f5d708",
+      "reviewed": true
+    },
+    "news.readMore": {
+      "value": "Read article",
+      "sourceHash": "3c6262b6",
+      "reviewed": true
+    },
+    "news.readUpdate": {
+      "value": "Read full update",
+      "sourceHash": "9f63675f",
+      "reviewed": true
+    },
+    "news.previous": {
+      "value": "Previous",
+      "sourceHash": "dd1f775e",
+      "reviewed": true
+    },
+    "news.next": {
+      "value": "Next",
+      "sourceHash": "10ac3d04",
+      "reviewed": true
+    },
+    "news.noUpdates": {
+      "value": "No announcements published yet.",
+      "sourceHash": "cc076580",
+      "reviewed": true
+    },
+    "news.noUpdatesText": {
+      "value": "Check back soon for academic calendar notices, workshops, and school events.",
+      "sourceHash": "c71eca79",
+      "reviewed": true
+    },
+    "login.eyebrow": {
+      "value": "Portal Access",
+      "sourceHash": "505340fc",
+      "reviewed": true
+    },
+    "login.heroTitle": {
+      "value": "Sign in to your account.",
+      "sourceHash": "9e869198",
+      "reviewed": true
+    },
+    "login.heroSubtitle": {
+      "value": "Access your dashboard, class schedules, and centre resources.",
+      "sourceHash": "5db92499",
+      "reviewed": true
+    },
+    "login.emailLabel": {
+      "value": "Login",
+      "sourceHash": "99dea780",
+      "reviewed": true
+    },
+    "login.emailPlaceholder": {
+      "value": "nickname@bilc.my",
+      "sourceHash": "63480603",
+      "reviewed": true
+    },
+    "login.passwordLabel": {
+      "value": "Password",
+      "sourceHash": "dc647eb6",
+      "reviewed": true
+    },
+    "login.passwordPlaceholder": {
+      "value": "Enter your password",
+      "sourceHash": "e8d28194",
+      "reviewed": true
+    },
+    "login.showPassword": {
+      "value": "Show password",
+      "sourceHash": "a1cc7ba8",
+      "reviewed": true
+    },
+    "login.hidePassword": {
+      "value": "Hide password",
+      "sourceHash": "3f5b7abc",
+      "reviewed": true
+    },
+    "login.submitButton": {
+      "value": "Sign in",
+      "sourceHash": "b6d4223e",
+      "reviewed": true
+    },
+    "login.signingIn": {
+      "value": "Signing in...",
+      "sourceHash": "4381b667",
+      "reviewed": true
+    },
+    "login.helpTitle": {
+      "value": "Need account access?",
+      "sourceHash": "03ebe524",
+      "reviewed": true
+    },
+    "login.helpText": {
+      "value": "Sign in using your assigned nickname@bilc.my credentials and password. Contact admissions if you need your account details.",
+      "sourceHash": "6bf8627a",
+      "reviewed": true
+    },
+    "userDashboard.welcome": {
+      "value": "Welcome",
+      "sourceHash": "83218ac3",
+      "reviewed": true
+    },
+    "userDashboard.roleStudent": {
+      "value": "Student account",
+      "sourceHash": "60e7aba1",
+      "reviewed": true
+    },
+    "userDashboard.roleTeacher": {
+      "value": "Teacher account",
+      "sourceHash": "9b247d4c",
+      "reviewed": true
+    },
+    "userDashboard.roleMember": {
+      "value": "Member account",
+      "sourceHash": "bd29eb3f",
+      "reviewed": true
+    },
+    "userDashboard.subtitle": {
+      "value": "Your account is ready. Information shared by the centre will appear here when it is available for your role.",
+      "sourceHash": "8227f1be",
+      "reviewed": true
+    },
+    "userDashboard.nextStepTitle": {
+      "value": "Find a programme",
+      "sourceHash": "f61cabad",
+      "reviewed": true
+    },
+    "userDashboard.nextStepText": {
+      "value": "Review the current programme information or contact the centre if you need help choosing the right option.",
+      "sourceHash": "43654ce5",
+      "reviewed": true
+    },
+    "userDashboard.nextStepButton": {
+      "value": "View programmes",
+      "sourceHash": "54db3622",
+      "reviewed": true
+    },
+    "userDashboard.attendanceTitle": {
+      "value": "Attendance information",
+      "sourceHash": "76efd780",
+      "reviewed": true
+    },
+    "userDashboard.attendanceLoading": {
+      "value": "Attendance: loading",
+      "sourceHash": "93d446f0",
+      "reviewed": true
+    },
+    "userDashboard.attendanceLoadingText": {
+      "value": "Your latest attendance summary is being prepared.",
+      "sourceHash": "8fe7200b",
+      "reviewed": true
+    },
+    "userDashboard.attendanceScore": {
+      "value": "Attendance: {percentage}%",
+      "sourceHash": "f9e63420",
+      "reviewed": true
+    },
+    "userDashboard.attendanceScoreText": {
+      "value": "{attended} of {total} completed sessions attended. Present and late marks count as attended.",
+      "sourceHash": "3b7a2a69",
+      "reviewed": true
+    },
+    "userDashboard.attendanceNotAvailable": {
+      "value": "Attendance is not available yet.",
+      "sourceHash": "611af932",
+      "reviewed": true
+    },
+    "userDashboard.attendanceNotAvailableText": {
+      "value": "Your attendance percentage will appear after the centre records completed sessions for your account.",
+      "sourceHash": "8c3843fc",
+      "reviewed": true
+    },
+    "userDashboard.signOut": {
+      "value": "Sign out",
+      "sourceHash": "c87aacf5",
+      "reviewed": true
+    },
+    "userDashboard.preparing": {
+      "value": "Preparing your workspace",
+      "sourceHash": "255a077b",
+      "reviewed": true
+    },
+    "userDashboard.preparingText": {
+      "value": "Please wait while your account access is confirmed.",
+      "sourceHash": "f178445c",
+      "reviewed": true
+    },
+    "userDashboard.placeholderText": {
+      "value": "Your dashboard is fully active and ready for future academic content.",
+      "sourceHash": "b2f5cac0",
+      "reviewed": true
+    },
+    "userDashboard.greeting": {
+      "value": "Welcome, {name}.",
+      "sourceHash": "03ef00d6",
+      "reviewed": true
+    },
+    "role.student": {
+      "value": "Student",
+      "sourceHash": "f5c0a1c9",
+      "reviewed": true
+    },
+    "role.teacher": {
+      "value": "Teacher",
+      "sourceHash": "8ab7bbdf",
+      "reviewed": true
+    },
+    "role.marketing": {
+      "value": "Marketing",
+      "sourceHash": "7cb15e41",
+      "reviewed": true
+    },
+    "role.admin": {
+      "value": "Admin",
+      "sourceHash": "e3afed00",
+      "reviewed": true
+    },
+    "role.superAdmin": {
+      "value": "Super Admin",
+      "sourceHash": "dbf36ff3",
+      "reviewed": true
+    },
+    "role.founder": {
+      "value": "Founder",
+      "sourceHash": "ad5b1a22",
+      "reviewed": true
+    },
+    "role.user": {
+      "value": "User",
+      "sourceHash": "8f9bfe9d",
+      "reviewed": true
+    },
+    "account.status": {
+      "value": "{role} Account",
+      "sourceHash": "3b1ad4fa",
+      "reviewed": true
+    },
+    "shell.myDashboard": {
+      "value": "My Dashboard",
+      "sourceHash": "cc9c45ed",
+      "reviewed": true
+    },
+    "shell.toggleSidebar": {
+      "value": "Toggle Sidebar",
+      "sourceHash": "7f8e313f",
+      "reviewed": true
+    },
+    "shell.attendancePending": {
+      "value": "Attendance is not available yet.",
+      "sourceHash": "611af932",
+      "reviewed": true
+    },
+    "shell.studentPortal": {
+      "value": "Student Portal",
+      "sourceHash": "57032670",
+      "reviewed": true
+    },
+    "shell.learningCentreAdmin": {
+      "value": "Learning Centre Admin",
+      "sourceHash": "91f59c22",
+      "reviewed": true
+    },
+    "form.studentName": {
+      "value": "Student full name *",
+      "sourceHash": "0cb0914b",
+      "reviewed": true
+    },
+    "form.studentNamePlaceholder": {
+      "value": "e.g. Sarah Tan",
+      "sourceHash": "ce5ae217",
+      "reviewed": true
+    },
+    "form.studentAge": {
+      "value": "Student age *",
+      "sourceHash": "f860db47",
+      "reviewed": true
+    },
+    "form.studentAgePlaceholder": {
+      "value": "e.g. 16",
+      "sourceHash": "21a76ec8",
+      "reviewed": true
+    },
+    "form.parentName": {
+      "value": "Parent / Guardian name *",
+      "sourceHash": "037874d3",
+      "reviewed": true
+    },
+    "form.parentNamePlaceholder": {
+      "value": "e.g. Michael Tan",
+      "sourceHash": "78f89cb9",
+      "reviewed": true
+    },
+    "form.parentEmail": {
+      "value": "Contact email *",
+      "sourceHash": "a71b9662",
+      "reviewed": true
+    },
+    "form.parentEmailPlaceholder": {
+      "value": "name@example.com",
+      "sourceHash": "a130ced3",
+      "reviewed": true
+    },
+    "form.parentPhone": {
+      "value": "Phone number (with country code) *",
+      "sourceHash": "34317617",
+      "reviewed": true
+    },
+    "form.parentPhonePlaceholder": {
+      "value": "+60 12 345 6789",
+      "sourceHash": "5a28e52e",
+      "reviewed": true
+    },
+    "form.programInterest": {
+      "value": "Interested programme *",
+      "sourceHash": "96a706b2",
+      "reviewed": true
+    },
+    "form.selectProgram": {
+      "value": "Select a programme...",
+      "sourceHash": "3d36a278",
+      "reviewed": true
+    },
+    "form.preferredSchedule": {
+      "value": "Preferred schedule *",
+      "sourceHash": "49930df2",
+      "reviewed": true
+    },
+    "form.selectSchedule": {
+      "value": "Select schedule...",
+      "sourceHash": "eac1d155",
+      "reviewed": true
+    },
+    "form.weekdayMorning": {
+      "value": "Weekday Mornings (9:00 AM - 12:00 PM)",
+      "sourceHash": "8b355e35",
+      "reviewed": true
+    },
+    "form.weekdayAfternoon": {
+      "value": "Weekday Afternoons (2:00 PM - 5:00 PM)",
+      "sourceHash": "9aa8cd80",
+      "reviewed": true
+    },
+    "form.weekdayEvening": {
+      "value": "Weekday Evenings (6:30 PM - 9:00 PM)",
+      "sourceHash": "d48c9918",
+      "reviewed": true
+    },
+    "form.weekendIntensive": {
+      "value": "Weekend Intensive (Sat/Sun)",
+      "sourceHash": "8e48d04d",
+      "reviewed": true
+    },
+    "form.flexiblePrivate": {
+      "value": "Flexible 1-on-1 Private Schedule",
+      "sourceHash": "39011325",
+      "reviewed": true
+    },
+    "form.message": {
+      "value": "Additional details or goals",
+      "sourceHash": "1ec3c40b",
+      "reviewed": true
+    },
+    "form.messagePlaceholder": {
+      "value": "Tell us about current language level, timeline or specific goals...",
+      "sourceHash": "0c50b4fb",
+      "reviewed": true
+    },
+    "form.submitEnquiry": {
+      "value": "Submit enquiry",
+      "sourceHash": "105625ae",
+      "reviewed": true
+    },
+    "form.sending": {
+      "value": "Submitting...",
+      "sourceHash": "f39bda51",
+      "reviewed": true
+    },
+    "form.successTitle": {
+      "value": "Thank you — we have your details.",
+      "sourceHash": "13ac8fd5",
+      "reviewed": true
+    },
+    "form.successText": {
+      "value": "Our admissions team will be in touch within 24 hours to discuss the next best step for your learner.",
+      "sourceHash": "28b0ad02",
+      "reviewed": true
+    },
+    "form.submitAnother": {
+      "value": "Submit another response",
+      "sourceHash": "eaf36858",
+      "reviewed": true
+    },
+    "form.kicker": {
+      "value": "Let’s talk",
+      "sourceHash": "cce862dd",
+      "reviewed": true
+    },
+    "form.stepInfo": {
+      "value": "Learner Info",
+      "sourceHash": "a5df11a7",
+      "reviewed": true
+    },
+    "form.stepTrack": {
+      "value": "Course Track",
+      "sourceHash": "48e15f17",
+      "reviewed": true
+    },
+    "form.stepContact": {
+      "value": "Guardian & Contact",
+      "sourceHash": "88d09ade",
+      "reviewed": true
+    },
+    "placementModal.title": {
+      "value": "Free 3-Minute Online English Evaluation",
+      "sourceHash": "9367f065",
+      "reviewed": true
+    },
+    "placementModal.subtitle": {
+      "value": "Answer 8 quick questions to determine your CEFR level (A1–C1) and get personalized course recommendations.",
+      "sourceHash": "b2164a9a",
+      "reviewed": true
+    },
+    "placementModal.questionNumber": {
+      "value": "Question {current} of {total}",
+      "sourceHash": "d9e19ee5",
+      "reviewed": true
+    },
+    "placementModal.completeBtn": {
+      "value": "See My Evaluation & Recommended Track",
+      "sourceHash": "b749b660",
+      "reviewed": true
+    },
+    "placementModal.resultTitle": {
+      "value": "Your CEFR English Assessment Result",
+      "sourceHash": "21487bc0",
+      "reviewed": true
+    },
+    "placementModal.yourLevel": {
+      "value": "Estimated CEFR Level",
+      "sourceHash": "e0e9a663",
+      "reviewed": true
+    },
+    "placementModal.diagnosticScore": {
+      "value": "Diagnostic Score: {score}/8 ({pct}%)",
+      "sourceHash": "6e71ad7f",
+      "reviewed": true
+    },
+    "placementModal.recommendedCourse": {
+      "value": "Recommended Course Track:",
+      "sourceHash": "0a398bfd",
+      "reviewed": true
+    },
+    "placementModal.enrollWithScore": {
+      "value": "Enroll with this score",
+      "sourceHash": "f60cf754",
+      "reviewed": true
+    },
+    "placementModal.retake": {
+      "value": "Retake test",
+      "sourceHash": "04f9c5dd",
+      "reviewed": true
+    },
+    "onlineTest.badge": {
+      "value": "Free Online Placement Test · Fast Evaluation",
+      "sourceHash": "6dd52e24",
+      "reviewed": true
+    },
+    "onlineTest.title": {
+      "value": "Quick English Level Evaluator",
+      "sourceHash": "19035f39",
+      "reviewed": true
+    },
+    "onlineTest.description": {
+      "value": "Answer 5 quick grammar & vocabulary questions to see your estimated CEFR level and recommended study pathway.",
+      "sourceHash": "56ad72ca",
+      "reviewed": true
+    },
+    "onlineTest.progress": {
+      "value": "Question {current} of {total}",
+      "sourceHash": "d9e19ee5",
+      "reviewed": true
+    },
+    "onlineTest.previous": {
+      "value": "Previous",
+      "sourceHash": "dd1f775e",
+      "reviewed": true
+    },
+    "onlineTest.next": {
+      "value": "Next Question",
+      "sourceHash": "caf05a4c",
+      "reviewed": true
+    },
+    "onlineTest.getResults": {
+      "value": "Get Evaluation Results",
+      "sourceHash": "4d0291f0",
+      "reviewed": true
+    },
+    "onlineTest.score": {
+      "value": "Score",
+      "sourceHash": "5dd135d1",
+      "reviewed": true
+    },
+    "onlineTest.complete": {
+      "value": "Evaluation Complete",
+      "sourceHash": "5b0e7759",
+      "reviewed": true
+    },
+    "onlineTest.estimatedLevel": {
+      "value": "Estimated Level:",
+      "sourceHash": "7885d996",
+      "reviewed": true
+    },
+    "onlineTest.recommendedForYou": {
+      "value": "Recommended For You",
+      "sourceHash": "dd6aba38",
+      "reviewed": true
+    },
+    "onlineTest.whatsappCta": {
+      "value": "💬 WhatsApp Results to Admissions",
+      "sourceHash": "fdb52033",
+      "reviewed": true
+    },
+    "onlineTest.whatsappMessage": {
+      "value": "Hello Bilingual Idol! I completed your free Online Placement Test. My score is {score}/{total} ({level}). I'd like to book my official evaluation.",
+      "sourceHash": "c494f040",
+      "reviewed": true
+    },
+    "onlineTest.closeLabel": {
+      "value": "Close Placement Test",
+      "sourceHash": "37948cca",
+      "reviewed": true
+    },
+    "onlineTest.bookClass": {
+      "value": "Book Your Class",
+      "sourceHash": "4c514b08",
+      "reviewed": true
+    },
+    "onlineTest.disclaimer": {
+      "value": "* Note: This quick online evaluation provides an initial estimate. Official placement for class allocation is verified in person at Pavilion Embassy or via live Zoom test with our academic faculty.",
+      "sourceHash": "966fc276",
+      "reviewed": true
+    },
+    "category.english": {
+      "value": "English",
+      "sourceHash": "78463a38",
+      "reviewed": true
+    },
+    "category.kids": {
+      "value": "Kids",
+      "sourceHash": "eb73ee66",
+      "reviewed": true
+    },
+    "category.professional": {
+      "value": "Professional",
+      "sourceHash": "9e8b1602",
+      "reviewed": true
+    },
+    "category.worldLanguages": {
+      "value": "World Languages",
+      "sourceHash": "b393c6a5",
+      "reviewed": true
+    },
+    "languageName.english": {
+      "value": "English",
+      "sourceHash": "78463a38",
+      "reviewed": true
+    },
+    "languageName.bahasaMelayu": {
+      "value": "Bahasa Melayu",
+      "sourceHash": "0339d3bb",
+      "reviewed": true
+    },
+    "languageName.mandarin": {
+      "value": "Mandarin",
+      "sourceHash": "76c06512",
+      "reviewed": true
+    },
+    "languageName.arabic": {
+      "value": "Arabic",
+      "sourceHash": "272ccb85",
+      "reviewed": true
+    },
+    "languageName.japanese": {
+      "value": "Japanese",
+      "sourceHash": "f32ced6a",
+      "reviewed": true
+    },
+    "languageName.korean": {
+      "value": "Korean",
+      "sourceHash": "d0bdb3cd",
+      "reviewed": true
+    },
+    "newsCategory.announcement": {
+      "value": "Announcement",
+      "sourceHash": "feb4d2df",
+      "reviewed": true
+    },
+    "newsCategory.event": {
+      "value": "Event",
+      "sourceHash": "a4ecfc70",
+      "reviewed": true
+    },
+    "newsCategory.holiday": {
+      "value": "Holiday",
+      "sourceHash": "84b8343a",
+      "reviewed": true
+    },
+    "promo.buttonLabel": {
+      "value": "Show Active Promotions",
+      "sourceHash": "d6045519",
+      "reviewed": true
+    },
+    "promo.badge": {
+      "value": "EXCLUSIVE OFFER",
+      "sourceHash": "bc38fded",
+      "reviewed": true
+    },
+    "promo.off": {
+      "value": "Discount Active",
+      "sourceHash": "41d3e77a",
+      "reviewed": true
+    },
+    "promo.codeLabel": {
+      "value": "PROMO CODE",
+      "sourceHash": "d69e2085",
+      "reviewed": true
+    },
+    "promo.copyCode": {
+      "value": "Copy Code",
+      "sourceHash": "d0562a57",
+      "reviewed": true
+    },
+    "promo.dismiss": {
+      "value": "Maybe Later",
+      "sourceHash": "91b27835",
+      "reviewed": true
+    },
+    "promo.discountPercent": {
+      "value": "{percent}% OFF",
+      "sourceHash": "9a578ac4",
+      "reviewed": true
+    },
+    "promo.discountActive": {
+      "value": "{discount} — offer active",
+      "sourceHash": "51c8f525",
+      "reviewed": true
+    },
+    "bookingModal.title": {
+      "value": "Book a Campus Consultation & Level Audit",
+      "sourceHash": "91f48bda",
+      "reviewed": true
+    },
+    "bookingModal.subtitle": {
+      "value": "Meet our academic advisor at Pavilion Embassy, KL for a personalized study pathway consultation.",
+      "sourceHash": "b8574755",
+      "reviewed": true
+    },
+    "bookingModal.selectDate": {
+      "value": "Select Preferred Date *",
+      "sourceHash": "4897de59",
+      "reviewed": true
+    },
+    "bookingModal.selectTime": {
+      "value": "Select Preferred Time Slot *",
+      "sourceHash": "5750d050",
+      "reviewed": true
+    },
+    "bookingModal.consultationReason": {
+      "value": "Consultation Objective *",
+      "sourceHash": "68c7827a",
+      "reviewed": true
+    },
+    "bookingModal.bookBtn": {
+      "value": "Confirm Campus Appointment",
+      "sourceHash": "fa8a575b",
+      "reviewed": true
+    },
+    "bookingModal.successTitle": {
+      "value": "Consultation Booked Successfully!",
+      "sourceHash": "2b5745cc",
+      "reviewed": true
+    },
+    "bookingModal.successDesc": {
+      "value": "Our admissions team has reserved your slot. We have sent confirmation details to your contact info.",
+      "sourceHash": "3a0d4349",
+      "reviewed": true
+    },
+    "chat.widgetTitle": {
+      "value": "Admissions Assistant",
+      "sourceHash": "3f62cca1",
+      "reviewed": true
+    },
+    "chat.welcome": {
+      "value": "Hello! Welcome to Bilingual Idol Language Centre at Pavilion Embassy. How can I help you today?",
+      "sourceHash": "04699e6e",
+      "reviewed": true
+    },
+    "chat.placeholder": {
+      "value": "Ask about courses, IELTS, fees, schedules...",
+      "sourceHash": "e90b02bf",
+      "reviewed": true
+    },
+    "chat.send": {
+      "value": "Send",
+      "sourceHash": "94966d90",
+      "reviewed": true
+    }
+  },
+  "seed": {
+    "programs": {
+      "general-english": {
+        "title": {
+          "value": "General English",
+          "sourceHash": "ecc38a00",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Build everyday confidence across speaking, listening, reading, and writing through practical, interactive learning.",
+          "sourceHash": "39bbfa62",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Beginner to advanced",
+          "sourceHash": "8338c745",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "kids-english": {
+        "title": {
+          "value": "Kids English",
+          "sourceHash": "bdd54a47",
+          "reviewed": true
+        },
+        "description": {
+          "value": "A playful, supportive foundation for young learners to grow their English through communication and guided practice.",
+          "sourceHash": "2c160fe2",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Children",
+          "sourceHash": "64e4aca4",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Foundation to developing",
+          "sourceHash": "26472e8a",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your child's learning plan",
+          "sourceHash": "4efd5890",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "speaking-conversation": {
+        "title": {
+          "value": "Speaking & Conversation",
+          "sourceHash": "e4ef63f1",
+          "reviewed": true
+        },
+        "description": {
+          "value": "A speaking-first programme for learners who want their words to feel natural, clear, and ready for daily life.",
+          "sourceHash": "98148347",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Elementary to advanced",
+          "sourceHash": "15f6ce94",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "ielts-preparation": {
+        "title": {
+          "value": "IELTS Preparation",
+          "sourceHash": "9692a9a5",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Focused preparation for learners planning to demonstrate their English proficiency for study, work, or migration.",
+          "sourceHash": "ace5939f",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Intermediate and above",
+          "sourceHash": "e34cebf1",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your exam goals",
+          "sourceHash": "f4ee056c",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "bahasa-melayu": {
+        "title": {
+          "value": "Bahasa Melayu",
+          "sourceHash": "0339d3bb",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Connect more confidently with life in Malaysia through structured Bahasa Melayu language learning.",
+          "sourceHash": "ec633926",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Beginner to advanced",
+          "sourceHash": "8338c745",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "mandarin": {
+        "title": {
+          "value": "Mandarin",
+          "sourceHash": "76c06512",
+          "reviewed": true
+        },
+        "description": {
+          "value": "A clear pathway into Mandarin that supports communication, listening skills, and purposeful progression.",
+          "sourceHash": "f2b71591",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Children, teens & adults",
+          "sourceHash": "14a34e89",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Beginner to advanced",
+          "sourceHash": "8338c745",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "arabic": {
+        "title": {
+          "value": "Arabic",
+          "sourceHash": "272ccb85",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Learn Arabic through guided practice that supports meaningful communication and steady progress.",
+          "sourceHash": "41c1e3f6",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Beginner to advanced",
+          "sourceHash": "8338c745",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "japanese": {
+        "title": {
+          "value": "Japanese",
+          "sourceHash": "f32ced6a",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Start your Japanese language journey with an approachable, well-paced programme built around your needs.",
+          "sourceHash": "d9053f08",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Beginner to developing",
+          "sourceHash": "43d0ab34",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "korean": {
+        "title": {
+          "value": "Korean",
+          "sourceHash": "d0bdb3cd",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Learn Korean in a supportive environment that makes new vocabulary and expressions feel achievable.",
+          "sourceHash": "56799fa2",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Teens & adults",
+          "sourceHash": "89150a92",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Beginner to developing",
+          "sourceHash": "43d0ab34",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around your learning plan",
+          "sourceHash": "d9cb6693",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      },
+      "business-english": {
+        "title": {
+          "value": "Business English",
+          "sourceHash": "66a33006",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Refine professional communication for meetings, presentations, correspondence, and international workplace settings.",
+          "sourceHash": "d411a764",
+          "reviewed": true
+        },
+        "ageGroup": {
+          "value": "Professionals",
+          "sourceHash": "06b4423e",
+          "reviewed": true
+        },
+        "level": {
+          "value": "Intermediate to advanced",
+          "sourceHash": "7942e1cc",
+          "reviewed": true
+        },
+        "duration": {
+          "value": "Designed around workplace needs",
+          "sourceHash": "82795ca5",
+          "reviewed": true
+        },
+        "schedule": {
+          "value": "Confirmed with the centre after consultation",
+          "sourceHash": "aacacbdb",
+          "reviewed": true
+        },
+        "fees": {
+          "value": "Fee guidance available on enquiry",
+          "sourceHash": "a5282437",
+          "reviewed": true
+        }
+      }
+    },
+    "news": {
+      "bilc-grand-redesign-transforming-language-learning": {
+        "title": {
+          "value": "Bilingual Idol Language Centre Redesign: Transforming Language Learning",
+          "sourceHash": "8953befd",
+          "reviewed": true
+        },
+        "excerpt": {
+          "value": "Explore our newly designed spaces, interactive programmes, and the modern learning framework that redefines bilingual fluency.",
+          "sourceHash": "3cb32cb8",
+          "reviewed": true
+        },
+        "body": {
+          "value": "We are absolutely thrilled to officially unveil the new, highly-polished experience of Bilingual Idol Language Centre! As a leading institution dedicated to nurturing language fluency across English, Bahasa Melayu, Mandarin, Arabic, Japanese, Korean, and more, our redesign brings a breath of fresh air to our campus, our digital presence, and our interactive classrooms.\n\n### What is New at Bilingual Idol?\n\n* **Premium Learning Spaces**: Our classrooms have been entirely redesigned with flexible seating, modern learning technology, and inspiring visual aids to keep you engaged.\n* **Interactive Programmes**: We have enhanced our curriculum to feature interactive dialogue-first methods, speaking circles, and real-life scenarios.\n* **Digital Hub & Live Student Portals**: Introducing advanced digital integrations for students and teachers to coordinate schedules, submit assignments, and track progress seamlessly.\n\n### Elevating Your Bilingual Journey\nWhether you are a beginner looking to take your first steps in Japanese or Arabic, or a professional aiming to perfect your IELTS score, Bilingual Idol offers tailored support and small-group environments to ensure you make rapid, steady progress.\n\nWe warmly invite you to explore our new website, get in touch with our friendly advisory team, or visit our physical centre for a personal tour. Your journey toward ultimate confidence and global fluency begins today!",
+          "sourceHash": "86643b39",
+          "reviewed": true
+        },
+        "imageAltText": {
+          "value": "Modern classroom interior and engaging environment at Bilingual Idol Language Centre",
+          "sourceHash": "5a575204",
+          "reviewed": true
+        }
+      }
+    },
+    "promo": {
+      "MERDEKA2026": {
+        "title": {
+          "value": "Merdeka Special Discount",
+          "sourceHash": "d937bdda",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Get 15% off all General English programs for a limited time to celebrate Independence Month!",
+          "sourceHash": "6f26e364",
+          "reviewed": true
+        }
+      },
+      "WELCOME50": {
+        "title": {
+          "value": "Welcome New Student Offer",
+          "sourceHash": "6df46781",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Receive a RM 50 flat discount on your registration and assessment fees for any selected course.",
+          "sourceHash": "79eef383",
+          "reviewed": true
+        }
+      }
+    },
+    "tests": {
+      "1": {
+        "title": {
+          "value": "General English Placement Test",
+          "sourceHash": "128f8a69",
+          "reviewed": true
+        },
+        "questions": {
+          "1": {
+            "text": {
+              "value": "Which sentence is correct?",
+              "sourceHash": "e99508ca",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "I has a dog.",
+                "sourceHash": "ad638bd4",
+                "reviewed": true
+              },
+              "1": {
+                "value": "I have a dog.",
+                "sourceHash": "a91013d3",
+                "reviewed": true
+              },
+              "2": {
+                "value": "I having a dog.",
+                "sourceHash": "bac18515",
+                "reviewed": true
+              }
+            }
+          },
+          "2": {
+            "text": {
+              "value": "What is the opposite of 'hot'?",
+              "sourceHash": "e5f3563f",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "cold",
+                "sourceHash": "75e52a0e",
+                "reviewed": true
+              },
+              "1": {
+                "value": "warm",
+                "sourceHash": "a957a315",
+                "reviewed": true
+              },
+              "2": {
+                "value": "boiling",
+                "sourceHash": "bc64132c",
+                "reviewed": true
+              }
+            }
+          },
+          "3": {
+            "text": {
+              "value": "She _____ to the gym every evening.",
+              "sourceHash": "5bbacd51",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "go",
+                "sourceHash": "34d1f91f",
+                "reviewed": true
+              },
+              "1": {
+                "value": "goes",
+                "sourceHash": "89fe7b5c",
+                "reviewed": true
+              },
+              "2": {
+                "value": "going",
+                "sourceHash": "f2bab060",
+                "reviewed": true
+              }
+            }
+          },
+          "4": {
+            "text": {
+              "value": "Yesterday, we _____ a wonderful dinner.",
+              "sourceHash": "0b79d1ce",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "have",
+                "sourceHash": "b42dad54",
+                "reviewed": true
+              },
+              "1": {
+                "value": "has",
+                "sourceHash": "3309a7a7",
+                "reviewed": true
+              },
+              "2": {
+                "value": "had",
+                "sourceHash": "a1e6cd7f",
+                "reviewed": true
+              }
+            }
+          },
+          "5": {
+            "text": {
+              "value": "If it rains tomorrow, we _____ the picnic.",
+              "sourceHash": "f52f7f79",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "will cancel",
+                "sourceHash": "d694e92c",
+                "reviewed": true
+              },
+              "1": {
+                "value": "would cancel",
+                "sourceHash": "a5f1bb30",
+                "reviewed": true
+              },
+              "2": {
+                "value": "cancelled",
+                "sourceHash": "38881e0a",
+                "reviewed": true
+              }
+            }
+          },
+          "6": {
+            "text": {
+              "value": "I have been living here _____ five years.",
+              "sourceHash": "45f4c3e5",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "since",
+                "sourceHash": "50324905",
+                "reviewed": true
+              },
+              "1": {
+                "value": "for",
+                "sourceHash": "d5566982",
+                "reviewed": true
+              },
+              "2": {
+                "value": "during",
+                "sourceHash": "bc500dd0",
+                "reviewed": true
+              }
+            }
+          },
+          "7": {
+            "text": {
+              "value": "He is looking forward _____ you next week.",
+              "sourceHash": "8d700258",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "to meet",
+                "sourceHash": "0ced5b6a",
+                "reviewed": true
+              },
+              "1": {
+                "value": "to meeting",
+                "sourceHash": "de9adf5d",
+                "reviewed": true
+              },
+              "2": {
+                "value": "meeting",
+                "sourceHash": "d4878816",
+                "reviewed": true
+              }
+            }
+          },
+          "8": {
+            "text": {
+              "value": "She succeeded _____ passing the exam.",
+              "sourceHash": "778e26e8",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "in",
+                "sourceHash": "13b5bfe9",
+                "reviewed": true
+              },
+              "1": {
+                "value": "on",
+                "sourceHash": "ed2b5c01",
+                "reviewed": true
+              },
+              "2": {
+                "value": "at",
+                "sourceHash": "7d0db380",
+                "reviewed": true
+              }
+            }
+          },
+          "9": {
+            "text": {
+              "value": "Had I known about the party, I _____ attended.",
+              "sourceHash": "5a18b10b",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "would have",
+                "sourceHash": "5eb009a8",
+                "reviewed": true
+              },
+              "1": {
+                "value": "will have",
+                "sourceHash": "10351928",
+                "reviewed": true
+              },
+              "2": {
+                "value": "had",
+                "sourceHash": "a1e6cd7f",
+                "reviewed": true
+              }
+            }
+          },
+          "10": {
+            "text": {
+              "value": "The presentation was _____ received by the board.",
+              "sourceHash": "7a60a5bf",
+              "reviewed": true
+            },
+            "options": {
+              "0": {
+                "value": "favorably",
+                "sourceHash": "bd57b435",
+                "reviewed": true
+              },
+              "1": {
+                "value": "favor",
+                "sourceHash": "047fb904",
+                "reviewed": true
+              },
+              "2": {
+                "value": "favorite",
+                "sourceHash": "8a6b6ea3",
+                "reviewed": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "promo_title": {
+        "value": "Special Promotional Offer",
+        "sourceHash": "2b2cdc5f",
+        "reviewed": true
+      },
+      "promo_text": {
+        "value": "Get exclusive access to all bilingual academic language programmes with a limited-time intake discount! Apply now and claim your student starter package.",
+        "sourceHash": "d2853158",
+        "reviewed": true
+      },
+      "promo_cta_text": {
+        "value": "View Programmes",
+        "sourceHash": "1b142959",
+        "reviewed": true
+      },
+      "promo_discount": {
+        "value": "15% OFF",
+        "sourceHash": "21885ff4",
+        "reviewed": true
+      },
+      "cta.apply_now.text": {
+        "value": "Apply Now",
+        "sourceHash": "739dda5d",
+        "reviewed": true
+      },
+      "cta.placement_test.text": {
+        "value": "Book Placement Test",
+        "sourceHash": "bd3e12d3",
+        "reviewed": true
+      },
+      "cta.book_visit.text": {
+        "value": "Book a Campus Visit",
+        "sourceHash": "48b20321",
+        "reviewed": true
+      },
+      "cta.consultation.text": {
+        "value": "Request Consultation",
+        "sourceHash": "cba12d6c",
+        "reviewed": true
+      }
+    },
+    "faq": {},
+    "cms": {}
+  }
+}

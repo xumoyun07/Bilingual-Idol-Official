@@ -1,325 +1,2197 @@
 {
-  "nav.home": "Laman Utama",
-  "nav.about": "Tentang Kami",
-  "nav.programs": "Program",
-  "nav.news": "Berita",
-  "nav.contact": "Hubungi",
-  "nav.makeEnquiry": "Buat Pertanyaan",
-  "nav.signIn": "Log Masuk",
-  "nav.signOut": "Log Keluar",
-  "nav.skipToContent": "Langkau ke kandungan",
-  "nav.menu": {
-    "value": "Menu",
-    "__TODO__": true
+  "ui": {
+    "nav.home": {
+      "value": "Laman Utama",
+      "sourceHash": "8cf04a97",
+      "reviewed": false
+    },
+    "nav.about": {
+      "value": "Tentang Kami",
+      "sourceHash": "8f7f4c1c",
+      "reviewed": false
+    },
+    "nav.programs": {
+      "value": "Program",
+      "sourceHash": "b9ad95ed",
+      "reviewed": false
+    },
+    "nav.news": {
+      "value": "Berita",
+      "sourceHash": "dd1ba187",
+      "reviewed": false
+    },
+    "nav.contact": {
+      "value": "Hubungi",
+      "sourceHash": "bbaff128",
+      "reviewed": false
+    },
+    "nav.makeEnquiry": {
+      "value": "Buat Pertanyaan",
+      "sourceHash": "03f1e936",
+      "reviewed": false
+    },
+    "nav.signIn": {
+      "value": "Log Masuk",
+      "sourceHash": "b6d4223e",
+      "reviewed": false
+    },
+    "nav.signOut": {
+      "value": "Log Keluar",
+      "sourceHash": "c87aacf5",
+      "reviewed": false
+    },
+    "nav.skipToContent": {
+      "value": "Langkau ke kandungan",
+      "sourceHash": "b58273f2",
+      "reviewed": false
+    },
+    "nav.menu": {
+      "value": "Menu",
+      "sourceHash": "b6154120",
+      "reviewed": true
+    },
+    "nav.close": {
+      "value": "Tutup",
+      "sourceHash": "d3d2e617",
+      "reviewed": false
+    },
+    "nav.workspace": {
+      "value": "Ruang Kerja",
+      "sourceHash": "03a21915",
+      "reviewed": false
+    },
+    "nav.accountActive": {
+      "value": "Akaun aktif",
+      "sourceHash": "2e68e5a8",
+      "reviewed": false
+    },
+    "nav.myClasses": {
+      "value": "Kelas Saya",
+      "sourceHash": "183b8339",
+      "reviewed": false
+    },
+    "nav.overview": {
+      "value": "Gambaran Keseluruhan",
+      "sourceHash": "3b878279",
+      "reviewed": false
+    },
+    "nav.users": {
+      "value": "Pengguna",
+      "sourceHash": "f9aae5fd",
+      "reviewed": false
+    },
+    "nav.students": {
+      "value": "Pelajar",
+      "sourceHash": "aba064f8",
+      "reviewed": false
+    },
+    "nav.media": {
+      "value": "Media",
+      "sourceHash": "3b563524",
+      "reviewed": true
+    },
+    "nav.auditLogs": {
+      "value": "Log Audit",
+      "sourceHash": "85400d27",
+      "reviewed": false
+    },
+    "nav.switchLanguage": {
+      "value": "Bahasa",
+      "sourceHash": "4994a8ff",
+      "reviewed": false
+    },
+    "nav.contactUs": {
+      "value": "Hubungi kami",
+      "sourceHash": "02d4482d",
+      "reviewed": false
+    },
+    "nav.enrollNow": {
+      "value": "Daftar sekarang",
+      "sourceHash": "e3b2ff6d",
+      "reviewed": false
+    },
+    "nav.bookTour": {
+      "value": "Tempah Lawatan Kampus",
+      "sourceHash": "7f301d66",
+      "reviewed": false
+    },
+    "footer.centreName": {
+      "value": "Pusat Bahasa Bilingual Idol",
+      "sourceHash": "57a62f3a",
+      "reviewed": false
+    },
+    "footer.location": {
+      "value": "Pavilion Embassy, Kuala Lumpur",
+      "sourceHash": "dfd78557",
+      "reviewed": true
+    },
+    "footer.brandSubtitle": {
+      "value": "Pusat Bahasa",
+      "sourceHash": "bf9f13e5",
+      "reviewed": false
+    },
+    "footer.allRightsReserved": {
+      "value": "Hak cipta terpelihara",
+      "sourceHash": "5db707f7",
+      "reviewed": false
+    },
+    "common.call": {
+      "value": "Telefon",
+      "sourceHash": "c3755e61",
+      "reviewed": false
+    },
+    "common.whatsapp": {
+      "value": "WhatsApp",
+      "sourceHash": "8b777ebc",
+      "reviewed": true
+    },
+    "common.email": {
+      "value": "E-mel",
+      "sourceHash": "ce8ae9da",
+      "reviewed": false
+    },
+    "common.openingHours": {
+      "value": "Waktu operasi",
+      "sourceHash": "80a0c205",
+      "reviewed": false
+    },
+    "common.backToHome": {
+      "value": "Kembali ke laman utama",
+      "sourceHash": "6110e369",
+      "reviewed": false
+    },
+    "common.viewDetails": {
+      "value": "Lihat butiran",
+      "sourceHash": "6e978337",
+      "reviewed": false
+    },
+    "common.readMore": {
+      "value": "Baca artikel",
+      "sourceHash": "3c6262b6",
+      "reviewed": false
+    },
+    "common.learnMore": {
+      "value": "Ketahui lebih lanjut",
+      "sourceHash": "d59048f2",
+      "reviewed": false
+    },
+    "common.submit": {
+      "value": "Hantar",
+      "sourceHash": "a4d3b161",
+      "reviewed": false
+    },
+    "common.loading": {
+      "value": "Memuatkan...",
+      "sourceHash": "8524de96",
+      "reviewed": false
+    },
+    "common.filter": {
+      "value": "Tapis",
+      "sourceHash": "d7778d0c",
+      "reviewed": false
+    },
+    "common.all": {
+      "value": "Semua",
+      "sourceHash": "b1c94ca2",
+      "reviewed": false
+    },
+    "common.search": {
+      "value": "Cari",
+      "sourceHash": "13348442",
+      "reviewed": false
+    },
+    "common.thankYou": {
+      "value": "Terima kasih",
+      "sourceHash": "7a7c46aa",
+      "reviewed": false
+    },
+    "common.close": {
+      "value": "Tutup",
+      "sourceHash": "d3d2e617",
+      "reviewed": false
+    },
+    "common.requiredFields": {
+      "value": "Medan bertanda bintang (*) adalah wajib.",
+      "sourceHash": "54672197",
+      "reviewed": false
+    },
+    "common.viewProgrammes": {
+      "value": "Lihat program",
+      "sourceHash": "54db3622",
+      "reviewed": false
+    },
+    "common.cancel": {
+      "value": "Batal",
+      "sourceHash": "ea478870",
+      "reviewed": false
+    },
+    "common.next": {
+      "value": "Seterusnya",
+      "sourceHash": "10ac3d04",
+      "reviewed": false
+    },
+    "common.prev": {
+      "value": "Kembali",
+      "sourceHash": "0557fa92",
+      "reviewed": false
+    },
+    "common.step": {
+      "value": "Langkah",
+      "sourceHash": "48c7c41b",
+      "reviewed": false
+    },
+    "common.sendMessage": {
+      "value": "Hantar pertanyaan",
+      "sourceHash": "61a5c5eb",
+      "reviewed": false
+    },
+    "common.location": {
+      "value": "Lokasi",
+      "sourceHash": "ce5bf551",
+      "reviewed": false
+    },
+    "common.addressText": {
+      "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur.",
+      "sourceHash": "e92f61e4",
+      "reviewed": true
+    },
+    "home.eyebrow": {
+      "value": "Musim Akademik 2026 · Pavilion Embassy, KL",
+      "sourceHash": "21d3f3e3",
+      "reviewed": false
+    },
+    "home.heroTitle": {
+      "value": "Pusat Bahasa Bilingual Idol",
+      "sourceHash": "57a62f3a",
+      "reviewed": false
+    },
+    "home.heroSubtitle": {
+      "value": "Program bahasa berstruktur, persediaan peperiksaan IELTS antarabangsa dan laluan bahasa dunia yang mendalam di Pavilion Embassy, Kuala Lumpur.",
+      "sourceHash": "0556fa8f",
+      "reviewed": false
+    },
+    "home.ctaFindCourse": {
+      "value": "Cari kursus anda",
+      "sourceHash": "d1f73a13",
+      "reviewed": false
+    },
+    "home.ctaEnquiry": {
+      "value": "Buat pertanyaan",
+      "sourceHash": "03f1e936",
+      "reviewed": false
+    },
+    "home.ctaPlacement": {
+      "value": "Ujian penempatan percuma",
+      "sourceHash": "6e1fc7e6",
+      "reviewed": false
+    },
+    "home.ctaBooking": {
+      "value": "Tempah perundingan",
+      "sourceHash": "49a10f52",
+      "reviewed": false
+    },
+    "home.taskPlacementTitle": {
+      "value": "Ujian penempatan dalam talian",
+      "sourceHash": "ea2e1ea2",
+      "reviewed": false
+    },
+    "home.taskPlacementDesc": {
+      "value": "Nilaikan tahap penguasaan anda dalam 3 minit dengan skor segera dan cadangan kursus.",
+      "sourceHash": "29bdd454",
+      "reviewed": false
+    },
+    "home.taskConsultationTitle": {
+      "value": "Tempah perundingan",
+      "sourceHash": "3402c556",
+      "reviewed": false
+    },
+    "home.taskConsultationDesc": {
+      "value": "Jadualkan lawatan peribadi dan sesi pelan bahasa 1-dengan-1 di Pavilion Embassy.",
+      "sourceHash": "8604dde2",
+      "reviewed": false
+    },
+    "home.taskProgramsTitle": {
+      "value": "Semak program 2026",
+      "sourceHash": "42ad52b7",
+      "reviewed": false
+    },
+    "home.taskProgramsDesc": {
+      "value": "Bahasa Inggeris Umum, IELTS, Kem Musim Panas, Korporat & Bahasa Dunia.",
+      "sourceHash": "01db7fc6",
+      "reviewed": false
+    },
+    "home.taskContactTitle": {
+      "value": "Bercakap dengan penasihat",
+      "sourceHash": "724492b4",
+      "reviewed": false
+    },
+    "home.taskContactDesc": {
+      "value": "WhatsApp atau hubungi pasukan kemasukan kami secara terus untuk bimbingan peribadi.",
+      "sourceHash": "16882d8c",
+      "reviewed": false
+    },
+    "home.pricingEyebrow": {
+      "value": "Yuran Rasmi 2026",
+      "sourceHash": "e3b5b750",
+      "reviewed": false
+    },
+    "home.pricingTitle": {
+      "value": "Program Akademik yang Diiktiraf",
+      "sourceHash": "2ead2678",
+      "reviewed": false
+    },
+    "home.pricingSubtitle": {
+      "value": "Terokai kursus bertauliah kami yang tersusun. Hubungi pihak kemasukan untuk pendaftaran berkumpulan, jadual tersuai dan promosi pengambilan aktif.",
+      "sourceHash": "bb8e5a00",
+      "reviewed": false
+    },
+    "home.pricingTabGeneral": {
+      "value": "Bahasa Inggeris Umum",
+      "sourceHash": "ecc38a00",
+      "reviewed": false
+    },
+    "home.pricingTabIelts": {
+      "value": "Persediaan IELTS",
+      "sourceHash": "f6dc473c",
+      "reviewed": false
+    },
+    "home.pricingTabCamps": {
+      "value": "Kem Cuti Sekolah",
+      "sourceHash": "9fbbe6dd",
+      "reviewed": false
+    },
+    "home.pricingTabPrivate": {
+      "value": "Privat 1-ke-1",
+      "sourceHash": "145c80f2",
+      "reviewed": false
+    },
+    "home.pricingTabExecutive": {
+      "value": "Korporat & Eksekutif",
+      "sourceHash": "8e57bfeb",
+      "reviewed": false
+    },
+    "home.pricingTabWorld": {
+      "value": "Bahasa Dunia",
+      "sourceHash": "b393c6a5",
+      "reviewed": false
+    },
+    "home.startHereEyebrow": {
+      "value": "Mula di sini",
+      "sourceHash": "8b6db1ec",
+      "reviewed": false
+    },
+    "home.startHereTitle": {
+      "value": "Pilih laluan anda ke arah kefasihan.",
+      "sourceHash": "73699bd0",
+      "reviewed": false
+    },
+    "home.startHereDesc": {
+      "value": "Terokai kursus bertauliah, tempah sesi perundingan kampus, atau akses akaun pelajar anda.",
+      "sourceHash": "d68a3278",
+      "reviewed": false
+    },
+    "home.admissionsTag": {
+      "value": "Kemasukan",
+      "sourceHash": "fff3e55e",
+      "reviewed": false
+    },
+    "home.taskPortalTitle": {
+      "value": "Portal Pelajar & Kakitangan",
+      "sourceHash": "18acf850",
+      "reviewed": false
+    },
+    "home.taskPortalDesc": {
+      "value": "Log masuk untuk melihat jadual kelas, rekod kehadiran, sumber pembelajaran dan gred.",
+      "sourceHash": "35bae672",
+      "reviewed": false
+    },
+    "home.facilitiesEyebrow": {
+      "value": "Kemudahan Kampus",
+      "sourceHash": "569db595",
+      "reviewed": false
+    },
+    "home.facilitiesTitle": {
+      "value": "Ruang Pembelajaran Moden di Pavilion Embassy",
+      "sourceHash": "ed6600d2",
+      "reviewed": false
+    },
+    "home.facilitiesSubtitle": {
+      "value": "Alami bilik darjah multimedia serba canggih, ruang istirahat eksekutif, suite belajar peribadi dan zon rehat pelajar kami.",
+      "sourceHash": "9935a39c",
+      "reviewed": false
+    },
+    "home.journeyEyebrow": {
+      "value": "Perjalanan Pelajar",
+      "sourceHash": "dea18be7",
+      "reviewed": false
+    },
+    "home.journeyTitle": {
+      "value": "Dari Pertanyaan Pertama Hingga Kefasihan Bahasa",
+      "sourceHash": "b2c0cca6",
+      "reviewed": false
+    },
+    "home.journeySubtitle": {
+      "value": "Pelan tindakan 5 peringkat yang direka untuk pemerolehan bahasa pantas, integrasi budaya dan peningkatan bertauliah.",
+      "sourceHash": "3381b10b",
+      "reviewed": false
+    },
+    "home.testimonialsEyebrow": {
+      "value": "Kisah Pelajar",
+      "sourceHash": "336e09f8",
+      "reviewed": false
+    },
+    "home.testimonialsTitle": {
+      "value": "Apa Kata Pelajar Kami",
+      "sourceHash": "0af93cb6",
+      "reviewed": false
+    },
+    "home.testimonialsSubtitle": {
+      "value": "Maklum balas tulen daripada pelajar antarabangsa, profesional dan ibu bapa yang belajar di Bilingual Idol.",
+      "sourceHash": "61b3af61",
+      "reviewed": false
+    },
+    "home.contactStripTitle": {
+      "value": "Bersedia untuk memulakan perjalanan bahasa anda?",
+      "sourceHash": "00be4420",
+      "reviewed": false
+    },
+    "home.contactStripSubtitle": {
+      "value": "Lawati kampus kami di Pavilion Embassy, Ampang atau berbincang dengan perunding pendidikan hari ini.",
+      "sourceHash": "de553de6",
+      "reviewed": false
+    },
+    "home.contactStripButton": {
+      "value": "Hubungi bahagian kemasukan",
+      "sourceHash": "2a9f7ad3",
+      "reviewed": false
+    },
+    "home.languageBandTitle": {
+      "value": "Bahasa-bahasa Dunia Ditawarkan",
+      "sourceHash": "711d8f56",
+      "reviewed": false
+    },
+    "home.languageBandSubtitle": {
+      "value": "Bahasa Inggeris, Bahasa Melayu, Mandarin, Arab, Jepun dan Korea diajar oleh pakar bahasa berdedikasi.",
+      "sourceHash": "bd5a7cad",
+      "reviewed": false
+    },
+    "about.eyebrow": {
+      "value": "Tentang Kami",
+      "sourceHash": "8f7f4c1c",
+      "reviewed": false
+    },
+    "about.heroTitle": {
+      "value": "Pembelajaran bahasa yang dibina atas kemajuan yang jelas.",
+      "sourceHash": "6abfa2b1",
+      "reviewed": false
+    },
+    "about.heroSubtitle": {
+      "value": "Pusat Bahasa Bilingual Idol menyokong pelajar di Kuala Lumpur dengan laluan bahasa berfokus, perundingan dan komunikasi yang yakin.",
+      "sourceHash": "c969ef51",
+      "reviewed": false
+    },
+    "about.storyEyebrow": {
+      "value": "Permulaan yang teliti",
+      "sourceHash": "ab920abc",
+      "reviewed": false
+    },
+    "about.storyTitle": {
+      "value": "Perkara yang disokong pusat ini",
+      "sourceHash": "311a9915",
+      "reviewed": false
+    },
+    "about.storyBody": {
+      "value": "Pusat ini menyediakan persekitaran pembelajaran dengan bilik darjah interaktif, sumber pembelajaran digital, panduan penempatan dan laluan bahasa yang diperibadikan.",
+      "sourceHash": "ac8c0f39",
+      "reviewed": false
+    },
+    "about.explorePrograms": {
+      "value": "Terokai program",
+      "sourceHash": "4b561635",
+      "reviewed": false
+    },
+    "about.approachEyebrow": {
+      "value": "Pendekatan pembelajaran",
+      "sourceHash": "8fd17cb1",
+      "reviewed": false
+    },
+    "about.approachTitle": {
+      "value": "Bagaimana pembelajaran disokong",
+      "sourceHash": "03657eab",
+      "reviewed": false
+    },
+    "about.approachSubtitle": {
+      "value": "Langkah seterusnya yang jelas, latihan aktif dan pembinaan keyakinan berterusan membentuk pendekatan pembelajaran pusat kami.",
+      "sourceHash": "c262d720",
+      "reviewed": false
+    },
+    "about.approach1Title": {
+      "value": "Bermula dengan matlamat pelajar",
+      "sourceHash": "59580ee1",
+      "reviewed": false
+    },
+    "about.approach1Body": {
+      "value": "Perundingan dan bimbingan penempatan membantu mengenal pasti laluan bahasa yang bersesuaian sebelum pendaftaran.",
+      "sourceHash": "e52a882c",
+      "reviewed": false
+    },
+    "about.approach2Title": {
+      "value": "Berlatih secara aktif",
+      "sourceHash": "c74e6993",
+      "reviewed": false
+    },
+    "about.approach2Body": {
+      "value": "Pusat ini mengutamakan pembelajaran interaktif yang disokong oleh alat bilik darjah digital dan latihan berpandu.",
+      "sourceHash": "18eee3eb",
+      "reviewed": false
+    },
+    "about.approach3Title": {
+      "value": "Bina keyakinan secara mantap",
+      "sourceHash": "7ac8715e",
+      "reviewed": false
+    },
+    "about.approach3Body": {
+      "value": "Laluan pembelajaran direka merangkumi perkembangan bahasa, kesedaran budaya dan komunikasi praktikal.",
+      "sourceHash": "f93de579",
+      "reviewed": false
+    },
+    "about.communityEyebrow": {
+      "value": "Komuniti dan latihan",
+      "sourceHash": "526ad7c2",
+      "reviewed": false
+    },
+    "about.communityTitle": {
+      "value": "Tempat untuk terus maju ke hadapan",
+      "sourceHash": "2ab54d31",
+      "reviewed": false
+    },
+    "about.communityCaption": {
+      "value": "Kemahiran bahasa berkembang melalui pertukaran bermakna dan latihan bersama.",
+      "sourceHash": "42af180d",
+      "reviewed": false
+    },
+    "about.teamEyebrow": {
+      "value": "Penasihat & Tenaga Pengajar",
+      "sourceHash": "642d91cc",
+      "reviewed": false
+    },
+    "about.teamTitle": {
+      "value": "Pengajar bertauliah yang berdedikasi untuk kemajuan anda",
+      "sourceHash": "fcc8ed5f",
+      "reviewed": false
+    },
+    "about.teamSubtitle": {
+      "value": "Tenaga pengajar kami menggabungkan kelayakan antarabangsa yang diiktiraf, pedagogi komunikatif dan bimbingan prihatin.",
+      "sourceHash": "4d266101",
+      "reviewed": false
+    },
+    "programs.eyebrow": {
+      "value": "Program",
+      "sourceHash": "b9ad95ed",
+      "reviewed": false
+    },
+    "programs.heroTitle": {
+      "value": "Cari program yang sesuai untuk pelajar.",
+      "sourceHash": "ff0047d0",
+      "reviewed": false
+    },
+    "programs.heroSubtitle": {
+      "value": "Terokai panduan kursus 2026 yang diterbitkan, kemudian hubungi pusat untuk mengesahkan kesesuaian, ketersediaan dan jadual pengambilan.",
+      "sourceHash": "45acb221",
+      "reviewed": false
+    },
+    "programs.guideEyebrow": {
+      "value": "Panduan yuran 2026",
+      "sourceHash": "1995be43",
+      "reviewed": false
+    },
+    "programs.guideTitle": {
+      "value": "Pilihan kursus yang diterbitkan",
+      "sourceHash": "107bb3df",
+      "reviewed": false
+    },
+    "programs.guideSubtitle": {
+      "value": "Yuran adalah panduan dari senarai 2026. Sahkan jumlah yuran, keperluan visa dan tarikh pengambilan dengan pusat sebelum pendaftaran.",
+      "sourceHash": "181afbe6",
+      "reviewed": false
+    },
+    "programs.feeGuideEyebrow": {
+      "value": "Struktur Kursus & Yuran",
+      "sourceHash": "d01bd510",
+      "reviewed": false
+    },
+    "programs.feeGuideTitle": {
+      "value": "Panduan Program 2026 Diterbitkan",
+      "sourceHash": "09de748b",
+      "reviewed": false
+    },
+    "programs.feeGuideSubtitle": {
+      "value": "Terokai program bahasa bertauliah yang direka khas untuk pelajar antarabangsa, kanak-kanak, remaja dan profesional.",
+      "sourceHash": "386e0ced",
+      "reviewed": false
+    },
+    "programs.searchPlaceholder": {
+      "value": "Cari mengikut bahasa, tahap atau kumpulan pelajar",
+      "sourceHash": "a09a67f6",
+      "reviewed": false
+    },
+    "programs.filterLabel": {
+      "value": "Tapis",
+      "sourceHash": "d7778d0c",
+      "reviewed": false
+    },
+    "programs.filterAll": {
+      "value": "Semua Kategori",
+      "sourceHash": "a6a2a55b",
+      "reviewed": false
+    },
+    "programs.countShown": {
+      "value": "{count} program disahkan dipaparkan",
+      "sourceHash": "8ff06a7a",
+      "reviewed": false
+    },
+    "programs.showingCount": {
+      "value": "program tersedia",
+      "sourceHash": "5226d7d0",
+      "reviewed": false
+    },
+    "programs.noMatches": {
+      "value": "Tiada program yang sepadan dengan carian semasa. Cuba tukar kategori atau kata kunci carian.",
+      "sourceHash": "dd6484f2",
+      "reviewed": false
+    },
+    "programs.emptyText": {
+      "value": "Tiada program ditemui yang sepadan dengan kriteria carian anda.",
+      "sourceHash": "2d0f67ab",
+      "reviewed": false
+    },
+    "programs.emptyCta": {
+      "value": "Hubungi kami untuk pilihan kursus tersuai",
+      "sourceHash": "496a8f2e",
+      "reviewed": false
+    },
+    "programs.viewDetails": {
+      "value": "Lihat butiran program",
+      "sourceHash": "c6311b5c",
+      "reviewed": false
+    },
+    "programs.catAll": {
+      "value": "Semua",
+      "sourceHash": "b1c94ca2",
+      "reviewed": false
+    },
+    "programs.catKids": {
+      "value": "Kanak-kanak",
+      "sourceHash": "eb73ee66",
+      "reviewed": false
+    },
+    "programs.catEnglish": {
+      "value": "Bahasa Inggeris",
+      "sourceHash": "78463a38",
+      "reviewed": false
+    },
+    "programs.catWorldLanguages": {
+      "value": "Bahasa Dunia",
+      "sourceHash": "b393c6a5",
+      "reviewed": false
+    },
+    "programs.catProfessional": {
+      "value": "Profesional",
+      "sourceHash": "9e8b1602",
+      "reviewed": false
+    },
+    "programDetail.backLink": {
+      "value": "Kembali ke senarai program",
+      "sourceHash": "60508e2d",
+      "reviewed": false
+    },
+    "programDetail.overviewEyebrow": {
+      "value": "Gambaran keseluruhan program",
+      "sourceHash": "466dd5c0",
+      "reviewed": false
+    },
+    "programDetail.duration": {
+      "value": "Tempoh",
+      "sourceHash": "e02d2ae0",
+      "reviewed": false
+    },
+    "programDetail.schedule": {
+      "value": "Jadual",
+      "sourceHash": "25f73472",
+      "reviewed": false
+    },
+    "programDetail.fees": {
+      "value": "Yuran",
+      "sourceHash": "006300ef",
+      "reviewed": false
+    },
+    "programDetail.level": {
+      "value": "Tahap",
+      "sourceHash": "a0db49ba",
+      "reviewed": false
+    },
+    "programDetail.ageGroup": {
+      "value": "Kumpulan Sasaran",
+      "sourceHash": "1f6a4e9b",
+      "reviewed": false
+    },
+    "programDetail.outcomesTitle": {
+      "value": "Hasil Pembelajaran Utama",
+      "sourceHash": "da420a67",
+      "reviewed": false
+    },
+    "programDetail.ctaTitle": {
+      "value": "Berminat dengan program ini?",
+      "sourceHash": "7f9f1f7a",
+      "reviewed": false
+    },
+    "programDetail.ctaSubtitle": {
+      "value": "Hantar pertanyaan pembelajaran untuk menyemak ketersediaan terkini dan membincangkan penempatan anda.",
+      "sourceHash": "f7ccc364",
+      "reviewed": false
+    },
+    "programDetail.ctaButton": {
+      "value": "Buat pertanyaan sekarang",
+      "sourceHash": "03f1e936",
+      "reviewed": false
+    },
+    "contact.eyebrow": {
+      "value": "Hubungi",
+      "sourceHash": "bbaff128",
+      "reviewed": false
+    },
+    "contact.heroTitle": {
+      "value": "Hubungi pihak pusat kami.",
+      "sourceHash": "32e0db28",
+      "reviewed": false
+    },
+    "contact.heroSubtitle": {
+      "value": "Pilih kaedah komunikasi yang paling mudah untuk anda, atau hantar pertanyaan ringkas di bawah.",
+      "sourceHash": "68ac39ff",
+      "reviewed": false
+    },
+    "contact.call": {
+      "value": "Telefon",
+      "sourceHash": "c3755e61",
+      "reviewed": false
+    },
+    "contact.whatsapp": {
+      "value": "WhatsApp",
+      "sourceHash": "8b777ebc",
+      "reviewed": true
+    },
+    "contact.whatsappValue": {
+      "value": "Mesej pusat kami",
+      "sourceHash": "b23f30e1",
+      "reviewed": false
+    },
+    "contact.email": {
+      "value": "E-mel",
+      "sourceHash": "ce8ae9da",
+      "reviewed": false
+    },
+    "contact.hours": {
+      "value": "Waktu operasi",
+      "sourceHash": "80a0c205",
+      "reviewed": false
+    },
+    "contact.openingHours": {
+      "value": "Isnin – Ahad: 9:00 PG – 9:00 MLM",
+      "sourceHash": "39f29d7b",
+      "reviewed": false
+    },
+    "contact.address": {
+      "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur.",
+      "sourceHash": "e92f61e4",
+      "reviewed": true
+    },
+    "contact.addressText": {
+      "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia.",
+      "sourceHash": "ac70f47f",
+      "reviewed": true
+    },
+    "contact.formEyebrow": {
+      "value": "Hantar pertanyaan",
+      "sourceHash": "6beffcc3",
+      "reviewed": false
+    },
+    "contact.formTitle": {
+      "value": "Beritahu kami keperluan pembelajaran anda.",
+      "sourceHash": "9bc2ccb4",
+      "reviewed": false
+    },
+    "contact.formSubtitle": {
+      "value": "Penerangan ringkas mengenai matlamat bahasa dan waktu pilihan sudah mencukupi untuk memulakan langkah.",
+      "sourceHash": "efa02180",
+      "reviewed": false
+    },
+    "contact.formCardTitle": {
+      "value": "Pertanyaan anda",
+      "sourceHash": "2078a6e9",
+      "reviewed": false
+    },
+    "contact.submitButton": {
+      "value": "Hantar pertanyaan",
+      "sourceHash": "61a5c5eb",
+      "reviewed": false
+    },
+    "enroll.backLink": {
+      "value": "Kembali ke laman utama",
+      "sourceHash": "6110e369",
+      "reviewed": false
+    },
+    "enroll.eyebrow": {
+      "value": "Pertanyaan pembelajaran",
+      "sourceHash": "bcfb3883",
+      "reviewed": false
+    },
+    "enroll.heroTitle": {
+      "value": "Beritahu pusat tentang maklumat pelajar.",
+      "sourceHash": "1cd743b5",
+      "reviewed": false
+    },
+    "enroll.heroSubtitle": {
+      "value": "Hantar butiran yang anda tahu. Membuat pertanyaan tidak mengikat anda kepada mana-mana kursus.",
+      "sourceHash": "ea5150de",
+      "reviewed": false
+    },
+    "enroll.nextStepsTitle": {
+      "value": "Apa yang berlaku seterusnya",
+      "sourceHash": "a273f1bc",
+      "reviewed": false
+    },
+    "enroll.step1": {
+      "value": "Pusat akan menyemak matlamat bahasa dan tahap semasa pelajar.",
+      "sourceHash": "6dfbe60e",
+      "reviewed": false
+    },
+    "enroll.step2": {
+      "value": "Pusat akan mengesyorkan langkah seterusnya yang relevan atau mengajukan soalan susulan.",
+      "sourceHash": "f14768e9",
+      "reviewed": false
+    },
+    "enroll.step3": {
+      "value": "Maklumat anda hanya dikendalikan oleh kakitangan pusat yang diberi kuasa.",
+      "sourceHash": "55f0ea9d",
+      "reviewed": false
+    },
+    "enroll.formEyebrow": {
+      "value": "Maklumat pelajar",
+      "sourceHash": "3078d791",
+      "reviewed": false
+    },
+    "enroll.formTitle": {
+      "value": "Beritahu kami keperluan pembelajaran anda.",
+      "sourceHash": "9bc2ccb4",
+      "reviewed": false
+    },
+    "enroll.formSubtitle": {
+      "value": "Penerangan ringkas mengenai matlamat bahasa dan waktu pilihan sudah mencukupi untuk memulakan langkah.",
+      "sourceHash": "efa02180",
+      "reviewed": false
+    },
+    "enroll.studentNameLabel": {
+      "value": "Nama Pelajar *",
+      "sourceHash": "24a50e0b",
+      "reviewed": false
+    },
+    "enroll.studentNamePlaceholder": {
+      "value": "cth. Sara Lee",
+      "sourceHash": "a372f852",
+      "reviewed": false
+    },
+    "enroll.studentAgeLabel": {
+      "value": "Umur Pelajar *",
+      "sourceHash": "402ee026",
+      "reviewed": false
+    },
+    "enroll.studentAgePlaceholder": {
+      "value": "cth. 16",
+      "sourceHash": "21a76ec8",
+      "reviewed": false
+    },
+    "enroll.programLabel": {
+      "value": "Program Pilihan *",
+      "sourceHash": "df535e7a",
+      "reviewed": false
+    },
+    "enroll.programPlaceholder": {
+      "value": "Pilih program...",
+      "sourceHash": "3d36a278",
+      "reviewed": false
+    },
+    "enroll.scheduleLabel": {
+      "value": "Jadual Pilihan *",
+      "sourceHash": "b6c54d80",
+      "reviewed": false
+    },
+    "enroll.schedulePlaceholder": {
+      "value": "Pilih waktu pilihan...",
+      "sourceHash": "8dfb38bb",
+      "reviewed": false
+    },
+    "enroll.parentNameLabel": {
+      "value": "Nama Ibu Bapa / Penjaga *",
+      "sourceHash": "f34ac7c9",
+      "reviewed": false
+    },
+    "enroll.parentNamePlaceholder": {
+      "value": "cth. David Lee",
+      "sourceHash": "57ee97ca",
+      "reviewed": false
+    },
+    "enroll.emailLabel": {
+      "value": "Alamat E-mel *",
+      "sourceHash": "2baf1487",
+      "reviewed": false
+    },
+    "enroll.emailPlaceholder": {
+      "value": "cth. penjaga@example.com",
+      "sourceHash": "6e6c43bc",
+      "reviewed": true
+    },
+    "enroll.phoneLabel": {
+      "value": "Nombor Telefon / WhatsApp *",
+      "sourceHash": "a6000211",
+      "reviewed": false
+    },
+    "enroll.phonePlaceholder": {
+      "value": "cth. +60 12-345 6789",
+      "sourceHash": "3c011b8b",
+      "reviewed": true
+    },
+    "enroll.messageLabel": {
+      "value": "Nota Tambahan atau Soalan",
+      "sourceHash": "90dfc9cd",
+      "reviewed": false
+    },
+    "enroll.messagePlaceholder": {
+      "value": "Kongsi sebarang matlamat bahasa, tahap semasa atau keperluan khas...",
+      "sourceHash": "99060564",
+      "reviewed": false
+    },
+    "enroll.submitButton": {
+      "value": "Hantar pertanyaan pembelajaran",
+      "sourceHash": "ffbd292b",
+      "reviewed": false
+    },
+    "enroll.requiredNote": {
+      "value": "Medan bertanda bintang (*) adalah wajib.",
+      "sourceHash": "54672197",
+      "reviewed": false
+    },
+    "enroll.successTitle": {
+      "value": "Pertanyaan Berjaya Dihantar",
+      "sourceHash": "e1a20036",
+      "reviewed": false
+    },
+    "enroll.successSubtitle": {
+      "value": "Terima kasih. Kaunselor akademik kami akan menyemak keperluan pelajar dan menghubungi anda dalam masa 24 jam.",
+      "sourceHash": "8497eefd",
+      "reviewed": false
+    },
+    "enroll.submitAnother": {
+      "value": "Hantar pertanyaan lain",
+      "sourceHash": "c157cdcb",
+      "reviewed": false
+    },
+    "news.eyebrow": {
+      "value": "Kemas Kini & Makluman",
+      "sourceHash": "0471bc5d",
+      "reviewed": false
+    },
+    "news.heroTitle": {
+      "value": "Berita dan pengumuman pusat.",
+      "sourceHash": "41fd931f",
+      "reviewed": false
+    },
+    "news.heroSubtitle": {
+      "value": "Baca makluman terkini, jadual cuti dan kemas kini akademik daripada Bilingual Idol.",
+      "sourceHash": "d547e1d1",
+      "reviewed": false
+    },
+    "news.searchPlaceholder": {
+      "value": "Cari artikel berita...",
+      "sourceHash": "b3874d6f",
+      "reviewed": false
+    },
+    "news.allCategories": {
+      "value": "Semua kategori",
+      "sourceHash": "62f5d708",
+      "reviewed": false
+    },
+    "news.readMore": {
+      "value": "Baca artikel",
+      "sourceHash": "3c6262b6",
+      "reviewed": false
+    },
+    "news.readUpdate": {
+      "value": "Baca makluman penuh",
+      "sourceHash": "9f63675f",
+      "reviewed": false
+    },
+    "news.previous": {
+      "value": "Sebelumnya",
+      "sourceHash": "dd1f775e",
+      "reviewed": false
+    },
+    "news.next": {
+      "value": "Seterusnya",
+      "sourceHash": "10ac3d04",
+      "reviewed": false
+    },
+    "news.noUpdates": {
+      "value": "Tiada pengumuman diterbitkan lagi.",
+      "sourceHash": "cc076580",
+      "reviewed": false
+    },
+    "news.noUpdatesText": {
+      "value": "Semak semula nanti untuk makluman takwim akademik, bengkel dan acara sekolah.",
+      "sourceHash": "c71eca79",
+      "reviewed": false
+    },
+    "login.eyebrow": {
+      "value": "Akses Portal",
+      "sourceHash": "505340fc",
+      "reviewed": false
+    },
+    "login.heroTitle": {
+      "value": "Log masuk ke akaun anda.",
+      "sourceHash": "9e869198",
+      "reviewed": false
+    },
+    "login.heroSubtitle": {
+      "value": "Akses papan pemuka, jadual kelas dan sumber pusat anda.",
+      "sourceHash": "5db92499",
+      "reviewed": false
+    },
+    "login.emailLabel": {
+      "value": "Log Masuk",
+      "sourceHash": "99dea780",
+      "reviewed": false
+    },
+    "login.emailPlaceholder": {
+      "value": "nickname@bilc.my",
+      "sourceHash": "63480603",
+      "reviewed": true
+    },
+    "login.passwordLabel": {
+      "value": "Kata laluan",
+      "sourceHash": "dc647eb6",
+      "reviewed": false
+    },
+    "login.passwordPlaceholder": {
+      "value": "Masukkan kata laluan anda",
+      "sourceHash": "e8d28194",
+      "reviewed": false
+    },
+    "login.showPassword": {
+      "value": "Tunjukkan kata laluan",
+      "sourceHash": "a1cc7ba8",
+      "reviewed": false
+    },
+    "login.hidePassword": {
+      "value": "Sembunyikan kata laluan",
+      "sourceHash": "3f5b7abc",
+      "reviewed": false
+    },
+    "login.submitButton": {
+      "value": "Log masuk",
+      "sourceHash": "b6d4223e",
+      "reviewed": false
+    },
+    "login.signingIn": {
+      "value": "Sedang log masuk...",
+      "sourceHash": "4381b667",
+      "reviewed": false
+    },
+    "login.helpTitle": {
+      "value": "Perlukan akses akaun?",
+      "sourceHash": "03ebe524",
+      "reviewed": false
+    },
+    "login.helpText": {
+      "value": "Log masuk menggunakan akaun nickname@bilc.my dan kata laluan anda. Hubungi bahagian kemasukan jika anda memerlukan maklumat akaun.",
+      "sourceHash": "6bf8627a",
+      "reviewed": false
+    },
+    "userDashboard.welcome": {
+      "value": "Selamat kembali",
+      "sourceHash": "83218ac3",
+      "reviewed": false
+    },
+    "userDashboard.roleStudent": {
+      "value": "Akaun pelajar",
+      "sourceHash": "60e7aba1",
+      "reviewed": false
+    },
+    "userDashboard.roleTeacher": {
+      "value": "Akaun guru",
+      "sourceHash": "9b247d4c",
+      "reviewed": false
+    },
+    "userDashboard.roleMember": {
+      "value": "Akaun ahli",
+      "sourceHash": "bd29eb3f",
+      "reviewed": false
+    },
+    "userDashboard.subtitle": {
+      "value": "Akaun anda telah bersedia. Maklumat yang dikongsi oleh pusat akan dipaparkan di sini apabila tersedia untuk peranan anda.",
+      "sourceHash": "8227f1be",
+      "reviewed": false
+    },
+    "userDashboard.nextStepTitle": {
+      "value": "Cari program pembelajaran",
+      "sourceHash": "f61cabad",
+      "reviewed": false
+    },
+    "userDashboard.nextStepText": {
+      "value": "Semak maklumat program semasa atau hubungi pusat jika anda memerlukan bantuan memilih pilihan yang tepat.",
+      "sourceHash": "43654ce5",
+      "reviewed": false
+    },
+    "userDashboard.nextStepButton": {
+      "value": "Lihat program",
+      "sourceHash": "54db3622",
+      "reviewed": false
+    },
+    "userDashboard.attendanceTitle": {
+      "value": "Maklumat kehadiran",
+      "sourceHash": "76efd780",
+      "reviewed": false
+    },
+    "userDashboard.attendanceLoading": {
+      "value": "Kehadiran: sedang dimuatkan",
+      "sourceHash": "93d446f0",
+      "reviewed": false
+    },
+    "userDashboard.attendanceLoadingText": {
+      "value": "Ringkasan kehadiran terkini anda sedang disediakan.",
+      "sourceHash": "8fe7200b",
+      "reviewed": false
+    },
+    "userDashboard.attendanceScore": {
+      "value": "Kehadiran: {percentage}%",
+      "sourceHash": "f9e63420",
+      "reviewed": false
+    },
+    "userDashboard.attendanceScoreText": {
+      "value": "{attended} daripada {total} sesi selesai telah dihadiri. Tanda hadir dan lewat dikira sebagai hadir.",
+      "sourceHash": "3b7a2a69",
+      "reviewed": false
+    },
+    "userDashboard.attendanceNotAvailable": {
+      "value": "Kehadiran belum tersedia.",
+      "sourceHash": "611af932",
+      "reviewed": false
+    },
+    "userDashboard.attendanceNotAvailableText": {
+      "value": "Peratusan kehadiran anda akan dipaparkan selepas pihak pusat merekodkan sesi yang telah selesai.",
+      "sourceHash": "8c3843fc",
+      "reviewed": false
+    },
+    "userDashboard.signOut": {
+      "value": "Log keluar",
+      "sourceHash": "c87aacf5",
+      "reviewed": false
+    },
+    "userDashboard.preparing": {
+      "value": "Menyediakan ruang kerja anda",
+      "sourceHash": "255a077b",
+      "reviewed": false
+    },
+    "userDashboard.preparingText": {
+      "value": "Sila tunggu sebentar sementara akses akaun anda disahkan.",
+      "sourceHash": "f178445c",
+      "reviewed": false
+    },
+    "userDashboard.placeholderText": {
+      "value": "Papan pemuka anda telah aktif sepenuhnya dan sedia untuk kandungan akademik akan datang.",
+      "sourceHash": "b2f5cac0",
+      "reviewed": false
+    },
+    "userDashboard.greeting": {
+      "value": "Selamat kembali, {name}.",
+      "sourceHash": "03ef00d6",
+      "reviewed": false
+    },
+    "role.student": {
+      "value": "Pelajar",
+      "sourceHash": "f5c0a1c9",
+      "reviewed": false
+    },
+    "role.teacher": {
+      "value": "Guru",
+      "sourceHash": "8ab7bbdf",
+      "reviewed": false
+    },
+    "role.marketing": {
+      "value": "Pemasaran",
+      "sourceHash": "7cb15e41",
+      "reviewed": false
+    },
+    "role.admin": {
+      "value": "Pentadbir",
+      "sourceHash": "e3afed00",
+      "reviewed": false
+    },
+    "role.superAdmin": {
+      "value": "Pentadbir Utama",
+      "sourceHash": "dbf36ff3",
+      "reviewed": false
+    },
+    "role.founder": {
+      "value": "Pengasas",
+      "sourceHash": "ad5b1a22",
+      "reviewed": false
+    },
+    "role.user": {
+      "value": "Pengguna",
+      "sourceHash": "8f9bfe9d",
+      "reviewed": false
+    },
+    "account.status": {
+      "value": "Akaun {role}",
+      "sourceHash": "3b1ad4fa",
+      "reviewed": false
+    },
+    "shell.myDashboard": {
+      "value": "Papan Pemuka Saya",
+      "sourceHash": "cc9c45ed",
+      "reviewed": false
+    },
+    "shell.toggleSidebar": {
+      "value": "Tukar Bar Sisi",
+      "sourceHash": "7f8e313f",
+      "reviewed": false
+    },
+    "shell.attendancePending": {
+      "value": "Kehadiran belum tersedia lagi.",
+      "sourceHash": "611af932",
+      "reviewed": false
+    },
+    "shell.studentPortal": {
+      "value": "Portal Pelajar",
+      "sourceHash": "57032670",
+      "reviewed": false
+    },
+    "shell.learningCentreAdmin": {
+      "value": "Pentadbir Pusat Pembelajaran",
+      "sourceHash": "91f59c22",
+      "reviewed": false
+    },
+    "form.studentName": {
+      "value": "Nama penuh pelajar *",
+      "sourceHash": "0cb0914b",
+      "reviewed": false
+    },
+    "form.studentNamePlaceholder": {
+      "value": "cth. Siti Nurhaliza",
+      "sourceHash": "ce5ae217",
+      "reviewed": false
+    },
+    "form.studentAge": {
+      "value": "Umur pelajar *",
+      "sourceHash": "f860db47",
+      "reviewed": false
+    },
+    "form.studentAgePlaceholder": {
+      "value": "cth. 16",
+      "sourceHash": "21a76ec8",
+      "reviewed": false
+    },
+    "form.parentName": {
+      "value": "Nama ibu bapa / penjaga *",
+      "sourceHash": "037874d3",
+      "reviewed": false
+    },
+    "form.parentNamePlaceholder": {
+      "value": "cth. Ahmad Faiz",
+      "sourceHash": "78f89cb9",
+      "reviewed": false
+    },
+    "form.parentEmail": {
+      "value": "E-mel perhubungan *",
+      "sourceHash": "a71b9662",
+      "reviewed": false
+    },
+    "form.parentEmailPlaceholder": {
+      "value": "nama@contoh.com",
+      "sourceHash": "a130ced3",
+      "reviewed": true
+    },
+    "form.parentPhone": {
+      "value": "Nombor telefon (dengan kod negara) *",
+      "sourceHash": "34317617",
+      "reviewed": false
+    },
+    "form.parentPhonePlaceholder": {
+      "value": "+60 12 345 6789",
+      "sourceHash": "5a28e52e",
+      "reviewed": true
+    },
+    "form.programInterest": {
+      "value": "Program yang diminati *",
+      "sourceHash": "96a706b2",
+      "reviewed": false
+    },
+    "form.selectProgram": {
+      "value": "Pilih satu program...",
+      "sourceHash": "3d36a278",
+      "reviewed": false
+    },
+    "form.preferredSchedule": {
+      "value": "Jadual pilihan *",
+      "sourceHash": "49930df2",
+      "reviewed": false
+    },
+    "form.selectSchedule": {
+      "value": "Pilih jadual...",
+      "sourceHash": "eac1d155",
+      "reviewed": false
+    },
+    "form.weekdayMorning": {
+      "value": "Pagi Hari Bekerja (9:00 PG - 12:00 TGH)",
+      "sourceHash": "8b355e35",
+      "reviewed": false
+    },
+    "form.weekdayAfternoon": {
+      "value": "Petang Hari Bekerja (2:00 PTG - 5:00 PTG)",
+      "sourceHash": "9aa8cd80",
+      "reviewed": false
+    },
+    "form.weekdayEvening": {
+      "value": "Malam Hari Bekerja (6:30 PTG - 9:00 MLM)",
+      "sourceHash": "d48c9918",
+      "reviewed": false
+    },
+    "form.weekendIntensive": {
+      "value": "Intensif Hujung Minggu (Sab/Ahad)",
+      "sourceHash": "8e48d04d",
+      "reviewed": false
+    },
+    "form.flexiblePrivate": {
+      "value": "Jadual Peribadi Fleksibel 1-dengan-1",
+      "sourceHash": "39011325",
+      "reviewed": false
+    },
+    "form.message": {
+      "value": "Butiran tambahan atau matlamat",
+      "sourceHash": "1ec3c40b",
+      "reviewed": false
+    },
+    "form.messagePlaceholder": {
+      "value": "Beritahu kami tentang tahap bahasa semasa, tempoh masa atau matlamat khusus...",
+      "sourceHash": "0c50b4fb",
+      "reviewed": false
+    },
+    "form.submitEnquiry": {
+      "value": "Hantar pertanyaan",
+      "sourceHash": "105625ae",
+      "reviewed": false
+    },
+    "form.sending": {
+      "value": "Sedang menghantar...",
+      "sourceHash": "f39bda51",
+      "reviewed": false
+    },
+    "form.successTitle": {
+      "value": "Terima kasih — kami telah menerima maklumat anda.",
+      "sourceHash": "13ac8fd5",
+      "reviewed": false
+    },
+    "form.successText": {
+      "value": "Pasukan kemasukan kami akan menghubungi anda dalam tempoh 24 jam untuk membincangkan langkah seterusnya.",
+      "sourceHash": "28b0ad02",
+      "reviewed": false
+    },
+    "form.submitAnother": {
+      "value": "Hantar maklum balas lain",
+      "sourceHash": "eaf36858",
+      "reviewed": false
+    },
+    "form.kicker": {
+      "value": "Mari berbincang",
+      "sourceHash": "cce862dd",
+      "reviewed": false
+    },
+    "form.stepInfo": {
+      "value": "Info Pelajar",
+      "sourceHash": "a5df11a7",
+      "reviewed": false
+    },
+    "form.stepTrack": {
+      "value": "Pilihan Kursus",
+      "sourceHash": "48e15f17",
+      "reviewed": false
+    },
+    "form.stepContact": {
+      "value": "Penjaga & Hubungan",
+      "sourceHash": "88d09ade",
+      "reviewed": false
+    },
+    "placementModal.title": {
+      "value": "Ujian Penilaian Bahasa Inggeris 3 Minit Percuma",
+      "sourceHash": "9367f065",
+      "reviewed": false
+    },
+    "placementModal.subtitle": {
+      "value": "Jawab 8 soalan pantas untuk mengenal pasti tahap CEFR anda (A1–C1) dan terima cadangan kursus yang diperibadikan.",
+      "sourceHash": "b2164a9a",
+      "reviewed": false
+    },
+    "placementModal.questionNumber": {
+      "value": "Soalan {current} daripada {total}",
+      "sourceHash": "d9e19ee5",
+      "reviewed": false
+    },
+    "placementModal.completeBtn": {
+      "value": "Lihat Penilaian & Laluan Kursus Disyorkan",
+      "sourceHash": "b749b660",
+      "reviewed": false
+    },
+    "placementModal.resultTitle": {
+      "value": "Keputusan Penilaian Bahasa Inggeris CEFR Anda",
+      "sourceHash": "21487bc0",
+      "reviewed": false
+    },
+    "placementModal.yourLevel": {
+      "value": "Anggaran Tahap CEFR",
+      "sourceHash": "e0e9a663",
+      "reviewed": false
+    },
+    "placementModal.diagnosticScore": {
+      "value": "Skor Diagnostik: {score}/8 ({pct}%)",
+      "sourceHash": "6e71ad7f",
+      "reviewed": false
+    },
+    "placementModal.recommendedCourse": {
+      "value": "Laluan Kursus Disyorkan:",
+      "sourceHash": "0a398bfd",
+      "reviewed": false
+    },
+    "placementModal.enrollWithScore": {
+      "value": "Daftar dengan skor ini",
+      "sourceHash": "f60cf754",
+      "reviewed": false
+    },
+    "placementModal.retake": {
+      "value": "Ambil semula ujian",
+      "sourceHash": "04f9c5dd",
+      "reviewed": false
+    },
+    "onlineTest.badge": {
+      "value": "Ujian Penempatan Dalam Talian Percuma",
+      "sourceHash": "6dd52e24",
+      "reviewed": false
+    },
+    "onlineTest.title": {
+      "value": "Penilai Tahap Bahasa Inggeris Pantas",
+      "sourceHash": "19035f39",
+      "reviewed": false
+    },
+    "onlineTest.description": {
+      "value": "Jawab 5 soalan tatabahasa & perbendaharaan kata untuk melihat anggaran tahap CEFR dan laluan pengajian yang disyorkan.",
+      "sourceHash": "56ad72ca",
+      "reviewed": false
+    },
+    "onlineTest.progress": {
+      "value": "Soalan {current} daripada {total}",
+      "sourceHash": "d9e19ee5",
+      "reviewed": false
+    },
+    "onlineTest.previous": {
+      "value": "Sebelumnya",
+      "sourceHash": "dd1f775e",
+      "reviewed": false
+    },
+    "onlineTest.next": {
+      "value": "Soalan Seterusnya",
+      "sourceHash": "caf05a4c",
+      "reviewed": false
+    },
+    "onlineTest.getResults": {
+      "value": "Dapatkan Keputusan",
+      "sourceHash": "4d0291f0",
+      "reviewed": false
+    },
+    "onlineTest.score": {
+      "value": "Skor",
+      "sourceHash": "5dd135d1",
+      "reviewed": false
+    },
+    "onlineTest.complete": {
+      "value": "Penilaian Selesai",
+      "sourceHash": "5b0e7759",
+      "reviewed": false
+    },
+    "onlineTest.estimatedLevel": {
+      "value": "Anggaran Tahap:",
+      "sourceHash": "7885d996",
+      "reviewed": false
+    },
+    "onlineTest.recommendedForYou": {
+      "value": "Disyorkan Untuk Anda",
+      "sourceHash": "dd6aba38",
+      "reviewed": false
+    },
+    "onlineTest.whatsappCta": {
+      "value": "💬 Hantar Keputusan ke WhatsApp Kemasukan",
+      "sourceHash": "fdb52033",
+      "reviewed": false
+    },
+    "onlineTest.whatsappMessage": {
+      "value": "Salam Bilingual Idol! Saya telah melengkapkan Ujian Penempatan dalam talian. Skor saya ialah {score}/{total} ({level}). Saya ingin menempah sesi penilaian rasmi.",
+      "sourceHash": "c494f040",
+      "reviewed": false
+    },
+    "onlineTest.closeLabel": {
+      "value": "Tutup Ujian Penempatan",
+      "sourceHash": "37948cca",
+      "reviewed": false
+    },
+    "onlineTest.bookClass": {
+      "value": "Tempah Kelas Anda",
+      "sourceHash": "4c514b08",
+      "reviewed": false
+    },
+    "onlineTest.disclaimer": {
+      "value": "* Nota: Penilaian pantas dalam talian ini memberikan anggaran awal. Penempatan rasmi untuk peruntukan kelas disahkan secara bersemuka di Pavilion Embassy atau melalui ujian Zoom bersama fakulti akademik kami.",
+      "sourceHash": "966fc276",
+      "reviewed": false
+    },
+    "category.english": {
+      "value": "Bahasa Inggeris",
+      "sourceHash": "78463a38",
+      "reviewed": false
+    },
+    "category.kids": {
+      "value": "Kanak-kanak",
+      "sourceHash": "eb73ee66",
+      "reviewed": false
+    },
+    "category.professional": {
+      "value": "Profesional",
+      "sourceHash": "9e8b1602",
+      "reviewed": false
+    },
+    "category.worldLanguages": {
+      "value": "Bahasa Dunia",
+      "sourceHash": "b393c6a5",
+      "reviewed": false
+    },
+    "languageName.english": {
+      "value": "Bahasa Inggeris",
+      "sourceHash": "78463a38",
+      "reviewed": false
+    },
+    "languageName.bahasaMelayu": {
+      "value": "Bahasa Melayu",
+      "sourceHash": "0339d3bb",
+      "reviewed": true
+    },
+    "languageName.mandarin": {
+      "value": "Mandarin",
+      "sourceHash": "76c06512",
+      "reviewed": true
+    },
+    "languageName.arabic": {
+      "value": "Arab",
+      "sourceHash": "272ccb85",
+      "reviewed": false
+    },
+    "languageName.japanese": {
+      "value": "Jepun",
+      "sourceHash": "f32ced6a",
+      "reviewed": false
+    },
+    "languageName.korean": {
+      "value": "Korea",
+      "sourceHash": "d0bdb3cd",
+      "reviewed": false
+    },
+    "newsCategory.announcement": {
+      "value": "Pengumuman",
+      "sourceHash": "feb4d2df",
+      "reviewed": false
+    },
+    "newsCategory.event": {
+      "value": "Acara",
+      "sourceHash": "a4ecfc70",
+      "reviewed": false
+    },
+    "newsCategory.holiday": {
+      "value": "Cuti",
+      "sourceHash": "84b8343a",
+      "reviewed": false
+    },
+    "promo.buttonLabel": {
+      "value": "Tunjukkan Promosi Aktif",
+      "sourceHash": "d6045519",
+      "reviewed": false
+    },
+    "promo.badge": {
+      "value": "TAWARAN EKSKLUSIF",
+      "sourceHash": "bc38fded",
+      "reviewed": false
+    },
+    "promo.off": {
+      "value": "Diskaun Aktif",
+      "sourceHash": "41d3e77a",
+      "reviewed": false
+    },
+    "promo.codeLabel": {
+      "value": "KOD PROMO",
+      "sourceHash": "d69e2085",
+      "reviewed": false
+    },
+    "promo.copyCode": {
+      "value": "Salin Kod",
+      "sourceHash": "d0562a57",
+      "reviewed": false
+    },
+    "promo.dismiss": {
+      "value": "Mungkin Nanti",
+      "sourceHash": "91b27835",
+      "reviewed": false
+    },
+    "promo.discountPercent": {
+      "value": "Diskaun {percent}%",
+      "sourceHash": "9a578ac4",
+      "reviewed": false
+    },
+    "promo.discountActive": {
+      "value": "{discount} Diskaun Aktif",
+      "sourceHash": "51c8f525",
+      "reviewed": false
+    },
+    "bookingModal.title": {
+      "value": "Tempah Perundingan Kampus & Audit Tahap",
+      "sourceHash": "91f48bda",
+      "reviewed": false
+    },
+    "bookingModal.subtitle": {
+      "value": "Temui penasihat akademik kami di Pavilion Embassy, KL untuk perundingan pelan pembelajaran yang diperibadikan.",
+      "sourceHash": "b8574755",
+      "reviewed": false
+    },
+    "bookingModal.selectDate": {
+      "value": "Pilih Tarikh Pilihan *",
+      "sourceHash": "4897de59",
+      "reviewed": false
+    },
+    "bookingModal.selectTime": {
+      "value": "Pilih Slot Masa Pilihan *",
+      "sourceHash": "5750d050",
+      "reviewed": false
+    },
+    "bookingModal.consultationReason": {
+      "value": "Objektif Perundingan *",
+      "sourceHash": "68c7827a",
+      "reviewed": false
+    },
+    "bookingModal.bookBtn": {
+      "value": "Sahkan Temujanji Kampus",
+      "sourceHash": "fa8a575b",
+      "reviewed": false
+    },
+    "bookingModal.successTitle": {
+      "value": "Temujanji Berjaya Ditempah!",
+      "sourceHash": "2b5745cc",
+      "reviewed": false
+    },
+    "bookingModal.successDesc": {
+      "value": "Pasukan kemasukan kami telah menempah slot anda. Kami telah menghantar maklumat pengesahan ke kenalan anda.",
+      "sourceHash": "3a0d4349",
+      "reviewed": false
+    },
+    "chat.widgetTitle": {
+      "value": "Pembantu Kemasukan",
+      "sourceHash": "3f62cca1",
+      "reviewed": false
+    },
+    "chat.welcome": {
+      "value": "Selamat sejahtera! Selamat datang ke Pusat Bahasa Bilingual Idol di Pavilion Embassy. Bagaimana saya boleh membantu anda hari ini?",
+      "sourceHash": "04699e6e",
+      "reviewed": false
+    },
+    "chat.placeholder": {
+      "value": "Tanya tentang kursus, IELTS, yuran, jadual...",
+      "sourceHash": "e90b02bf",
+      "reviewed": false
+    },
+    "chat.send": {
+      "value": "Hantar",
+      "sourceHash": "94966d90",
+      "reviewed": false
+    }
   },
-  "nav.close": "Tutup",
-  "nav.workspace": "Ruang Kerja",
-  "nav.accountActive": "Akaun aktif",
-  "nav.myClasses": "Kelas Saya",
-  "nav.overview": "Gambaran Keseluruhan",
-  "nav.users": "Pengguna",
-  "nav.students": "Pelajar",
-  "nav.media": {
-    "value": "Media",
-    "__TODO__": true
-  },
-  "nav.auditLogs": "Log Audit",
-  "nav.switchLanguage": "Bahasa",
-  "nav.contactUs": "Hubungi kami",
-  "nav.enrollNow": "Daftar sekarang",
-  "nav.bookTour": "Tempah Lawatan Kampus",
-  "footer.centreName": "Pusat Bahasa Bilingual Idol",
-  "footer.location": {
-    "value": "Pavilion Embassy, Kuala Lumpur",
-    "__TODO__": true
-  },
-  "footer.brandSubtitle": "Pusat Bahasa",
-  "footer.allRightsReserved": "Hak cipta terpelihara",
-  "common.call": "Telefon",
-  "common.whatsapp": {
-    "value": "WhatsApp",
-    "__TODO__": true
-  },
-  "common.email": "E-mel",
-  "common.openingHours": "Waktu operasi",
-  "common.backToHome": "Kembali ke laman utama",
-  "common.viewDetails": "Lihat butiran",
-  "common.readMore": "Baca artikel",
-  "common.learnMore": "Ketahui lebih lanjut",
-  "common.submit": "Hantar",
-  "common.loading": "Memuatkan...",
-  "common.filter": "Tapis",
-  "common.all": "Semua",
-  "common.search": "Cari",
-  "common.thankYou": "Terima kasih",
-  "common.close": "Tutup",
-  "common.requiredFields": "Medan bertanda bintang (*) adalah wajib.",
-  "common.viewProgrammes": "Lihat program",
-  "common.cancel": "Batal",
-  "common.next": "Seterusnya",
-  "common.prev": "Kembali",
-  "common.step": "Langkah",
-  "common.sendMessage": "Hantar pertanyaan",
-  "common.location": "Lokasi",
-  "common.addressText": {
-    "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur.",
-    "__TODO__": true
-  },
-  "home.eyebrow": "Musim Akademik 2026 · Pavilion Embassy, KL",
-  "home.heroTitle": "Pusat Bahasa Bilingual Idol",
-  "home.heroSubtitle": "Program bahasa berstruktur, persediaan peperiksaan IELTS antarabangsa dan laluan bahasa dunia yang mendalam di Pavilion Embassy, Kuala Lumpur.",
-  "home.ctaFindCourse": "Cari kursus anda",
-  "home.ctaEnquiry": "Buat pertanyaan",
-  "home.ctaPlacement": "Ujian penempatan percuma",
-  "home.ctaBooking": "Tempah perundingan",
-  "home.taskPlacementTitle": "Ujian penempatan dalam talian",
-  "home.taskPlacementDesc": "Nilaikan tahap penguasaan anda dalam 3 minit dengan skor segera dan cadangan kursus.",
-  "home.taskConsultationTitle": "Tempah perundingan",
-  "home.taskConsultationDesc": "Jadualkan lawatan peribadi dan sesi pelan bahasa 1-dengan-1 di Pavilion Embassy.",
-  "home.taskProgramsTitle": "Semak program 2026",
-  "home.taskProgramsDesc": "Bahasa Inggeris Umum, IELTS, Kem Musim Panas, Korporat & Bahasa Dunia.",
-  "home.taskContactTitle": "Bercakap dengan penasihat",
-  "home.taskContactDesc": "WhatsApp atau hubungi pasukan kemasukan kami secara terus untuk bimbingan peribadi.",
-  "home.pricingEyebrow": "Yuran Rasmi 2026",
-  "home.pricingTitle": "Program Akademik yang Diiktiraf",
-  "home.pricingSubtitle": "Terokai kursus bertauliah kami yang tersusun. Hubungi pihak kemasukan untuk pendaftaran berkumpulan, jadual tersuai dan promosi pengambilan aktif.",
-  "home.pricingTabGeneral": "Bahasa Inggeris Umum",
-  "home.pricingTabIelts": "Persediaan IELTS",
-  "home.pricingTabCamps": "Kem Cuti Sekolah",
-  "home.pricingTabPrivate": "Privat 1-ke-1",
-  "home.pricingTabExecutive": "Korporat & Eksekutif",
-  "home.pricingTabWorld": "Bahasa Dunia",
-  "home.startHereEyebrow": "Mula di sini",
-  "home.startHereTitle": "Pilih laluan anda ke arah kefasihan.",
-  "home.startHereDesc": "Terokai kursus bertauliah, tempah sesi perundingan kampus, atau akses akaun pelajar anda.",
-  "home.admissionsTag": "Kemasukan",
-  "home.taskPortalTitle": "Portal Pelajar & Kakitangan",
-  "home.taskPortalDesc": "Log masuk untuk melihat jadual kelas, rekod kehadiran, sumber pembelajaran dan gred.",
-  "home.facilitiesEyebrow": "Kemudahan Kampus",
-  "home.facilitiesTitle": "Ruang Pembelajaran Moden di Pavilion Embassy",
-  "home.facilitiesSubtitle": "Alami bilik darjah multimedia serba canggih, ruang istirahat eksekutif, suite belajar peribadi dan zon rehat pelajar kami.",
-  "home.journeyEyebrow": "Perjalanan Pelajar",
-  "home.journeyTitle": "Dari Pertanyaan Pertama Hingga Kefasihan Bahasa",
-  "home.journeySubtitle": "Pelan tindakan 5 peringkat yang direka untuk pemerolehan bahasa pantas, integrasi budaya dan peningkatan bertauliah.",
-  "home.testimonialsEyebrow": "Kisah Pelajar",
-  "home.testimonialsTitle": "Apa Kata Pelajar Kami",
-  "home.testimonialsSubtitle": "Maklum balas tulen daripada pelajar antarabangsa, profesional dan ibu bapa yang belajar di Bilingual Idol.",
-  "home.contactStripTitle": "Bersedia untuk memulakan perjalanan bahasa anda?",
-  "home.contactStripSubtitle": "Lawati kampus kami di Pavilion Embassy, Ampang atau berbincang dengan perunding pendidikan hari ini.",
-  "home.contactStripButton": "Hubungi bahagian kemasukan",
-  "home.languageBandTitle": "Bahasa-bahasa Dunia Ditawarkan",
-  "home.languageBandSubtitle": "Bahasa Inggeris, Bahasa Melayu, Mandarin, Arab, Jepun dan Korea diajar oleh pakar bahasa berdedikasi.",
-  "about.eyebrow": "Tentang Kami",
-  "about.heroTitle": "Pembelajaran bahasa yang dibina atas kemajuan yang jelas.",
-  "about.heroSubtitle": "Pusat Bahasa Bilingual Idol menyokong pelajar di Kuala Lumpur dengan laluan bahasa berfokus, perundingan dan komunikasi yang yakin.",
-  "about.storyEyebrow": "Permulaan yang teliti",
-  "about.storyTitle": "Perkara yang disokong pusat ini",
-  "about.storyBody": "Pusat ini menyediakan persekitaran pembelajaran dengan bilik darjah interaktif, sumber pembelajaran digital, panduan penempatan dan laluan bahasa yang diperibadikan.",
-  "about.explorePrograms": "Terokai program",
-  "about.approachEyebrow": "Pendekatan pembelajaran",
-  "about.approachTitle": "Bagaimana pembelajaran disokong",
-  "about.approachSubtitle": "Langkah seterusnya yang jelas, latihan aktif dan pembinaan keyakinan berterusan membentuk pendekatan pembelajaran pusat kami.",
-  "about.approach1Title": "Bermula dengan matlamat pelajar",
-  "about.approach1Body": "Perundingan dan bimbingan penempatan membantu mengenal pasti laluan bahasa yang bersesuaian sebelum pendaftaran.",
-  "about.approach2Title": "Berlatih secara aktif",
-  "about.approach2Body": "Pusat ini mengutamakan pembelajaran interaktif yang disokong oleh alat bilik darjah digital dan latihan berpandu.",
-  "about.approach3Title": "Bina keyakinan secara mantap",
-  "about.approach3Body": "Laluan pembelajaran direka merangkumi perkembangan bahasa, kesedaran budaya dan komunikasi praktikal.",
-  "about.communityEyebrow": "Komuniti dan latihan",
-  "about.communityTitle": "Tempat untuk terus maju ke hadapan",
-  "about.communityCaption": "Kemahiran bahasa berkembang melalui pertukaran bermakna dan latihan bersama.",
-  "about.teamEyebrow": "Penasihat & Tenaga Pengajar",
-  "about.teamTitle": "Pengajar bertauliah yang berdedikasi untuk kemajuan anda",
-  "about.teamSubtitle": "Tenaga pengajar kami menggabungkan kelayakan antarabangsa yang diiktiraf, pedagogi komunikatif dan bimbingan prihatin.",
-  "programs.eyebrow": "Program",
-  "programs.heroTitle": "Cari program yang sesuai untuk pelajar.",
-  "programs.heroSubtitle": "Terokai panduan kursus 2026 yang diterbitkan, kemudian hubungi pusat untuk mengesahkan kesesuaian, ketersediaan dan jadual pengambilan.",
-  "programs.guideEyebrow": "Panduan yuran 2026",
-  "programs.guideTitle": "Pilihan kursus yang diterbitkan",
-  "programs.guideSubtitle": "Yuran adalah panduan dari senarai 2026. Sahkan jumlah yuran, keperluan visa dan tarikh pengambilan dengan pusat sebelum pendaftaran.",
-  "programs.feeGuideEyebrow": "Struktur Kursus & Yuran",
-  "programs.feeGuideTitle": "Panduan Program 2026 Diterbitkan",
-  "programs.feeGuideSubtitle": "Terokai program bahasa bertauliah yang direka khas untuk pelajar antarabangsa, kanak-kanak, remaja dan profesional.",
-  "programs.searchPlaceholder": "Cari mengikut bahasa, tahap atau kumpulan pelajar",
-  "programs.filterLabel": "Tapis",
-  "programs.filterAll": "Semua Kategori",
-  "programs.countShown": "{count} program disahkan dipaparkan",
-  "programs.showingCount": "program tersedia",
-  "programs.noMatches": "Tiada program yang sepadan dengan carian semasa. Cuba tukar kategori atau kata kunci carian.",
-  "programs.emptyText": "Tiada program ditemui yang sepadan dengan kriteria carian anda.",
-  "programs.emptyCta": "Hubungi kami untuk pilihan kursus tersuai",
-  "programs.viewDetails": "Lihat butiran program",
-  "programs.catAll": "Semua",
-  "programs.catKids": "Kanak-kanak",
-  "programs.catEnglish": "Bahasa Inggeris",
-  "programs.catWorldLanguages": "Bahasa Dunia",
-  "programs.catProfessional": "Profesional",
-  "programDetail.backLink": "Kembali ke senarai program",
-  "programDetail.overviewEyebrow": "Gambaran keseluruhan program",
-  "programDetail.duration": "Tempoh",
-  "programDetail.schedule": "Jadual",
-  "programDetail.fees": "Yuran",
-  "programDetail.level": "Tahap",
-  "programDetail.ageGroup": "Kumpulan Sasaran",
-  "programDetail.outcomesTitle": "Hasil Pembelajaran Utama",
-  "programDetail.ctaTitle": "Berminat dengan program ini?",
-  "programDetail.ctaSubtitle": "Hantar pertanyaan pembelajaran untuk menyemak ketersediaan terkini dan membincangkan penempatan anda.",
-  "programDetail.ctaButton": "Buat pertanyaan sekarang",
-  "contact.eyebrow": "Hubungi",
-  "contact.heroTitle": "Hubungi pihak pusat kami.",
-  "contact.heroSubtitle": "Pilih kaedah komunikasi yang paling mudah untuk anda, atau hantar pertanyaan ringkas di bawah.",
-  "contact.call": "Telefon",
-  "contact.whatsapp": {
-    "value": "WhatsApp",
-    "__TODO__": true
-  },
-  "contact.whatsappValue": "Mesej pusat kami",
-  "contact.email": "E-mel",
-  "contact.hours": "Waktu operasi",
-  "contact.openingHours": "Isnin – Ahad: 9:00 PG – 9:00 MLM",
-  "contact.address": {
-    "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur.",
-    "__TODO__": true
-  },
-  "contact.addressText": {
-    "value": "B-25-07, Kompleks Pavilion Ampang, Menara G-Vestor, 200, Jln Ampang, Kampung Datuk Keramat, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia.",
-    "__TODO__": true
-  },
-  "contact.formEyebrow": "Hantar pertanyaan",
-  "contact.formTitle": "Beritahu kami keperluan pembelajaran anda.",
-  "contact.formSubtitle": "Penerangan ringkas mengenai matlamat bahasa dan waktu pilihan sudah mencukupi untuk memulakan langkah.",
-  "contact.formCardTitle": "Pertanyaan anda",
-  "contact.submitButton": "Hantar pertanyaan",
-  "enroll.backLink": "Kembali ke laman utama",
-  "enroll.eyebrow": "Pertanyaan pembelajaran",
-  "enroll.heroTitle": "Beritahu pusat tentang maklumat pelajar.",
-  "enroll.heroSubtitle": "Hantar butiran yang anda tahu. Membuat pertanyaan tidak mengikat anda kepada mana-mana kursus.",
-  "enroll.nextStepsTitle": "Apa yang berlaku seterusnya",
-  "enroll.step1": "Pusat akan menyemak matlamat bahasa dan tahap semasa pelajar.",
-  "enroll.step2": "Pusat akan mengesyorkan langkah seterusnya yang relevan atau mengajukan soalan susulan.",
-  "enroll.step3": "Maklumat anda hanya dikendalikan oleh kakitangan pusat yang diberi kuasa.",
-  "enroll.formEyebrow": "Maklumat pelajar",
-  "enroll.formTitle": "Beritahu kami keperluan pembelajaran anda.",
-  "enroll.formSubtitle": "Penerangan ringkas mengenai matlamat bahasa dan waktu pilihan sudah mencukupi untuk memulakan langkah.",
-  "enroll.studentNameLabel": "Nama Pelajar *",
-  "enroll.studentNamePlaceholder": "cth. Sara Lee",
-  "enroll.studentAgeLabel": "Umur Pelajar *",
-  "enroll.studentAgePlaceholder": "cth. 16",
-  "enroll.programLabel": "Program Pilihan *",
-  "enroll.programPlaceholder": "Pilih program...",
-  "enroll.scheduleLabel": "Jadual Pilihan *",
-  "enroll.schedulePlaceholder": "Pilih waktu pilihan...",
-  "enroll.parentNameLabel": "Nama Ibu Bapa / Penjaga *",
-  "enroll.parentNamePlaceholder": "cth. David Lee",
-  "enroll.emailLabel": "Alamat E-mel *",
-  "enroll.emailPlaceholder": "cth. penjaga@example.com",
-  "enroll.phoneLabel": "Nombor Telefon / WhatsApp *",
-  "enroll.phonePlaceholder": "cth. +60 12-345 6789",
-  "enroll.messageLabel": "Nota Tambahan atau Soalan",
-  "enroll.messagePlaceholder": "Kongsi sebarang matlamat bahasa, tahap semasa atau keperluan khas...",
-  "enroll.submitButton": "Hantar pertanyaan pembelajaran",
-  "enroll.requiredNote": "Medan bertanda bintang (*) adalah wajib.",
-  "enroll.successTitle": "Pertanyaan Berjaya Dihantar",
-  "enroll.successSubtitle": "Terima kasih. Kaunselor akademik kami akan menyemak keperluan pelajar dan menghubungi anda dalam masa 24 jam.",
-  "enroll.submitAnother": "Hantar pertanyaan lain",
-  "news.eyebrow": "Kemas Kini & Makluman",
-  "news.heroTitle": "Berita dan pengumuman pusat.",
-  "news.heroSubtitle": "Baca makluman terkini, jadual cuti dan kemas kini akademik daripada Bilingual Idol.",
-  "news.searchPlaceholder": "Cari artikel berita...",
-  "news.allCategories": "Semua kategori",
-  "news.readMore": "Baca artikel",
-  "news.readUpdate": "Baca makluman penuh",
-  "news.previous": "Sebelumnya",
-  "news.next": "Seterusnya",
-  "news.noUpdates": "Tiada pengumuman diterbitkan lagi.",
-  "news.noUpdatesText": "Semak semula nanti untuk makluman takwim akademik, bengkel dan acara sekolah.",
-  "login.eyebrow": "Akses Portal",
-  "login.heroTitle": "Log masuk ke akaun anda.",
-  "login.heroSubtitle": "Akses papan pemuka, jadual kelas dan sumber pusat anda.",
-  "login.emailLabel": "Log Masuk",
-  "login.emailPlaceholder": {
-    "value": "nickname@bilc.my",
-    "__TODO__": true
-  },
-  "login.passwordLabel": "Kata laluan",
-  "login.passwordPlaceholder": "Masukkan kata laluan anda",
-  "login.showPassword": "Tunjukkan kata laluan",
-  "login.hidePassword": "Sembunyikan kata laluan",
-  "login.submitButton": "Log masuk",
-  "login.signingIn": "Sedang log masuk...",
-  "login.helpTitle": "Perlukan akses akaun?",
-  "login.helpText": "Log masuk menggunakan akaun nickname@bilc.my dan kata laluan anda. Hubungi bahagian kemasukan jika anda memerlukan maklumat akaun.",
-  "userDashboard.welcome": "Selamat kembali",
-  "userDashboard.roleStudent": "Akaun pelajar",
-  "userDashboard.roleTeacher": "Akaun guru",
-  "userDashboard.roleMember": "Akaun ahli",
-  "userDashboard.subtitle": "Akaun anda telah bersedia. Maklumat yang dikongsi oleh pusat akan dipaparkan di sini apabila tersedia untuk peranan anda.",
-  "userDashboard.nextStepTitle": "Cari program pembelajaran",
-  "userDashboard.nextStepText": "Semak maklumat program semasa atau hubungi pusat jika anda memerlukan bantuan memilih pilihan yang tepat.",
-  "userDashboard.nextStepButton": "Lihat program",
-  "userDashboard.attendanceTitle": "Maklumat kehadiran",
-  "userDashboard.attendanceLoading": "Kehadiran: sedang dimuatkan",
-  "userDashboard.attendanceLoadingText": "Ringkasan kehadiran terkini anda sedang disediakan.",
-  "userDashboard.attendanceScore": "Kehadiran: {percentage}%",
-  "userDashboard.attendanceScoreText": "{attended} daripada {total} sesi selesai telah dihadiri. Tanda hadir dan lewat dikira sebagai hadir.",
-  "userDashboard.attendanceNotAvailable": "Kehadiran belum tersedia.",
-  "userDashboard.attendanceNotAvailableText": "Peratusan kehadiran anda akan dipaparkan selepas pihak pusat merekodkan sesi yang telah selesai.",
-  "userDashboard.signOut": "Log keluar",
-  "userDashboard.preparing": "Menyediakan ruang kerja anda",
-  "userDashboard.preparingText": "Sila tunggu sebentar sementara akses akaun anda disahkan.",
-  "form.studentName": "Nama penuh pelajar *",
-  "form.studentNamePlaceholder": "cth. Siti Nurhaliza",
-  "form.studentAge": "Umur pelajar *",
-  "form.studentAgePlaceholder": "cth. 16",
-  "form.parentName": "Nama ibu bapa / penjaga *",
-  "form.parentNamePlaceholder": "cth. Ahmad Faiz",
-  "form.parentEmail": "E-mel perhubungan *",
-  "form.parentEmailPlaceholder": "nama@contoh.com",
-  "form.parentPhone": "Nombor telefon (dengan kod negara) *",
-  "form.parentPhonePlaceholder": {
-    "value": "+60 12 345 6789",
-    "__TODO__": true
-  },
-  "form.programInterest": "Program yang diminati *",
-  "form.selectProgram": "Pilih satu program...",
-  "form.preferredSchedule": "Jadual pilihan *",
-  "form.selectSchedule": "Pilih jadual...",
-  "form.weekdayMorning": "Pagi Hari Bekerja (9:00 PG - 12:00 TGH)",
-  "form.weekdayAfternoon": "Petang Hari Bekerja (2:00 PTG - 5:00 PTG)",
-  "form.weekdayEvening": "Malam Hari Bekerja (6:30 PTG - 9:00 MLM)",
-  "form.weekendIntensive": "Intensif Hujung Minggu (Sab/Ahad)",
-  "form.flexiblePrivate": "Jadual Peribadi Fleksibel 1-dengan-1",
-  "form.message": "Butiran tambahan atau matlamat",
-  "form.messagePlaceholder": "Beritahu kami tentang tahap bahasa semasa, tempoh masa atau matlamat khusus...",
-  "form.submitEnquiry": "Hantar pertanyaan",
-  "form.sending": "Sedang menghantar...",
-  "form.successTitle": "Terima kasih — kami telah menerima maklumat anda.",
-  "form.successText": "Pasukan kemasukan kami akan menghubungi anda dalam tempoh 24 jam untuk membincangkan langkah seterusnya.",
-  "form.submitAnother": "Hantar maklum balas lain",
-  "form.kicker": "Mari berbincang",
-  "form.stepInfo": "Info Pelajar",
-  "form.stepTrack": "Pilihan Kursus",
-  "form.stepContact": "Penjaga & Hubungan",
-  "placementModal.title": "Ujian Penilaian Bahasa Inggeris 3 Minit Percuma",
-  "placementModal.subtitle": "Jawab 8 soalan pantas untuk mengenal pasti tahap CEFR anda (A1–C1) dan terima cadangan kursus yang diperibadikan.",
-  "placementModal.questionNumber": "Soalan {current} daripada {total}",
-  "placementModal.completeBtn": "Lihat Penilaian & Laluan Kursus Disyorkan",
-  "placementModal.resultTitle": "Keputusan Penilaian Bahasa Inggeris CEFR Anda",
-  "placementModal.yourLevel": "Anggaran Tahap CEFR",
-  "placementModal.diagnosticScore": "Skor Diagnostik: {score}/8 ({pct}%)",
-  "placementModal.recommendedCourse": "Laluan Kursus Disyorkan:",
-  "placementModal.enrollWithScore": "Daftar dengan skor ini",
-  "placementModal.retake": "Ambil semula ujian",
-  "bookingModal.title": "Tempah Perundingan Kampus & Audit Tahap",
-  "bookingModal.subtitle": "Temui penasihat akademik kami di Pavilion Embassy, KL untuk perundingan pelan pembelajaran yang diperibadikan.",
-  "bookingModal.selectDate": "Pilih Tarikh Pilihan *",
-  "bookingModal.selectTime": "Pilih Slot Masa Pilihan *",
-  "bookingModal.consultationReason": "Objektif Perundingan *",
-  "bookingModal.bookBtn": "Sahkan Temujanji Kampus",
-  "bookingModal.successTitle": "Temujanji Berjaya Ditempah!",
-  "bookingModal.successDesc": "Pasukan kemasukan kami telah menempah slot anda. Kami telah menghantar maklumat pengesahan ke kenalan anda.",
-  "chat.widgetTitle": "Pembantu Kemasukan",
-  "chat.welcome": "Selamat sejahtera! Selamat datang ke Pusat Bahasa Bilingual Idol di Pavilion Embassy. Bagaimana saya boleh membantu anda hari ini?",
-  "chat.placeholder": "Tanya tentang kursus, IELTS, yuran, jadual...",
-  "chat.send": "Hantar"
+  "seed": {
+    "programs": {
+      "general-english": {
+        "title": {
+          "value": "Bahasa Inggeris Am",
+          "sourceHash": "ecc38a00",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Bina keyakinan harian melalui pertuturan, mendengar, membaca, dan menulis melalui pembelajaran praktikal dan interaktif.",
+          "sourceHash": "39bbfa62",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari pemula hingga lanjutan",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "kids-english": {
+        "title": {
+          "value": "Bahasa Inggeris Kanak-kanak",
+          "sourceHash": "bdd54a47",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Asas yang menyeronokkan dan menyokong untuk pelajar muda mengembangkan bahasa Inggeris mereka melalui komunikasi dan latihan berpandu.",
+          "sourceHash": "2c160fe2",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Anak-anak",
+          "sourceHash": "64e4aca4",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Asas kepada pembangunan",
+          "sourceHash": "26472e8a",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anak anda",
+          "sourceHash": "4efd5890",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "speaking-conversation": {
+        "title": {
+          "value": "Bercakap & Berbual",
+          "sourceHash": "e4ef63f1",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Program bercakap dahulu untuk pelajar yang mahu kata-kata mereka terasa semula jadi, jelas, dan bersedia untuk kehidupan harian.",
+          "sourceHash": "98148347",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari asas hingga lanjutan",
+          "sourceHash": "15f6ce94",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "ielts-preparation": {
+        "title": {
+          "value": "IELTS Penyediaan",
+          "sourceHash": "9692a9a5",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Persediaan khusus untuk pelajar yang merancang untuk menunjukkan kemahiran bahasa Inggeris mereka bagi belajar, bekerja, atau berhijrah.",
+          "sourceHash": "ace5939f",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Pertengahan dan ke atas",
+          "sourceHash": "e34cebf1",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut matlamat peperiksaan anda",
+          "sourceHash": "f4ee056c",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "bahasa-melayu": {
+        "title": {
+          "value": "Bahasa Melayu",
+          "sourceHash": "0339d3bb",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Berhubung dengan lebih yakin dengan kehidupan di Malaysia melalui pembelajaran bahasa Bahasa Melayu yang terstruktur.",
+          "sourceHash": "ec633926",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari pemula hingga lanjutan",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "mandarin": {
+        "title": {
+          "value": "Mandarin",
+          "sourceHash": "76c06512",
+          "reviewed": true
+        },
+        "description": {
+          "value": "Laluan yang jelas ke dalam Mandarin yang menyokong komunikasi, kemahiran mendengar, dan kemajuan yang bertujuan.",
+          "sourceHash": "f2b71591",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Kanak-kanak, remaja & dewasa",
+          "sourceHash": "14a34e89",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari pemula hingga lanjutan",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "arabic": {
+        "title": {
+          "value": "Bahasa Arab",
+          "sourceHash": "272ccb85",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Belajar bahasa Arab melalui latihan berpandu yang menyokong komunikasi bermakna dan kemajuan yang berterusan.",
+          "sourceHash": "41c1e3f6",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari pemula hingga lanjutan",
+          "sourceHash": "8338c745",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "japanese": {
+        "title": {
+          "value": "Bahasa Jepun",
+          "sourceHash": "f32ced6a",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Mulakan perjalanan bahasa Jepun anda dengan program yang mudah didekati dan berirama baik yang dibina mengikut keperluan anda.",
+          "sourceHash": "d9053f08",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari pemula hingga pembangunan",
+          "sourceHash": "43d0ab34",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "korean": {
+        "title": {
+          "value": "Bahasa Korea",
+          "sourceHash": "d0bdb3cd",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Belajar bahasa Korea dalam persekitaran yang menyokong yang menjadikan perbendaharaan kata dan ungkapan baru terasa boleh dicapai.",
+          "sourceHash": "56799fa2",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Remaja & dewasa",
+          "sourceHash": "89150a92",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Dari pemula hingga pembangunan",
+          "sourceHash": "43d0ab34",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut pelan pembelajaran anda",
+          "sourceHash": "d9cb6693",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      },
+      "business-english": {
+        "title": {
+          "value": "Bahasa Inggeris Perniagaan",
+          "sourceHash": "66a33006",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Perhalusi komunikasi profesional untuk mesyuarat, pembentangan, surat-menyurat, dan suasana tempat kerja antarabangsa.",
+          "sourceHash": "d411a764",
+          "reviewed": false
+        },
+        "ageGroup": {
+          "value": "Profesional",
+          "sourceHash": "06b4423e",
+          "reviewed": false
+        },
+        "level": {
+          "value": "Sederhana hingga lanjutan",
+          "sourceHash": "7942e1cc",
+          "reviewed": false
+        },
+        "duration": {
+          "value": "Direka mengikut keperluan tempat kerja",
+          "sourceHash": "82795ca5",
+          "reviewed": false
+        },
+        "schedule": {
+          "value": "Disahkan dengan pusat selepas berunding",
+          "sourceHash": "aacacbdb",
+          "reviewed": false
+        },
+        "fees": {
+          "value": "Panduan bayaran tersedia atas pertanyaan",
+          "sourceHash": "a5282437",
+          "reviewed": false
+        }
+      }
+    },
+    "news": {
+      "bilc-grand-redesign-transforming-language-learning": {
+        "title": {
+          "value": "Bilingual Idol Reka Bentuk Semula Pusat Bahasa: Mengubah Pembelajaran Bahasa",
+          "sourceHash": "8953befd",
+          "reviewed": false
+        },
+        "excerpt": {
+          "value": "Terokai ruang baru kami, program interaktif, dan rangka kerja pembelajaran moden yang mentakrifkan semula kefasihan dwibahasa.",
+          "sourceHash": "3cb32cb8",
+          "reviewed": false
+        },
+        "body": {
+          "value": "Kami sangat teruja untuk secara rasmi memperkenalkan pengalaman baharu yang sangat kemas di Bilingual Idol Language Centre! Sebagai institusi terkemuka yang berdedikasi untuk memupuk kefasihan bahasa dalam bahasa Inggeris, Bahasa Melayu, Mandarin, Arab, Jepun, Korea, dan banyak lagi, reka bentuk semula kami membawa angin segar ke kampus, kehadiran digital kami, dan bilik darjah interaktif kami. \n\n### Apa yang Baru di Bilingual Idol? \n\n* **Ruang Pembelajaran Premium**: Bilik darjah kami telah direka semula sepenuhnya dengan tempat duduk yang fleksibel, teknologi pembelajaran moden, dan alat visual yang menginspirasikan untuk memastikan anda terus terlibat. \n* **Program Interaktif**: Kami telah mempertingkatkan kurikulum kami dengan menampilkan kaedah dialog interaktif, bulatan pertuturan, dan senario kehidupan sebenar. \n* **Digital Hub & Live Student Portals**: Memperkenalkan integrasi digital lanjutan untuk pelajar dan guru bagi menyelaraskan jadual, menghantar tugasan, dan menjejak kemajuan dengan lancar. \n\n### Meningkatkan Perjalanan Dwibahasa Anda\nSama ada anda seorang pemula yang ingin mengambil langkah pertama dalam bahasa Jepun atau Arab, atau seorang profesional yang ingin menyempurnakan skor IELTS anda, Bilingual Idol menawarkan sokongan yang disesuaikan dan persekitaran kumpulan kecil untuk memastikan anda membuat kemajuan yang pantas dan stabil. \n\nKami dengan mesra mengajak anda untuk meneroka laman web baru kami, berhubung dengan pasukan penasihat mesra kami, atau melawat pusat fizikal kami untuk lawatan peribadi. Perjalanan anda menuju keyakinan tertinggi dan kefasihan global bermula hari ini!",
+          "sourceHash": "86643b39",
+          "reviewed": false
+        },
+        "imageAltText": {
+          "value": "Dalaman bilik darjah moden dan persekitaran yang menarik di Bilingual Idol Language Centre",
+          "sourceHash": "5a575204",
+          "reviewed": false
+        }
+      }
+    },
+    "promo": {
+      "MERDEKA2026": {
+        "title": {
+          "value": "Diskaun Istimewa Merdeka",
+          "sourceHash": "d937bdda",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Dapatkan diskaun 15% untuk semua program Bahasa Inggeris Am untuk masa terhad bagi meraikan Bulan Kemerdekaan!",
+          "sourceHash": "6f26e364",
+          "reviewed": false
+        }
+      },
+      "WELCOME50": {
+        "title": {
+          "value": "Tawaran Selamat Datang Pelajar Baru",
+          "sourceHash": "6df46781",
+          "reviewed": false
+        },
+        "description": {
+          "value": "Terima diskaun tetap RM 50 untuk yuran pendaftaran dan penilaian anda untuk mana-mana kursus yang dipilih.",
+          "sourceHash": "79eef383",
+          "reviewed": false
+        }
+      }
+    },
+    "settings": {
+      "promo_title": {
+        "value": "Tawaran Promosi Istimewa",
+        "sourceHash": "2b2cdc5f",
+        "reviewed": false
+      },
+      "promo_text": {
+        "value": "Dapatkan akses eksklusif ke semua program bahasa akademik dwibahasa dengan diskaun pengambilan masa terhad! Mohon sekarang dan tuntut pakej permulaan pelajar anda.",
+        "sourceHash": "d2853158",
+        "reviewed": false
+      },
+      "promo_cta_text": {
+        "value": "Lihat Program",
+        "sourceHash": "1b142959",
+        "reviewed": false
+      },
+      "promo_discount": {
+        "value": "15% DISKAUN",
+        "sourceHash": "21885ff4",
+        "reviewed": false
+      },
+      "cta.apply_now.text": {
+        "value": "Mohon Sekarang",
+        "sourceHash": "739dda5d",
+        "reviewed": false
+      },
+      "cta.placement_test.text": {
+        "value": "Ujian Penempatan Buku",
+        "sourceHash": "bd3e12d3",
+        "reviewed": false
+      },
+      "cta.book_visit.text": {
+        "value": "Tempah Lawatan Kampus",
+        "sourceHash": "48b20321",
+        "reviewed": false
+      },
+      "cta.consultation.text": {
+        "value": "Mohon Konsultasi",
+        "sourceHash": "cba12d6c",
+        "reviewed": false
+      }
+    },
+    "faq": {},
+    "cms": {}
+  }
 }
