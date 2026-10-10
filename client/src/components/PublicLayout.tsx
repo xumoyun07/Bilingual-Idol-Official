@@ -44,8 +44,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     promoColor = "blue";
   }
 
-  const getPromoTheme = (color: string) => {
-    switch (color) {
+  // Бейдж скидки. Раньше выводилось сырое значение настройки "15% OFF",
+  // и в арабском RTL строка разворачивалась в "OFF 15%".
+  // Число берём из значения, формулировку — из локали: тогда порядок слов
+  // верный для каждого языка ("Diskaun 15%", "خصم 15%").
+  const discountNumber = (String(promoDiscount).match(/\d+/) || [""])[0];
+  const discountLabel =
+    String(promoDiscount).includes("%") && discountNumber
+      ? t("promo.discountPercent", { percent: discountNumber })
+      : promoDiscount;
+
+  const getPromoTheme = (color: string) => {    switch (color) {
       case "blue":
         return {
           bg: "from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800",
@@ -720,9 +729,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
                         <Gift size={22} className="relative text-white group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
                       </span>
-                      {promoDiscount && (
-                        <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
-                          {promoDiscount}
+                      {discountLabel && (
+                        <span dir="auto" className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+                          {discountLabel}
                         </span>
                       )}
                     </button>
@@ -874,9 +883,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${promoTheme.ping} opacity-75`}></span>
                 <Gift size={18} className="relative text-white" aria-hidden="true" />
               </span>
-              {promoDiscount && (
-                <span className="absolute -top-1 -right-1 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
-                  {promoDiscount}
+              {discountLabel && (
+                <span dir="auto" className="absolute -top-1 -right-1 bg-yellow-400 text-slate-900 text-[8px] font-extrabold px-1 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+                  {discountLabel}
                 </span>
               )}
             </button>

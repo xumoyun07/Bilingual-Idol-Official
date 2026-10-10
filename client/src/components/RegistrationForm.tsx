@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { languageLabel } from "@/lib/enumLabels";
 
 const registrationSchema = z.object({
   fullName: z.string().trim().min(2, "Please enter your full name."),
@@ -18,7 +19,9 @@ type RegistrationValues = z.infer<typeof registrationSchema>;
 const fieldClass = "mt-2 w-full rounded-lg border border-[#d9cbb8] bg-white px-3.5 py-3 text-sm text-[#10253e] shadow-sm outline-none placeholder:text-[#708098] focus:border-[#173fad] focus:ring-2 focus:ring-[#173fad]/20 min-h-[44px]";
 
 export function RegistrationForm({ title }: { title?: string }) {
-  const { t, isRTL, language } = useLanguage();
+  const { t, isRTL, language, seedText } = useLanguage();
+  /** Перевод технических enum-значений (язык программы). */
+  const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
   const [customValues, setCustomValues] = useState<Record<number, string>>({});
   const [fileStates, setFileStates] = useState<Record<number, { name: string; size: string; uploading: boolean }>>({});
   
@@ -221,7 +224,7 @@ export function RegistrationForm({ title }: { title?: string }) {
           >
             <option value="">{language === "ms" ? "Pilih kursus..." : language === "ar" ? "اختر البرنامج..." : "Select a programme..."}</option>
             {programsQuery.data?.map(prog => (
-              <option key={prog.id} value={String(prog.id)}>{prog.title} ({prog.language})</option>
+              <option key={prog.id} value={String(prog.id)}>{seedText(["programs", prog.slug, "title"], prog.title)} ({languageLabel(prog.language, enumT)})</option>
             ))}
           </select>
           {errorFor("programId") && <span className="text-xs text-red-500 mt-1 block">{errorFor("programId")}</span>}

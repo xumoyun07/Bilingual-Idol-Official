@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { newsCategoryLabel } from "@/lib/enumLabels";
 
 const icons = { announcement: Megaphone, event: CalendarDays, holiday: PartyPopper };
 type NewsPost = { id: number; slug: string; title: string; excerpt: string; body: string; category: "announcement" | "event" | "holiday"; imageUrl: string | null; imageAltText: string | null; publishedAt: Date | null };
@@ -20,7 +21,9 @@ function dateLabel(value: Date | null, locale: string) {
 }
 
 export default function News() {
-  const { t, isRTL, language } = useLanguage();
+  const { t, isRTL, language, seedText } = useLanguage();
+  /** Перевод технических enum-значений (категория новости). */
+  const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<NewsPost | null>(null);
   const [shareLabel, setShareLabel] = useState("");
@@ -125,12 +128,12 @@ export default function News() {
                           <span className="news-card-meta">
                             <span className="news-category">
                               <Icon size={14} />
-                              {item.category}
+                              {newsCategoryLabel(item.category, enumT)}
                             </span>
                             <time dateTime={item.publishedAt?.toISOString()}><bdi dir="ltr">{dateLabel(item.publishedAt, language)}</bdi></time>
                           </span>
-                          <strong>{item.title}</strong>
-                          <span className="news-card-excerpt">{item.excerpt}</span>
+                          <strong>{seedText(["news", item.slug, "title"], item.title)}</strong>
+                          <span className="news-card-excerpt">{seedText(["news", item.slug, "excerpt"], item.excerpt)}</span>
                           <span className="news-read-more">
                             {t("news.readUpdate")} <ChevronRight size={16} className={isRTL ? "rotate-180" : ""} />
                           </span>
@@ -206,7 +209,7 @@ export default function News() {
             <div className="news-dialog-body">
               {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.imageAltText || ""} /> : null}
               <div className="news-dialog-copy">
-                {selected.body.split(/\n{2,}/).map((paragraph, index) => (
+                {seedText(["news", selected.slug, "body"], selected.body).split(/\n{2,}/).map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
@@ -225,13 +228,15 @@ export default function News() {
 }
 
 function NewsDialogHeader({ post, language }: { post: NewsPost; language: string }) {
+  const { t } = useLanguage();
+  const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
   const Icon = icons[post.category];
   return (
     <>
       <div className="news-card-meta">
         <span className="news-category">
           <Icon size={14} />
-          {post.category}
+          {newsCategoryLabel(post.category, enumT)}
         </span>
         <time dateTime={post.publishedAt?.toISOString()}><bdi dir="ltr">{dateLabel(post.publishedAt, language)}</bdi></time>
       </div>

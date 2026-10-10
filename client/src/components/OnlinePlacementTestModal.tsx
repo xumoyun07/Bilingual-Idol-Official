@@ -156,7 +156,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
           type="button"
           className={cn("bilc-modal-close-btn", isRTL && "bilc-modal-close-btn-rtl left-5 right-auto")}
           onClick={onClose}
-          aria-label={language === "ar" ? "إغلاق اختبار تحديد المستوى" : language === "ms" ? "Tutup Ujian Penempatan" : "Close Placement Test"}
+          aria-label={t("onlineTest.closeLabel")}
         >
           <X size={20} />
         </button>
@@ -166,28 +166,10 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
             <div className="bilc-modal-header">
               <div className="bilc-modal-badge">
                 <Sparkles size={14} />
-                <span>
-                  {language === "ms"
-                    ? "Ujian Penempatan Dalam Talian Percuma"
-                    : language === "ar"
-                    ? "اختبار تحديد المستوى المجاني عبر الإنترنت"
-                    : "Free Online Placement Test · Fast Evaluation"}
-                </span>
+                <span>{t("onlineTest.badge")}</span>
               </div>
-              <h2>
-                {language === "ms"
-                  ? "Penilai Tahap Bahasa Inggeris Pantas"
-                  : language === "ar"
-                  ? "مقياس مستوى اللغة الإنجليزية السريع"
-                  : "Quick English Level Evaluator"}
-              </h2>
-              <p>
-                {language === "ms"
-                  ? "Jawab 5 soalan tatabahasa & perbendaharaan kata untuk melihat anggaran tahap CEFR dan laluan pengajian yang disyorkan."
-                  : language === "ar"
-                  ? "أجب عن 5 أسئلة سريعة في القواعد والمفردات لمعرفة مستواك التقديري وفق الإطار الأوروبي (CEFR) والمسار الأكاديمي الموصى به."
-                  : "Answer 5 quick grammar & vocabulary questions to see your estimated CEFR level and recommended study pathway."}
-              </p>
+              <h2>{t("onlineTest.title")}</h2>
+              <p>{t("onlineTest.description")}</p>
             </div>
 
             <div className="bilc-test-progress-bar">
@@ -195,11 +177,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                 <div className="bilc-progress-fill" style={{ width: `${((currentIdx + 1) / totalQ) * 100}%` }} />
               </div>
               <span className="bilc-test-step-label">
-                {language === "ms"
-                  ? `Soalan ${currentIdx + 1} daripada ${totalQ}`
-                  : language === "ar"
-                  ? `السؤال ${currentIdx + 1} من ${totalQ}`
-                  : `Question ${currentIdx + 1} of ${totalQ}`}
+                {t("onlineTest.progress", { current: currentIdx + 1, total: totalQ })}
               </span>
             </div>
 
@@ -214,7 +192,12 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                     onClick={() => handleSelect(oIdx)}
                   >
                     <span className="bilc-option-letter">{String.fromCharCode(65 + oIdx)}</span>
-                    <span className="bilc-option-label">{opt.text}</span>
+                    {/* Вариант ответа ВСЕГДА английский: тест измеряет английскую
+                        грамматику, а неверные варианты неверны именно из-за
+                        английского словоизменения (she doesn't like / she don't like).
+                        dir="ltr" обязателен: в арабском RTL предложение с пропуском
+                        разворачивается и точка уезжает в начало строки. */}
+                    <span className="bilc-option-label" dir="ltr" lang="en">{opt.text}</span>
                     {selectedAnswers[currentIdx] === oIdx && <CheckCircle2 size={18} className="bilc-check-icon-active" />}
                   </button>
                 ))}
@@ -228,7 +211,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                 disabled={currentIdx === 0}
                 onClick={() => setCurrentIdx(i => i - 1)}
               >
-                {language === "ms" ? "Sebelumnya" : language === "ar" ? "السابق" : "Previous"}
+                {t("onlineTest.previous")}
               </button>
 
               {currentIdx < totalQ - 1 ? (
@@ -238,7 +221,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                   disabled={selectedAnswers[currentIdx] === undefined}
                   onClick={() => setCurrentIdx(i => i + 1)}
                 >
-                  {language === "ms" ? "Soalan Seterusnya" : language === "ar" ? "السؤال التالي" : "Next Question"} <ChevronRight size={16} />
+                  {t("onlineTest.next")} <ChevronRight size={16} />
                 </button>
               ) : (
                 <button
@@ -247,7 +230,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                   disabled={selectedAnswers[currentIdx] === undefined}
                   onClick={() => setSubmitted(true)}
                 >
-                  {language === "ms" ? "Dapatkan Keputusan" : language === "ar" ? "عرض نتيجة التقييم" : "Get Evaluation Results"} <Award size={16} />
+                  {t("onlineTest.getResults")} <Award size={16} />
                 </button>
               )}
             </div>
@@ -257,14 +240,14 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
             <div className="bilc-result-header">
               <div className="bilc-score-circle">
                 <strong>{score} / {totalQ}</strong>
-                <span>{language === "ms" ? "Skor" : language === "ar" ? "النتيجة" : "Score"}</span>
+                <span>{t("onlineTest.score")}</span>
               </div>
               <div>
                 <span className="bilc-rec-tag">
-                  {language === "ms" ? "Penilaian Selesai" : language === "ar" ? "اكتمل التقييم" : "Evaluation Complete"}
+                  {t("onlineTest.complete")}
                 </span>
                 <h3>
-                  {language === "ms" ? "Anggaran Tahap:" : language === "ar" ? "المستوى التقديري:" : "Estimated Level:"} {evalResult.level}
+                  {t("onlineTest.estimatedLevel")} {evalResult.level}
                 </h3>
                 <p className="text-sm text-slate-600">{evalResult.description}</p>
               </div>
@@ -272,7 +255,7 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
 
             <div className="bilc-rec-course-card">
               <span className="bilc-rec-small">
-                {language === "ms" ? "Disyorkan Untuk Anda" : language === "ar" ? "موصى به لك" : "Recommended For You"}
+                {t("onlineTest.recommendedForYou")}
               </span>
               <h4>{evalResult.recommendedCourse}</h4>
               <p className="bilc-intake-note">{evalResult.nextIntake}</p>
@@ -281,21 +264,13 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
             <div className="bilc-result-cta-grid">
               <a
                 href={`https://wa.me/60367310449?text=${encodeURIComponent(
-                  language === "ms"
-                    ? `Salam Bilingual Idol! Saya telah melengkapkan Ujian Penempatan dalam talian. Skor saya ialah ${score}/${totalQ} (${evalResult.level}). Saya ingin menempah sesi penilaian rasmi.`
-                    : language === "ar"
-                    ? `مرحباً بايلينجوال آيدول! أكملت اختبار تحديد المستوى المجاني عبر الإنترنت. نتيجتي هي ${score}/${totalQ} (${evalResult.level}). أود حجز تقييم رسمي.`
-                    : `Hello Bilingual Idol! I completed your free Online Placement Test. My score is ${score}/${totalQ} (${evalResult.level}). I'd like to book my official evaluation.`
+                  t("onlineTest.whatsappMessage", { score, total: totalQ, level: evalResult.level })
                 )}`}
                 target="_blank"
                 rel="noreferrer"
                 className="simple-button bilc-wa-btn"
               >
-                {language === "ms"
-                  ? "💬 Hantar Keputusan ke WhatsApp Kemasukan"
-                  : language === "ar"
-                  ? "💬 إرسال النتيجة عبر واتساب إلى القبول"
-                  : "💬 WhatsApp Results to Admissions"}
+                {t("onlineTest.whatsappCta")}
               </a>
 
               <button
@@ -308,16 +283,12 @@ export function OnlinePlacementTestModal({ isOpen, onClose, onBookConsultation }
                 }}
                 className="simple-button simple-button-quiet cursor-pointer"
               >
-                {language === "ms" ? "Tempah Kelas Anda" : language === "ar" ? "احجز صفك الدراسي" : "Book Your Class"}
+                {t("onlineTest.bookClass")}
               </button>
             </div>
 
             <p className="bilc-disclaimer-text">
-              {language === "ms"
-                ? "* Nota: Penilaian pantas dalam talian ini memberikan anggaran awal. Penempatan rasmi untuk peruntukan kelas disahkan secara bersemuka di Pavilion Embassy atau melalui ujian Zoom bersama fakulti akademik kami."
-                : language === "ar"
-                ? "* ملاحظة: هذا التقييم السريع عبر الإنترنت يوفر تقديراً أولياً. يتم تأكيد تحديد المستوى الرسمي لتوزيع الفصول حضورياً في بافيليون إمباسي أو عبر اختبار زووم مباشر مع هيئتنا التدريسية الأكاديمية."
-                : "* Note: This quick online evaluation provides an initial estimate. Official placement for class allocation is verified in person at Pavilion Embassy or via live Zoom test with our academic faculty."}
+              {t("onlineTest.disclaimer")}
             </p>
           </div>
         )}

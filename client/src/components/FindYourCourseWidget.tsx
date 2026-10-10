@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/lib/translations";
+import { categoryLabel } from "@/lib/enumLabels";
 
 interface StepOption {
   id: string;
@@ -16,7 +17,9 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
   const [who, setWho] = useState<string>("");
   const [goal, setGoal] = useState<string>("");
   const [level, setLevel] = useState<string>("");
-  const { t, language, isRTL } = useLanguage();
+  const { t, language, isRTL, seedText } = useLanguage();
+  /** Перевод технических enum-значений: сырое значение остаётся для логики. */
+  const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
 
   const whoOptions: StepOption[] = [
     {
@@ -515,9 +518,9 @@ export function FindYourCourseWidget({ onOpenPlacementTest, onOpenBooking }: { o
 
             <div className="bilc-result-content">
               <div className="bilc-result-main">
-                <span className="bilc-result-cat">{rec.category}</span>
-                <h2>{rec.title}</h2>
-                <p className="bilc-result-desc">{rec.description}</p>
+                <span className="bilc-result-cat">{categoryLabel(rec.category, enumT)}</span>
+                <h2>{seedText(["programs", rec.slug, "title"], rec.title)}</h2>
+                <p className="bilc-result-desc">{seedText(["programs", rec.slug, "description"], rec.description)}</p>
 
                 {/* Desktop Grid (Hidden on Mobile) */}
                 <div className="hidden sm:grid grid-cols-2 gap-4 mb-6 bilc-result-meta-grid">

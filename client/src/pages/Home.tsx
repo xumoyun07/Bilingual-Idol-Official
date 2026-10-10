@@ -139,7 +139,7 @@ export default function Home() {
             
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
               {language === "ms"
-                ? "Di Mana Bahasa dan Keanggunan Bersatu."
+                ? "Di Mana Bahasa dan Kemewahan Bertemu."
                 : language === "ar"
                 ? "حيث تلتقي فصاحة اللغة مع رفاهية التعلم."
                 : "Where Language and Luxury Converge."}

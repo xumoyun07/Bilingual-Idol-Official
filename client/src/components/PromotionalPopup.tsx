@@ -159,6 +159,14 @@ export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
     promoColor = "blue";
   }
 
+  // Бейдж скидки: сырое "15% OFF" в арабском RTL разворачивалось в "OFF 15%".
+  // Число берём из значения, формулировку — из локали.
+  const badgeDiscountNumber = (String(discount).match(/\d+/) || [""])[0];
+  const badgeDiscountLabel =
+    String(discount).includes("%") && badgeDiscountNumber
+      ? t("promo.discountPercent", { percent: badgeDiscountNumber })
+      : discount;
+
   const theme = getColorTheme(promoColor);
 
   useEffect(() => {
@@ -198,9 +206,9 @@ export function PromotionalFloatingBadge({ isOpen, setIsOpen }: PromoProps) {
             <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${theme.floatingPing} opacity-75`}></span>
             <Gift size={22} className="relative text-white group-hover:rotate-12 transition-transform duration-300" />
           </span>
-          {discount && (
-            <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
-              {discount}
+          {badgeDiscountLabel && (
+            <span dir="auto" className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs select-none tracking-tight whitespace-nowrap">
+              {badgeDiscountLabel}
             </span>
           )}
         </motion.button>
@@ -216,7 +224,7 @@ export function PromotionalPopupModal({
   publicPromos: propPublicPromos, 
   isLoading: propIsLoading 
 }: PromoProps) {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, seedText } = useLanguage();
   
   // Conditionally enable fallback queries to prevent redundant fetches if props are available
   const settingsQuery = trpc.content.siteSettings.useQuery(undefined, { enabled: !propSettings });
@@ -235,7 +243,9 @@ export function PromotionalPopupModal({
   let ctaUrl = settings?.promo_cta_url || "";
   let promoColor = settings?.promo_color || "red";
 
+  let fromPromotionsTable = false;
   if (!isActive && publicPromos && publicPromos.length > 0) {
+    fromPromotionsTable = true;
     const latestPromo = publicPromos[0];
     isActive = true;
     title = latestPromo.title || "";
@@ -246,6 +256,32 @@ export function PromotionalPopupModal({
     ctaUrl = "/enroll";
     promoColor = "blue";
   }
+
+  // Перевод промо-контента из БД с фоллбеком на английский:
+  //   seed.settings.promo_*  — когда активны настройки сайта;
+  //   seed.promo.<код>.*     — когда промо взято из таблицы промоакций.
+  // Регулярные выражения не используются.
+  if (title) {
+    title = fromPromotionsTable
+      ? seedText(["promo", code, "title"], title)
+      : seedText(["settings", "promo_title"], title);
+  }
+  if (text) {
+    text = fromPromotionsTable
+      ? seedText(["promo", code, "description"], text)
+      : seedText(["settings", "promo_text"], text);
+  }
+  if (ctaText && !fromPromotionsTable) {
+    ctaText = seedText(["settings", "promo_cta_text"], ctaText);
+  }
+
+  // Тот же бейдж скидки, что и в плавающей кнопке: число из значения,
+  // формулировка из локали — иначе в арабском строка разворачивается.
+  const popupDiscountNumber = (String(discount).match(/\d+/) || [""])[0];
+  const popupDiscountLabel =
+    String(discount).includes("%") && popupDiscountNumber
+      ? t("promo.discountPercent", { percent: popupDiscountNumber })
+      : discount;
 
   const theme = getColorTheme(promoColor);
 
@@ -306,8 +342,8 @@ export function PromotionalPopupModal({
                     {t("promo.badge", undefined, "EXCLUSIVE OFFER")}
                   </span>
                   {discount && (
-                    <span className={`text-xs font-semibold ${theme.discountText}`}>
-                      {discount} {t("promo.off", undefined, "Discount Active")}
+                    <span dir="auto" className={`text-xs font-semibold ${theme.discountText}`}>
+                      {t("promo.discountActive", { discount: popupDiscountLabel })}
                     </span>
                   )}
                 </div>

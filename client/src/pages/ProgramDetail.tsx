@@ -3,6 +3,7 @@ import { Link, useRoute } from "wouter";
 import { PublicLayout } from "@/components/PublicLayout";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { languageLabel } from "@/lib/enumLabels";
 
 const programImageBySlug: Record<string, string> = {
   "general-english": "/media/prog_general_english.webp",
@@ -19,7 +20,7 @@ const programImageBySlug: Record<string, string> = {
 
 export default function ProgramDetail() {
   const [, params] = useRoute("/programs/:slug");
-  const { t, isRTL, language } = useLanguage();
+  const { t, isRTL, language, seedText } = useLanguage();
   const record = trpc.content.publicProgram.useQuery({ slug: params?.slug ?? "" }, { enabled: Boolean(params?.slug) });
   const media = trpc.media.publicList.useQuery();
   const detailMedia = (media.data ?? []).find(item => item.slot === "programme_detail");
@@ -50,12 +51,20 @@ export default function ProgramDetail() {
     );
   }
 
+  // Перевод контента из БД: seed.programs.<slug>.<поле>.
+  // Никаких регулярных выражений — если перевода нет, показывается английский оригинал.
+  const seedSlug = params?.slug ?? programme.slug;
+  const seedValue = (field: string, fallback: string) => seedText(["programs", seedSlug, field], fallback);
+  /** Перевод технических enum-значений (category, language): сырое значение
+   *  остаётся для логики, на экран идёт подпись из локалей. */
+  const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
+
   const facts = [
-    { icon: GraduationCap, label: language === "ms" ? "Kumpulan Sasaran" : language === "ar" ? "الفئة العمرية" : "Learner group", value: programme.ageGroup },
-    { icon: Landmark, label: language === "ms" ? "Tahap" : language === "ar" ? "المستوى" : "Level", value: programme.level },
-    { icon: Clock3, label: language === "ms" ? "Tempoh" : language === "ar" ? "المدة" : "Duration", value: programme.duration },
-    { icon: CalendarClock, label: language === "ms" ? "Jadual" : language === "ar" ? "الجدول" : "Schedule", value: programme.schedule },
-    { icon: WalletCards, label: language === "ms" ? "Yuran" : language === "ar" ? "الرسوم" : "Fees", value: programme.fees },
+    { icon: GraduationCap, label: language === "ms" ? "Kumpulan Sasaran" : language === "ar" ? "الفئة العمرية" : "Learner group", value: seedValue("ageGroup", programme.ageGroup) },
+    { icon: Landmark, label: language === "ms" ? "Tahap" : language === "ar" ? "المستوى" : "Level", value: seedValue("level", programme.level) },
+    { icon: Clock3, label: language === "ms" ? "Tempoh" : language === "ar" ? "المدة" : "Duration", value: seedValue("duration", programme.duration) },
+    { icon: CalendarClock, label: language === "ms" ? "Jadual" : language === "ar" ? "الجدول" : "Schedule", value: seedValue("schedule", programme.schedule) },
+    { icon: WalletCards, label: language === "ms" ? "Yuran" : language === "ar" ? "الرسوم" : "Fees", value: seedValue("fees", programme.fees) },
   ];
 
   const bannerImageSrc = (params?.slug && programImageBySlug[params.slug]) || detailMedia?.publicUrl || "/media/prog_speaking.webp";
@@ -69,9 +78,9 @@ export default function ProgramDetail() {
             <Link href="/programs" className="simple-text-link">
               <ArrowLeft size={16} className={isRTL ? "rotate-180" : ""} /> {language === "ms" ? "Semua program" : language === "ar" ? "جميع البرامج" : "All programmes"}
             </Link>
-            <p className="simple-eyebrow mt-4">{programme.language} {language === "ms" ? "Program" : language === "ar" ? "برنامج" : "programme"}</p>
-            <h1>{programme.title}</h1>
-            <p className="simple-route-header-description">{programme.description}</p>
+            <p className="simple-eyebrow mt-4">{languageLabel(programme.language, enumT)} {language === "ms" ? "Program" : language === "ar" ? "برنامج" : "programme"}</p>
+            <h1>{seedValue("title", programme.title)}</h1>
+            <p className="simple-route-header-description">{seedValue("description", programme.description)}</p>
           </div>
           <div className="simple-route-header-media" aria-label={language === "ar" ? `صورة ${programme.title}` : language === "ms" ? `Gambar ${programme.title}` : `${programme.title} photo`}>
             <img src={bannerImageSrc} alt={bannerImageAlt} loading="lazy" decoding="async" />
