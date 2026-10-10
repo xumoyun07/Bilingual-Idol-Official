@@ -1,4 +1,5 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { resolveHomeRoute } from "../shared/console";
 
 export function createUserPasswordHash(password: string) {
   const salt = randomBytes(16).toString("hex");
