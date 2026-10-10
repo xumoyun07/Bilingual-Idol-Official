@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "../db";
 import { adminProcedure, publicProcedure, studentProcedure, marketingProcedure, router } from "../_core/trpc";
