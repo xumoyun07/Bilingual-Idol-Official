@@ -296,11 +296,13 @@ export interface TranslationDictionary {
       title: string;
       overview: string;
       queueTitle: string;
+    applicationsTitle: string;
+    noApplications: string;
       filterCategory: string;
       filterProgram: string;
       empty: string;
       category: { all: string; adult: string; child: string; internationalStudent: string };
-      action: { assign: string; approve: string; reject: string; rejectPrompt: string };
+      action: { assign: string; approve: string; reject: string; rejectPrompt: string; advance: string };
     };
     /** Трекер заявки студента (G2). */
     tracker: {
@@ -742,7 +744,9 @@ export const translations: Record<Language, TranslationDictionary> = {
         filterProgram: "Filter by programme…",
         empty: "No registration requests match the current filters.",
         category: { all: "All categories", adult: "Adult", child: "Child", internationalStudent: "International student" },
-        action: { assign: "Assign to me", approve: "Approve", reject: "Reject", rejectPrompt: "Rejection reason:" },
+        action: { assign: "Assign to me", approve: "Approve", reject: "Reject", rejectPrompt: "Rejection reason:", advance: "Advance stage" },
+        applicationsTitle: "Applications",
+        noApplications: "No applications yet. Approve a registration request to create one.",
       },
       tracker: {
         title: "Track Application",
@@ -1174,7 +1178,9 @@ export const translations: Record<Language, TranslationDictionary> = {
         filterProgram: "Tapis mengikut program…",
         empty: "Tiada permohonan pendaftaran yang sepadan dengan penapis semasa.",
         category: { all: "Semua kategori", adult: "Dewasa", child: "Kanak-kanak", internationalStudent: "Pelajar antarabangsa" },
-        action: { assign: "Serah kepada saya", approve: "Luluskan", reject: "Tolak", rejectPrompt: "Sebab penolakan:" },
+        action: { assign: "Serah kepada saya", approve: "Luluskan", reject: "Tolak", rejectPrompt: "Sebab penolakan:", advance: "Maju ke peringkat seterusnya" },
+        applicationsTitle: "Permohonan",
+        noApplications: "Tiada permohonan lagi. Luluskan permintaan pendaftaran untuk mencipta satu.",
       },
       tracker: {
         title: "Jejaki Permohonan",
@@ -1606,7 +1612,9 @@ export const translations: Record<Language, TranslationDictionary> = {
         filterProgram: "تصفية حسب البرنامج…",
         empty: "لا توجد طلبات تسجيل مطابقة للفلاتر الحالية.",
         category: { all: "جميع الفئات", adult: "بالغ", child: "طفل", internationalStudent: "طالب دولي" },
-        action: { assign: "إسناد إليّ", approve: "موافقة", reject: "رفض", rejectPrompt: "سبب الرفض:" },
+        action: { assign: "إسناد إليّ", approve: "موافقة", reject: "رفض", rejectPrompt: "سبب الرفض:", advance: "تقديم المرحلة" },
+        applicationsTitle: "الطلبات",
+        noApplications: "لا توجد طلبات بعد. وافق على طلب تسجيل لإنشاء واحد.",
       },
       tracker: {
         title: "تتبع الطلب",

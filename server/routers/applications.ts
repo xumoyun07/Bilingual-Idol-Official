@@ -14,6 +14,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as audit from "../audit";
+import * as db from "../db";
 import { adminProcedure, router, studentProcedure } from "../_core/trpc";
 import * as pipeline from "../services/applicationPipeline";
 import { PipelineError } from "../services/applicationPipeline";
@@ -53,6 +54,10 @@ async function record(ctx: AuditContext, event: {
 }
 
 export const applicationsRouter = router({
+  /** Все заявки (admin-контур): для продвижения стадий в консоли. */
+  adminList: adminProcedure.query(async () => {
+    return db.listApplications();
+  }),
   /** Очередь заявок Ф2 со статусом new/routed, с фильтрами по категории и программе. */
   queue: adminProcedure
     .input(z.object({

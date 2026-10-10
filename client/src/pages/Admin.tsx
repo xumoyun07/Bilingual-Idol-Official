@@ -47,9 +47,12 @@ function AdminConsole() {
   const assign = trpc.applications.assign.useMutation();
   const approve = trpc.applications.approve.useMutation();
   const reject = trpc.applications.reject.useMutation();
+  const apps = trpc.applications.adminList.useQuery();
+  const advance = trpc.applications.advanceStatus.useMutation();
 
   const refresh = () => {
     void utils.applications.queue.invalidate();
+    void utils.applications.adminList.invalidate();
   };
 
   const rows = queue.data ?? [];
@@ -134,6 +137,33 @@ function AdminConsole() {
                     {t("adminConsole.action.reject", undefined, "Reject")}
                   </button>
                 </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      </section>
+
+      <section className="rounded-2xl border border-[#edf2f5] bg-white p-5">
+        <h2 className="mb-3 text-sm font-bold text-[#10253e]">{t("adminConsole.applicationsTitle", undefined, "Applications")}</h2>
+        {(apps.data ?? []).length === 0 ? (
+          <p className="text-xs text-[#708098]">{t("adminConsole.noApplications", undefined, "No applications yet. Approve a registration request to create one.")}</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {(apps.data ?? []).map(app => (
+              <li key={app.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-[#edf2f5] bg-[#fcfdfe] p-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-[#10253e]"><bdi dir="ltr">#{app.id}</bdi> · {td(String(app.status))}</p>
+                  <p className="text-[11px] text-[#566983]"><bdi dir="ltr">{td("Student")} #{app.userId}</bdi></p>
+                </div>
+                <button
+                  type="button"
+                  disabled={advance.isPending || String(app.status) === "registrationCompleted"}
+                  onClick={() => advance.mutate({ applicationId: Number(app.id) }, { onSuccess: refresh })}
+                  className="rounded-lg border border-[#d9e2f1] bg-white px-2.5 py-1.5 text-xs font-bold text-[#445d80] hover:text-[#173fad] disabled:opacity-50"
+                >
+                  {t("adminConsole.action.advance", undefined, "Advance stage")}
+                </button>
               </li>
             ))}
           </ul>
