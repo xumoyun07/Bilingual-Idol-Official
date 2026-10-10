@@ -18,6 +18,7 @@ import { superAdminUsersRouter } from "./routers/superAdminUsers";
 import { auditRouter } from "./routers/audit";
 import { studentsRouter } from "./routers/students";
 import { usersRouter } from "./routers/users";
+import { pricesRouter } from "./routers/prices";
 import { mediaRouter } from "./routers/media";
 import { newsRouter } from "./routers/news";
 import { teacherRouter } from "./routers/teacher";
@@ -294,6 +295,7 @@ export const appRouter = router({
   audit: auditRouter,
   students: studentsRouter,
   users: usersRouter,
+  prices: pricesRouter,
   media: mediaRouter,
   news: newsRouter,
   teacher: teacherRouter,
