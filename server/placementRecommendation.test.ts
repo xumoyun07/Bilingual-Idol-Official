@@ -46,7 +46,8 @@ describe("placementTests.submitAttempt", () => {
       answers: { q1: "a", q2: "a" },
     });
     expect(result.score).toBe(1);
-    expect(result.cefrLevel).toBe("A1");
+    // 1 правильный ответ из 2 -> ratio 0.5 -> B1 по порогам сервиса (>0.4).
+    expect(result.cefrLevel).toBe("B1");
     expect(typeof result.recommendedProgramId).toBe("number");
     expect(result.recommendedProgramId).toBeGreaterThan(0);
     expect(result.recommendedCourse).toBeDefined();
