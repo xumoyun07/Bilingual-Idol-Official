@@ -1,0 +1,105 @@
+# =============================================================================
+#  BILC - контейнеризованная база данных + приложение
+#
+#  Запуск БД:            docker compose up -d db
+#  Запуск всего стека:   docker compose up -d --build
+#  Остановка:            docker compose down          (volume сохраняется)
+#  Полный сброс:         docker compose down -v       (УДАЛЯЕТ все данные)
+#
+#  Секреты не хранятся в этом файле — только в .env (см. .env.docker.example).
+#  Порты публикуются исключительно на loopback (127.0.0.1), чтобы БД не была
+#  доступна из внешней сети.
+# =============================================================================
+
+name: bilc
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: bilc-db
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+00:00
+      # Запрещаем DNS-резолв имён клиентов — ускоряет подключения в bridge-сети.
+      - --skip-name-resolve
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD обязателен — задайте в .env}
+      MYSQL_DATABASE: ${DB_NAME:-bilingual_idol}
+      # Роли приложения создаются в docker/initdb/03-roles.sh с узкими правами.
+      APP_DB_USER: ${APP_DB_USER:-bilc_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?APP_DB_PASSWORD обязателен — задайте в .env}
+      READONLY_DB_USER: ${READONLY_DB_USER:-bilc_readonly}
+      READONLY_DB_PASSWORD: ${READONLY_DB_PASSWORD:?READONLY_DB_PASSWORD обязателен — задайте в .env}
+      BACKUP_DB_USER: ${BACKUP_DB_USER:-bilc_backup}
+      BACKUP_DB_PASSWORD: ${BACKUP_DB_PASSWORD:?BACKUP_DB_PASSWORD обязателен — задайте в .env}
+    ports:
+      # Только loopback + нестандартный порт 3307: не конфликтует с локальным
+      # MySQL на 3306 и не публикуется во внешнюю сеть.
+      - "127.0.0.1:${DB_HOST_PORT:-3307}:3306"
+    volumes:
+      # Именованный volume (не bind-mount): Docker управляет правами каталога
+      # /var/lib/mysql и владельцем mysql (UID 999) внутри образа.
+      - bilc-db-data:/var/lib/mysql
+      # Init-скрипты выполняются ТОЛЬКО при первой инициализации пустого volume.
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    networks:
+      - bilc-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      # Первая инициализация создаёт 42 таблицы и 46 индексов — дольше, чем 3×10 с.
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bilc-app:local
+    container_name: bilc-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        # Приложение стартует только после того, как healthcheck БД прошёл.
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      # Единственный источник строки подключения — переменные окружения,
+      # в исходном коде ничего не захардкожено.
+      DATABASE_URL: mysql://${APP_DB_USER:-bilc_app}:${APP_DB_PASSWORD}@db:3306/${DB_NAME:-bilingual_idol}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET обязателен — задайте в .env}
+      # Хеш пароля основателя для неинтерактивного входа. Только ссылка на переменную,
+      # литералов секретов здесь нет. Значение содержит двоеточия (scrypt:<соль>:<хеш>) —
+      # compose подставляет его из .env как есть, без дополнительной интерполяции.
+      FOUNDER_PASSWORD_HASH: ${FOUNDER_PASSWORD_HASH:?FOUNDER_PASSWORD_HASH обязателен — задайте в .env (pnpm founder:hash)}
+      VITE_APP_ID: ${VITE_APP_ID:-bilingual-idol-platform}
+      TRANSLATOR_MONTHLY_LIMIT: ${TRANSLATOR_MONTHLY_LIMIT:-1800000}
+      AZURE_TRANSLATOR_ENDPOINT: ${AZURE_TRANSLATOR_ENDPOINT:-https://api.cognitive.microsofttranslator.com}
+      AZURE_TRANSLATOR_REGION: ${AZURE_TRANSLATOR_REGION:-global}
+      AZURE_TRANSLATOR_KEY: ${AZURE_TRANSLATOR_KEY:-}
+      BILLPLZ_ENABLED: ${BILLPLZ_ENABLED:-}
+      BILLPLZ_API_KEY: ${BILLPLZ_API_KEY:-}
+      BILLPLZ_COLLECTION_ID: ${BILLPLZ_COLLECTION_ID:-}
+      BILLPLZ_SIGNATURE_KEY: ${BILLPLZ_SIGNATURE_KEY:-}
+    ports:
+      - "127.0.0.1:${APP_HOST_PORT:-3000}:3000"
+    networks:
+      - bilc-net
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  bilc-db-data:
+    name: bilc-db-data
+
+networks:
+  # Выделенная bridge-сеть: приложение и БД видят друг друга по именам сервисов
+  # (db:3306), но БД недоступна из других сетей и из интернета.
+  bilc-net:
+    name: bilc-net
+    driver: bridge

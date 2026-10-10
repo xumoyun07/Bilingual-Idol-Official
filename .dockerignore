@@ -1,0 +1,54 @@
+# =============================================================================
+#  Контекст сборки образа приложения.
+#  Цель: не тянуть в образ node_modules, секреты и артефакты разработки,
+#  но СОХРАНИТЬ client/public/media (нужны vite build для dist/public).
+# =============================================================================
+
+# Зависимости и артефакты сборки — пересоздаются внутри образа
+node_modules
+dist
+build
+.pnpm-store
+
+# Git и служебные файлы инструментов
+.git
+.gitignore
+.gitkeep
+.prettierignore
+.prettierrc
+.manus-logs
+.uploads
+
+# СЕКРЕТЫ: .env не должен попасть ни в один слой образа
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.docker.example
+
+# Разработка и тесты
+coverage
+tests
+.vscode
+.idea
+*.log
+
+# Документация (не нужна в рантайме)
+docs
+*.md
+
+# Артефакты, лежащие в корне репозитория (скриншоты QA, выгрузки)
+/before_*.png
+/after_*.png
+/audit_results.json
+/gdrive_items.json
+/screenshots
+/template.json
+
+# Генерируемые init-скрипты БД монтируются в контейнер БД, в образе приложения не нужны
+docker
+
+# Сам Dockerfile и compose не нужны внутри образа
+Dockerfile
+docker-compose.yml
+.dockerignore
