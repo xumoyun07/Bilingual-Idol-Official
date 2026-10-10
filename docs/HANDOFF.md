@@ -76,3 +76,5 @@ Owner run confirmed: `npx vitest run` -> 334 passed, 11 skipped; `npm run e2e:co
 
 Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console-roles.ts plus the npm script).
 - 2026-10-10 15:34: 2.3 committed in 2396e9b — displayed role/badge/title/modules from resolveConsole(sessionRole); founder default removed with a loop guard. Still open in 2.3: Admin.tsx founder wording and the new en/ms/ar keys (shell.language).
+
+- 2026-10-10 15:39: S1 partial, committed f0486d2 — pure module split (/founder vs /admin), routeRoleOf admin role, resolveRedirect + idempotence tests over all six routes, matrix updated. Still open in S1: /founder route in App.tsx, Admin.tsx admin console (no FounderConsole for admin), server redirectTo updates, client "/admin" links, and the isRoleAuthorized/effect rewrite on resolveRedirect. Owner commands: npm run i18n:sync (answer n to the Azure question), npx vitest run, $env:TEST_FIXTURES="1"; npm run e2e:console.
