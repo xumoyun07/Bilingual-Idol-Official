@@ -132,3 +132,12 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 ## Owner commands (обязательная предпосылка)
 Запустите dev-сервер в отдельном терминале перед любым e2e: 
 pm run dev. Если его нет — форма входа не отрендерится и e2e:sheet-all / e2e:console повиснут на #sign-in-email.
+
+## Owner final sequence (в этом порядке)
+
+1. `npm run i18n:sync` → ответить y (22 символа, 1 ms-ключ: console.super_admin.label)
+2. `npx vitest run` → ожидается 0 failed
+3. Запустить `npm run dev` в отдельном терминале
+4. `$env:TEST_FIXTURES="1"; npm run e2e:console` → ожидается 0 failures
+5. `$env:TEST_FIXTURES="1"; npm run e2e:sheet-all` → ожидается 0 failures для admin и student
+6. `git push origin stage-3c-shell`
