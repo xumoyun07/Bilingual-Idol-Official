@@ -86,3 +86,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 16:58: G1 done, committed a711abd — applications router (queue/assign/approve/reject/advanceStatus/overrideStatus/myStatus) + service + audit actions + vitest suite. Owner runs: npx vitest run. Next: G2 tracker UI in UserDashboard, G3 admin queue UI in /admin.
 
 - 2026-10-10 17:00: G4 done, committed d65ff5d — studentCabinet.grades/documents (studentProcedure, own-only, published-only) + tests. Next: G2 tracker UI in UserDashboard.
+
+- 2026-10-10 17:02: G2 done, committed 01d29ed — ApplicationStatusTracker component + tracker.* keys in translations.ts (en/ms/ar) + block in UserDashboard. Key-parity stays RED until owner runs npm run i18n:sync. Next: G3 admin queue UI in /admin.
