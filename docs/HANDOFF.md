@@ -114,3 +114,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:26: G3 remainder done, committed eca0909 — admin console Applications section with forward-only Advance. ALL GAPS DONE: G1-G12, C1-C4, S2-S3. Next: final report and goal completion.
 
 - 2026-10-10 17:45: OWNER-FIX G1 done, committed 61a6f9a — pipeline генерирует пароль внутри.
+
+- 2026-10-10 17:46: OWNER-FIX G2 done, committed 826a3e7 — импорт TRPCError.
