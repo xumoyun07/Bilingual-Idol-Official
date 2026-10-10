@@ -176,6 +176,23 @@ async function startServer() {
     console.error("[Startup] Failed to seed default users or run programId mapping migration:", error);
   }
 
+  // Startup invariant: exactly one founder account, with the address from FOUNDER_EMAIL.
+  // If it is broken, every user-management mutation is disabled (fail closed).
+  try {
+    const { inspectFounderInvariant } = await import("../services/userPolicy");
+    const report = await inspectFounderInvariant();
+    if (report.ok) {
+      console.log("[Startup] Инвариант основателя соблюдён: ровно одна учётная запись founder.");
+    } else {
+      console.error(
+        `[Startup] Инвариант основателя нарушен (${report.problems.join(", ")}). ` +
+          "Управление пользователями заблокировано до устранения.",
+      );
+    }
+  } catch {
+    console.error("[Startup] Не удалось проверить инвариант основателя. Управление пользователями заблокировано.");
+  }
+
   const port = 3000;
 
   server.listen(port, "0.0.0.0", () => {

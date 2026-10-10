@@ -1,6 +1,9 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { users as usersTable, userProfileValues as userProfileValuesTable } from "../drizzle/schema";
+import * as audit from "./audit";
 import * as db from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { sdk } from "./_core/sdk";
@@ -8,6 +11,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { FOUNDER_OPEN_ID, isFounderAuthConfigured, verifyFounderCredentials } from "./founderAuth";
 import { FOUNDER_EMAIL } from "./founderIdentity";
+import { enforceUpdateUser } from "./services/userPolicy";
 import { contentRouter } from "./routers/content";
 import { submissionsRouter } from "./routers/submissions";
 import { superAdminUsersRouter } from "./routers/superAdminUsers";
@@ -47,6 +51,7 @@ export const appRouter = router({
         const founderEmail = isFounderEmail(raw) ? raw : resolvedEmail;
         if (verifyFounderCredentials(founderEmail, input.password)) {
           const openId = `founder:${founderEmail}`;
+          // upsertUser применяет политику: роль founder выдаётся только точному FOUNDER_EMAIL.
           await db.upsertUser({ openId, name: "Founder", email: founderEmail, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
           const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
           ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
@@ -171,6 +176,13 @@ export const appRouter = router({
       const database = await db.getDb();
       const newHash = createUserPasswordHash(input.password);
 
+      // Политика учётных записей: онбординг не меняет роль и адрес, но проходит
+      // через ту же проверку, что и любое обновление пользователя.
+      await enforceUpdateUser(
+        { path: "auth.completeOnboarding", actor: { id: ctx.user.id, role: ctx.user.role } },
+        { targetId: userId, nextRole: ctx.user.role, nextEmail: ctx.user.email },
+      );
+
       // Validate Stage B (atFirstLogin) dynamic profile fields
       const { fields } = await db.getUserFormSchema(false);
       const stageBFields = fields.filter(f => f.collectionStage === "atFirstLogin");
@@ -187,7 +199,7 @@ export const appRouter = router({
 
       if (database) {
         await database.transaction(async tx => {
-          await tx.update(db.users).set({
+          await tx.update(usersTable).set({
             passwordHash: newHash,
             isOtp: false,
             otpCreatedAt: null,
@@ -195,11 +207,11 @@ export const appRouter = router({
             sessionVersion: newSessionVersion,
             loginMethod: "completed_onboarding",
             updatedAt: new Date(),
-          }).where(eq(db.users.id, userId));
+          }).where(eq(usersTable.id, userId));
 
           if (profileRows.length) {
             for (const row of profileRows) {
-              await tx.insert(db.userProfileValues).values({
+              await tx.insert(userProfileValuesTable).values({
                 userId,
                 fieldId: row.fieldId,
                 value: row.value,
@@ -248,8 +260,10 @@ export const appRouter = router({
           actor: ctx.user,
           request: ctx.req,
         });
-      } catch (err) {
-        console.error("[Audit] Onboarding completion audit failed:", err);
+      } catch {
+        // Сбой аудита не должен раскрывать содержимое события и не должен
+        // проглатываться молча — пишем факт без значений.
+        audit.reportAuditFailure("auth.completeOnboarding");
       }
 
       // Generate standard unrestricted session token

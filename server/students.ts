@@ -1,8 +1,16 @@
 import { and, asc, desc, eq, like, or, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { studentDocuments, studentProfileHistory, studentProfiles, users } from "../drizzle/schema";
-import { getDb } from "./db";
+import { getDb, countUserDependencies, inMemoryStore } from "./db";
 import { storageGet, storagePut } from "./storage";
+import {
+  decideDeletion,
+  enforceCreateUser,
+  enforceDeleteUser,
+  enforceUpdateUser,
+  STUDENT_PROFILE_OWN_COLUMNS,
+  type PolicyActor,
+} from "./services/userPolicy";
 
 const supportedDocuments = new Map([
   ["application/pdf", "pdf"],
@@ -67,39 +75,13 @@ async function writeHistory(database: any, studentId: number, actorUserId: numbe
 
 function studentBaseWhere(studentId: number) { return and(eq(users.id, studentId), eq(users.role, "student")); }
 
-const inMemoryStudentsList: Array<any> = [
-  {
-    userId: 6,
-    name: "Student Learner",
-    email: "student@bilc.my",
-    isActive: true,
-    createdAt: new Date("2026-01-01"),
-    updatedAt: new Date("2026-01-01"),
-    guardianName: "Parent Learner",
-    guardianPhone: "+60123456789",
-    contactEmail: "guardian@bilc.my",
-    dateOfBirth: new Date("2010-05-15"),
-    address: "123 Learning Street, Kuala Lumpur",
-    notes: "Requires intermediate grammar support.",
-    attendedSessions: 18,
-    totalSessions: 20,
-    currentLevel: "Intermediate",
-    courseName: "General English",
-    courseCode: "GEN-ENG",
-    courseStartDate: new Date("2026-01-10"),
-    courseEndDate: new Date("2026-06-30"),
-    documents: [],
-    history: [
-      {
-        id: 1,
-        eventType: "student_profile.create",
-        changesJson: JSON.stringify({ changedFields: ["profile"] }),
-        createdAt: new Date("2026-01-01"),
-        actorName: "Super Admin",
-      },
-    ],
-  },
-];
+/**
+ * In-memory список студентов. Сид-запись «Student Learner» (`student@bilc.my`,
+ * userId 6, выдуманная посещаемость 18/20 и поддельная история) удалена: в коде
+ * не должно оставаться фиктивных учётных записей. Список наполняется только
+ * через createStudentProfile.
+ */
+const inMemoryStudentsList: Array<any> = [];
 
 export async function listStudentProfiles(filters: StudentListFilters = {}) {
   const database = await getDb();
@@ -169,10 +151,12 @@ export async function getStudentProfile(studentId: number) {
   return { ...profile, documents: documentsWithUrls, history: sanitizedHistory };
 }
 
-export async function createStudentProfile(input: StudentProfileInput, actorUserId: number) {
+export async function createStudentProfile(input: StudentProfileInput, actor: PolicyActor) {
   const database = await getDb();
   const email = normaliseOptional(input.email)?.toLowerCase() ?? null;
   const values = profileValues(input);
+  // Политика: этот путь создаёт только роль student; адрес основателя зарезервирован.
+  await enforceCreateUser({ path: "students.create", actor }, { role: "student", email });
   if (!database) {
     const newStudent = {
       userId: inMemoryStudentsList.length + 10,
@@ -188,23 +172,29 @@ export async function createStudentProfile(input: StudentProfileInput, actorUser
     inMemoryStudentsList.push(newStudent);
     return newStudent;
   }
-  if (email && (await database.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1))[0]) throw new Error("A user with this e-mail already exists.");
+  if (email && (await database.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1))[0]) throw new Error("An account with this email or nickname already exists.");
   let studentId = 0;
   await database.transaction(async tx => {
     const inserted = await tx.insert(users).values({ openId: `student-profile:${randomUUID()}`, name: input.name.trim(), email, isActive: input.isActive, loginMethod: "student-profile", role: "student", lastSignedIn: new Date() });
     studentId = Number(inserted[0].insertId);
     await tx.insert(studentProfiles).values({ userId: studentId, ...values });
-    await writeHistory(tx, studentId, actorUserId, "student.created", ["student profile"]);
+    await writeHistory(tx, studentId, actor?.id ?? 0, "student.created", ["student profile"]);
   });
   return getStudentProfile(studentId);
 }
 
-export async function updateStudentProfile(studentId: number, input: StudentProfileInput, actorUserId: number) {
+export async function updateStudentProfile(studentId: number, input: StudentProfileInput, actor: PolicyActor) {
   const database = await getDb();
   const existing = await getStudentProfile(studentId);
   if (!existing) throw new Error("Student profile not found.");
   const email = normaliseOptional(input.email)?.toLowerCase() ?? null;
   const values = profileValues(input);
+  // Политика: основателя нельзя переименовать, заблокировать или деактивировать,
+  // даже если строка попала в список студентов.
+  await enforceUpdateUser(
+    { path: "students.update", actor },
+    { targetId: studentId, nextRole: "student", nextEmail: email, nextIsActive: input.isActive },
+  );
   if (!database) {
     const idx = inMemoryStudentsList.findIndex(s => s.userId === studentId);
     if (idx !== -1) {
@@ -222,34 +212,74 @@ export async function updateStudentProfile(studentId: number, input: StudentProf
   }
   if (email) {
     const duplicate = (await database.select({ id: users.id }).from(users).where(and(eq(users.email, email), sql`${users.id} <> ${studentId}`)).limit(1))[0];
-    if (duplicate) throw new Error("A user with this e-mail already exists.");
+    if (duplicate) throw new Error("An account with this email or nickname already exists.");
   }
   const before = { ...existing };
   const after = { name: input.name.trim(), email, isActive: input.isActive, ...values };
   await database.transaction(async tx => {
     await tx.update(users).set({ name: after.name, email: after.email, isActive: after.isActive }).where(studentBaseWhere(studentId));
     await tx.insert(studentProfiles).values({ userId: studentId, ...values }).onDuplicateKeyUpdate({ set: values });
-    await writeHistory(tx, studentId, actorUserId, "student.updated", safeHistoryChanges(before, after));
+    await writeHistory(tx, studentId, actor?.id ?? 0, "student.updated", safeHistoryChanges(before, after));
   });
   return getStudentProfile(studentId);
 }
 
-export async function deleteStudentProfile(studentId: number, actorUserId: number) {
+export async function deleteStudentProfile(studentId: number, actor: PolicyActor) {
   const database = await getDb();
   const existing = await getStudentProfile(studentId);
   if (!existing) throw new Error("Student profile not found.");
+  // Политика: основателя нельзя удалить ни через профиль студента, ни напрямую.
+  await enforceDeleteUser({ path: "students.remove", actor }, { targetId: studentId });
+
+  // Зависимости считаем, исключая собственные строки профиля: они удаляются вместе с ним.
+  const dependents = await countUserDependencies(studentId, STUDENT_PROFILE_OWN_COLUMNS);
+  const decision = decideDeletion({ dependents });
+
+  if (decision.action === "deactivate") {
+    // Отказ от жёсткого удаления: ничего не удаляем, только деактивируем.
+    if (database) {
+      await database.transaction(async tx => {
+        await tx.update(users).set({ isActive: false, updatedAt: new Date() }).where(studentBaseWhere(studentId));
+      });
+    } else {
+      const row = inMemoryStore.users.find(user => user.id === studentId);
+      if (row) {
+        row.isActive = false;
+        row.updatedAt = new Date();
+      }
+    }
+    console.warn(
+      `[userPolicy] Удаление профиля студента ${studentId} отклонено: есть зависимые строки (${decision.total} в ${Object.keys(decision.perTable).length} таблицах). Профиль и учётная запись деактивированы.`,
+    );
+    return {
+      success: true,
+      mode: "deactivated",
+      userId: studentId,
+      dependents: decision.perTable,
+      dependentTotal: decision.total,
+      message: decision.message,
+    } as const;
+  }
+
   if (!database) {
     const idx = inMemoryStudentsList.findIndex(s => s.userId === studentId);
     if (idx !== -1) inMemoryStudentsList.splice(idx, 1);
-    return { success: true } as const;
+    inMemoryStore.users = inMemoryStore.users.filter(user => user.id !== studentId);
+    return { success: true, mode: "deleted", userId: studentId } as const;
   }
+
+  // Всё или ничего: одна транзакция, никаких половинчатых удалений.
   await database.transaction(async tx => {
+    const target = (await tx.select({ role: users.role }).from(users).where(eq(users.id, studentId)).limit(1))[0];
+    if (target && target.role !== "student") {
+      throw new Error("Only student accounts can be deleted from the student directory.");
+    }
     await tx.delete(studentDocuments).where(eq(studentDocuments.studentId, studentId));
     await tx.delete(studentProfileHistory).where(eq(studentProfileHistory.studentId, studentId));
     await tx.delete(studentProfiles).where(eq(studentProfiles.userId, studentId));
-    await tx.delete(users).where(studentBaseWhere(studentId));
+    await tx.delete(users).where(eq(users.id, studentId));
   });
-  return { success: true } as const;
+  return { success: true, mode: "deleted", userId: studentId } as const;
 }
 
 function fileExtension(mimeType: string) { return supportedDocuments.get(mimeType); }

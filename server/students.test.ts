@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+﻿import { afterEach, describe, expect, it, vi } from "vitest";
 import type { TrpcContext } from "./_core/context";
 
 vi.mock("./students", () => ({
@@ -40,9 +40,9 @@ describe("Students Profile router", () => {
     await expect(caller.students.create(input)).resolves.toMatchObject({ userId: 12 });
     await expect(caller.students.update({ studentId: 12, ...input, currentLevel: "B1" })).resolves.toMatchObject({ userId: 12 });
     await expect(caller.students.remove({ studentId: 12 })).resolves.toEqual({ success: true });
-    expect(students.createStudentProfile).toHaveBeenCalledWith(expect.objectContaining({ name: "Ari Student" }), 77);
-    expect(students.updateStudentProfile).toHaveBeenCalledWith(12, expect.objectContaining({ currentLevel: "B1" }), 77);
-    expect(students.deleteStudentProfile).toHaveBeenCalledWith(12, 77);
+    expect(students.createStudentProfile).toHaveBeenCalledWith(expect.objectContaining({ name: "Ari Student" }), expect.objectContaining({ id: 77, role: "founder" }));
+    expect(students.updateStudentProfile).toHaveBeenCalledWith(12, expect.objectContaining({ currentLevel: "B1" }), expect.objectContaining({ id: 77, role: "founder" }));
+    expect(students.deleteStudentProfile).toHaveBeenCalledWith(12, expect.objectContaining({ id: 77, role: "founder" }));
   });
 
   it("accepts only the supported document MIME contract and uses Founder identity", async () => {

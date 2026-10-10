@@ -22,7 +22,7 @@ function studentError(error: unknown): never {
 }
 
 async function record(ctx: { user: Pick<User, "id" | "role">; req: Request }, action: audit.AuditAction, studentId: number | undefined, description: string, isSuccess = true) {
-  try { await audit.writeAuditEvent({ actor: ctx.user, request: ctx.req, action, targetType: "student_profile", targetId: studentId, targetRole: "student", description, isSuccess, metadata: { module: "students_profile" } }); } catch (error) { console.error("[audit] Could not persist Students Profile event", error); }
+  try { await audit.writeAuditEvent({ actor: ctx.user, request: ctx.req, action, targetType: "student_profile", targetId: studentId, targetRole: "student", description, isSuccess, metadata: { module: "students_profile" } }); } catch { audit.reportAuditFailure("students"); }
 }
 
 export const studentsRouter = router({
@@ -33,13 +33,13 @@ export const studentsRouter = router({
     return profile;
   }),
   create: founderProcedure.input(profileInput).mutation(async ({ ctx, input }) => {
-    try { const profile = await students.createStudentProfile(input, ctx.user.id); if (!profile) throw new Error("Student profile was not returned."); await record(ctx, "student_profile.create", profile.userId, "Created a student profile."); return profile; } catch (error) { await record(ctx, "student_profile.create", undefined, "Student profile creation failed.", false); return studentError(error); }
+    try { const profile = await students.createStudentProfile(input, ctx.user); if (!profile) throw new Error("Student profile was not returned."); await record(ctx, "student_profile.create", profile.userId, "Created a student profile."); return profile; } catch (error) { await record(ctx, "student_profile.create", undefined, "Student profile creation failed.", false); return studentError(error); }
   }),
   update: founderProcedure.input(profileInput.extend({ studentId: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
-    try { const { studentId, ...profileInput } = input; const profile = await students.updateStudentProfile(studentId, profileInput, ctx.user.id); if (!profile) throw new Error("Student profile was not returned."); await record(ctx, "student_profile.update", studentId, "Updated a student profile."); return profile; } catch (error) { await record(ctx, "student_profile.update", input.studentId, "Student profile update failed.", false); return studentError(error); }
+    try { const { studentId, ...profileInput } = input; const profile = await students.updateStudentProfile(studentId, profileInput, ctx.user); if (!profile) throw new Error("Student profile was not returned."); await record(ctx, "student_profile.update", studentId, "Updated a student profile."); return profile; } catch (error) { await record(ctx, "student_profile.update", input.studentId, "Student profile update failed.", false); return studentError(error); }
   }),
   remove: founderProcedure.input(z.object({ studentId: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
-    try { const result = await students.deleteStudentProfile(input.studentId, ctx.user.id); await record(ctx, "student_profile.delete", input.studentId, "Deleted a student profile."); return result; } catch (error) { await record(ctx, "student_profile.delete", input.studentId, "Student profile deletion failed.", false); return studentError(error); }
+    try { const result = await students.deleteStudentProfile(input.studentId, ctx.user); await record(ctx, "student_profile.delete", input.studentId, "Deleted a student profile."); return result; } catch (error) { await record(ctx, "student_profile.delete", input.studentId, "Student profile deletion failed.", false); return studentError(error); }
   }),
   uploadDocument: founderProcedure.input(documentInput).mutation(async ({ ctx, input }) => {
     try { const document = await students.uploadStudentDocument(input, ctx.user.id); await record(ctx, "student_document.upload", input.studentId, "Uploaded a student document."); return document; } catch (error) { await record(ctx, "student_document.upload", input.studentId, "Student document upload failed.", false); return studentError(error); }

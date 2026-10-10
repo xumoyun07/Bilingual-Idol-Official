@@ -1,5 +1,7 @@
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { users as usersTable } from "../../drizzle/schema";
 import * as db from "../db";
 import { router, adminProcedure } from "../_core/trpc";
 import * as audit from "../audit";
@@ -38,7 +40,7 @@ function userError(error: unknown): never {
 
 type AuditContext = { user: Pick<User, "id" | "role">; req: Request };
 async function recordSuperAdminAudit(ctx: AuditContext, event: Omit<audit.AuditEventInput, "actor" | "request">) {
-  try { await audit.writeAuditEvent({ ...event, actor: ctx.user, request: ctx.req }); } catch (error) { console.error("[audit] Could not persist Super admin Users event", error); }
+  try { await audit.writeAuditEvent({ ...event, actor: ctx.user, request: ctx.req }); } catch { audit.reportAuditFailure("superAdminUsers"); }
 }
 
 export const superAdminUsersRouter = router({
@@ -92,7 +94,7 @@ export const superAdminUsersRouter = router({
       }
     }
     try {
-      const result = await db.createSuperAdminManagedUser(input);
+      const result = await db.createSuperAdminManagedUser(input, ctx.user);
       await recordSuperAdminAudit(ctx, { action: "user.create", targetType: "user", targetId: result.id, targetRole: result.role, description: "Created a scoped managed user account.", metadata: { role: result.role, active: result.isActive } });
       return result;
     } catch (error) {
@@ -114,7 +116,7 @@ export const superAdminUsersRouter = router({
     }
     try {
       const { id, password, ...profile } = input;
-      const result = await db.updateSuperAdminManagedUser(id, { ...profile, password: password || undefined });
+      const result = await db.updateSuperAdminManagedUser(id, { ...profile, password: password || undefined }, ctx.user);
       await recordSuperAdminAudit(ctx, { action: "user.update", targetType: "user", targetId: id, targetRole: result.role, description: "Updated a scoped managed user account.", metadata: { role: result.role, active: result.isActive } });
       return result;
     } catch (error) {
@@ -133,7 +135,7 @@ export const superAdminUsersRouter = router({
       });
     }
     try {
-      const result = await db.deleteSuperAdminManagedUser(input.id);
+      const result = await db.deleteSuperAdminManagedUser(input.id, ctx.user);
       await recordSuperAdminAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Deleted a scoped managed user account." });
       return result;
     } catch (error) {
@@ -143,15 +145,13 @@ export const superAdminUsersRouter = router({
   }),
 
   resetPassword: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
-    // 1. Fetch user to verify they exist and obtain their role/email
-    const databaseUser = await db.getUserByOpenId(`issued:${input.id}`); // Check if we can find them
-    // Wait, let's use the normal db.getSuperAdminManagedUser or standard db select to get the actual User row with email/passwordHash
+    // 1. Fetch the real user row (email/passwordHash/role) directly from the schema table.
     const database = await db.getDb();
-    let accountRow: any;
+    let accountRow: typeof usersTable.$inferSelect | undefined;
     if (database) {
-      accountRow = (await database.select().from(db.users).where(eq(db.users.id, input.id)).limit(1))[0];
+      accountRow = (await database.select().from(usersTable).where(eq(usersTable.id, input.id)).limit(1))[0];
     } else {
-      accountRow = db.inMemoryStore.users.find(u => u.id === input.id);
+      accountRow = db.inMemoryStore.users.find(u => u.id === input.id) as typeof usersTable.$inferSelect | undefined;
     }
     
     if (!accountRow) {
@@ -183,12 +183,13 @@ export const superAdminUsersRouter = router({
     }
     recentResets.set(input.id, now);
 
-    // 4. Generate random temporary password OTP
-    const tempPassword = "BILC$Reset$" + Math.random().toString(36).slice(-8);
+    // 4. Generate cryptographically strong temporary password OTP (>= 16 characters)
+    const tempPassword = db.generateTemporaryPassword();
     const passwordHash = db.createUserPasswordHash(tempPassword);
 
     // 5. Atomic Update: passwordHash, sets isOtp = true, reset failedAttempts, increment sessionVersion
-    await db.resetUserPasswordAndSession(input.id, passwordHash);
+    //    Policy: resetting the founder account's password is forbidden.
+    await db.resetUserPasswordAndSession(input.id, passwordHash, ctx.user);
 
     // 6. Record Audit Log (containing NO plain text passwords or hashes)
     await recordSuperAdminAudit(ctx, {
@@ -204,7 +205,7 @@ export const superAdminUsersRouter = router({
     const contactEmail = await db.getContactEmailForUser(input.id, accountRow.role, accountRow.email);
     if (contactEmail && contactEmail.includes("@")) {
       try {
-        await EmailProvider.sendOtpEmail(contactEmail, accountRow.email, tempPassword, "en");
+        await EmailProvider.sendOtpEmail(contactEmail, accountRow.email ?? "", tempPassword, "en");
       } catch (err) {
         console.error("[Email] Failed to dispatch password reset email:", err);
       }

@@ -42,7 +42,7 @@ export const enrollmentsRouter = router({
         const result = await db.createClientAccountAndEnrollment({
           ...input,
           approvedByUserId: ctx.user.id,
-        });
+        }, ctx.user);
         return result;
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Could not create client account and enrollment.";
@@ -67,6 +67,7 @@ export const enrollmentsRouter = router({
       try {
         const result = await db.createEnrollment({
           ...input,
+          notes: input.notes ?? null,
           approvedByUserId: ctx.user.id,
           submissionId: null,
           registrationSubmissionId: null,

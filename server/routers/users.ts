@@ -35,7 +35,7 @@ function userError(error: unknown): never {
 
 type AuditContext = { user: Pick<User, "id" | "role">; req: Request };
 async function recordUserAudit(ctx: AuditContext, event: Omit<audit.AuditEventInput, "actor" | "request">) {
-  try { await audit.writeAuditEvent({ ...event, actor: ctx.user, request: ctx.req }); } catch (error) { console.error("[audit] Could not persist Users event", error); }
+  try { await audit.writeAuditEvent({ ...event, actor: ctx.user, request: ctx.req }); } catch { audit.reportAuditFailure("users"); }
 }
 
 export const usersRouter = router({
@@ -85,17 +85,17 @@ export const usersRouter = router({
     try { const result = await db.reorderUserFormFields(input.fieldIds); await recordUserAudit(ctx, { action: "user_field.reorder", targetType: "user_form", description: "Reordered user form fields.", metadata: { fieldCount: input.fieldIds.length } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user_field.reorder", targetType: "user_form", description: "User form field reorder failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
   create: founderProcedure.input(createProfileInput.extend({ password: passwordInput.optional(), profileValues })).mutation(async ({ ctx, input }) => {
-    try { const result = await db.createManagedUser(input); await recordUserAudit(ctx, { action: "user.create", targetType: "user", targetId: result.id, targetRole: result.role, description: "Created a managed user account.", metadata: { role: result.role, active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user.create", targetType: "user", targetRole: input.role ?? null, description: "Managed user creation failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
+    try { const result = await db.createManagedUser(input, ctx.user); await recordUserAudit(ctx, { action: "user.create", targetType: "user", targetId: result.id, targetRole: result.role, description: "Created a managed user account.", metadata: { role: result.role, active: result.isActive } }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user.create", targetType: "user", targetRole: input.role ?? null, description: "Managed user creation failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
   update: founderProcedure.input(profileInput.extend({ id: z.number().int().positive(), password: passwordInput.optional().or(z.literal("")) })).mutation(async ({ ctx, input }) => {
     try {
       const { id, password, ...profile } = input;
-      const result = await db.updateManagedUser(id, { ...profile, password: password || undefined });
+      const result = await db.updateManagedUser(id, { ...profile, password: password || undefined }, ctx.user);
       await recordUserAudit(ctx, { action: "user.update", targetType: "user", targetId: id, targetRole: result.role, description: "Updated a managed user account.", metadata: { role: result.role, active: result.isActive } });
       return result;
     } catch (error) { await recordUserAudit(ctx, { action: "user.update", targetType: "user", targetId: input.id, targetRole: input.role, description: "Managed user update failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
   remove: founderProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
-    try { const result = await db.deleteManagedUser(input.id); await recordUserAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Deleted a managed user account." }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Managed user deletion failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
+    try { const result = await db.deleteManagedUser(input.id, ctx.user); await recordUserAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Deleted a managed user account." }); return result; } catch (error) { await recordUserAudit(ctx, { action: "user.delete", targetType: "user", targetId: input.id, description: "Managed user deletion failed.", isSuccess: false, metadata: { reason: "operation_failed" } }); return userError(error); }
   }),
 });
