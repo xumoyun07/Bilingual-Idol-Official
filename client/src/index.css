@@ -10916,3 +10916,34 @@ header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-
    сайдбар начинался на y=54 вместо --shell-gap и вылезал за оба края
    окна (на 1024 это давало top=-12 при высоте окна 768). */
 
+
+/* ─── item 2: единственный скроллер страницы — документ ──────────────────
+   Раньше прокручивались и html, и body (48 и 97 px), из-за чего на дашборде
+   было видно две вертикальные полосы. Теперь прокручивается только документ,
+   body не скроллится, а обёртки задают min-height вместо фиксированной высоты. */
+html {
+  overflow-y: auto;
+}
+
+body {
+  overflow: visible;
+  height: auto;
+  min-height: 100dvh;
+}
+
+.blue-workspace > .minimal-dashboard-inset {
+  min-height: 100dvh !important;
+}
+
+/* Меню сайдбара прокручивается внутри только при переполнении, без полосы. */
+.blue-workspace .bilc-floating-sidebar .minimal-sidebar-content {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.blue-workspace .bilc-floating-sidebar .minimal-sidebar-content::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

@@ -108,6 +108,20 @@ try {
       rows.push("  --shell-header-h=" + String(r.headerVar).trim() + "  scrollPaddingTop=" + r.scrollPadTop + "  scrollBehavior=" + r.docScrollBehavior);
       rows.push("  html.scroll=" + r.htmlScroll + " body.scroll=" + r.bodyScroll + " body.overflowY=" + r.bodyOvY + " body.height=" + r.bodyH + " body.minHeight=" + r.bodyMinH);
       rows.push("  ПРОКРУЧИВАЕМЫЕ=" + JSON.stringify(r.scrollables) + "  documentScroller=" + r.docScroll);
+      if (process.env.SHOT) {
+        await page.evaluate(function () {
+          var tall = document.createElement("div");
+          tall.id = "shell-diag-tall";
+          tall.style.height = "2600px";
+          tall.style.background = "repeating-linear-gradient(180deg,#eef2ff 0 40px,#ffffff 40px 80px)";
+          if (document.body) document.body.appendChild(tall);
+        });
+        await page.waitForTimeout(700);
+        var fs = await import("node:fs");
+        if (!fs.existsSync("e2e/screenshots")) fs.mkdirSync("e2e/screenshots", { recursive: true });
+        await page.screenshot({ path: "e2e/screenshots/item2-" + tag + ".png" });
+        log(tag + ": скриншот сохранён");
+      }
       await context.close();
       log(tag + ": готово");
     }
