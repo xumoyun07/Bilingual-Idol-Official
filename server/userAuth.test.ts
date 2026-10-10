@@ -25,10 +25,10 @@ describe("universal user credentials", () => {
   });
 
   it("routes every supported role through the universal login to its permitted dashboard", () => {
-    expect(dashboardPathForRole("founder")).toBe("/admin");
+    expect(dashboardPathForRole("founder")).toBe("/founder");
     expect(dashboardPathForRole("super_admin")).toBe("/super-admin");
-    expect(dashboardPathForRole("admin")).toBe("/dashboard");
-    expect(dashboardPathForRole("marketing")).toBe("/dashboard");
+    expect(dashboardPathForRole("admin")).toBe("/admin");
+    expect(dashboardPathForRole("marketing")).toBe("/marketing");
     expect(dashboardPathForRole("teacher")).toBe("/teacher");
     expect(dashboardPathForRole("student")).toBe("/dashboard");
     expect(dashboardPathForRole("user")).toBe("/dashboard");
