@@ -9,6 +9,7 @@ export const auditActions = [
   "user.password_reset", "user.policy_rejected",
   "price.set", "price.change", "price.cancel", "price.complete", "payment.create",
   "application.assign", "application.approve", "application.reject", "application.advance", "application.override",
+  "promotion.create", "promotion.update", "promotion.delete",
   "student_profile.create", "student_profile.update", "student_profile.delete",
   "student_document.upload", "student_document.delete",
   "public_media.upload", "public_media.update", "public_media.delete",
