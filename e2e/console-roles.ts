@@ -92,7 +92,7 @@ try {
         const email = "console-" + spec.role + "-" + vp.n + "-" + randomBytes(4).toString("hex") + "@example.test";
         const password = "Diag-" + randomBytes(12).toString("base64url") + "!7";
         const made = (await createManagedUser(
-          { email, name: "Diag " + spec.role, role: spec.role } as never,
+          { email, name: "Diag " + spec.role, role: spec.role, password, initialPassword: password } as never,
           { id: founder.id, role: "founder" } as never,
         )) as unknown as { id?: number };
         if (made.id !== undefined) created.push(made.id);
