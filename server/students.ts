@@ -151,15 +151,23 @@ export async function getStudentProfile(studentId: number) {
   return { ...profile, documents: documentsWithUrls, history: sanitizedHistory };
 }
 
-export async function createStudentProfile(input: StudentProfileInput, actor: PolicyActor) {
+export async function createStudentProfile(
+  input: StudentProfileInput,
+  actor: PolicyActor,
+  options?: { userAlreadyCreated?: boolean; userId?: number },
+) {
   const database = await getDb();
   const email = normaliseOptional(input.email)?.toLowerCase() ?? null;
   const values = profileValues(input);
   // Политика: этот путь создаёт только роль student; адрес основателя зарезервирован.
-  await enforceCreateUser({ path: "students.create", actor }, { role: "student", email });
+  // userAlreadyCreated=true — аккаунт только что создан вызывающим (пайплайн одобрения),
+  // повторная проверка на дубликат email всегда находила бы его самого.
+  if (!options?.userAlreadyCreated) {
+    await enforceCreateUser({ path: "students.create", actor }, { role: "student", email });
+  }
   if (!database) {
     const newStudent = {
-      userId: inMemoryStudentsList.length + 10,
+      userId: options?.userId ?? inMemoryStudentsList.length + 10,
       name: input.name.trim(),
       email,
       isActive: input.isActive,
@@ -171,6 +179,14 @@ export async function createStudentProfile(input: StudentProfileInput, actor: Po
     };
     inMemoryStudentsList.push(newStudent);
     return newStudent;
+  }
+  if (options?.userAlreadyCreated && options.userId) {
+    const profileUserId = options.userId;
+    await database.transaction(async tx => {
+      await tx.insert(studentProfiles).values({ userId: profileUserId, ...values });
+      await writeHistory(tx, profileUserId, actor?.id ?? 0, "student.created", ["student profile"]);
+    });
+    return getStudentProfile(profileUserId);
   }
   if (email && (await database.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1))[0]) throw new Error("An account with this email or nickname already exists.");
   let studentId = 0;

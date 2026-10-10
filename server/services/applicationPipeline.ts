@@ -210,6 +210,7 @@ export async function approveSubmission(input: { submissionId: number }, actor: 
     await createStudentProfile(
       { name: fullName, email, isActive: true, contactEmail: email } as never,
       { id: actor.id, role: actor.role },
+      { userAlreadyCreated: true, userId },
     );
     const application = await createApplicationRow(userId, "submitted");
     await setSubmissionStatus(submission.id, "accountCreated", actor.id);

@@ -17,12 +17,13 @@ import { FOUNDER_EMAIL } from "./founderIdentity";
 const FOUNDER = { id: 1, email: FOUNDER_EMAIL, role: "founder" };
 const ADMIN = { id: 2, email: "admin@example.test", role: "admin" };
 const TEACHER = { id: 3, email: "teacher@example.test", role: "teacher" };
-const STUDENT_LOCAL = { id: 4, email: "local@example.test", role: "student" };
-const STUDENT_INTL = { id: 5, email: "intl@example.test", role: "student" };
+// Одобрение САМО создаёт student-аккаунт (контракт пайплайна), поэтому в фикстуре
+// заранее существует только студент БЕЗ заявки — для теста no_application.
+const STUDENT_EMPTY = { id: 4, email: "empty@example.test", role: "student" };
 const MARKETING = { id: 6, email: "mkt@example.test", role: "marketing" };
 
 function seed() {
-  inMemoryStore.users = [FOUNDER, ADMIN, TEACHER, STUDENT_LOCAL, STUDENT_INTL, MARKETING].map(row => ({
+  inMemoryStore.users = [FOUNDER, ADMIN, TEACHER, STUDENT_EMPTY, MARKETING].map(row => ({
     id: row.id, openId: `seed:${row.id}`, name: `Seed ${row.role}`, email: row.email,
     passwordHash: null, role: row.role, isActive: true, loginMethod: "test",
     createdAt: new Date("2026-01-01T00:00:00.000Z"), updatedAt: new Date("2026-01-01T00:00:00.000Z"),
@@ -31,8 +32,8 @@ function seed() {
   })) as never;
 
   inMemoryStore.registrationSubmissions = [
-    { id: 11, programId: 1, programInterest: "General English", applicantCategory: "adult", fullName: "Local Kid", email: STUDENT_LOCAL.email, phone: "+6011111111", status: "new", assignedToUserId: null, utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, createdAt: new Date(), updatedAt: new Date() },
-    { id: 12, programId: 1, programInterest: "General English", applicantCategory: "internationalStudent", fullName: "Intl Kid", email: STUDENT_INTL.email, phone: "+6022222222", status: "new", assignedToUserId: null, utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, createdAt: new Date(), updatedAt: new Date() },
+    { id: 11, programId: 1, programInterest: "General English", applicantCategory: "adult", fullName: "Local Kid", email: "local@example.test", phone: "+6011111111", status: "new", assignedToUserId: null, utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, createdAt: new Date(), updatedAt: new Date() },
+    { id: 12, programId: 1, programInterest: "General English", applicantCategory: "internationalStudent", fullName: "Intl Kid", email: "intl@example.test", phone: "+6022222222", status: "new", assignedToUserId: null, utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, createdAt: new Date(), updatedAt: new Date() },
     { id: 13, programId: 2, programInterest: "IELTS Prep", applicantCategory: "child", fullName: "Routed Kid", email: "routed@example.test", phone: "+6033333333", status: "routed", assignedToUserId: ADMIN.id, utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, createdAt: new Date(), updatedAt: new Date() },
     { id: 14, programId: 1, programInterest: "General English", applicantCategory: "adult", fullName: "Rejected Kid", email: "rejected@example.test", phone: "+6044444444", status: "rejected", assignedToUserId: null, utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, createdAt: new Date(), updatedAt: new Date() },
   ] as never;
@@ -41,13 +42,17 @@ function seed() {
   (inMemoryStore as unknown as { studentProfiles?: unknown[] }).studentProfiles = [];
 }
 
-function caller(role: string | null) {
-  const row = role ? inMemoryStore.users.find(u => u.role === role) : undefined;
+function callerForUser(row: Record<string, unknown> | null | undefined) {
   return appRouter.createCaller({
     user: (row ?? null) as TrpcContext["user"],
     req: { headers: {}, protocol: "http", ip: "127.0.0.1", socket: {} } as TrpcContext["req"],
     res: { cookie: () => {}, clearCookie: () => {} } as TrpcContext["res"],
   });
+}
+
+function caller(role: string | null) {
+  const row = role ? inMemoryStore.users.find(u => u.role === role) : undefined;
+  return callerForUser(row as never);
 }
 
 beforeEach(seed);
@@ -188,7 +193,8 @@ describe("applications.overrideStatus", () => {
 describe("applications.myStatus", () => {
   it("студент видит свою цепочку; visa скрыт для местного", async () => {
     const approved = await caller("admin").applications.approve({ submissionId: 11 });
-    const mine = await caller("student").applications.myStatus();
+    const studentRow = inMemoryStore.users.find(u => u.id === approved.userId);
+    const mine = await callerForUser(studentRow as never).applications.myStatus();
     expect(mine.state).toBe("set");
     expect(mine.application?.id).toBe(approved.applicationId);
     // ST11: для местного студента стадия visaProcess отсутствует в цепочке целиком.
@@ -197,8 +203,9 @@ describe("applications.myStatus", () => {
   });
 
   it("у международного visa видна", async () => {
-    await caller("admin").applications.approve({ submissionId: 12 });
-    const mine = await caller("student").applications.myStatus();
+    const approved = await caller("admin").applications.approve({ submissionId: 12 });
+    const studentRow = inMemoryStore.users.find(u => u.id === approved.userId);
+    const mine = await callerForUser(studentRow as never).applications.myStatus();
     expect(mine.state).toBe("set");
     // Для международного студента visaProcess присутствует в цепочке.
     const visa = mine.application?.chain.find(s => s.stage === "visaProcess");
@@ -206,7 +213,8 @@ describe("applications.myStatus", () => {
   });
 
   it("без заявки — явное состояние no_application", async () => {
-    const mine = await caller("student").applications.myStatus();
+    const emptyRow = inMemoryStore.users.find(u => u.id === STUDENT_EMPTY.id);
+    const mine = await callerForUser(emptyRow as never).applications.myStatus();
     expect(mine.state).toBe("no_application");
     expect(mine.application).toBeNull();
   });
@@ -222,6 +230,7 @@ describe("applications.myStatus", () => {
 
   it("статус студента не изменился после оверсайда чужой роли", async () => {
     const approved = await caller("admin").applications.approve({ submissionId: 11 });
-    await expect(caller("student").applications.overrideStatus({ applicationId: approved.applicationId, status: "visaProcess" })).rejects.toBeDefined();
+    const studentRow = inMemoryStore.users.find(u => u.id === approved.userId);
+    await expect(callerForUser(studentRow as never).applications.overrideStatus({ applicationId: approved.applicationId, status: "visaProcess" })).rejects.toBeDefined();
   });
 });

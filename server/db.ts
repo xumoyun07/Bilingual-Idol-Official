@@ -615,7 +615,7 @@ export async function createManagedUser(
   const suppliedNickname = input.nickname?.trim() || (input.email && !input.email.includes("@") ? input.email.trim() : undefined);
   const suppliedEmail = input.email && input.email.includes("@") ? normaliseEmail(input.email) : undefined;
   
-  const supplied: Record<UserSystemFieldId, unknown> = {
+  const supplied: Record<string, unknown> = {
     name: input.name,
     nickname: suppliedNickname || suppliedEmail,
     role: input.role,
