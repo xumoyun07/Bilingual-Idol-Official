@@ -52,6 +52,12 @@ function Router({ location }: { location?: string }) {
 
       {/* Founder Console — отдельный маршрут, пока отдаёт ту же консоль (C1). */}
       <Route path="/founder" component={Founder} />
+      <Route path="/founder/users" component={Founder} />
+      <Route path="/founder/students" component={Founder} />
+      <Route path="/founder/students/:id" component={Founder} />
+      <Route path="/founder/news" component={Founder} />
+      <Route path="/founder/media" component={Founder} />
+      <Route path="/founder/audit-logs" component={Founder} />
 
       {/* Admin Canonical Paths */}
       <Route path="/admin" component={Admin} />

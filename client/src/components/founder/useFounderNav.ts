@@ -14,7 +14,8 @@ function parseCurrentNav(userRole?: string): FounderNavState {
 
   const pathname = window.location.pathname;
   const searchParams = new URLSearchParams(window.location.search);
-  const roleParam = searchParams.get("role") as PlatformUserType | null;
+  // C3: параметр ?role= игнорируется — в founder-консоли роль всегда founder.
+  const roleParam = null as PlatformUserType | null;
   const tabParam = searchParams.get("tab");
 
   // Check query params first
@@ -23,12 +24,12 @@ function parseCurrentNav(userRole?: string): FounderNavState {
   }
 
   // Check canonical pathname mappings
-  if (pathname === "/admin/users") return { role: "founder", tab: "founder-users" };
-  if (pathname === "/admin/students") return { role: "founder", tab: "founder-students" };
-  if (pathname === "/admin/news") return { role: "founder", tab: "founder-news" };
-  if (pathname === "/admin/media") return { role: "founder", tab: "founder-media" };
-  if (pathname === "/admin/audit-logs") return { role: "founder", tab: "founder-audit" };
-  if (pathname.startsWith("/admin/students/")) return { role: "founder", tab: "founder-students" };
+  if (pathname === "/founder/users") return { role: "founder", tab: "founder-users" };
+  if (pathname === "/founder/students") return { role: "founder", tab: "founder-students" };
+  if (pathname === "/founder/news") return { role: "founder", tab: "founder-news" };
+  if (pathname === "/founder/media") return { role: "founder", tab: "founder-media" };
+  if (pathname === "/founder/audit-logs") return { role: "founder", tab: "founder-audit" };
+  if (pathname.startsWith("/founder/students/")) return { role: "founder", tab: "founder-students" };
 
   if (roleParam) {
     const section = FOUNDER_NAVIGATION_SECTIONS.find((s) => s.type === roleParam);
@@ -114,7 +115,7 @@ export function useFounderNav() {
   }, [userRole]);
 
   const navigateTo = useCallback((role: PlatformUserType, tab: string) => {
-    const targetUrl = `/admin?role=${role}&tab=${tab}`;
+    const targetUrl = `/founder?role=${role}&tab=${tab}`;
     
     // Update local state immediately with 0 latency
     setNavState({ role, tab });

@@ -58,14 +58,14 @@ export const appRouter = router({
           await db.upsertUser({ openId, name: "Founder", email: founderEmail, passwordHash: createUserPasswordHash(input.password), loginMethod: "email_password", role: "founder", lastSignedIn: new Date() });
           const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Founder" });
           ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
-          return { success: true, redirectTo: "/admin", role: "founder", token } as const;
+          return { success: true, redirectTo: "/founder", role: "founder", token } as const;
         }
         const existing = await db.getUserByEmail(founderEmail);
         if (existing?.isActive && verifyUserPasswordHash(input.password, existing.passwordHash)) {
           await db.recordUserSignIn(existing.openId);
           const token = await sdk.createSessionToken(existing.openId, { expiresInMs: ONE_YEAR_MS, name: existing.name ?? "Founder" });
           ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
-          return { success: true, redirectTo: "/admin", role: "founder", token } as const;
+          return { success: true, redirectTo: "/founder", role: "founder", token } as const;
         }
       }
 

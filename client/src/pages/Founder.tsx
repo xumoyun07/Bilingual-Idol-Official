@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { resolveRedirect } from "@shared/console";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -79,12 +80,14 @@ export default function Founder() {
     if (loading) return;
     if (!user) {
       window.location.replace("/login");
-    } else if (user.role !== "founder" && user.role !== "admin") {
-      window.location.replace(user.role === "super_admin" ? "/super-admin" : "/dashboard");
+      return;
     }
+    // /founder — только founder; остальных уводит единая функция редиректа.
+    const target = resolveRedirect(user.role, "/founder");
+    if (target) window.location.replace(target);
   }, [loading, user]);
   if (loading) return <div className="grid min-h-screen place-items-center bg-[#fbf8f2]"><Loader2 className="animate-spin text-[#173fad]" /></div>;
-  if (!user || (user.role !== "founder" && user.role !== "admin")) return null;
+  if (!user || user.role !== "founder") return null;
   return <DashboardLayout><FounderConsole /></DashboardLayout>;
 }
 
@@ -97,8 +100,8 @@ function FounderConsole() {
   const tabParam = activeTab;
 
   // Canonical paths
-  if (location === "/admin/audit-logs") return <AuditLogs role="founder" />;
-  if (location === "/admin/users") return <UsersModule />;
+  if (location === "/founder/audit-logs") return <AuditLogs role="founder" />;
+  if (location === "/founder/users") return <UsersModule />;
 
   // Render module based on active Tab
   const renderActiveModule = () => {
