@@ -27,7 +27,7 @@ const ROLES = [
   { role: "marketing", route: "/marketing" },
   { role: "teacher", route: "/teacher" },
   { role: "student", route: "/dashboard" },
-] as const;
+] as Array<{ role: string; route: string }>;
 const VIEWPORTS = [
   { n: "1440", w: 1440, h: 900 },
   { n: "390", w: 390, h: 844 },
