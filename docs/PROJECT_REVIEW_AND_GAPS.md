@@ -87,3 +87,37 @@ npm run i18n:sync            # answer n if asked to call Azure
 $env:TEST_FIXTURES="1"; npm run e2e:console   # after S3 lands
 npm run e2e:sheet-all
 ```
+
+---
+
+## PART 5 — IMPLEMENTATION STATUS (final)
+
+All twelve gaps from Part 2 plus the console-split items are implemented and committed on `stage-3c-shell`:
+
+| Item | Commit | What was implemented |
+|---|---|---|
+| G1 Application Pipeline | a711abd | `applications` router + service: queue/assign/approve/reject/advanceStatus (forward-only, visa skip for locals), founder override incl. rollback, student myStatus with per-stage visibility; audit on every mutation; 20 tests |
+| G4 Student cabinet | d65ff5d | `studentCabinet.grades` (published only) and `.documents` (own, read-only) under studentProcedure; 5 tests |
+| G2 Tracker UI | 01d29ed | `ApplicationStatusTracker` in UserDashboard with `tracker.*` keys en/ms/ar |
+| G5 Promotions | 459a291 | `update`, `publicActive`, duplicate-code CONFLICT, `usedCount` immutable via CRUD, audit, 10 tests |
+| G6 Legacy enrollment closed | 687627e | `submissions.create` rejects `type='enrollment'`; historical rows preserved; test |
+| G7 `/enroll` retargeted | 3c04b2a | redirects to `/programs`; popup and roadmap links updated |
+| C2 Admin console | 140bcb1 | founder console moved to `pages/Founder.tsx`; `/admin` renders the admin console (overview + queue), no founder wording |
+| C3 Founder under /founder | 7485d02 | server redirects, nav hook paths, canonical paths, `?role=` ignored, `/founder` sub-routes |
+| C4 Single redirect | 1ea0e34 | layout effect on `resolveRedirect`; legacy admin-on-founder rule removed; source-level tests |
+| S2 Wording + shell.language | 0e0b2f4 | role console label/title/subtitle keys, founder console strings, `shell.language`; en/ms/ar by hand in translations.ts |
+| S3 Console e2e | 9c1f830 | `e2e/console-roles.ts` + `npm run e2e:console`; tag `step-2-done` |
+| G9 Placement binding | 7aada9d | `resolveRecommendedProgram` + `recommendedProgramId` in submitAttempt; migration + rollback for persistent storage; tests |
+| G10 Notifications | 5a1af25 | template-driven engine (enquiry/payment/promo-expiring), wired into createInquiry and the payments webhook, cron-ping endpoint; tests |
+| G11 Form conformance | (verified) | single Form 1 (LeadForm) and Form 2 (OfficialRegistryModal), quiz prefill, no booking entities — no change required |
+| G12 Journey content | 8026f9b | roadmap rewritten to the 4-step V2 funnel in en/ms/ar |
+| G3 remainder | eca0909 | Applications section in the admin console with forward-only Advance |
+
+Verification run for every commit: `npx tsc --noEmit` = 0 (improved from the stale baseline of 4) and `npm run check:e2e` = 0 errors.
+
+OWNER RUNS (sandbox blocks vitest/tsx/docker/browsers for the agent; no result is claimed):
+- `npx vitest run`
+- `npm run i18n:sync` (answer n to the Azure question) — locale JSONs updated by hand only in translations.ts; key-parity stays red until sync
+- `$env:TEST_FIXTURES="1"; npm run e2e:console`
+- `npm run e2e:sheet-all`
+- DDL (after a verified dump): `docs/pending-migrations/2026-placement-recommended-program.sql` (idempotent, guarded) and its rollback
