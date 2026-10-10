@@ -212,7 +212,15 @@ try {
 
     console.log("\n########## " + lang + " @390 ##########");
     await step(lang + ": вход", async () => {
-      await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+      // G6: дожидаемся, пока сеть успокоится и React смонтирует корень,
+      // прежде чем искать форму входа.
+      await page.goto(BASE + "/login", { waitUntil: "networkidle" });
+      try {
+        await page.waitForSelector("#root > *", { timeout: 15000 });
+      } catch (error) {
+        log("  REACT НЕ СМОНТИРОВАЛСЯ: #root пуст");
+        throw new Error("React did not mount: #root is empty");
+      }
       // G6-fix: явное ожидание поля входа с диагностикой, если его нет.
       try {
         await page.waitForSelector("#sign-in-email", { timeout: 15000 });
