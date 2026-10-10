@@ -42,7 +42,11 @@ export async function handleBillplzCallback(req: Request, res: Response) {
       return res.status(400).send("Missing billplz ID.");
     }
 
-    const isPaid = isPaidStr === "true" || isPaidStr === true || isPaidStr === "1";
+    // Значение приходит из query/body как строка (или массив строк) — приводим тип,
+    // вместо сравнения с boolean, которое не имеет пересечения типов.
+    const isPaidRaw = Array.isArray(isPaidStr) ? isPaidStr[0] : isPaidStr;
+    const isPaidValue = String(isPaidRaw ?? "");
+    const isPaid = isPaidValue === "true" || isPaidValue === "1";
     const amountCents = Math.round(Number(amountStr));
 
     const database = await db.getDb();
@@ -132,7 +136,9 @@ export async function handleBillplzRedirect(req: Request, res: Response) {
 
   const flatPayload = normalizePayload(req.query);
   const isPaidStr = flatPayload["billplz[paid]"] || req.query.paid;
-  const isPaid = isPaidStr === "true" || isPaidStr === true || isPaidStr === "1";
+  const isPaidRaw = Array.isArray(isPaidStr) ? isPaidStr[0] : isPaidStr;
+  const isPaidValue = String(isPaidRaw ?? "");
+  const isPaid = isPaidValue === "true" || isPaidValue === "1";
 
   const provider = getPaymentProvider();
   const isValidSig = provider.verifyCallback(req.query);

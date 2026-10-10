@@ -127,6 +127,7 @@ export const paymentsRouter = router({
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: message.providerFailed });
       }
 
+      // Полный набор полей вместо приведения типа: utm-метки в новом потоке не используются.
       const record = await db.createPayment({
         userId: ctx.user.id,
         amount: amountMinor,
@@ -139,7 +140,12 @@ export const paymentsRouter = router({
         metadataJson: JSON.stringify({ priceId: price.id }),
         receiptNumber,
         transactionReference: providerBillId,
-      } as never);
+        utmSource: null,
+        utmMedium: null,
+        utmCampaign: null,
+        utmTerm: null,
+        utmContent: null,
+      });
 
       try {
         await audit.writeAuditEvent({

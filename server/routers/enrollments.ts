@@ -68,6 +68,9 @@ export const enrollmentsRouter = router({
         const result = await db.createEnrollment({
           ...input,
           notes: input.notes ?? null,
+          approvedAt: new Date(),
+          status: "active" as const,
+          completedAt: null,
           approvedByUserId: ctx.user.id,
           submissionId: null,
           registrationSubmissionId: null,
