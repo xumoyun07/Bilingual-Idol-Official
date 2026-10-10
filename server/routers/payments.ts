@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { adminProcedure, publicProcedure, router } from "../_core/trpc";
+import { adminProcedure, publicProcedure, router, studentProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { isBillplzConfigured, getPaymentProvider } from "../paymentProvider";
 import { ENV } from "../_core/env";
@@ -147,6 +147,26 @@ export const paymentsRouter = router({
     return db.listPayments();
   }),
 
+  /**
+   * Свои платежи. Параметров нет — только ctx.user.id, поэтому чужое не читается.
+   * Отдаются только безопасные поля: без metadataJson, utm-меток и служебных заметок.
+   */
+  mine: studentProcedure.query(async ({ ctx }) => {
+    const rows = await db.listPayments(ctx.user.id);
+    return rows.map(row => {
+      const extra = row as { priceId?: number | null; amountMinor?: number | null };
+      return {
+        id: row.id,
+        priceId: extra.priceId ?? null,
+        amount: row.amount,
+        amountMinor: extra.amountMinor ?? null,
+        currency: row.currency,
+        status: row.status,
+        receiptNumber: row.receiptNumber,
+        createdAt: row.createdAt,
+      };
+    });
+  }),
   // Returns the connection state of the payment gateway (without exposing keys)
   getGatewayStatus: publicProcedure.query(async () => {
     const isConfigured = isBillplzConfigured();
