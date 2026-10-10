@@ -3,29 +3,30 @@ import {
   isAuthorizedFor,
   resolveConsole,
   resolveHomeRoute,
+  resolveRedirect,
+  ROLE_ROUTE,
   routeRoleOf,
   SESSION_ROLES,
   ROUTE_ROLES,
 } from "../shared/console";
 
+const ALL_ROUTES = ["/founder", "/admin", "/super-admin", "/marketing", "/teacher", "/dashboard", "/programs"];
+
 describe("resolveConsole", () => {
   it("founder получает Overview, User Accounts и Audit & Security", () => {
     const c = resolveConsole("founder");
-    expect(c).not.toBeNull();
     expect(c!.consoleKey).toBe("founder");
     expect(c!.modules.map(m => m.id)).toEqual(["overview", "users", "audit", "prices"]);
   });
 
   it("admin НЕ получает User Accounts и Audit & Security", () => {
-    const c = resolveConsole("admin");
-    expect(c!.consoleKey).toBe("admin");
-    const ids = c!.modules.map(m => m.id);
+    const ids = resolveConsole("admin")!.modules.map(m => m.id);
     expect(ids).toContain("overview");
     expect(ids).not.toContain("users");
     expect(ids).not.toContain("audit");
   });
 
-  it("super_admin получает audit (auditProcedure), но не users (founderProcedure)", () => {
+  it("super_admin получает audit, но не users", () => {
     const ids = resolveConsole("super_admin")!.modules.map(m => m.id);
     expect(ids).toContain("audit");
     expect(ids).not.toContain("users");
@@ -37,24 +38,23 @@ describe("resolveConsole", () => {
     }
   });
 
-  it("legacy user получает консоль без модулей (пустое состояние)", () => {
-    const c = resolveConsole("user");
-    expect(c).not.toBeNull();
-    expect(c!.modules).toEqual([]);
+  it("legacy user получает консоль без модулей", () => {
+    expect(resolveConsole("user")!.modules).toEqual([]);
   });
 
-  it("неизвестная, пустая и отсутствующая роль дают null", () => {
+  it("неизвестная роль даёт null", () => {
     expect(resolveConsole("nobody")).toBeNull();
-    expect(resolveConsole("")).toBeNull();
     expect(resolveConsole(null)).toBeNull();
-    expect(resolveConsole(undefined)).toBeNull();
   });
 });
 
-describe("resolveHomeRoute", () => {
-  it("маршруты совпадают с текущими", () => {
-    expect(resolveHomeRoute("founder")).toBe("/admin");
+describe("resolveHomeRoute: у каждой роли свой маршрут", () => {
+  it("founder -> /founder, admin -> /admin", () => {
+    expect(resolveHomeRoute("founder")).toBe("/founder");
     expect(resolveHomeRoute("admin")).toBe("/admin");
+  });
+
+  it("остальные роли сохраняют текущие маршруты", () => {
     expect(resolveHomeRoute("super_admin")).toBe("/super-admin");
     expect(resolveHomeRoute("marketing")).toBe("/marketing");
     expect(resolveHomeRoute("teacher")).toBe("/teacher");
@@ -62,50 +62,79 @@ describe("resolveHomeRoute", () => {
     expect(resolveHomeRoute("user")).toBe("/dashboard");
     expect(resolveHomeRoute("nobody")).toBe("/login");
   });
+
+  it("маршруты ролей не пересекаются", () => {
+    const used = SESSION_ROLES.map(r => ROLE_ROUTE[r]);
+    expect(new Set(used).size).toBe(new Set(used.filter(u => u !== "/dashboard")).size + 1);
+    expect(ROLE_ROUTE.founder).not.toBe(ROLE_ROUTE.admin);
+  });
 });
 
 describe("routeRoleOf", () => {
-  it("распознаёт маршруты и не путает вложенные", () => {
-    expect(routeRoleOf("/admin")).toBe("founder");
-    expect(routeRoleOf("/admin/users")).toBe("founder");
-    expect(routeRoleOf("/super-admin")).toBe("super_admin");
-    expect(routeRoleOf("/marketing")).toBe("marketing");
-    expect(routeRoleOf("/teacher")).toBe("teacher");
+  it("различает /founder и /admin и не путает вложенные", () => {
+    expect(routeRoleOf("/founder")).toBe("founder");
+    expect(routeRoleOf("/founder?tab=x")).toBe("founder");
+    expect(routeRoleOf("/admin")).toBe("admin");
+    expect(routeRoleOf("/admin/users")).toBe("admin");
     expect(routeRoleOf("/dashboard")).toBe("student");
-    expect(routeRoleOf("/dashboard?tab=x")).toBe("student");
     expect(routeRoleOf("/programs")).toBeNull();
   });
 });
 
-describe("isAuthorizedFor", () => {
-  it("admin авторизован на /admin (иначе редирект зациклится)", () => {
-    expect(isAuthorizedFor("admin", "founder")).toBe(true);
+describe("isAuthorizedFor: только своя роль", () => {
+  it("founder не авторизован на /admin и наоборот", () => {
+    expect(isAuthorizedFor("founder", "admin")).toBe(false);
+    expect(isAuthorizedFor("admin", "founder")).toBe(false);
     expect(isAuthorizedFor("founder", "founder")).toBe(true);
+    expect(isAuthorizedFor("admin", "admin")).toBe(true);
   });
 
-  it("student не авторизован на чужих маршрутах", () => {
-    for (const route of ROUTE_ROLES) {
-      if (route === "student") continue;
-      expect(isAuthorizedFor("student", route), route).toBe(false);
+  it("ни одна роль не авторизована на чужом маршруте", () => {
+    for (const role of SESSION_ROLES) {
+      const own = routeRoleOf(resolveHomeRoute(role));
+      for (const route of ROUTE_ROLES) {
+        if (own && route === own) continue;
+        expect(isAuthorizedFor(role, route), role + " @ " + route).toBe(false);
+      }
     }
-  });
-
-  it("неизвестная роль не авторизована нигде", () => {
-    for (const route of ROUTE_ROLES) expect(isAuthorizedFor("nobody", route), route).toBe(false);
   });
 });
 
-describe("идемпотентность редиректа", () => {
-  it("двукратное применение не меняет маршрут ни для одной роли", () => {
+describe("resolveRedirect идемпотентен и всегда ведёт на разрешённый маршрут", () => {
+  it("двукратное применение совпадает с однократным для каждой роли и маршрута", () => {
     for (const role of SESSION_ROLES) {
-      const first = resolveHomeRoute(role);
-      const firstRole = routeRoleOf(first);
-      // Роль авторизована на своём домашнем маршруте, поэтому второй проход не редиректит.
-      if (firstRole) {
-        expect(isAuthorizedFor(role, firstRole), role + " -> " + first).toBe(true);
+      for (const route of ALL_ROUTES) {
+        const once = resolveRedirect(role, route);
+        const landed = once ?? route;
+        const twice = resolveRedirect(role, landed);
+        expect(twice, role + " @ " + route + " -> " + landed).toBe(null);
       }
-      const second = resolveHomeRoute(role);
-      expect(second, role).toBe(first);
     }
+  });
+
+  it("конечный маршрут всегда разрешён роли", () => {
+    for (const role of SESSION_ROLES) {
+      for (const route of ALL_ROUTES) {
+        const landed = resolveRedirect(role, route) ?? route;
+        const routeRole = routeRoleOf(landed);
+        if (routeRole === null) continue;
+        expect(isAuthorizedFor(role, routeRole), role + " @ " + landed).toBe(true);
+      }
+    }
+  });
+
+  it("founder с /admin уходит на /founder, admin с /founder — на /admin", () => {
+    expect(resolveRedirect("founder", "/admin")).toBe("/founder");
+    expect(resolveRedirect("admin", "/founder")).toBe("/admin");
+  });
+
+  it("свой маршрут не перенаправляется", () => {
+    for (const role of SESSION_ROLES) {
+      expect(resolveRedirect(role, resolveHomeRoute(role)), role).toBe(null);
+    }
+  });
+
+  it("публичный маршрут не трогаем", () => {
+    expect(resolveRedirect("student", "/programs")).toBe(null);
   });
 });

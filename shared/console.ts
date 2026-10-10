@@ -1,12 +1,11 @@
 /**
  * Единственный источник правды для консоли: какая роль какой консолью пользуется,
- * какие модули ей показывает сервер и на какой маршрут она попадает.
+ * какие модули ей показывает сервер, на какой маршрут она попадает и куда её
+ * перенаправить с чужого маршрута.
  *
- * Чистый модуль: без React, без DOM, без сети — поэтому его можно покрыть
- * юнит-тестами и использовать и в браузере, и на сервере.
- *
- * Наборы ролей выведены из реальных guard'ов в server/_core/trpc.ts, а не из
- * намерений интерфейса. Подробная таблица: docs/CONSOLE_MATRIX.md.
+ * Чистый модуль: без React, без DOM, без сети.
+ * Наборы ролей выведены из реальных guard'ов в server/_core/trpc.ts.
+ * Таблица: docs/CONSOLE_MATRIX.md.
  */
 
 export type SessionRole =
@@ -18,7 +17,7 @@ export type SessionRole =
   | "student"
   | "user";
 
-export type RouteRole = "founder" | "super_admin" | "marketing" | "teacher" | "student";
+export type RouteRole = "founder" | "admin" | "super_admin" | "marketing" | "teacher" | "student";
 
 export type ConsoleModuleId = "overview" | "users" | "audit" | "prices";
 
@@ -50,7 +49,18 @@ const BY_ROLE: Record<SessionRole, { consoleKey: string; labelKey: string; title
 };
 
 export const SESSION_ROLES: SessionRole[] = ["founder", "super_admin", "admin", "marketing", "teacher", "student", "user"];
-export const ROUTE_ROLES: RouteRole[] = ["founder", "super_admin", "marketing", "teacher", "student"];
+export const ROUTE_ROLES: RouteRole[] = ["founder", "admin", "super_admin", "marketing", "teacher", "student"];
+
+/** Маршрут каждой роли. Ровно один маршрут на роль, без общих. */
+export const ROLE_ROUTE: Record<SessionRole, string> = {
+  founder: "/founder",
+  admin: "/admin",
+  super_admin: "/super-admin",
+  marketing: "/marketing",
+  teacher: "/teacher",
+  student: "/dashboard",
+  user: "/dashboard",
+};
 
 export function isSessionRole(value: unknown): value is SessionRole {
   return typeof value === "string" && (SESSION_ROLES as string[]).indexOf(value) >= 0;
@@ -71,28 +81,34 @@ export function resolveConsole(sessionRole: string | null | undefined): ConsoleR
 /** Домашний маршрут роли. Неизвестная роль — /login. */
 export function resolveHomeRoute(sessionRole: string | null | undefined): string {
   if (!isSessionRole(sessionRole)) return "/login";
-  if (sessionRole === "super_admin") return "/super-admin";
-  if (sessionRole === "marketing") return "/marketing";
-  if (sessionRole === "teacher") return "/teacher";
-  if (sessionRole === "student" || sessionRole === "user") return "/dashboard";
-  return "/admin";
+  return ROLE_ROUTE[sessionRole];
 }
 
 export function routeRoleOf(path: string): RouteRole | null {
   const clean = String(path || "").split("?")[0].replace(/\/+$/, "") || "/";
-  if (clean === "/admin" || clean.indexOf("/admin/") === 0) return "founder";
-  if (clean === "/super-admin" || clean.indexOf("/super-admin/") === 0) return "super_admin";
-  if (clean === "/marketing" || clean.indexOf("/marketing/") === 0) return "marketing";
-  if (clean === "/teacher" || clean.indexOf("/teacher/") === 0) return "teacher";
-  if (clean === "/dashboard" || clean.indexOf("/dashboard/") === 0) return "student";
+  const known: Array<[RouteRole, string]> = [
+    ["founder", "/founder"],
+    ["admin", "/admin"],
+    ["super_admin", "/super-admin"],
+    ["marketing", "/marketing"],
+    ["teacher", "/teacher"],
+    ["student", "/dashboard"],
+  ];
+  for (const pair of known) {
+    if (clean === pair[1] || clean.indexOf(pair[1] + "/") === 0) return pair[0];
+  }
   return null;
 }
 
+/**
+ * Только своя роль на своём маршруте: founder на /founder, admin на /admin.
+ * Общих маршрутов нет, поэтому чужая роль всегда перенаправляется.
+ */
 const ALLOWED: Record<RouteRole, string[]> = {
-  // /admin принимает и founder, и admin: admin попадает на свою консоль там же.
-  founder: ["founder", "admin"],
+  founder: ["founder"],
+  admin: ["admin"],
   super_admin: ["super_admin"],
-  marketing: ["marketing", "admin", "super_admin", "founder"],
+  marketing: ["marketing"],
   teacher: ["teacher"],
   // legacy user остаётся на студенческой оболочке, иначе редирект зациклится.
   student: ["student", "user"],
@@ -101,4 +117,17 @@ const ALLOWED: Record<RouteRole, string[]> = {
 export function isAuthorizedFor(sessionRole: string | null | undefined, routeRole: RouteRole): boolean {
   if (!isSessionRole(sessionRole)) return false;
   return (ALLOWED[routeRole] || []).indexOf(sessionRole) >= 0;
+}
+
+/**
+ * Единственная функция редиректа. null означает «остаться на месте».
+ * Маршруты без ограничений (публичные) не трогаем.
+ */
+export function resolveRedirect(sessionRole: string | null | undefined, path: string): string | null {
+  const routeRole = routeRoleOf(path);
+  if (routeRole === null) return null;
+  if (isAuthorizedFor(sessionRole, routeRole)) return null;
+  const home = resolveHomeRoute(sessionRole);
+  // Если и домашний маршрут недоступен (неизвестная роль), уводим на вход.
+  return home === path ? "/login" : home;
 }
