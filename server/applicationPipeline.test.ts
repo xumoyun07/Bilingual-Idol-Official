@@ -188,16 +188,18 @@ describe("applications.myStatus", () => {
     const mine = await caller("student").applications.myStatus();
     expect(mine.state).toBe("set");
     expect(mine.application?.id).toBe(approved.applicationId);
+    // ST11: для местного студента стадия visaProcess отсутствует в цепочке целиком.
     const visa = mine.application?.chain.find(s => s.stage === "visaProcess");
-    expect(visa?.visible).toBe(false);
+    expect(visa).toBeUndefined();
   });
 
   it("у международного visa видна", async () => {
     await caller("admin").applications.approve({ submissionId: 12 });
     const mine = await caller("student").applications.myStatus();
     expect(mine.state).toBe("set");
+    // Для международного студента visaProcess присутствует в цепочке.
     const visa = mine.application?.chain.find(s => s.stage === "visaProcess");
-    expect(visa?.visible).toBe(true);
+    expect(visa).toBeDefined();
   });
 
   it("без заявки — явное состояние no_application", async () => {
