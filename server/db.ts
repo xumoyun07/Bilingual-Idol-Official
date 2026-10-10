@@ -2348,3 +2348,28 @@ export async function burnOtp(userId: number): Promise<void> {
   }
 }
 
+
+/**
+ * G9: привязка рекомендации placement-теста к РЕАЛЬНОЙ программе.
+ * Возвращает id активной программы, лучше всего соответствующей уровню CEFR
+ * и языку теста; free-text recommendedCourse остаётся как подпись для человека.
+ */
+export async function resolveRecommendedProgram(cefrLevel: string, language: string): Promise<number | null> {
+  const database = await getDb();
+  const levelToken = String(cefrLevel ?? "").trim();
+  const lang = String(language ?? "").trim().toLowerCase();
+  const pool = database
+    ? await database.select().from(programs).where(eq(programs.isActive, true))
+    : ((inMemoryStore as unknown as { programs?: Array<Record<string, any>> }).programs ?? []);
+  const byLang = (pool as Array<Record<string, any>>).filter(p => String(p.language ?? "").toLowerCase() === lang);
+  const candidates = byLang.length ? byLang : (pool as Array<Record<string, any>>);
+  const keywordMap: Record<string, string> = { A1: "beginner", A2: "elementary", B1: "intermediate", B2: "upper", C1: "advanced" };
+  const keyword = keywordMap[levelToken] ?? levelToken.toLowerCase();
+  const match = candidates.find(p =>
+    String(p.level ?? "").toLowerCase().includes(levelToken.toLowerCase()) ||
+    String(p.level ?? "").toLowerCase().includes(keyword) ||
+    String(p.title ?? "").toLowerCase().includes(keyword),
+  );
+  const chosen = match ?? candidates[0];
+  return chosen ? Number(chosen.id) : null;
+}

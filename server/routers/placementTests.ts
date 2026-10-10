@@ -78,12 +78,19 @@ export const placementTestsRouter = router({
       };
 
       const result = await db.createPlacementTestAttempt(attemptData);
+
+      // G9: рекомендация привязывается к реальной активной программе (id), а не
+      // только к свободному тексту; постоянное хранение id — миграция
+      // 2026-placement-recommended-program.sql (владелец, после проверенного дампа).
+      const recommendedProgramId = await db.resolveRecommendedProgram(cefrLevel, test.language);
+
       return {
         id: result.id,
         score,
         maxScore,
         cefrLevel,
         recommendedCourse,
+        recommendedProgramId,
       };
     }),
 
