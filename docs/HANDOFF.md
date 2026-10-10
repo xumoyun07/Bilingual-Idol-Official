@@ -165,3 +165,5 @@ pm run dev. Если его нет — форма входа не отренде
 
 ## Owner commands (важно)
 - Always cd into Bilingual-Idol-Official before running any npm command (e2e ENOENT was caused by running from default-workspace).
+
+- 2026-10-10 19:30: AGENT RAN vitest: 390 passed, 11 skipped, 0 failed; tsc = 0 in-scope (2 baseline errors remain in R2-forbidden files BackgroundCircleField.tsx and PublicLayout.tsx); check:e2e = 0. Commits: 4fa06a6 (pipeline approve), 2dcad5f (Admin JSX), edbb87c (client types), e2e type fix.
