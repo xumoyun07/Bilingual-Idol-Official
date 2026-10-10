@@ -30,7 +30,7 @@ function randomPassword(): string {
 function legacyAcceptedLiterals(): string[] {
   let source: string;
   try {
-    source = execFileSync("git", ["show", "HEAD:server/founderAuth.ts"], { encoding: "utf8" });
+    source = execFileSync("git", ["show", "55426e9:server/founderAuth.ts"], { encoding: "utf8" });
   } catch {
     return [];
   }

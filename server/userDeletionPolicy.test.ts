@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { countUserDependencies, deleteManagedUser, inMemoryStore } from "./db";
 import * as students from "./students";
 import { FOUNDER_EMAIL } from "./founderIdentity";
-import { DEACTIVATION_MESSAGE, decideDeletion, UserPolicyError } from "./services/userPolicy";
+import { DEACTIVATION_MESSAGE, decideDeletion, DEPENDENT_COLUMNS, UserPolicyError } from "./services/userPolicy";
 
 /**
  * Политика удаления:
@@ -125,6 +125,26 @@ describe("deleteManagedUser: жёсткое удаление против деа
     const result = await deleteManagedUser(STUDENT.id, ACTOR);
     expect(result.dependentTotal).toBe(2);
     expect(Object.keys(result.dependents ?? {}).sort()).toEqual(["applications.userId", "enrollments.userId"]);
+  });
+
+  it("согласованная цена студента входит в список зависимостей", () => {
+    const keys = DEPENDENT_COLUMNS.map(column => `${column.table}.${column.column}`);
+    expect(keys).toContain("studentPrices.studentId");
+    expect(keys).toContain("studentPrices.agreedBy");
+    expect(keys).toContain("studentPrices.supersededById");
+    expect(keys).toContain("payments.priceId");
+    expect(keys).toContain("payments.userId");
+  });
+
+  it("студент с согласованной ценой деактивируется, а не удаляется", async () => {
+    inMemoryStore.studentPrices = [{ id: 1, studentId: STUDENT.id, programId: 1, amountMinor: 100 }] as never;
+    const result = await deleteManagedUser(STUDENT.id, ACTOR);
+    expect(result.mode).toBe("deactivated");
+    expect(result.dependents).toEqual({ "studentPrices.studentId": 1 });
+    const row = inMemoryStore.users.find(user => user.id === STUDENT.id);
+    expect(row?.isActive).toBe(false);
+    expect(inMemoryStore.studentPrices.length, "цена не удалена").toBe(1);
+    inMemoryStore.studentPrices = [];
   });
 });
 
