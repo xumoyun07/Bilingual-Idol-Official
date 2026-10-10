@@ -148,3 +148,5 @@ pm run dev. Если его нет — форма входа не отренде
 - 2026-10-10 18:08: OWNER-FIX FILE2 (код) committed b33ea67 — фильтр visa в myStatus.
 
 - 2026-10-10 18:08: OWNER-FIX FILE3 done, committed 3507e0b — frontend-redesign.test выровнен.
+
+- 2026-10-10 18:09: OWNER-FIX FILE4 done, committed 4d4f856 — promotions возвращает usedCount.
