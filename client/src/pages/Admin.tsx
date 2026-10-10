@@ -55,7 +55,8 @@ function AdminConsole() {
     void utils.applications.adminList.invalidate();
   };
 
-  const rows = queue.data ?? [];
+  type QueueRow = { id: number; fullName: string; email: string; programInterest: string; applicantCategory: string; status: string };
+  const rows = (queue.data ?? []) as QueueRow[];
 
   return (
     <div data-page="admin" className="w-full space-y-6 p-6 text-start">
@@ -141,7 +142,6 @@ function AdminConsole() {
             ))}
           </ul>
         )}
-      </section>
       </section>
 
       <section className="rounded-2xl border border-[#edf2f5] bg-white p-5">
