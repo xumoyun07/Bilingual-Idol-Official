@@ -126,3 +126,9 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:47: OWNER-FIX G4 done, committed 60ef5f0 — даты в тесте от реальных часов.
 
 - 2026-10-10 17:47: OWNER-FIX G5 done, committed 67e7a72 — тест ждёт B1 при 50%.
+
+- 2026-10-10 17:47: OWNER-FIX G6 done, committed be84685 — ожидание #sign-in-email + дамп диагностики при провале.
+
+## Owner commands (обязательная предпосылка)
+Запустите dev-сервер в отдельном терминале перед любым e2e: 
+pm run dev. Если его нет — форма входа не отрендерится и e2e:sheet-all / e2e:console повиснут на #sign-in-email.
