@@ -4,6 +4,14 @@ export const AXIOS_TIMEOUT_MS = 30_000;
 export const UNAUTHED_ERR_MSG = 'Please login (10001)';
 export const NOT_ADMIN_ERR_MSG = 'You do not have required permission (10002)';
 
+/**
+ * Денежные значения хранятся целыми в МИНОРНЫХ единицах (сен для MYR).
+ * Единственный источник валюты проекта — эта константа; разбрасывать литералы
+ * "MYR" по коду нельзя. Billplz также принимает сумму в центах.
+ */
+export const DEFAULT_CURRENCY = "MYR";
+export const CURRENCY_MINOR_UNITS = 100;
+
 // One-time nonce cookie that binds an OAuth login to the browser that started
 // it. The `__Host-` prefix forces the cookie host-only (Secure, Path=/, no
 // Domain), so a sibling *.manus.space site cannot plant a matching value in a

@@ -1,4 +1,5 @@
-import { boolean, date, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { boolean, char, date, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { DEFAULT_CURRENCY } from "../shared/const";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -626,7 +627,52 @@ export const payments = mysqlTable("payments", {
   metadataJson: text("metadataJson"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+
+  // --- Связь с согласованной ценой студента (только новые nullable-колонки) ---
+  // amountMinor и currency КОПИРУЮТСЯ из studentPrices в момент оплаты, чтобы
+  // история платежа не менялась вместе с ценой. payments.amount (sen) остаётся
+  // как есть для legacy-строк; сегодня таких строк 0.
+  priceId: int("priceId"),
+  amountMinor: int("amountMinor"),
+  idempotencyKey: varchar("idempotencyKey", { length: 128 }),
+}, table => [
+  // Идемпотентность checkout: один ключ — не более одной строки платежа.
+  uniqueIndex("payments_idempotency_unique").on(table.idempotencyKey),
+]);
+
+/**
+ * Согласованная цена студента: одна строка = одна цена для пары (студент, программа).
+ *
+ * Внешних ключей в проекте нет (0 ограничений) — целостность держится кодом и
+ * транзакциями. История не удаляется никогда: смена цены создаёт НОВУЮ строку и
+ * помечает старую 'superseded' со ссылкой supersededById и причиной; переход на
+ * новый курс создаёт новую строку для новой программы, а старая становится
+ * 'completed'. После появления платежа сумма неизменяема.
+ *
+ * ВАЖНО: колонка active_slot и уникальный индекс
+ * UNIQUE(studentId, programId, active_slot) добавляются ТОЛЬКО миграцией
+ * (drizzle-orm 0.44 не умеет описывать генерируемые колонки), поэтому в
+ * information_schema они есть, а в этом файле их нет — это ожидаемый дрейф.
+ */
+export const studentPrices = mysqlTable("studentPrices", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  programId: int("programId").notNull(),
+  amountMinor: int("amountMinor").notNull(),
+  currency: char("currency", { length: 3 }).default(DEFAULT_CURRENCY).notNull(),
+  status: mysqlEnum("status", ["active", "paid", "completed", "cancelled", "superseded"]).default("active").notNull(),
+  agreedBy: int("agreedBy").notNull(),
+  agreedAt: timestamp("agreedAt").defaultNow().notNull(),
+  staffNote: text("staffNote"),
+  supersededById: int("supersededById"),
+  supersededReason: varchar("supersededReason", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => [
+  index("studentPrices_student_idx").on(table.studentId),
+  index("studentPrices_program_idx").on(table.programId),
+  index("studentPrices_status_idx").on(table.status),
+]);
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
