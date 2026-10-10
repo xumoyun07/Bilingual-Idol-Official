@@ -92,3 +92,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:05: G5 done, committed 459a291 — promotions.update + publicActive + duplicate-code CONFLICT + audit + tests. Field-name deviation (code vs promoCode etc.) recorded as accepted; no migration. Next: G6 legacy enrollment input removal + G7 /enroll target, then G3 admin queue UI.
 
 - 2026-10-10 17:07: G6 done, committed 687627e — submissions.create rejects type=enrollment; test added.
+
+- 2026-10-10 17:07: G7 done, committed 3c04b2a — /enroll redirects to /programs; PromotionalPopup and StudentJourneyRoadmap links updated.
