@@ -122,3 +122,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:46: OWNER-FIX G3 (доп.) committed 69891f1 — функция делегирует resolveHomeRoute (первая замена промахнулась по отступам).
 
 - 2026-10-10 17:47: OWNER-FIX G3 (CRLF-нормализация) committed cf2e821 — функция заменена.
+
+- 2026-10-10 17:47: OWNER-FIX G4 done, committed 60ef5f0 — даты в тесте от реальных часов.
