@@ -253,7 +253,7 @@ export function PromotionalPopupModal({
     discount = latestPromo.discountType === "percentage" ? `${latestPromo.discountValue}% OFF` : `RM ${latestPromo.discountValue} OFF`;
     code = latestPromo.code;
     ctaText = "Claim Offer";
-    ctaUrl = "/enroll";
+    ctaUrl = "/programs";
     promoColor = "blue";
   }
 

@@ -387,7 +387,7 @@ export function StudentJourneyRoadmap() {
               </button>
             </div>
 
-            <Link href="/enroll" className="simple-button">
+            <Link href="/programs" className="simple-button">
               {t("nav.makeEnquiry")} <Sparkles size={16} />
             </Link>
           </div>
@@ -521,7 +521,7 @@ export function StudentJourneyRoadmap() {
         {/* Unified premium Call to Action button */}
         <div className="mt-6 px-1">
           <Link
-            href="/enroll"
+            href="/programs"
             className="w-full h-12 bg-[#173fad] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-md active:scale-[0.98] cursor-pointer"
           >
             {t("nav.makeEnquiry")} <Sparkles size={14} className="stroke-[2.5]" />

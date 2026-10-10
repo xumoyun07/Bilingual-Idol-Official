@@ -5,7 +5,7 @@ export default function Enroll() {
   const [_, setLocation] = useLocation();
 
   useEffect(() => {
-    setLocation("/contact", { replace: true });
+    setLocation("/programs", { replace: true });
   }, [setLocation]);
 
   return null;
