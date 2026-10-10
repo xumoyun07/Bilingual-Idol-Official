@@ -10317,7 +10317,8 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   --shell-sidebar-w: var(--dashboard-sidebar-width, 18.5rem);
   /* Единственная переменная высоты топбара: мобильный отступ и sticky-смещение
      считаются от неё, магических чисел в правилах больше нет. */
-  --shell-header-h: 4.5rem;
+  --shell-header-h: calc(12px + 56px);
+  --shell-desktop-bar-h: 72px;
 }
 
 /* Плавающий сайдбар: зазор сверху равен зазору снизу и равен --shell-gap,
@@ -10370,7 +10371,7 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
 .blue-workspace .bilc-floating-header {
   position: sticky;
   inset-block-start: var(--shell-gap);
-  height: var(--shell-header-h);
+  height: var(--shell-desktop-bar-h);
   width: auto;
   margin: 0;
   border-radius: 1rem;
@@ -10957,7 +10958,8 @@ body {
    не уезжали под шапку. */
 :root {
   --shell-gap: 16px;
-  --shell-header-h: 4.5rem;
+  --shell-header-h: calc(12px + 56px);
+  --shell-desktop-bar-h: 72px;
 }
 
 html {

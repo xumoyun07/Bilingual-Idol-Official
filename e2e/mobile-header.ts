@@ -1,8 +1,8 @@
-/** Item 3: мобильная шапка и первый блок контента. Свежая запись на контекст. */
+/** Item 3: мобильная шапка. Свежая запись на контекст; удаление проверяется запросом. */
 import "dotenv/config";
 import { randomBytes } from "node:crypto";
 import { chromium } from "playwright";
-import { eq } from "drizzle-orm";
+import { eq, like } from "drizzle-orm";
 import { createManagedUser, deleteManagedUser, getDb } from "../server/db";
 import { users } from "../drizzle/schema";
 
@@ -10,33 +10,51 @@ const BASE = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
 const STEP = 20000;
 const started = Date.now();
 function log(m: string) { console.log("[" + (Math.round((Date.now() - started) / 100) / 10) + "s] " + m); }
-const kill = setTimeout(function () { log("ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, 180000);
+const kill = setTimeout(function () { log("ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, 170000);
 kill.unref();
 const VPS = [{ n: "412", w: 412, h: 915 }, { n: "390", w: 390, h: 844 }, { n: "360", w: 360, h: 800 }];
-const LANGS = ["en", "ar"];
 
 const PROBE = [
   "(function(){",
-  "var b = function(el){ if(!el) return null; var r = el.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, h: r.height }; };",
-  "var rr = function(v){ return (v === null || v === undefined) ? null : Math.round(v*100)/100; };",
-  "var hdr = document.querySelector('header.bilc-floating-header');",
+  "var vis = function(el){ if(!el) return false; var r = el.getBoundingClientRect(); return r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; };",
+  "var hdrs = Array.prototype.slice.call(document.querySelectorAll('header')).filter(vis);",
+  "var hdr = hdrs.length ? hdrs[0] : null;",
   "var col = document.querySelector('.bilc-content-column');",
-  "var first = col ? col.querySelector('main, [data-page]') : null;",
-  "if (!first && col) first = col.lastElementChild;",
-  "var hb = b(hdr); var fb = b(first);",
-  "return { scrollY: window.scrollY, dir: document.documentElement.dir,",
-  "  hdrBottom: hb ? rr(hb.bottom) : null, hdrTop: hb ? rr(hb.top) : null, hdrH: hb ? rr(hb.h) : null,",
+  "var first = mainBlock();",
+  "function mainBlock(){ if(!col) return null; var kids = Array.prototype.slice.call(col.children);",
+  "  for (var i=0;i<kids.length;i++){ var r = kids[i].getBoundingClientRect(); if (r.height > 20 && kids[i].tagName.toLowerCase() !== 'header') return kids[i]; } return null; }",
+  "var rr = function(v){ return (v === null || v === undefined) ? null : Math.round(v*100)/100; };",
+  "var hb = hdr ? hdr.getBoundingClientRect() : null; var fb = first ? first.getBoundingClientRect() : null;",
+  "var gapRaw = getComputedStyle(document.documentElement).getPropertyValue('--shell-gap');",
+  "return { scrollY: window.scrollY, dir: document.documentElement.dir, headerCount: hdrs.length,",
+  "  headerBottom: hb ? rr(hb.bottom) : null, headerTop: hb ? rr(hb.top) : null, headerH: hb ? rr(hb.height) : null,",
+  "  headerPos: hdr ? getComputedStyle(hdr).position : null, headerCls: hdr ? String(hdr.className).slice(0,50) : null,",
   "  firstTop: fb ? rr(fb.top) : null, firstTag: first ? first.tagName.toLowerCase() : null,",
-  "  colPadTop: col ? getComputedStyle(col).paddingBlockStart || getComputedStyle(col).paddingTop : null,",
-  "  scrollPadTop: getComputedStyle(document.documentElement).scrollPaddingTop,",
-  "  gap: getComputedStyle(document.documentElement).getPropertyValue('--shell-gap'),",
-  "  hdrVar: getComputedStyle(document.documentElement).getPropertyValue('--shell-header-h') };",
+  "  colPadTop: col ? getComputedStyle(col).paddingBlockStart : null, scrollPadTop: getComputedStyle(document.documentElement).scrollPaddingTop,",
+  "  gapVar: gapRaw, headerVar: getComputedStyle(document.documentElement).getPropertyValue('--shell-header-h'), url: location.pathname + location.search };",
+  "})()",
+].join("\n");
+
+const SHEET = [
+  "(function(){",
+  "var dlg = document.querySelector('[role=\"dialog\"]');",
+  "if (!dlg) return { found: false };",
+  "var rr = function(v){ return Math.round(v*100)/100; };",
+  "var head = dlg.querySelector('header') || dlg.firstElementChild;",
+  "var kids = Array.prototype.slice.call(dlg.children);",
+  "var first = null;",
+  "for (var i=0;i<kids.length;i++){ if (kids[i] !== head && kids[i].getBoundingClientRect().height > 40) { first = kids[i]; break; } }",
+  "return { found: true, role: dlg.getAttribute('role'),",
+  "  sheetTop: rr(dlg.getBoundingClientRect().top), sheetBottom: rr(dlg.getBoundingClientRect().bottom),",
+  "  headBottom: head ? rr(head.getBoundingClientRect().bottom) : null,",
+  "  firstTop: first ? rr(first.getBoundingClientRect().top) : null, firstCls: first ? String(first.className).slice(0,60) : null,",
+  "  navLinks: Array.prototype.slice.call(dlg.querySelectorAll('a[href]')).slice(0,6).map(function(a){ return a.getAttribute('href'); }) };",
   "})()",
 ].join("\n");
 
 async function withTimeout<T>(label: string, p: Promise<T>): Promise<T> {
   let timer: NodeJS.Timeout | undefined;
-  const guard = new Promise<never>(function (_res, rej) { timer = setTimeout(function () { rej(new Error("ТАЙМАУТ: " + label)); }, STEP); });
+  const guard = new Promise<never>(function (_r, rej) { timer = setTimeout(function () { rej(new Error("ТАЙМАУТ: " + label)); }, STEP); });
   try { return await Promise.race([p, guard]); } finally { if (timer) clearTimeout(timer); }
 }
 
@@ -45,8 +63,9 @@ const db = await getDb();
 const founder = (await db!.select().from(users).where(eq(users.role, "founder")).limit(1))[0];
 const browser = await chromium.launch();
 const created: number[] = [];
+const GAP = 16;
 try {
-  for (const lang of LANGS) {
+  for (const lang of ["en", "ar"]) {
     for (const vp of VPS) {
       const tag = lang + "@" + vp.n;
       const email = "mh-" + lang + "-" + vp.n + "-" + randomBytes(4).toString("hex") + "@example.test";
@@ -59,69 +78,56 @@ try {
       const page = await context.newPage();
       page.setDefaultTimeout(STEP);
       page.setDefaultNavigationTimeout(STEP);
-      await withTimeout(tag + " login", page.goto(BASE + "/login", { waitUntil: "domcontentloaded" }));
+      await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
       await page.fill("#sign-in-email", email);
       await page.fill("#sign-in-password", password);
       await withTimeout(tag + " submit", page.click('button[type="submit"]'));
       await page.waitForTimeout(2500);
       await page.evaluate(function (l) { try { localStorage.setItem("bilc_language", l); } catch (e) { /* noop */ } document.cookie = "bilc_language=" + l + "; path=/"; }, lang);
-      await withTimeout(tag + " dash", page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" }));
+      await page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(3000);
       await page.evaluate(function () { window.scrollTo(0, 0); });
       await page.waitForTimeout(300);
 
-      const r = (await page.evaluate(PROBE)) as Record<string, unknown>;
-      const gap = 16;
-      const need = typeof r.hdrBottom === "number" ? Math.round((r.hdrBottom + gap) * 100) / 100 : null;
-      const ok = typeof r.firstTop === "number" && need !== null && r.firstTop >= need;
-      log(tag + " ПЕРВЫЙ БЛОК: header bottom=" + r.hdrBottom + " + gap=" + gap + " => нужно >=" + need + "; фактически первый блок top=" + r.firstTop + " [" + (ok ? "PASS" : "FAIL") + "]");
-      log(tag + "   colPadTop=" + r.colPadTop + " scrollPadTop=" + r.scrollPadTop + " --shell-gap=" + String(r.gap).trim() + " --shell-header-h=" + String(r.hdrVar).trim() + " hdrTop=" + r.hdrTop + " hdrH=" + r.hdrH + " dir=" + r.dir + " scrollY=" + r.scrollY);
+      const r = (await page.evaluate(PROBE)) as Record<string, any>;
+      const need = r.headerBottom === null ? null : Math.round((r.headerBottom + GAP) * 100) / 100;
+      const pass = need !== null && r.firstTop !== null && r.firstTop >= need;
+      log(tag + " ШАПКА: header top=" + r.headerTop + " bottom=" + r.headerBottom + " h=" + r.headerH + " pos=" + r.headerPos + " cls=" + r.headerCls);
+      log(tag + "       первый блок top=" + r.firstTop + " (" + r.firstTag + ")  нужно >=" + need + "  ЗАЗОР=" + (r.firstTop !== null && r.headerBottom !== null ? Math.round((r.firstTop - r.headerBottom) * 100) / 100 : null) + "  [" + (pass ? "PASS" : "FAIL") + "]");
+      log(tag + "       colPadTop=" + r.colPadTop + " scrollPadTop=" + r.scrollPadTop + " --shell-header-h=" + String(r.headerVar).trim() + " --shell-gap=" + String(r.gapVar).trim() + " dir=" + r.dir + " url=" + r.url);
 
-      // Смена модуля через select, если он есть в мобильной раскладке.
-      const select = page.locator("select").first();
-      if ((await select.count()) > 0) {
-        const options = await select.locator("option").allTextContents().catch(function () { return []; });
-        if (options.length > 1) {
-          await select.selectOption({ index: 1 }).catch(function () { /* noop */ });
-          await page.waitForTimeout(2500);
-          await page.evaluate(function () { window.scrollTo(0, 0); });
-          await page.waitForTimeout(400);
-          const r2 = (await page.evaluate(PROBE)) as Record<string, unknown>;
-          const need2 = typeof r2.hdrBottom === "number" ? r2.hdrBottom + gap : null;
-          log(tag + " ПОСЛЕ СМЕНЫ МОДУЛЯ: нужно >=" + need2 + "; первый блок top=" + r2.firstTop + " [" + (typeof r2.firstTop === "number" && need2 !== null && r2.firstTop >= need2 ? "PASS" : "FAIL") + "] url=" + page.url());
-        } else { log(tag + " select найден, но опций " + options.length + " — пропуск"); }
-      } else { log(tag + " select в мобильной раскладке НЕ НАЙДЕН"); }
+      const sel = page.locator("select").first();
+      if ((await sel.count()) > 0) {
+        await sel.selectOption({ index: 1 }).catch(function () { /* noop */ });
+        await page.waitForTimeout(2500);
+        await page.evaluate(function () { window.scrollTo(0, 0); });
+        await page.waitForTimeout(400);
+        const r2 = (await page.evaluate(PROBE)) as Record<string, any>;
+        const need2 = r2.headerBottom === null ? null : r2.headerBottom + GAP;
+        log(tag + " ПОСЛЕ SELECT: первый блок top=" + r2.firstTop + " нужно >=" + need2 + " [" + (need2 !== null && r2.firstTop !== null && r2.firstTop >= need2 ? "PASS" : "FAIL") + "] url=" + r2.url);
+      } else { log(tag + " ПОСЛЕ SELECT: select не найден"); }
 
-      // Смена маршрута.
-      await withTimeout(tag + " route", page.goto(BASE + "/dashboard/users", { waitUntil: "domcontentloaded" }));
-      await page.waitForTimeout(3000);
-      await page.evaluate(function () { window.scrollTo(0, 0); });
-      await page.waitForTimeout(400);
-      const r3 = (await page.evaluate(PROBE)) as Record<string, unknown>;
-      const need3 = typeof r3.hdrBottom === "number" ? r3.hdrBottom + gap : null;
-      log(tag + " ПОСЛЕ СМЕНЫ МАРШРУТА: нужно >=" + need3 + "; первый блок top=" + r3.firstTop + " [" + (typeof r3.firstTop === "number" && need3 !== null && r3.firstTop >= need3 ? "PASS" : "FAIL") + "] url=" + page.url());
-
-      // Открытая шторка: карточка профиля ниже шапки шторки с тем же зазором.
-      const trigger = page.locator('header button, [data-sidebar="trigger"]').first();
-      if ((await trigger.count()) > 0) {
-        await trigger.click().catch(function () { /* noop */ });
-        await page.waitForTimeout(2000);
-        const sheet = await page.evaluate(function () {
-          var dlg = document.querySelector('[role="dialog"], [data-state="open"][data-mobile="true"], .bilc-mobile-sheet');
-          if (!dlg) return null;
-          var b = function (el) { var r = el.getBoundingClientRect(); return { top: Math.round(r.top * 100) / 100, bottom: Math.round(r.bottom * 100) / 100, h: Math.round(r.height * 100) / 100 }; };
-          var head = dlg.querySelector('header') || dlg.firstElementChild;
-          var kids = Array.prototype.slice.call(dlg.children);
-          var firstBlock = null;
-          for (var i = 0; i < kids.length; i++) { if (kids[i] !== head && kids[i].getBoundingClientRect().height > 20) { firstBlock = kids[i]; break; } }
-          return { sheet: b(dlg), headBottom: head ? b(head).bottom : null, firstTop: firstBlock ? b(firstBlock).top : null, firstCls: firstBlock ? String(firstBlock.className).slice(0, 60) : null };
-        });
-        log(tag + " ШТОРКА: " + JSON.stringify(sheet));
-        if (sheet && typeof sheet.headBottom === "number" && typeof sheet.firstTop === "number") {
-          const needS = Math.round((sheet.headBottom + gap) * 100) / 100;
-          log(tag + " ШТОРКА проверка: нужно >=" + needS + "; первый блок top=" + sheet.firstTop + " [" + (sheet.firstTop >= needS ? "PASS" : "FAIL") + "]");
-        }
-      } else { log(tag + " триггер шторки НЕ НАЙДЕН"); }
+      const urlBefore = page.url();
+      const trigger = page.locator("header button").first();
+      let opened = false;
+      if ((await trigger.count()) > 0) { await trigger.click().catch(function () { /* noop */ }); await page.waitForTimeout(2000); opened = true; }
+      log(tag + " триггер шторки: " + (opened ? "нажат" : "НЕ НАЙДЕН") + " url до=" + urlBefore);
+      const sheet = (await page.evaluate(SHEET)) as Record<string, any>;
+      log(tag + " ШТОРКА: " + JSON.stringify(sheet));
+      if (sheet.found && typeof sheet.headBottom === "number" && typeof sheet.firstTop === "number") {
+        const needS = Math.round((sheet.headBottom + GAP) * 100) / 100;
+        log(tag + " ШТОРКА зазор=" + (Math.round((sheet.firstTop - sheet.headBottom) * 100) / 100) + " нужно >=" + needS + " [" + (sheet.firstTop >= needS ? "PASS" : "FAIL") + "]");
+      }
+      if (sheet.found && Array.isArray(sheet.navLinks) && sheet.navLinks.length) {
+        const link = page.locator('[role="dialog"] a[href]').first();
+        await link.click().catch(function () { /* noop */ });
+        await page.waitForTimeout(2500);
+        await page.evaluate(function () { window.scrollTo(0, 0); });
+        await page.waitForTimeout(400);
+        const r3 = (await page.evaluate(PROBE)) as Record<string, any>;
+        const need3 = r3.headerBottom === null ? null : r3.headerBottom + GAP;
+        log(tag + " ПОСЛЕ ПЕРЕХОДА: url до=" + urlBefore + " после=" + r3.url + " первый блок top=" + r3.firstTop + " нужно >=" + need3 + " [" + (need3 !== null && r3.firstTop !== null && r3.firstTop >= need3 ? "PASS" : "FAIL") + "]");
+      }
       await context.close();
     }
   }
@@ -132,6 +138,7 @@ try {
   await browser.close();
   let removed = 0;
   for (const id of created) { try { await deleteManagedUser(id, { id: founder.id, role: "founder" } as never); removed += 1; } catch (e) { /* noop */ } }
-  log("очистка: удалено " + removed + " из " + created.length);
+  const left = await db!.select().from(users).where(like(users.email, "mh-%@example.test"));
+  log("удалено вызовами: " + removed + " из " + created.length + "; ОСТАЛОСЬ В БД mh-%: " + left.length);
   process.exit(process.exitCode ? 1 : 0);
 }
