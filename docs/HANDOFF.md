@@ -158,3 +158,5 @@ pm run dev. Если его нет — форма входа не отренде
 - Precondition for e2e:sheet-all and e2e:console: `npm run dev` must be running in a separate terminal.
 
 - 2026-10-10 18:10: committed ec21a92 — результат owner-прогона i18n:sync (JSON, 855 строк; ms console.super_admin.label остался в очереди).
+
+- 2026-10-10 18:20: OWNER-FIX FILE1 committed d580fca — фикстура founder использует FOUNDER_EMAIL (инвариант).
