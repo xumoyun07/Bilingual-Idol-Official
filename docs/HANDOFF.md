@@ -98,3 +98,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:09: C2+G3 core done, committed 140bcb1 — Founder.tsx holds the founder console; Admin.tsx renders the admin console (overview + queue with assign/approve/reject via applications.*). Stage-advance UI in the queue still to add. Next: C3 redirect/link switch, C4 authorization rewrite, S2 shell.language, S3 e2e console test.
 
 - 2026-10-10 17:12: C3 done, committed 7485d02 — founder redirects/links/canonical paths -> /founder; ?role= ignored; /founder sub-routes added.
+
+- 2026-10-10 17:12: C4 done, committed 1ea0e34 — effect on resolveRedirect, legacy rule removed, consoleSource.test.ts added.
