@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TRPCError } from "@trpc/server";
 import type { TrpcContext } from "./_core/context";
 import { paymentsRouter } from "./routers/payments";
 import * as db from "./db";
@@ -7,6 +6,13 @@ import * as paymentProvider from "./paymentProvider";
 import { ENV } from "./_core/env";
 import { handleBillplzCallback } from "./paymentsWebhook";
 import { Request, Response } from "express";
+
+/**
+ * Тесты платежей под НОВЫЙ контракт:
+ *  - payments.create принимает только { priceId, idempotencyKey };
+ *  - сумма берётся из studentPrices и копируется на платёж как amountMinor;
+ *  - фикстуры вебхука используют amountMinor.
+ */
 
 function createTrpcContext(role: "student" | "admin" | "founder", userId: number = 6): TrpcContext {
   return {
@@ -28,83 +34,95 @@ function createTrpcContext(role: "student" | "admin" | "founder", userId: number
   };
 }
 
+type SeedPrice = { id: number; studentId: number; programId?: number; amountMinor: number; status?: string };
+
+function seedPrice(input: SeedPrice) {
+  const store = (db.inMemoryStore as unknown as { studentPrices?: unknown[] }).studentPrices ?? [];
+  store.push({
+    id: input.id,
+    studentId: input.studentId,
+    programId: input.programId ?? 1,
+    amountMinor: input.amountMinor,
+    currency: "MYR",
+    status: input.status ?? "active",
+    agreedBy: 1,
+    agreedAt: new Date(),
+    staffNote: null,
+    supersededById: null,
+    supersededReason: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  (db.inMemoryStore as unknown as { studentPrices?: unknown[] }).studentPrices = store;
+}
+
+function mockResponse() {
+  const state = { status: 0, text: "" };
+  const res = {
+    status: (code: number) => {
+      state.status = code;
+      return res;
+    },
+    send: (text: string) => {
+      state.text = text ?? "";
+      return res;
+    },
+  } as unknown as Response;
+  return { res, state };
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
   db.inMemoryStore.payments = [];
   db.inMemoryStore.enrollments = [];
+  (db.inMemoryStore as unknown as { studentPrices?: unknown[] }).studentPrices = [];
 });
 
 describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
 
   it("1. Missing keys in production leads to a controlled error, database is not modified", async () => {
-    // Mock configuration state to disabled/unconfigured
-    const configSpy = vi.spyOn(paymentProvider, "isBillplzConfigured").mockReturnValue(false);
-    
-    // Set production env
+    vi.spyOn(paymentProvider, "isBillplzConfigured").mockReturnValue(false);
+
     const origEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
     const origIsProd = ENV.isProduction;
     (ENV as any).isProduction = true;
 
-    // Seed mock active enrollment to avoid pre-gateway errors
-    db.inMemoryStore.enrollments = [{
-      id: 50,
-      userId: 6,
-      programId: 1,
-      agreedPrice: 75000,
-      registrationFee: 0,
-      placementTestFee: 0,
-      visaFee: 0,
-      status: "active" as const,
-      approvedByUserId: 1,
-      approvedAt: new Date(),
-      source: "whatsapp" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }];
+    // Согласованная цена — единственный источник суммы.
+    seedPrice({ id: 500, studentId: 6, amountMinor: 75000 });
 
-    const ctx = createTrpcContext("student", 6);
-    const caller = paymentsRouter.createCaller(ctx);
-
+    const caller = paymentsRouter.createCaller(createTrpcContext("student", 6));
     const initialLength = db.inMemoryStore.payments.length;
 
-    // Expect the mutation to throw BAD_REQUEST with a clear localized message
-    await expect(caller.create({})).rejects.toThrow(/disabled|offline|payment/i);
+    await expect(caller.create({ priceId: 500, idempotencyKey: "test-key-0001" })).rejects.toThrow(/disabled|offline|payment/i);
 
-    // Verify database was not changed
     expect(db.inMemoryStore.payments.length).toBe(initialLength);
 
-    // Restore environment
     process.env.NODE_ENV = origEnv;
     (ENV as any).isProduction = origIsProd;
-    configSpy.mockRestore();
-    db.inMemoryStore.enrollments = [];
   });
 
-  it("2. Users cannot initiate payments for other student accounts (unauthorized enrollment access)", async () => {
-    // Enable stubbing
+  it("2. A student cannot pay another student's price (NOT_FOUND)", async () => {
     vi.spyOn(paymentProvider, "isBillplzConfigured").mockReturnValue(false);
-    
-    // Student 6 tries to pay for Student 7
-    const ctx = createTrpcContext("student", 6);
-    const caller = paymentsRouter.createCaller(ctx);
 
-    await expect(caller.create({ userId: 7 })).rejects.toThrowError(
-      new TRPCError({ code: "FORBIDDEN", message: "You are only authorized to make payments for your own account." })
-    );
+    seedPrice({ id: 501, studentId: 7, amountMinor: 75000 });
+
+    const caller = paymentsRouter.createCaller(createTrpcContext("student", 6));
+    await expect(caller.create({ priceId: 501, idempotencyKey: "test-key-0002" })).rejects.toMatchObject({ code: "NOT_FOUND" });
+
+    // Чужая цена не должна создавать платёж.
+    expect(db.inMemoryStore.payments.length).toBe(0);
   });
 
   it("3. Dev-stub/gateway must throw an error and refuse to initialize in production", () => {
     const origEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
-    
+
     const origIsProd = ENV.isProduction;
     (ENV as any).isProduction = true;
 
-    // Instantiating DevPaymentProvider in production must throw
     expect(() => new paymentProvider.DevPaymentProvider()).toThrow(/strictly unavailable/i);
 
-    // Restore
     process.env.NODE_ENV = origEnv;
     (ENV as any).isProduction = origIsProd;
   });
@@ -119,20 +137,8 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
       },
     } as unknown as Request;
 
-    let resStatus = 0;
-    let resText = "";
-    const mockRes = {
-      status: (code: number) => {
-        resStatus = code;
-        return mockRes;
-      },
-      send: (text: string) => {
-        resText = text;
-        return mockRes;
-      },
-    } as unknown as Response;
+    const { res, state } = mockResponse();
 
-    // Set configuration so it instantiates the real BillplzProvider
     const origApiKey = process.env.BILLPLZ_API_KEY;
     const origCollId = process.env.BILLPLZ_COLLECTION_ID;
     const origSigKey = process.env.BILLPLZ_SIGNATURE_KEY;
@@ -142,127 +148,86 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
     process.env.BILLPLZ_COLLECTION_ID = "test_coll_id";
     process.env.BILLPLZ_SIGNATURE_KEY = "super_secret_sig_key";
     process.env.BILLPLZ_ENABLED = "true";
-    
-    await handleBillplzCallback(mockReq, mockRes);
 
-    // Invalid signature must yield a 400 Bad Request with "Invalid signature"
-    expect(resStatus).toBe(400);
-    expect(resText).toContain("Invalid signature");
+    await handleBillplzCallback(mockReq, res);
 
-    // Restore
+    expect(state.status).toBe(400);
+    expect(state.text).toContain("Invalid signature");
+
     process.env.BILLPLZ_API_KEY = origApiKey;
     process.env.BILLPLZ_COLLECTION_ID = origCollId;
     process.env.BILLPLZ_SIGNATURE_KEY = origSigKey;
     process.env.BILLPLZ_ENABLED = origEnabled;
   });
 
-  it("5. Rejected webhooks: Callbacks with mismatched amounts or unknown bill IDs must fail", async () => {
-    // Prepare a mock transaction in-memory
-    const testPayment = {
+  it("5. Rejected webhooks: mismatched amounts and unknown bill IDs must fail", async () => {
+    // Фикстура нового образца: сумма хранится в amountMinor.
+    db.inMemoryStore.payments.push({
       id: 99,
       userId: 6,
-      amount: 75000, // RM 750.00
+      amount: 75000,
+      amountMinor: 75000,
       currency: "MYR",
       status: "pending" as const,
       provider: "billplz",
+      priceId: 500,
+      idempotencyKey: "webhook-fixture-1",
       transactionReference: "BILL-OK-111",
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
-    db.inMemoryStore.payments.push(testPayment);
+    } as never);
 
-    // Webhook with a mismatched amount (e.g. 50000 instead of 75000)
-    const mockReqWrongAmount = {
-      body: {
-        id: "BILL-OK-111",
-        paid: "true",
-        amount: "50000", // 50000 is wrong
-        x_signature: "any_val_dev",
-      },
-    } as unknown as Request;
-
-    let resStatusWrong = 0;
-    const mockResWrong = {
-      status: (code: number) => {
-        resStatusWrong = code;
-        return mockResWrong;
-      },
-      send: () => mockResWrong,
-    } as unknown as Response;
-
-    // Mock verification so signature check passes
     vi.spyOn(paymentProvider.DevPaymentProvider.prototype, "verifyCallback").mockReturnValue(true);
 
-    await handleBillplzCallback(mockReqWrongAmount, mockResWrong);
-    expect(resStatusWrong).toBe(400); // Mismatched amount rejected
+    const wrongAmount = mockResponse();
+    await handleBillplzCallback(
+      { body: { id: "BILL-OK-111", paid: "true", amount: "50000", x_signature: "any_val_dev" } } as unknown as Request,
+      wrongAmount.res,
+    );
+    expect(wrongAmount.state.status).toBe(400);
 
-    // Unknown Bill ID
-    const mockReqUnknownBill = {
-      body: {
-        id: "BILL-NON-EXISTENT",
-        paid: "true",
-        amount: "75000",
-        x_signature: "any_val_dev",
-      },
-    } as unknown as Request;
+    const unknownBill = mockResponse();
+    await handleBillplzCallback(
+      { body: { id: "BILL-NON-EXISTENT", paid: "true", amount: "75000", x_signature: "any_val_dev" } } as unknown as Request,
+      unknownBill.res,
+    );
+    expect(unknownBill.state.status).toBe(400);
 
-    let resStatusUnknown = 0;
-    const mockResUnknown = {
-      status: (code: number) => {
-        resStatusUnknown = code;
-        return mockResUnknown;
-      },
-      send: () => mockResUnknown,
-    } as unknown as Response;
-
-    await handleBillplzCallback(mockReqUnknownBill, mockResUnknown);
-    expect(resStatusUnknown).toBe(400); // Unknown bill ID rejected
+    // Ни одна из отклонённых попыток не изменила платёж.
+    expect(db.inMemoryStore.payments[0].status).toBe("pending");
   });
 
-  it("6. Idempotence: Duplicate success callbacks are safe and return 200 OK (Idempotent)", async () => {
-    // Set up a mock payment record that is already marked as completed
-    const testPayment = {
+  it("6. Idempotence: duplicate success callbacks return 200 and change nothing", async () => {
+    db.inMemoryStore.payments.push({
       id: 101,
       userId: 6,
       amount: 75000,
+      amountMinor: 75000,
       currency: "MYR",
-      status: "completed" as const, // already completed
+      status: "completed" as const,
       provider: "billplz",
+      priceId: 500,
+      idempotencyKey: "webhook-fixture-2",
       transactionReference: "BILL-ID-IDEM",
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
-    db.inMemoryStore.payments.push(testPayment);
+    } as never);
+    seedPrice({ id: 500, studentId: 6, amountMinor: 75000, status: "paid" });
 
-    const mockReq = {
-      body: {
-        id: "BILL-ID-IDEM",
-        paid: "true",
-        amount: "75000",
-        x_signature: "dev_sig",
-      },
-    } as unknown as Request;
-
-    let resStatus = 0;
-    let resText = "";
-    const mockRes = {
-      status: (code: number) => {
-        resStatus = code;
-        return mockRes;
-      },
-      send: (text: string) => {
-        resText = text;
-        return mockRes;
-      },
-    } as unknown as Response;
+    const snapshot = JSON.stringify(db.inMemoryStore.payments);
 
     vi.spyOn(paymentProvider.DevPaymentProvider.prototype, "verifyCallback").mockReturnValue(true);
 
-    await handleBillplzCallback(mockReq, mockRes);
+    const { res, state } = mockResponse();
+    await handleBillplzCallback(
+      { body: { id: "BILL-ID-IDEM", paid: "true", amount: "75000", x_signature: "dev_sig" } } as unknown as Request,
+      res,
+    );
 
-    // Duplicate callback must return 200 OK with idempotent confirmation
-    expect(resStatus).toBe(200);
-    expect(resText).toContain("Idempotent");
+    expect(state.status).toBe(200);
+    expect(state.text).toContain("Idempotent");
+    expect(JSON.stringify(db.inMemoryStore.payments)).toBe(snapshot);
+    expect(db.inMemoryStore.payments.length).toBe(1);
   });
 
   it("7. Gateway connection checks must never leak secret API keys/credentials in API responses", async () => {
@@ -274,7 +239,6 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
 
     const statusRes = await caller.getGatewayStatus();
 
-    // Verify response is completely redacted and contains no secret traces
     const serialised = JSON.stringify(statusRes);
     expect(serialised).not.toContain("API_KEY");
     expect(serialised).not.toContain("SIGNATURE_KEY");
@@ -283,7 +247,6 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
   });
 
   it("8. Verify signature generation matches the clean callback webhook format processed in production", () => {
-    // Pure Callback format (webhook POST style) from Billplz
     const payload = {
       "id": "zq0tm2wc",
       "paid": "true",
@@ -292,23 +255,19 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
     };
     const signatureKey = "S-s7b4yWpp9h7rrkNM1i3Z_g";
 
-    // 1. Verify standard helper function matches expected hash exactly
     const computed = paymentProvider.generateBillplzSignature(payload, signatureKey);
     expect(computed).toBe("4db8ddef73ae51dbf8df9268aacc0d746756e8cc0e4ebdb7a4522ed8c3c07ef1");
 
-    // 2. Verify BillplzProvider.verifyCallback processes the payload and returns true
     const origSigKey = process.env.BILLPLZ_SIGNATURE_KEY;
     process.env.BILLPLZ_SIGNATURE_KEY = signatureKey;
 
     const provider = new paymentProvider.BillplzProvider();
-    const isVerified = provider.verifyCallback(payload);
-    expect(isVerified).toBe(true);
+    expect(provider.verifyCallback(payload)).toBe(true);
 
     process.env.BILLPLZ_SIGNATURE_KEY = origSigKey;
   });
 
   it("9. Verify signature generation matches the official mixed/redirect reference example from Billplz documentation", () => {
-    // Official Billplz documented reference example payload with mixed/bracket keys and x_signature
     const payload = {
       "billplz[id]": "zq0tm2wc",
       "billplz[paid]": "true",
@@ -317,17 +276,14 @@ describe("Bilingual Idol - Billplz Payment Integration Tests", () => {
     };
     const signatureKey = "S-s7b4yWpp9h7rrkNM1i3Z_g";
 
-    // 1. Verify standard helper function matches expected hash exactly
     const computed = paymentProvider.generateBillplzSignature(payload, signatureKey);
     expect(computed).toBe("4aab095fe5a39b1d534500988f9a0cb085cd1b6d5bbb55dd4e02ea6fa102b47b");
 
-    // 2. Verify BillplzProvider.verifyCallback processes the payload and returns true
     const origSigKey = process.env.BILLPLZ_SIGNATURE_KEY;
     process.env.BILLPLZ_SIGNATURE_KEY = signatureKey;
 
     const provider = new paymentProvider.BillplzProvider();
-    const isVerified = provider.verifyCallback(payload);
-    expect(isVerified).toBe(true);
+    expect(provider.verifyCallback(payload)).toBe(true);
 
     process.env.BILLPLZ_SIGNATURE_KEY = origSigKey;
   });
