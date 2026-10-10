@@ -291,6 +291,17 @@ export interface TranslationDictionary {
     myDashboard: string;
     toggleSidebar: string;
     attendancePending: string;
+    /** Консоль администратора (C2/G3). */
+    adminConsole: {
+      title: string;
+      overview: string;
+      queueTitle: string;
+      filterCategory: string;
+      filterProgram: string;
+      empty: string;
+      category: { all: string; adult: string; child: string; internationalStudent: string };
+      action: { assign: string; approve: string; reject: string; rejectPrompt: string };
+    };
     /** Трекер заявки студента (G2). */
     tracker: {
       title: string;
@@ -708,7 +719,17 @@ export const translations: Record<Language, TranslationDictionary> = {
     shell: {
       myDashboard: "My Dashboard",
       toggleSidebar: "Toggle Sidebar",
-            attendancePending: "Attendance is not available yet.",
+                  attendancePending: "Attendance is not available yet.",
+      adminConsole: {
+        title: "Administrator Console",
+        overview: "Programmes, admissions and the registration queue. User accounts, audit and security are managed by other roles.",
+        queueTitle: "Registration queue",
+        filterCategory: "Applicant category",
+        filterProgram: "Filter by programme…",
+        empty: "No registration requests match the current filters.",
+        category: { all: "All categories", adult: "Adult", child: "Child", internationalStudent: "International student" },
+        action: { assign: "Assign to me", approve: "Approve", reject: "Reject", rejectPrompt: "Rejection reason:" },
+      },
       tracker: {
         title: "Track Application",
         current: "Current stage",
@@ -1116,7 +1137,17 @@ export const translations: Record<Language, TranslationDictionary> = {
     shell: {
       myDashboard: "Papan Pemuka Saya",
       toggleSidebar: "Tukar Bar Sisi",
-            attendancePending: "Kehadiran belum tersedia lagi.",
+                  attendancePending: "Kehadiran belum tersedia lagi.",
+      adminConsole: {
+        title: "Konsol Pentadbir",
+        overview: "Program, kemasukan dan baris gilir pendaftaran. Akaun pengguna, audit dan keselamatan diuruskan oleh peranan lain.",
+        queueTitle: "Baris gilir pendaftaran",
+        filterCategory: "Kategori pemohon",
+        filterProgram: "Tapis mengikut program…",
+        empty: "Tiada permohonan pendaftaran yang sepadan dengan penapis semasa.",
+        category: { all: "Semua kategori", adult: "Dewasa", child: "Kanak-kanak", internationalStudent: "Pelajar antarabangsa" },
+        action: { assign: "Serah kepada saya", approve: "Luluskan", reject: "Tolak", rejectPrompt: "Sebab penolakan:" },
+      },
       tracker: {
         title: "Jejaki Permohonan",
         current: "Peringkat semasa",
@@ -1524,7 +1555,17 @@ export const translations: Record<Language, TranslationDictionary> = {
     shell: {
       myDashboard: "لوحتي",
       toggleSidebar: "إظهار الشريط الجانبي",
-            attendancePending: "سجل الحضور غير متاح بعد.",
+                  attendancePending: "سجل الحضور غير متاح بعد.",
+      adminConsole: {
+        title: "وحدة تحكم المدير",
+        overview: "البرامج والقبول وطابور التسجيل. تُدار حسابات المستخدمين والتدقيق والأمان من قبل أدوار أخرى.",
+        queueTitle: "طابور التسجيل",
+        filterCategory: "فئة المتقدم",
+        filterProgram: "تصفية حسب البرنامج…",
+        empty: "لا توجد طلبات تسجيل مطابقة للفلاتر الحالية.",
+        category: { all: "جميع الفئات", adult: "بالغ", child: "طفل", internationalStudent: "طالب دولي" },
+        action: { assign: "إسناد إليّ", approve: "موافقة", reject: "رفض", rejectPrompt: "سبب الرفض:" },
+      },
       tracker: {
         title: "تتبع الطلب",
         current: "المرحلة الحالية",
