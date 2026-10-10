@@ -12,7 +12,7 @@ export default function UserDashboard() {
     return (
       <div className="grid min-h-screen place-items-center bg-[#fbf8f2]">
         <div className="text-center">
-          <h1 className="text-xl font-semibold text-[#10253e]">{t("userDashboard.preparing", "Preparing Workspace…")}</h1>
+          <h1 className="text-xl font-semibold text-[#10253e]">{t("userDashboard.preparing")}</h1>
         </div>
       </div>
     );

@@ -93,7 +93,7 @@ export default function Founder() {
 
 function FounderConsole() {
   const [location] = useLocation();
-  const { td, isRTL } = useLanguage();
+  const { td, t, isRTL } = useLanguage();
   const { activeRole, activeTab, navigateTo } = useFounderNav();
 
   const roleParam = activeRole;
@@ -198,12 +198,12 @@ function FounderConsole() {
 }
 
 function ModuleHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
-  const { td } = useLanguage();
+  const { td, t } = useLanguage();
   return <header className="founder-command-header"><div><p className="founder-command-eyebrow">{td(eyebrow)}</p><h1 className="founder-command-title">{td(title)}</h1><p className="founder-command-description">{td(description)}</p></div>{action ? <div className="founder-command-action">{action}</div> : null}</header>;
 }
 
 function DashboardModule() {
-  const { td } = useLanguage();
+  const { td, t } = useLanguage();
 
   return (
     <div className="w-full min-h-[500px] flex flex-col justify-center items-center text-center p-8 bg-white border border-[#eee4d7] rounded-2xl shadow-sm">
@@ -221,7 +221,7 @@ function DashboardModule() {
 }
 
 function UsersModule() {
-  const { td } = useLanguage();
+  const { td, t } = useLanguage();
   const utils = trpc.useUtils();
   const [category, setCategory] = useState<CategoryRole>("student");
   const [search, setSearch] = useState("");
@@ -459,7 +459,7 @@ function UsersModule() {
 function FilterSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: [string, string][] }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<select value={value} onChange={event => onChange(event.target.value)} className="mt-1 block h-12 w-full rounded-xl border border-[#dfd1bf] bg-white px-3 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]">{options.map(([key, copy]) => <option key={key} value={key}>{td(copy)}</option>)}</select></label>; }
 function DateFilter({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { const { td } = useLanguage(); return <label className="block text-[11px] font-extrabold tracking-[.08em] text-[#708098] uppercase">{td(label)}<span className="relative mt-1 block"><CalendarDays className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[#708098]" size={15} /><input type="date" value={value} onChange={event => onChange(event.target.value)} className="h-12 w-full rounded-xl border border-[#dfd1bf] bg-white ps-9 pe-2 text-sm font-semibold normal-case tracking-normal text-[#10253e] outline-none focus:border-[#173fad] focus:ring-2 focus:ring-[#c8d9f8]" /></span></label>; }
 function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: () => void }) {
-  const { td } = useLanguage();
+  const { td, t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   return (
     <div className="bg-white hover:bg-[#faf6ef] transition-colors border-b border-[#f0e9df]">
@@ -570,7 +570,7 @@ function AccountRow({ account, onClick }: { account: ManagedAccount; onClick: ()
 }
 
 function UserModal({ mode, selected, loading, draft, setDraft, profileFields, profileSections, profileValues, setProfileValues, pending, error, onSubmit, onClose, onDelete }: { mode: ModalMode; selected: ManagedAccount | undefined; loading: boolean; draft: AccountDraft; setDraft: (draft: AccountDraft) => void; profileFields: DynamicField[]; profileSections: DynamicSection[]; profileValues: Record<string, string>; setProfileValues: (values: Record<string, string>) => void; pending: boolean; error?: string; onSubmit: (event: React.FormEvent<HTMLFormElement>) => void; onClose: () => void; onDelete: () => void }) {
-  const { td } = useLanguage();
+  const { td, t } = useLanguage();
   if (mode === "detail" && loading) return <div className="grid min-h-80 place-items-center"><Loader2 className="animate-spin text-[#173fad]" /></div>;
   const createMode = mode === "create";
   if (createMode) return <ConfigurableCreateUserModal draft={draft} setDraft={setDraft} profileValues={profileValues} setProfileValues={setProfileValues} pending={pending} error={error} onSubmit={onSubmit} onClose={onClose} />;

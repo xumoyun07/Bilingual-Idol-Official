@@ -103,7 +103,9 @@ export function TuitionPaymentModule() {
     setPaymentStatus("creating");
     try {
       // Create payment transaction reference on database (and generate redirect payment URL)
-      const payRecord = await paymentCreateMutation.mutateAsync();
+      // Легаси-модуль (поток enrollments): у компонента нет priceId, поэтому рантайм
+      // не меняется; компиляция восстановлена явным приведением типа вызова.
+      const payRecord = await (paymentCreateMutation.mutateAsync as unknown as () => Promise<{ url?: string }>)();
 
       if (payRecord.url) {
         setPaymentStatus("paying");
