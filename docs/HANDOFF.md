@@ -94,3 +94,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:07: G6 done, committed 687627e — submissions.create rejects type=enrollment; test added.
 
 - 2026-10-10 17:07: G7 done, committed 3c04b2a — /enroll redirects to /programs; PromotionalPopup and StudentJourneyRoadmap links updated.
+
+- 2026-10-10 17:09: C2+G3 core done, committed 140bcb1 — Founder.tsx holds the founder console; Admin.tsx renders the admin console (overview + queue with assign/approve/reject via applications.*). Stage-advance UI in the queue still to add. Next: C3 redirect/link switch, C4 authorization rewrite, S2 shell.language, S3 e2e console test.
