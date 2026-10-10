@@ -66,6 +66,11 @@ const RELATED_RULES: RelatedRule[] = [
   { table: "enrollments", column: "userId", mode: "delete" },
   { table: "enrollments", column: "approvedByUserId", mode: "delete" },
   { table: "payments", column: "userId", mode: "delete" },
+  // Согласованные цены студента. Их наличие ОСТАНАВЛИВАЕТ скрипт без
+  // --include-related; финансовые строки уходят только при осознанном полном сбросе.
+  { table: "studentPrices", column: "studentId", mode: "delete" },
+  { table: "studentPrices", column: "agreedBy", mode: "null" },
+  { table: "studentPrices", column: "supersededById", mode: "null" },
   { table: "placementTestAttempts", column: "userId", mode: "delete" },
   { table: "applications", column: "userId", mode: "delete" },
   { table: "userProfileValues", column: "userId", mode: "delete" },

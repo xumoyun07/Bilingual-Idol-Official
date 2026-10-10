@@ -834,6 +834,7 @@ export async function countUserDependencies(userId: number, exclude: readonly st
     enrollments: inMemoryStore.enrollments as Array<Record<string, unknown>>,
     placementTestAttempts: inMemoryStore.placementTestAttempts as Array<Record<string, unknown>>,
     payments: (inMemoryStore as unknown as { payments?: Array<Record<string, unknown>> }).payments ?? [],
+    studentPrices: (inMemoryStore as unknown as { studentPrices?: Array<Record<string, unknown>> }).studentPrices ?? [],
   };
 
   for (const { table, column } of DEPENDENT_COLUMNS) {

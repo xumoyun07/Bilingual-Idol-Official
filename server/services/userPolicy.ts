@@ -191,6 +191,12 @@ export const DEPENDENT_COLUMNS: ReadonlyArray<{ table: string; column: string }>
   { table: "audienceSegments", column: "createdByUserId" },
   { table: "events", column: "createdByUserId" },
   { table: "blogPosts", column: "authorId" },
+  // Согласованные цены и связь платежа с ценой: финансовую историю не удаляем,
+  // поэтому пользователь с ними деактивируется, а не удаляется жёстко.
+  { table: "studentPrices", column: "studentId" },
+  { table: "studentPrices", column: "agreedBy" },
+  { table: "studentPrices", column: "supersededById" },
+  { table: "payments", column: "priceId" },
 ];
 
 /** Строки, которые принадлежат самому профилю студента и удаляются вместе с ним. */
