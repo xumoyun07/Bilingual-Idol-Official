@@ -1270,6 +1270,136 @@
       "sourceHash": "611af932",
       "reviewed": false
     },
+    "shell.adminConsole.title": {
+      "value": "Konsol Pentadbir",
+      "sourceHash": "bae673dc",
+      "reviewed": false
+    },
+    "shell.adminConsole.overview": {
+      "value": "Program, kemasukan dan baris gilir pendaftaran. Akaun pengguna, audit dan keselamatan diuruskan oleh peranan lain.",
+      "sourceHash": "33dcb85c",
+      "reviewed": false
+    },
+    "shell.adminConsole.queueTitle": {
+      "value": "Baris gilir pendaftaran",
+      "sourceHash": "99d2f903",
+      "reviewed": false
+    },
+    "shell.adminConsole.filterCategory": {
+      "value": "Kategori pemohon",
+      "sourceHash": "afed7449",
+      "reviewed": false
+    },
+    "shell.adminConsole.filterProgram": {
+      "value": "Tapis mengikut program…",
+      "sourceHash": "14d6b592",
+      "reviewed": false
+    },
+    "shell.adminConsole.empty": {
+      "value": "Tiada permohonan pendaftaran yang sepadan dengan penapis semasa.",
+      "sourceHash": "fe40d649",
+      "reviewed": false
+    },
+    "shell.adminConsole.category.all": {
+      "value": "Semua kategori",
+      "sourceHash": "62f5d708",
+      "reviewed": false
+    },
+    "shell.adminConsole.category.adult": {
+      "value": "Dewasa",
+      "sourceHash": "5a600f5b",
+      "reviewed": false
+    },
+    "shell.adminConsole.category.child": {
+      "value": "Kanak-kanak",
+      "sourceHash": "a82fea38",
+      "reviewed": false
+    },
+    "shell.adminConsole.category.internationalStudent": {
+      "value": "Pelajar antarabangsa",
+      "sourceHash": "6ddea224",
+      "reviewed": false
+    },
+    "shell.adminConsole.action.assign": {
+      "value": "Serah kepada saya",
+      "sourceHash": "b7408bf6",
+      "reviewed": false
+    },
+    "shell.adminConsole.action.approve": {
+      "value": "Luluskan",
+      "sourceHash": "6f735165",
+      "reviewed": false
+    },
+    "shell.adminConsole.action.reject": {
+      "value": "Tolak",
+      "sourceHash": "d98ac127",
+      "reviewed": false
+    },
+    "shell.adminConsole.action.rejectPrompt": {
+      "value": "Sebab penolakan:",
+      "sourceHash": "dd929574",
+      "reviewed": false
+    },
+    "shell.adminConsole.action.advance": {
+      "value": "Maju ke peringkat seterusnya",
+      "sourceHash": "f263d27c",
+      "reviewed": false
+    },
+    "shell.adminConsole.applicationsTitle": {
+      "value": "Permohonan",
+      "sourceHash": "1ddf333c",
+      "reviewed": false
+    },
+    "shell.adminConsole.noApplications": {
+      "value": "Tiada permohonan lagi. Luluskan permintaan pendaftaran untuk mencipta satu.",
+      "sourceHash": "98d95d96",
+      "reviewed": false
+    },
+    "shell.tracker.title": {
+      "value": "Jejaki Permohonan",
+      "sourceHash": "7a956a08",
+      "reviewed": false
+    },
+    "shell.tracker.current": {
+      "value": "Peringkat semasa",
+      "sourceHash": "31329cd3",
+      "reviewed": false
+    },
+    "shell.tracker.stage.submitted": {
+      "value": "Dihantar",
+      "sourceHash": "5c835c22",
+      "reviewed": false
+    },
+    "shell.tracker.stage.documentsReceived": {
+      "value": "Dokumen Diterima",
+      "sourceHash": "9c1fcede",
+      "reviewed": false
+    },
+    "shell.tracker.stage.underReview": {
+      "value": "Dalam Semakan",
+      "sourceHash": "e1521f74",
+      "reviewed": false
+    },
+    "shell.tracker.stage.offerIssued": {
+      "value": "Tawaran Dikeluarkan",
+      "sourceHash": "b19badf3",
+      "reviewed": false
+    },
+    "shell.tracker.stage.paymentCompleted": {
+      "value": "Bayaran Selesai",
+      "sourceHash": "66e59abd",
+      "reviewed": false
+    },
+    "shell.tracker.stage.visaProcess": {
+      "value": "Proses Visa",
+      "sourceHash": "07f3e785",
+      "reviewed": false
+    },
+    "shell.tracker.stage.registrationCompleted": {
+      "value": "Pendaftaran Selesai",
+      "sourceHash": "4d1a7515",
+      "reviewed": false
+    },
     "shell.studentPortal": {
       "value": "Portal Pelajar",
       "sourceHash": "57032670",
@@ -1278,6 +1408,161 @@
     "shell.learningCentreAdmin": {
       "value": "Pentadbir Pusat Pembelajaran",
       "sourceHash": "91f59c22",
+      "reviewed": false
+    },
+    "shell.language": {
+      "value": "Bahasa",
+      "sourceHash": "4994a8ff",
+      "reviewed": false
+    },
+    "shell.strategicModules": {
+      "value": "modul strategik",
+      "sourceHash": "73d1de75",
+      "reviewed": false
+    },
+    "shell.platformGovernance": {
+      "value": "Platform & Tadbir Urus",
+      "sourceHash": "a36f0601",
+      "reviewed": false
+    },
+    "console.founder.label": {
+      "value": "Pengasas",
+      "sourceHash": "ad5b1a22",
+      "reviewed": false
+    },
+    "console.founder.title": {
+      "value": "Konsol Pengasas",
+      "sourceHash": "f5f8814e",
+      "reviewed": false
+    },
+    "console.founder.subtitle": {
+      "value": "Konsol Pengasas",
+      "sourceHash": "f5f8814e",
+      "reviewed": false
+    },
+    "console.super_admin.label": {
+      "value": "Super Admin",
+      "sourceHash": "dbf36ff3",
+      "reviewed": false
+    },
+    "console.super_admin.title": {
+      "value": "Konsol Super Admin",
+      "sourceHash": "e17fc273",
+      "reviewed": false
+    },
+    "console.super_admin.subtitle": {
+      "value": "Konsol Super Admin",
+      "sourceHash": "e17fc273",
+      "reviewed": false
+    },
+    "console.admin.label": {
+      "value": "Pentadbir",
+      "sourceHash": "7b7bc251",
+      "reviewed": false
+    },
+    "console.admin.title": {
+      "value": "Konsol Pentadbir",
+      "sourceHash": "bae673dc",
+      "reviewed": false
+    },
+    "console.admin.subtitle": {
+      "value": "Konsol Pentadbir",
+      "sourceHash": "bae673dc",
+      "reviewed": false
+    },
+    "console.marketing.label": {
+      "value": "Pemasaran",
+      "sourceHash": "7cb15e41",
+      "reviewed": false
+    },
+    "console.marketing.title": {
+      "value": "Konsol Pemasaran",
+      "sourceHash": "ba93be03",
+      "reviewed": false
+    },
+    "console.marketing.subtitle": {
+      "value": "Konsol Pemasaran",
+      "sourceHash": "ba93be03",
+      "reviewed": false
+    },
+    "console.teacher.label": {
+      "value": "Guru",
+      "sourceHash": "8ab7bbdf",
+      "reviewed": false
+    },
+    "console.teacher.title": {
+      "value": "Konsol Guru",
+      "sourceHash": "a815de56",
+      "reviewed": false
+    },
+    "console.teacher.subtitle": {
+      "value": "Konsol Guru",
+      "sourceHash": "a815de56",
+      "reviewed": false
+    },
+    "console.student.label": {
+      "value": "Pelajar",
+      "sourceHash": "f5c0a1c9",
+      "reviewed": false
+    },
+    "console.student.title": {
+      "value": "Portal Pelajar",
+      "sourceHash": "57032670",
+      "reviewed": false
+    },
+    "console.student.subtitle": {
+      "value": "Portal Pelajar",
+      "sourceHash": "57032670",
+      "reviewed": false
+    },
+    "console.empty.label": {
+      "value": "Pengguna",
+      "sourceHash": "8f9bfe9d",
+      "reviewed": false
+    },
+    "console.empty.title": {
+      "value": "Akaun",
+      "sourceHash": "08bd40c7",
+      "reviewed": false
+    },
+    "console.empty.subtitle": {
+      "value": "Akaun",
+      "sourceHash": "08bd40c7",
+      "reviewed": false
+    },
+    "console.module.overview": {
+      "value": "Gambaran Keseluruhan",
+      "sourceHash": "3b878279",
+      "reviewed": false
+    },
+    "console.module.users": {
+      "value": "Akaun Pengguna",
+      "sourceHash": "e55adecd",
+      "reviewed": false
+    },
+    "console.module.audit": {
+      "value": "Audit & Keselamatan",
+      "sourceHash": "d2c5254a",
+      "reviewed": false
+    },
+    "console.module.prices": {
+      "value": "Harga",
+      "sourceHash": "e16dd6e1",
+      "reviewed": false
+    },
+    "founderConsole.dashboard": {
+      "value": "Papan Pemuka Pengasas",
+      "sourceHash": "227964e4",
+      "reviewed": false
+    },
+    "founderConsole.verifiedSession": {
+      "value": "Sesi Pengasas Disahkan",
+      "sourceHash": "2c6d0718",
+      "reviewed": false
+    },
+    "founderConsole.activeModule": {
+      "value": "Modul Aktif:",
+      "sourceHash": "405bea28",
       "reviewed": false
     },
     "form.studentName": {
