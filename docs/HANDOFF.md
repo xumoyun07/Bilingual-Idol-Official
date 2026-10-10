@@ -82,3 +82,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 15:49: C1 done, committed 484bd2e — /founder route added, renders the existing founder console, ?tab= preserved via useFounderNav, ?role= ignored. /admin unchanged.
 
 - 2026-10-10 16:52: NEW STREAM — 12-doc review completed; docs/PROJECT_REVIEW_AND_GAPS.md written. Gaps G1-G12; implementation order G1 applications router -> G2 tracker UI -> G3 admin queue -> G4 student grades/documents -> G5 promotions -> G6 legacy enrollment input -> G7 /enroll target -> G8 console finish (C2-C4, S2, S3) -> G9 placement binding -> G10 notifications -> G11 form conformance -> G12 journey content.
+
+- 2026-10-10 16:58: G1 done, committed a711abd — applications router (queue/assign/approve/reject/advanceStatus/overrideStatus/myStatus) + service + audit actions + vitest suite. Owner runs: npx vitest run. Next: G2 tracker UI in UserDashboard, G3 admin queue UI in /admin.
