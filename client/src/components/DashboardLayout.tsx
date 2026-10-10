@@ -43,7 +43,7 @@ import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { Button } from "./ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { resolveConsole } from "@shared/console";
+import { resolveConsole, resolveRedirect } from "@shared/console";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   PlatformUserType,
@@ -94,26 +94,18 @@ export default function DashboardLayout({
     // иначе admin получил бы скелет и бесконечный редирект на тот же /admin.
     if (!role) return true;
     if (user.role === role) return true;
-    if (role === "founder" && user.role === "admin") return true;
     if (role === "marketing" && ["founder", "super_admin", "admin"].includes(user.role)) return true;
     return false;
   };
 
   useEffect(() => {
-    if (!loading && user && !isRoleAuthorized()) {
-      window.location.replace(
-        user.role === "super_admin"
-          ? "/super-admin"
-          : (user.role === "founder" || user.role === "admin")
-          ? "/admin"
-          : user.role === "teacher"
-          ? "/teacher"
-          : user.role === "marketing"
-          ? "/marketing"
-          : "/dashboard"
-      );
+    // C4: единственная функция редиректа — resolveRedirect(sessionRole, path).
+    // Идемпотентна: применённая дважды не меняет результат (см. console.test.ts).
+    if (!loading && user) {
+      const target = resolveRedirect(user.role, window.location.pathname);
+      if (target) window.location.replace(target);
     }
-  }, [loading, role, user]);
+  }, [loading, user]);
 
   if (loading || (user && !isRoleAuthorized())) return <DashboardLayoutSkeleton />;
   if (!user) return <DashboardSignIn />;
