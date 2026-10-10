@@ -318,7 +318,21 @@ export interface TranslationDictionary {
     };
     studentPortal: string;
     learningCentreAdmin: string;
+    language: string;
+    strategicModules: string;
+    platformGovernance: string;
   };
+  console: {
+    founder: { label: string; title: string; subtitle: string };
+    super_admin: { label: string; title: string; subtitle: string };
+    admin: { label: string; title: string; subtitle: string };
+    marketing: { label: string; title: string; subtitle: string };
+    teacher: { label: string; title: string; subtitle: string };
+    student: { label: string; title: string; subtitle: string };
+    empty: { label: string; title: string; subtitle: string };
+    module: { overview: string; users: string; audit: string; prices: string };
+  };
+  founderConsole: { dashboard: string; verifiedSession: string; activeModule: string };
   form: {
     studentName: string;
     studentNamePlaceholder: string;
@@ -745,7 +759,21 @@ export const translations: Record<Language, TranslationDictionary> = {
       },
       studentPortal: "Student Portal",
       learningCentreAdmin: "Learning Centre Admin",
+      language: "Language",
+      strategicModules: "strategic modules",
+      platformGovernance: "Platform & Governance",
     },
+    console: {
+      founder: { label: "Founder", title: "Founder Console", subtitle: "Founder Console" },
+      super_admin: { label: "Super Admin", title: "Super Admin Console", subtitle: "Super Admin Console" },
+      admin: { label: "Administrator", title: "Administrator Console", subtitle: "Administrator Console" },
+      marketing: { label: "Marketing", title: "Marketing Console", subtitle: "Marketing Console" },
+      teacher: { label: "Teacher", title: "Teacher Console", subtitle: "Teacher Console" },
+      student: { label: "Student", title: "Student Portal", subtitle: "Student Portal" },
+      empty: { label: "User", title: "Account", subtitle: "Account" },
+      module: { overview: "Overview", users: "User Accounts", audit: "Audit & Security", prices: "Prices" },
+    },
+    founderConsole: { dashboard: "Founder Dashboard", verifiedSession: "Verified Founder Session", activeModule: "Active Module:" },
     form: {
       studentName: "Student full name *",
       studentNamePlaceholder: "e.g. Sarah Tan",
@@ -1163,7 +1191,21 @@ export const translations: Record<Language, TranslationDictionary> = {
       },
       studentPortal: "Portal Pelajar",
       learningCentreAdmin: "Pentadbir Pusat Pembelajaran",
+      language: "Bahasa",
+      strategicModules: "modul strategik",
+      platformGovernance: "Platform & Tadbir Urus",
     },
+    console: {
+      founder: { label: "Pengasas", title: "Konsol Pengasas", subtitle: "Konsol Pengasas" },
+      super_admin: { label: "Super Admin", title: "Konsol Super Admin", subtitle: "Konsol Super Admin" },
+      admin: { label: "Pentadbir", title: "Konsol Pentadbir", subtitle: "Konsol Pentadbir" },
+      marketing: { label: "Pemasaran", title: "Konsol Pemasaran", subtitle: "Konsol Pemasaran" },
+      teacher: { label: "Guru", title: "Konsol Guru", subtitle: "Konsol Guru" },
+      student: { label: "Pelajar", title: "Portal Pelajar", subtitle: "Portal Pelajar" },
+      empty: { label: "Pengguna", title: "Akaun", subtitle: "Akaun" },
+      module: { overview: "Gambaran Keseluruhan", users: "Akaun Pengguna", audit: "Audit & Keselamatan", prices: "Harga" },
+    },
+    founderConsole: { dashboard: "Papan Pemuka Pengasas", verifiedSession: "Sesi Pengasas Disahkan", activeModule: "Modul Aktif:" },
     form: {
       studentName: "Nama penuh pelajar *",
       studentNamePlaceholder: "cth. Siti Nurhaliza",
@@ -1581,7 +1623,21 @@ export const translations: Record<Language, TranslationDictionary> = {
       },
       studentPortal: "بوابة الطالب",
       learningCentreAdmin: "إدارة المركز التعليمي",
+      language: "اللغة",
+      strategicModules: "وحدات استراتيجية",
+      platformGovernance: "المنصة والحوكمة",
     },
+    console: {
+      founder: { label: "المؤسس", title: "وحدة تحكم المؤسس", subtitle: "وحدة تحكم المؤسس" },
+      super_admin: { label: "مدير عام", title: "وحدة تحكم المدير العام", subtitle: "وحدة تحكم المدير العام" },
+      admin: { label: "مدير", title: "وحدة تحكم المدير", subtitle: "وحدة تحكم المدير" },
+      marketing: { label: "تسويق", title: "وحدة تحكم التسويق", subtitle: "وحدة تحكم التسويق" },
+      teacher: { label: "مدرّس", title: "وحدة تحكم المدرّس", subtitle: "وحدة تحكم المدرّس" },
+      student: { label: "طالب", title: "بوابة الطالب", subtitle: "بوابة الطالب" },
+      empty: { label: "مستخدم", title: "الحساب", subtitle: "الحساب" },
+      module: { overview: "نظرة عامة", users: "حسابات المستخدمين", audit: "التدقيق والأمان", prices: "الأسعار" },
+    },
+    founderConsole: { dashboard: "لوحة تحكم المؤسس", verifiedSession: "جلسة مؤسس موثقة", activeModule: "الوحدة النشطة:" },
     form: {
       studentName: "اسم الطالب الثلاثي *",
       studentNamePlaceholder: "مثال: أحمد عبد الله",

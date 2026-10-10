@@ -58,13 +58,13 @@ type DashboardRole = "founder" | "super_admin" | "teacher" | "marketing" | "stud
 const STRATEGIC_PORTFOLIOS = [
   {
     id: "platform-gov",
-    label: "Platform & Governance",
+    label: "shell.platformGovernance",
     icon: Crown,
     tone: "bg-[#fff8e6] text-[#b47d00] border-[#ffd580]",
     modules: [
-      { id: "founder-overview", title: "Overview", icon: LayoutDashboard, role: "founder" },
-      { id: "founder-users", title: "User Accounts", icon: UsersRound, role: "founder" },
-      { id: "founder-audit", title: "Audit & Security", icon: ScrollText, role: "founder" },
+      { id: "founder-overview", title: "console.module.overview", icon: LayoutDashboard, role: "founder" },
+      { id: "founder-users", title: "console.module.users", icon: UsersRound, role: "founder" },
+      { id: "founder-audit", title: "console.module.audit", icon: ScrollText, role: "founder" },
     ],
   },
 ];
@@ -116,7 +116,7 @@ export default function DashboardLayout({
       className="blue-workspace"
       style={{ "--sidebar-width": "18.5rem" } as React.CSSProperties}
     >
-      <DashboardShell role={role ?? "student"} sessionRole={sessionRole} consoleKey={consoleDef ? consoleDef.consoleKey : null} activeTab={activeTab} setActiveTab={setActiveTab}>{children}</DashboardShell>
+      <DashboardShell role={role ?? "student"} sessionRole={sessionRole} consoleKey={consoleDef ? consoleDef.consoleKey : null} consoleLabelKey={consoleDef ? consoleDef.labelKey : null} activeTab={activeTab} setActiveTab={setActiveTab}>{children}</DashboardShell>
     </SidebarProvider>
   );
 }
@@ -147,12 +147,14 @@ function DashboardShell({
   role,
   sessionRole,
   consoleKey,
+  consoleLabelKey,
   activeTab: externalActiveTab,
   setActiveTab: externalSetActiveTab,
 }: {
   children: React.ReactNode;
   role: DashboardRole;
   sessionRole?: string | null;
+  consoleLabelKey?: string | null;
   consoleKey?: string | null;
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
@@ -166,7 +168,7 @@ function DashboardShell({
   // Подпись роли — из реальной сессии, а не из пропа маршрута:
   // admin не должен видеть Founder.
   const displayedRole = (sessionRole ?? role) as DashboardRole;
-  const roleText = roleLabel(displayedRole as never, enumT) as string;
+  const roleText = t(consoleLabelKey ?? "console.student.label", undefined, roleLabel(displayedRole as never, enumT) as string);
   const accountStatusLabel = t("account.status", { role: roleText });
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -223,10 +225,10 @@ function DashboardShell({
                       </span>
                       <div className="min-w-0">
                         <span className="block text-xs font-bold text-[#10253e] truncate">
-                          {td(section.label)}
+                          {t(section.label, undefined, "Platform & Governance")}
                         </span>
                         <span className="block text-[10px] text-[#708098] truncate">
-                          {section.modules.length} {td("strategic modules")}
+                          {section.modules.length} {t("shell.strategicModules", undefined, "strategic modules")}
                         </span>
                       </div>
                     </div>
@@ -263,7 +265,7 @@ function DashboardShell({
                                 size={14}
                                 className={isModuleActive ? "text-white" : "text-[#64748b]"}
                               />
-                              <span className="truncate">{td(mod.title)}</span>
+                              <span className="truncate">{t(mod.title, undefined, "Overview")}</span>
                             </div>
                           </button>
                         );
@@ -344,18 +346,18 @@ function DashboardShell({
 
   // Header Title
   const getHeaderTitle = () => {
-    if ((sessionRole ?? role) === "admin") return td("Platform Control Centre");
+    if ((sessionRole ?? role) === "admin") return t("console.admin.title", undefined, "Administrator Console");
     if ((sessionRole ?? role) === "founder") {
       for (const section of STRATEGIC_PORTFOLIOS) {
         const mod = section.modules.find((m) => m.id === activeTab);
-        if (mod) return `${td(section.label)} · ${td(mod.title)}`;
+        if (mod) return `${t(section.label, undefined, "Platform & Governance")} · ${t(mod.title, undefined, "Overview")}`;
       }
       return td("Founder · Platform Governance");
     }
-    if (role === "super_admin") return td("Super Admin Workspace");
-    if (role === "teacher") return td("Teacher Workspace");
-    if (role === "marketing") return td("Marketing Console");
-    return td("Student Portal");
+    if (role === "super_admin") return t("console.super_admin.title", undefined, "Super Admin Console");
+    if (role === "teacher") return t("console.teacher.title", undefined, "Teacher Console");
+    if (role === "marketing") return t("console.marketing.title", undefined, "Marketing Console");
+    return t("console.student.title", undefined, "Student Portal");
   };
 
   const getSessionBadgeLabel = () => accountStatusLabel;
@@ -380,11 +382,11 @@ function DashboardShell({
 
   const getDefaultName = () => {
     if (user?.name) return user.name;
-    if (role === "founder") return td("Founder Account");
-    if (role === "super_admin") return td("Super Admin Account");
-    if (role === "teacher") return td("Teacher Account");
-    if (role === "marketing") return td("Marketing Account");
-    return td("Student Account");
+    if (role === "founder") return t("console.founder.label", undefined, "Founder Account");
+    if (role === "super_admin") return t("console.super_admin.label", undefined, "Super Admin Account");
+    if (role === "teacher") return t("console.teacher.label", undefined, "Teacher Account");
+    if (role === "marketing") return t("console.marketing.label", undefined, "Marketing Account");
+    return t("console.student.label", undefined, "Student Account");
   };
 
   const sidebarWidth = isMobile ? "0px" : state === "collapsed" ? "5rem" : "18.5rem";
@@ -409,7 +411,7 @@ function DashboardShell({
             <strong className="block text-sm font-bold text-[#10253e] leading-tight">
               Bilingual Idol
             </strong>
-            <small className="text-[11px] text-[#53657a]">{td("Learning Centre Admin")}</small>
+            <small className="text-[11px] text-[#53657a]">{t("console." + String(consoleKey ?? sessionRole ?? role ?? "student") + ".subtitle", undefined, "Learning Centre Admin")}</small>
           </span>
         </SidebarHeader>
 
@@ -531,7 +533,7 @@ function DashboardShell({
                 кнопку выхода, поэтому теперь это встроенный список из трёх
                 вариантов, а нижний ряд языка убран целиком. */}
             <div data-testid="sheet-language-block" className="rounded-2xl border border-slate-100 bg-white p-2.5 shadow-sm">
-              <span className="mb-2 block px-1 text-xs font-bold text-[#566983]">{td("Language")}</span>
+              <span className="mb-2 block px-1 text-xs font-bold text-[#566983]">{t("shell.language", undefined, "Language")}</span>
               <LanguageSwitcher variant="inline" className="dashboard-lang-inline" />
             </div>
 
@@ -574,7 +576,7 @@ function DashboardShell({
               <Menu className="size-5" />
             </SidebarTrigger>
             <div className="min-w-0 text-start">
-              <p className="minimal-eyebrow text-[10px] uppercase tracking-wider leading-none mb-0.5">{td("BILC Management Console")}</p>
+              <p className="minimal-eyebrow text-[10px] uppercase tracking-wider leading-none mb-0.5">{t("console." + String(consoleKey ?? sessionRole ?? role ?? "student") + ".subtitle", undefined, "BILC Management Console")}</p>
               <h1 className="text-xs sm:text-base md:text-lg font-bold text-[#10253e] leading-tight truncate" title={getHeaderTitle()}>
                 {getHeaderTitle()}
               </h1>

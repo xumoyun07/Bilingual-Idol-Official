@@ -63,13 +63,13 @@ const categoryItems: { role: CategoryRole; icon: typeof UsersRound }[] = [
 const STRATEGIC_PORTFOLIOS = [
   {
     id: "platform-gov",
-    label: "Platform & Governance",
+    label: "shell.platformGovernance",
     icon: Crown,
     tone: "bg-[#fff8e6] text-[#b47d00] border-[#ffd580]",
     modules: [
-      { id: "founder-overview", title: "Overview", icon: LayoutDashboard, role: "founder" },
-      { id: "founder-users", title: "User Accounts", icon: UsersRound, role: "founder" },
-      { id: "founder-audit", title: "Audit & Security", icon: ScrollText, role: "founder" },
+      { id: "founder-overview", title: "console.module.overview", icon: LayoutDashboard, role: "founder" },
+      { id: "founder-users", title: "console.module.users", icon: UsersRound, role: "founder" },
+      { id: "founder-audit", title: "console.module.audit", icon: ScrollText, role: "founder" },
     ],
   },
 ];
@@ -132,12 +132,12 @@ function FounderConsole() {
         <div className="flex items-center gap-2 text-xs text-[#566983] font-semibold tracking-tight">
           <span>{td("Platform Control Centre")}</span>
           <span className="text-[#a1b0cb] font-normal">/</span>
-          <span className="text-[#566983] font-bold">{td(activePortfolio.label)}</span>
+          <span className="text-[#566983] font-bold">{t(activePortfolio.label, undefined, "Platform & Governance")}</span>
           <span className="text-[#a1b0cb] font-normal">/</span>
-          <span className="text-[#173fad] font-extrabold">{td(activeModule.title)}</span>
+          <span className="text-[#173fad] font-extrabold">{t(activeModule.title, undefined, "Overview")}</span>
         </div>
         <div className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider">
-          ● {td("Verified Founder Session")}
+          ● {t("founderConsole.verifiedSession", undefined, "Verified Founder Session")}
         </div>
       </div>
 
@@ -169,7 +169,7 @@ function FounderConsole() {
         {/* Compact Sub-Module Dropdown Selector (Limits scroll and groups related functions) */}
         <div className="flex items-center justify-between gap-3 border-t border-[#edf2f5] pt-3">
           <span className="text-[11px] font-bold text-[#708098] uppercase tracking-wider shrink-0">
-            {td("Active Module:")}
+            {t("founderConsole.activeModule", undefined, "Active Module:")}
           </span>
           <select
             value={tabParam}
@@ -183,7 +183,7 @@ function FounderConsole() {
           >
             {activePortfolio.modules.map((mod) => (
               <option key={mod.id} value={mod.id}>
-                {td(mod.title)}
+                {t(mod.title, undefined, "Overview")}
               </option>
             ))}
           </select>
@@ -211,7 +211,7 @@ function DashboardModule() {
         <LayoutDashboard size={32} />
       </div>
       <h2 className="text-xl font-bold text-[#10253e] mb-2">
-        {td("Founder Dashboard")}
+        {t("founderConsole.dashboard", undefined, "Founder Dashboard")}
       </h2>
       <p className="text-sm text-[#53657a] max-w-sm leading-relaxed">
         {td("Your founder command console is active and ready. This page is empty and prepared for future operational summaries and metrics.")}
