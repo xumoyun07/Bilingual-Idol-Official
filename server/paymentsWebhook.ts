@@ -1,3 +1,4 @@
+import { settlePaymentAndPrice } from "./services/studentPrices";
 import { Request, Response } from "express";
 import * as db from "./db";
 import { getPaymentProvider, isBillplzConfigured, normalizePayload } from "./paymentProvider";
@@ -63,13 +64,18 @@ export async function handleBillplzCallback(req: Request, res: Response) {
       return res.status(200).send("OK (Idempotent)");
     }
 
-    if (amountCents !== payRecord.amount) {
-      console.error(`[Payment Webhook] Rejected webhook: amount mismatch. Expected ${payRecord.amount} cents, received ${amountCents} cents.`);
+    if (amountCents !== Number(payRecord.amountMinor ?? payRecord.amount)) {
+      console.error(`[Payment Webhook] Rejected webhook: amount mismatch. Expected ${payRecord.amountMinor ?? payRecord.amount} minor units, received ${amountCents}.`);
       return res.status(400).send("Amount mismatch.");
     }
 
     const finalStatus = isPaid ? "completed" : "failed";
-    await db.updatePaymentStatus(payRecord.id, finalStatus, billplzId, "fpx_bank_transfer");
+    // Платёж и связанная цена переводятся в новое состояние ОДНОЙ транзакцией.
+    const settlement = await settlePaymentAndPrice(payRecord.id, finalStatus, billplzId, "fpx_bank_transfer");
+    if (!settlement.changed) {
+      console.log("[Payment Webhook] Idempotent callback safe: payment " + payRecord.id + " (" + settlement.reason + ").");
+      return res.status(200).send("OK (Idempotent)");
+    }
 
     console.log(`[Payment Webhook] Payment ${payRecord.id} updated to status ${finalStatus}.`);
 

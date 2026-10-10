@@ -359,3 +359,54 @@ export async function priceDeletionGuard(studentId: number): Promise<{ allowed: 
 
 export type { User };
 export { inArray };
+
+/* ------------------------------------------------------------------ */
+/* Проведение платежа: платёж и связанная цена — одной транзакцией      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Идемпотентно: если платёж уже не 'pending', ничего не меняется и возвращается
+ * changed=false. При 'completed' связанная цена переходит в 'paid'.
+ */
+export async function settlePaymentAndPrice(
+  paymentId: number,
+  status: "completed" | "failed",
+  reference?: string,
+  method?: string,
+): Promise<{ changed: boolean; reason: "settled" | "already_settled" | "not_found" }> {
+  const database = await getDb();
+  const now = new Date();
+  if (database) {
+    return database.transaction(async tx => {
+      const row = (await tx.select().from(payments).where(eq(payments.id, paymentId)).limit(1))[0] as unknown as
+        | { id: number; status: string; priceId: number | null; transactionReference: string | null; paymentMethod: string | null }
+        | undefined;
+      if (!row) return { changed: false, reason: "not_found" as const };
+      if (row.status !== "pending") return { changed: false, reason: "already_settled" as const };
+      await tx.update(payments).set({
+        status,
+        transactionReference: reference ?? row.transactionReference,
+        paymentMethod: method ?? row.paymentMethod,
+        updatedAt: now,
+      }).where(eq(payments.id, paymentId));
+      if (status === "completed" && row.priceId) {
+        await tx.update(studentPrices)
+          .set({ status: "paid", updatedAt: now })
+          .where(and(eq(studentPrices.id, row.priceId), eq(studentPrices.status, "active")));
+      }
+      return { changed: true, reason: "settled" as const };
+    });
+  }
+
+  const store = (inMemoryStore as unknown as { payments?: Array<Record<string, any>> }).payments ?? [];
+  const row = store.find(item => Number(item.id) === paymentId);
+  if (!row) return { changed: false, reason: "not_found" as const };
+  if (String(row.status) !== "pending") return { changed: false, reason: "already_settled" as const };
+  row.status = status;
+  if (status === "completed" && row.priceId) {
+    const prices = (inMemoryStore as unknown as { studentPrices?: PriceRow[] }).studentPrices ?? [];
+    const target = prices.find(price => price.id === Number(row.priceId) && price.status === "active");
+    if (target) target.status = "paid";
+  }
+  return { changed: true, reason: "settled" as const };
+}
