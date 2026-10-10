@@ -126,7 +126,8 @@ export const promotionsRouter = router({
         expiresAt: input.expiresAt ?? null,
       });
       await writeAudit(ctx as never, "promotion.create", "Created a promotion.", { code: input.code, discountType: input.discountType, discountValue: input.discountValue });
-      return created;
+      // usedCount входит в ответ всегда (0 у новой записи); CRUD его не меняет.
+      return { ...created, usedCount: Number((created as { usedCount?: number }).usedCount ?? 0) };
     }),
 
   /** Обновление; usedCount через CRUD изменить нельзя — только системно. */
@@ -155,7 +156,7 @@ export const promotionsRouter = router({
       const rows = await database.select().from(promotions).where(eq(promotions.id, id)).limit(1);
       if (!rows[0]) throw new TRPCError({ code: "NOT_FOUND", message: "Promotion not found." });
       await writeAudit(ctx as never, "promotion.update", "Updated a promotion.", { id, code: input.code });
-      return rows[0];
+      return { ...rows[0], usedCount: Number((rows[0] as { usedCount?: number }).usedCount ?? 0) };
     }),
 
   delete: marketingProcedure
