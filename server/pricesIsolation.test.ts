@@ -96,3 +96,56 @@ describe("A · изоляция и отсутствие by-id путей у ст
     }
   });
 });
+describe("C · payments.list: доступ и изоляция", () => {
+  const ROLES = [
+    { id: 1, email: "f@example.test", role: "founder" },
+    { id: 4, email: "sa@example.test", role: "super_admin" },
+    { id: 5, email: "ad@example.test", role: "admin" },
+    { id: 6, email: "te@example.test", role: "teacher" },
+    { id: 7, email: "mk@example.test", role: "marketing" },
+    { id: 8, email: "us@example.test", role: "user" },
+  ];
+
+  beforeEach(() => seed([FOUNDER, STUDENT_A, STUDENT_B, ...ROLES]));
+
+  it("студент видит только свои платежи", async () => {
+    const rows = await caller(STUDENT_A).payments.list();
+    expect(rows.map(r => r.id)).toEqual([11]);
+  });
+
+  it("founder, super_admin и admin видят все платежи", async () => {
+    for (const role of ["founder", "super_admin", "admin"]) {
+      const user = ROLES.find(r => r.role === role)!;
+      const rows = await caller(user).payments.list();
+      expect(rows.map(r => r.id).sort((a, b) => a - b), `роль ${role}`).toEqual([11, 12]);
+    }
+  });
+
+  it("teacher, marketing и user получают FORBIDDEN", async () => {
+    for (const role of ["teacher", "marketing", "user"]) {
+      const user = ROLES.find(r => r.role === role)!;
+      await expect(caller(user).payments.list(), `роль ${role}`).rejects.toMatchObject({ code: "FORBIDDEN" });
+    }
+  });
+
+  it("без входа процедура больше не публичная", async () => {
+    await expect(caller(null).payments.list()).rejects.toBeDefined();
+  });
+
+  it("enrollments-процедуры с legacy-колонками закрыты для teacher/marketing/user", async () => {
+    for (const role of ["teacher", "marketing", "user"]) {
+      const user = ROLES.find(r => r.role === role)!;
+      await expect(caller(user).enrollments.list(), `enrollments.list как ${role}`).rejects.toMatchObject({ code: "FORBIDDEN" });
+      await expect(caller(user).enrollments.byUserId({ userId: STUDENT_B.id })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    }
+  });
+
+  it("студент читает только свои зачисления", async () => {
+    (inMemoryStore as unknown as { enrollments?: unknown[] }).enrollments = [
+      { id: 1, userId: STUDENT_A.id, programId: 1, agreedPrice: 100, registrationFee: 0, placementTestFee: 0, visaFee: 0, status: "active", approvedByUserId: 1, approvedAt: new Date(), source: "whatsapp", createdAt: new Date(), updatedAt: new Date() },
+      { id: 2, userId: STUDENT_B.id, programId: 1, agreedPrice: 200, registrationFee: 0, placementTestFee: 0, visaFee: 0, status: "active", approvedByUserId: 1, approvedAt: new Date(), source: "whatsapp", createdAt: new Date(), updatedAt: new Date() },
+    ];
+    const rows = await caller(STUDENT_A).enrollments.myEnrollments();
+    expect(rows.map(r => r.id)).toEqual([1]);
+  });
+});

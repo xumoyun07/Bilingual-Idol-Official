@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as db from "../db";
-import { adminProcedure, publicProcedure, router, studentProcedure } from "../_core/trpc";
+import { adminProcedure, protectedProcedure, publicProcedure, router, studentProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { isBillplzConfigured, getPaymentProvider } from "../paymentProvider";
 import * as priceStore from "../services/studentPrices";
@@ -158,12 +158,20 @@ export const paymentsRouter = router({
 
       return { id: record.id, amountMinor, currency, receiptNumber, url: paymentUrl as string | null, idempotent: false };
     }),
-  list: publicProcedure.query(async ({ ctx }) => {
-    if (!ctx.user) return [];
-    if (ctx.user.role === "student" || ctx.user.role === "user") {
+  /**
+   * Платежи. Раньше это была publicProcedure: студент видел свои, а ВСЕ прочие роли
+   * (включая teacher и marketing) получали полный список платежей всех студентов.
+   * Теперь: студент — только свои; founder, super_admin, admin — все;
+   * teacher, marketing, user — FORBIDDEN.
+   */
+  list: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role === "student") {
       return db.listPayments(ctx.user.id);
     }
-    return db.listPayments();
+    if (["founder", "super_admin", "admin"].includes(ctx.user.role)) {
+      return db.listPayments();
+    }
+    throw new TRPCError({ code: "FORBIDDEN", message: "This resource is unavailable." });
   }),
 
   /**
