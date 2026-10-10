@@ -35,7 +35,19 @@ export const createInquiryInput = z.object({
 
 export const submissionsRouter = router({
   list: marketingProcedure.query(() => db.listSubmissions()),
-  create: publicProcedure.input(submissionInput).mutation(({ input }) => db.createSubmission(input)),
+  /**
+   * F25/F26: старая параллельная схема регистрации (type='enrollment' со
+   * studentName/studentAge/parentName/...) больше не принимает НОВЫЕ записи:
+   * все регистрации идут через Form 2 (registrationSubmissions). Исторические
+   * строки type='enrollment' остаются в БД и в отчётах. Лёгкие обращения —
+   * через createInquiry ниже.
+   */
+  create: publicProcedure.input(submissionInput).mutation(({ input }) => {
+    if (input.type === "enrollment") {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "Programme registration now goes through the unified registration form." });
+    }
+    return db.createSubmission(input);
+  }),
   updateStatus: marketingProcedure
     .input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "contacted", "interested", "enrolled", "closed"]) }))
     .mutation(({ input }) => db.updateSubmissionStatus(input.id, input.status)),
