@@ -10950,3 +10950,22 @@ body {
   width: 0;
   height: 0;
 }
+/* ─── item 3: мобильная шапка не перекрывает первый блок ─────────────────
+   Шапка ниже мобильного брейкпоинта — fixed (top-3 + h-14), поэтому контент
+   резервирует её высоту плюс --shell-gap плюс безопасную зону выреза.
+   scroll-padding-top считается тем же выражением, чтобы фокус и якоря
+   не уезжали под шапку. */
+:root {
+  --shell-gap: 16px;
+  --shell-header-h: 4.5rem;
+}
+
+html {
+  scroll-padding-top: calc(var(--shell-header-h) + var(--shell-gap) + env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 1023px) {
+  .blue-workspace .bilc-content-column {
+    padding-block-start: calc(var(--shell-header-h) + var(--shell-gap) + env(safe-area-inset-top, 0px));
+  }
+}
