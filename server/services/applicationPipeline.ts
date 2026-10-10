@@ -13,6 +13,7 @@
 
 import { desc, eq } from "drizzle-orm";
 import { applications, registrationSubmissions, users } from "../../drizzle/schema";
+import { randomUUID } from "node:crypto";
 import { createApplication, createManagedUser, deleteManagedUser, getDb, inMemoryStore, listApplications, updateApplicationStatus } from "../db";
 import { createStudentProfile } from "../students";
 
@@ -195,8 +196,12 @@ export async function approveSubmission(input: { submissionId: number }, actor: 
 
   // Отклонённая заявка не должна создавать аккаунт — поэтому сначала проверка,
   // затем создание, и при сбое следующих шагов — откат созданной учётки.
+  // G1-fix: пароль генерируется ВНУТРИ пайплайна и никогда не попадает в логи (R1);
+  // в ответе он остаётся как temporaryPassword по устоявшемуся паттерну
+  // createManagedUser (однократная выдача, как в superAdminUsers.create).
+  const generatedPassword = randomUUID();
   const created = (await createManagedUser(
-    { name: fullName, email, role: "student" } as never,
+    { name: fullName, email, role: "student", password: generatedPassword } as never,
     { id: actor.id, role: actor.role },
   )) as unknown as { id?: number; tempPassword?: string | null };
   const userId = Number(created.id);
