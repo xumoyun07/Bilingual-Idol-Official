@@ -7,6 +7,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { auditRotationSchedulePath, handleScheduledAuditRotation } from "../scheduledAuditRotation";
+import { notificationsSchedulePath, handleScheduledNotifications } from "../scheduledNotifications";
 import { handleTeacherAttendance, handleTeacherAttendanceUpdate, handleTeacherClassSessionDetails, handleTeacherClassSessions, teacherAttendancePath, teacherClassSessionsPath } from "../teacherPortal";
 import { marketingPortalRouter } from "../portal/marketingPortal";
 import { createContext } from "./context";
@@ -40,6 +41,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   app.post(auditRotationSchedulePath, handleScheduledAuditRotation);
+  app.post(notificationsSchedulePath, handleScheduledNotifications);
   app.get(teacherClassSessionsPath, handleTeacherClassSessions);
   app.get(`${teacherClassSessionsPath}/:id`, handleTeacherClassSessionDetails);
   app.get(teacherAttendancePath, handleTeacherAttendance);

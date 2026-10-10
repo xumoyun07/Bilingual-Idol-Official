@@ -1,6 +1,7 @@
 import { z } from "zod";
 import * as db from "../db";
 import { adminProcedure, publicProcedure, studentProcedure, marketingProcedure, router } from "../_core/trpc";
+import { notifyEnquiryReceived } from "../services/notifications";
 
 export const submissionInput = z.object({
   type: z.enum(["enrollment", "inquiry"]),
@@ -75,7 +76,7 @@ export const submissionsRouter = router({
       const matched = input.programId ? programs.find(p => p.id === input.programId) : null;
       const programInterestText = matched ? matched.title : input.programInterest || "General Inquiry";
 
-      return db.createSubmission({
+      const created = await db.createSubmission({
         type: "inquiry",
         studentName: input.name,
         studentAge: 18, // Default fallback age
@@ -89,6 +90,9 @@ export const submissionsRouter = router({
         source: input.sourcePage || "website",
         reasonType: input.reasonType,
       });
+      // G10: подтверждение обращения; уведомление не блокирует запрос.
+      void notifyEnquiryReceived({ name: input.name, email: input.email, phone: input.phone, reasonType: input.reasonType, message: input.message }).catch(function () { /* noop */ });
+      return created;
     }),
 
   // Form 2 Schema & Submission

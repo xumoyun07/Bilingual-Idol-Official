@@ -1,4 +1,5 @@
 import { settlePaymentAndPrice } from "./services/studentPrices";
+import { notifyPaymentReceived } from "./services/notifications";
 import { Request, Response } from "express";
 import * as db from "./db";
 import { getPaymentProvider, isBillplzConfigured, normalizePayload } from "./paymentProvider";
@@ -97,16 +98,13 @@ export async function handleBillplzCallback(req: Request, res: Response) {
 
       if (user && user.email) {
         try {
-          await EmailProvider.sendEmail({
+          // G10: подтверждение оплаты идёт через шаблонный движок уведомлений;
+          // при отсутствии шаблона используется тот же встроенный текст.
+          await notifyPaymentReceived({
             to: user.email,
-            subject: "Tuition Fee Payment Confirmed - Bilingual Idol Language Centre",
-            body: `Hello ${user.name},\n\n` +
-                  `We are pleased to inform you that your tuition fee payment of RM ${(payRecord.amount / 100).toFixed(2)} has been successfully received.\n\n` +
-                  `Your receipt number is ${payRecord.receiptNumber}.\n` +
-                  `Your enrollment status has been fully activated in our academic system.\n\n` +
-                  `Thank you for choosing Bilingual Idol Language Centre.\n\n` +
-                  `Best Regards,\n` +
-                  `Bilingual Idol Admissions Team`
+            name: user.name ?? "Student",
+            amountMinor: Number(payRecord.amountMinor ?? payRecord.amount),
+            receiptNumber: payRecord.receiptNumber ?? null,
           });
           console.log(`[Payment Webhook] Tuition payment notification email sent to ${user.email}.`);
         } catch (emailError) {
