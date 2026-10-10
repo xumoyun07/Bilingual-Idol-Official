@@ -1,14 +1,24 @@
 export interface EmailOptions {
   to: string;
   subject: string;
+  /** Имя шаблона — попадает в лог вместо тела письма. */
+  template?: string;
   body: string;
 }
 
+/**
+ * Провайдер писем.
+ *
+ * Строгое правило: в лог никогда не попадают тело письма, временные пароли и коды.
+ * Заглушка печатает только получателя, тему и имя шаблона.
+ *
+ * Временный пароль новой учётной записи возвращается РОВНО ОДИН РАЗ — в ответе
+ * процедуры создания тому сотруднику, кто её создал. В ответе не должно быть
+ * никаких других каналов: ни логов, ни записей аудита, ни писем в dev-режиме.
+ */
 export const EmailProvider = {
   async sendEmail(options: EmailOptions): Promise<void> {
-    console.log(`[EmailProvider] To: ${options.to}`);
-    console.log(`[EmailProvider] Subject: ${options.subject}`);
-    console.log(`[EmailProvider] Body:\n${options.body}\n`);
+    console.log(`[EmailProvider] to=${options.to} subject="${options.subject}" template=${options.template ?? "unspecified"}`);
 
     if (process.env.NODE_ENV === "production" && !process.env.SMTP_HOST) {
       throw new Error("No real email delivery provider (SMTP_HOST) is configured in production.");
@@ -22,6 +32,8 @@ export const EmailProvider = {
       ar: "بيانات تسجيل الدخول الخاصة بك في BILC",
     };
 
+    // Тело письма собирается здесь и живёт только в памяти процесса отправки:
+    // оно не логируется и не сохраняется.
     let body = "";
     if (lang === "ar") {
       body = `مرحباً بك في منصة BILC.\n\n` +
@@ -43,6 +55,6 @@ export const EmailProvider = {
              `Note: This password is valid for 7 days and is single-use only. You will be required to set a new permanent password on your first sign-in.`;
     }
 
-    await this.sendEmail({ to, subject: subjects[lang], body });
-  }
+    await this.sendEmail({ to, subject: subjects[lang], template: `otp_login_${lang}`, body });
+  },
 };
