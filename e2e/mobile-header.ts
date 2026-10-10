@@ -72,8 +72,8 @@ try {
       const password = "Diag-" + randomBytes(12).toString("base64url") + "!7";
       const made = (await withTimeout(tag + " create", createManagedUser(
         { email: email, name: "MH " + tag, role: "admin", password: password } as never,
-        { id: founder.id, role: "founder" } as never) as never)) as { user?: { id: number } };
-      if (made.user) created.push(made.user.id);
+        { id: founder.id, role: "founder" } as never) as never)) as { id?: number };
+      if (made.id !== undefined) created.push(made.id);
       const context = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, isMobile: true, hasTouch: true });
       const page = await context.newPage();
       page.setDefaultTimeout(STEP);
@@ -108,7 +108,7 @@ try {
       } else { log(tag + " ПОСЛЕ SELECT: select не найден"); }
 
       const urlBefore = page.url();
-      const trigger = page.locator("header button").first();
+      const trigger = page.locator("header button[aria-label=""Toggle menu""], header button").first();
       let opened = false;
       if ((await trigger.count()) > 0) { await trigger.click().catch(function () { /* noop */ }); await page.waitForTimeout(2000); opened = true; }
       log(tag + " триггер шторки: " + (opened ? "нажат" : "НЕ НАЙДЕН") + " url до=" + urlBefore);
