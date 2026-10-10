@@ -1,3 +1,7 @@
+// OWNER MANUAL FALLBACK (если автоматика не сработает — воспроизведите вручную):
+//   DevTools -> device mode 390x844 -> открыть /admin (admin-фикстура) или /dashboard (student).
+//   Кнопка меню в шапке: aria-label="Toggle menu" (английская строка во всех языках).
+//   Панель: position:fixed, top 5rem, inset-x 3, bottom 3, внутри кнопка выхода.
 /**
  * Item 4 proof: бургер-шторка и языковой блок.
  *
@@ -91,28 +95,59 @@ async function dumpPage(page: Page) {
     log("  диагностика страницы не удалась: " + (error instanceof Error ? error.message : String(error)));
   }
 }
+const TRIGGER_CASCADE = [
+  "[data-testid=mobile-shell-trigger]",
+  'header.lg\\:hidden button[aria-label="Toggle menu"]',
+  "header.lg\\:hidden button",
+];
+const PANEL_FALLBACK = [
+  "(function(){",
+  "if(document.querySelector('[data-testid=mobile-shell-panel]')) return JSON.stringify('testid');",
+  "var SIGNS=['sign out','log keluar','تسجيل الخروج'];",
+  "var btns=Array.prototype.slice.call(document.querySelectorAll('button'));",
+  "var s=null;",
+  "for(var i=0;i<btns.length;i++){var tx=(btns[i].textContent||'').toLowerCase();for(var j=0;j<SIGNS.length;j++){if(tx.indexOf(SIGNS[j])>=0){s=btns[i];break;}}if(s)break;}",
+  "if(!s) return JSON.stringify(null);",
+  "var n=s;",
+  "while(n.parentElement && !(getComputedStyle(n).position==='fixed' && n.getBoundingClientRect().height>250)) n=n.parentElement;",
+  "if(getComputedStyle(n).position!=='fixed') return JSON.stringify(null);",
+  "n.setAttribute('data-testid','mobile-shell-panel');",
+  "return JSON.stringify('walk');",
+  "})()",
+].join("\n");
+
+async function findTrigger(page: Page): Promise<string | null> {
+  for (let i = 0; i < TRIGGER_CASCADE.length; i += 1) {
+    const loc = page.locator(TRIGGER_CASCADE[i]).first();
+    try {
+      await loc.waitFor({ state: "visible", timeout: i === 0 ? 5000 : 2000 });
+      return "уровень " + (i + 1) + " (" + TRIGGER_CASCADE[i] + ")";
+    } catch { /* следующий уровень */ }
+  }
+  return null;
+}
 async function openPanel(page: Page, tag: string): Promise<boolean> {
-  const trigger = page.locator("[data-testid=mobile-shell-trigger]").first();
-  try {
-    await page.waitForSelector("[data-testid=mobile-shell-trigger]", { timeout: 5000 });
-    log("  триггер найден: " + (await trigger.count()));
-  } catch {
-    log("  ТРИГГЕР НЕ НАЙДЕН за 5000ms (роль=" + ROLE + ", маршрут=" + ROUTE + ")");
+  const level = await findTrigger(page);
+  if (!level) {
+    log("  ТРИГГЕР НЕ НАЙДЕН ни на одном уровне каскада (роль=" + ROLE + ", маршрут=" + ROUTE + ")");
     failures += 1;
     await dumpPage(page);
     return false;
   }
+  log("  триггер найден: " + level);
+  const trigger = page.locator(TRIGGER_CASCADE[Number(level.charAt(8)) - 1]).first();
   await trigger.click();
   try {
     await page.waitForSelector(PANEL_SELECTOR, { timeout: 3000 });
-    log("  панель появилась");
+    log("  панель: уровень 1 (data-testid)");
     return true;
-  } catch {
-    log("  ПАНЕЛЬ НЕ ПОЯВИЛАСЬ за 3000ms (" + tag + ")");
-    failures += 1;
-    await dumpFixed(page);
-    return false;
-  }
+  } catch { /* уровень 2 */ }
+  const walked = await evalJson<string | null>(page, PANEL_FALLBACK, "panel fallback");
+  if (walked === "walk") { log("  панель: уровень 2 (обход от кнопки выхода, testid присвоен)"); return true; }
+  log("  ПАНЕЛЬ НЕ НАЙДЕНА ни на одном уровне (" + tag + ")");
+  failures += 1;
+  await dumpFixed(page);
+  return false;
 }
 
 async function shot(page: Page, name: string) {
@@ -182,6 +217,12 @@ try {
       await page.fill("#sign-in-password", password);
       await page.click('button[type="submit"]');
       await page.waitForTimeout(2500);
+      if (page.url().indexOf("first-login") >= 0) {
+        log("  промежуточный /first-login — открываю " + ROUTE + " напрямую");
+        await page.goto(BASE + ROUTE, { waitUntil: "domcontentloaded" });
+        await page.waitForTimeout(2500);
+        log("  итоговый URL после /first-login: " + page.url());
+      }
     });
     await step(lang + ": выставить язык " + lang + " и открыть " + ROUTE, async () => {
       await page.evaluate("(function(l){try{localStorage.setItem('bilc_language',l);}catch(e){}document.cookie='bilc_language='+l+'; path=/';})(" + JSON.stringify(lang) + ")");

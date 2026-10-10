@@ -1,3 +1,7 @@
+// OWNER MANUAL FALLBACK (если автоматика не сработает — воспроизведите вручную):
+//   DevTools -> device mode 390x844 -> открыть /admin (admin-фикстура) или /dashboard (student).
+//   Кнопка меню в шапке: aria-label="Toggle menu" (английская строка во всех языках).
+//   Панель: position:fixed, top 5rem, inset-x 3, bottom 3, внутри кнопка выхода.
 /** Item 3: мобильная шапка. Свежая запись на контекст; удаление проверяется запросом. */
 import "dotenv/config";
 import { randomBytes } from "node:crypto";

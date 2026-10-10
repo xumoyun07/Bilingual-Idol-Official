@@ -478,6 +478,7 @@ function DashboardShell({
               onClick={() => setMobileMenuOpen(prev => !prev)}
               className="p-1.5 rounded-lg border border-[#edf2f5] bg-white text-[#10253e] hover:bg-slate-50 transition-colors"
               aria-label={td("Toggle menu")}
+              data-testid="mobile-shell-trigger"
             >
               {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
