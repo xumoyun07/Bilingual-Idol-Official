@@ -20,6 +20,7 @@ import { studentsRouter } from "./routers/students";
 import { usersRouter } from "./routers/users";
 import { pricesRouter } from "./routers/prices";
 import { applicationsRouter } from "./routers/applications";
+import { studentCabinetRouter } from "./routers/studentCabinet";
 import { mediaRouter } from "./routers/media";
 import { newsRouter } from "./routers/news";
 import { teacherRouter } from "./routers/teacher";
@@ -298,6 +299,7 @@ export const appRouter = router({
   users: usersRouter,
   prices: pricesRouter,
   applications: applicationsRouter,
+  studentCabinet: studentCabinetRouter,
   media: mediaRouter,
   news: newsRouter,
   teacher: teacherRouter,
