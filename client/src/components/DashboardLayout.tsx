@@ -486,9 +486,9 @@ function DashboardShell({
 
         {/* Unified Mobile Floating Navigation Panel */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed top-[5rem] inset-x-3 bottom-3 bg-[#fafbfe]/98 backdrop-blur-md border border-slate-100/80 rounded-2xl shadow-xl z-45 overflow-y-auto p-4 flex flex-col gap-5 select-none animate-in fade-in slide-in-from-top-4 duration-250">
+          <div data-testid="mobile-shell-panel" className="lg:hidden fixed top-[5rem] inset-x-3 bottom-3 bg-[#fafbfe]/98 backdrop-blur-md border border-slate-100/80 rounded-2xl shadow-xl z-45 overflow-y-auto p-4 flex flex-col gap-5 select-none animate-in fade-in slide-in-from-top-4 duration-250">
             {/* Unified Identity Card with Avatar, Name & Session status */}
-            <div className="p-3.5 rounded-2xl border border-slate-100 bg-white shadow-sm flex items-center justify-between gap-3 text-start">
+            <div data-testid="sheet-profile-card" className="p-3.5 rounded-2xl border border-slate-100 bg-white shadow-sm flex items-center justify-between gap-3 text-start">
               <div className="flex items-center gap-3 min-w-0">
                 <Avatar className="h-10 w-10 border border-[#d9e2f1] shrink-0">
                   <AvatarFallback className="bg-gradient-to-br from-[#e8eeff] to-[#d0ddff] text-xs font-bold text-[#173fad]">
@@ -519,7 +519,7 @@ function DashboardShell({
                 Раньше здесь был popover внизу шторки: он обрезался и накрывал
                 кнопку выхода, поэтому теперь это встроенный список из трёх
                 вариантов, а нижний ряд языка убран целиком. */}
-            <div className="rounded-2xl border border-slate-100 bg-white p-2.5 shadow-sm">
+            <div data-testid="sheet-language-block" className="rounded-2xl border border-slate-100 bg-white p-2.5 shadow-sm">
               <span className="mb-2 block px-1 text-xs font-bold text-[#566983]">{td("Language")}</span>
               <LanguageSwitcher variant="inline" className="dashboard-lang-inline" />
             </div>
@@ -534,6 +534,7 @@ function DashboardShell({
               <button
                 type="button"
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-xs font-bold text-rose-600 border border-rose-100 bg-rose-50/20 hover:bg-rose-50 hover:border-rose-200 transition-all duration-200 shadow-sm"
+                data-testid="sheet-sign-out"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

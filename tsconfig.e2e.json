@@ -8,5 +8,6 @@
     "moduleResolution": "bundler",
     "types": ["node"]
   },
-  "include": ["e2e/**/*.ts", "server/testing/**/*.ts", "server/db.ts", "drizzle/schema.ts", "shared/**/*.ts"]
+  "include": ["e2e/**/*.ts", "server/testing/**/*.ts", "server/db.ts", "drizzle/schema.ts", "shared/**/*.ts"],
+  "exclude": ["e2e/**/*.spec.ts"]
 }

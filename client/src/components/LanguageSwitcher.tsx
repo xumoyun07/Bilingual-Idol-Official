@@ -84,6 +84,7 @@ export function LanguageSwitcher({
               key={item.code}
               type="button"
               onClick={() => setLanguage(item.code)}
+              data-testid={"language-option-" + item.code}
               className={`flex w-full items-center gap-2.5 px-3 min-h-[44px] rounded-lg text-xs font-bold text-start transition-all ${
                 isSelected
                   ? "bg-[#173fad] text-white shadow-sm"

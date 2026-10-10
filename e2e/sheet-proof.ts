@@ -2,8 +2,8 @@ import "dotenv/config";
 import { randomBytes } from "node:crypto";
 import { chromium } from "playwright";
 import { eq } from "drizzle-orm";
-import { createManagedUser, deleteManagedUser, getDb } from "./server/db";
-import { users } from "./drizzle/schema";
+import { createManagedUser, deleteManagedUser, getDb } from "../server/db";
+import { users } from "../drizzle/schema";
 import fs from "node:fs";
 
 const BASE = "http://127.0.0.1:3000";
@@ -20,7 +20,7 @@ const FIND_SHEET = [
   "  for (var j=0;j<SIGNS.length;j++){ if (t.indexOf(SIGNS[j])>=0){ target=btns[i]; break; } } if (target) break; }",
   "if (!target) return { found: false };",
   "var node = target;",
-  "while (node.parentElement && !(getComputedStyle(node).position === 'fixed' && node.getBoundingClientRect().height > 250)) node = node.parentElement;",
+  "",
   "return { found: true, panel: true };",
   "})()",
 ].join("\n");
@@ -33,8 +33,8 @@ const MEASURE = [
   "var signOut=null;",
   "for(var i=0;i<btns.length;i++){var t=(btns[i].textContent||'').toLowerCase();for(var j=0;j<SIGNS.length;j++){if(t.indexOf(SIGNS[j])>=0){signOut=btns[i];break;}}if(signOut)break;}",
   "if(!signOut) return { found:false };",
-  "var panel=signOut;",
-  "while(panel.parentElement && !(getComputedStyle(panel).position==='fixed' && panel.getBoundingClientRect().height>250)) panel=panel.parentElement;",
+  "var panel=document.querySelector('[data-testid=mobile-shell-panel]');",
+  "",
   "var pb=rr(panel); var sb=rr(signOut);",
   "var headerEl=panel.querySelector('header');",
   "var profile=null;",
@@ -96,8 +96,8 @@ try {
     console.log("   Sign out: top=" + m.signOut.top + " bottom=" + m.signOut.bottom + " подпись=\"" + m.signOutLabel + "\"");
     console.log("   панель: top=" + m.panel.top + " bottom=" + m.panel.bottom + " scrollTop=" + m.scrollTop + " scrollHeight=" + m.scrollHeight + " clientHeight=" + m.clientHeight);
     const direction = m.htmlDir === "rtl" ? "RTL" : "LTR";
-    if (!gapPass) failures += 1;
     const gapPass = m.profileGap !== null && m.profileGap >= m.shellGap;
+    if (!gapPass) failures += 1;
     console.log("   КАРТОЧКА ПРОФИЛЯ [" + direction + "]: top=" + m.profileTop + " ; низ шапки шторки=" + m.sheetHeaderBottom +
       (m.hasHeaderEl ? "" : " (элемента <header> в шторке нет — взят верхний край панели)") +
       " ; зазор=" + m.profileGap + " ; --shell-gap=" + m.shellGap +

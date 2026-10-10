@@ -109,7 +109,7 @@ try {
       } else { log(tag + " ПОСЛЕ SELECT: select не найден"); }
 
       const urlBefore = page.url();
-      const trigger = page.locator('header button[aria-label="Toggle menu"]').first();
+      const trigger = page.locator('[data-testid=mobile-shell-trigger]').first();
       let opened = false;
       if ((await trigger.count()) > 0) { await trigger.click().catch(function () { /* noop */ }); await page.waitForTimeout(2000); opened = true; }
       log(tag + " триггер шторки: " + (opened ? "нажат" : "НЕ НАЙДЕН") + " url до=" + urlBefore);
