@@ -1,16 +1,46 @@
 import { and, asc, desc, eq, gte, like, lte, ne, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { randomUUID } from "node:crypto";
-import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment, enrollments, Enrollment } from "../drizzle/schema";
+import { randomBytes, randomUUID } from "node:crypto";
+import { Announcement, announcements, InsertUser, Program, programs, PublicMedia, publicMedia, siteSettings, Submission, submissions, TeamProfile, teamProfiles, Testimonial, testimonials, User, userFormFields, userFormSections, userProfileValues, users, registrationSubmissions, registrationSubmissionValues, applications, placementTests, placementTestAttempts, promotions, payments, RegistrationSubmission, RegistrationSubmissionValue, Application, PlacementTest, PlacementTestAttempt, Promotion, Payment, enrollments, Enrollment, studentProfiles } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { shouldGrantFounderRole } from "./founderIdentity";
+import { FOUNDER_EMAIL, shouldGrantFounderRole } from "./founderIdentity";
+import { isFounderAuthConfigured } from "./founderAuth";
 import { createUserPasswordHash } from "./userAuth";
 import { EmailProvider } from "./email";
 import { normaliseOptions, parseFieldOptions, type RuntimeUserField, type UserFieldType, validateProfileValues } from "./userFieldSchema";
+import {
+  decideDeletion,
+  DEPENDENT_COLUMNS,
+  enforceCreateUser,
+  enforceDeleteUser,
+  enforceFounderIdentity,
+  enforcePasswordReset,
+  enforceSeedFounder,
+  enforceUpdateUser,
+  STUDENT_PROFILE_OWN_COLUMNS,
+  type DependencyCounts,
+  type PolicyActor,
+} from "./services/userPolicy";
 import { BILC_DOMAIN, generateBilcEmail, resolveLoginIdentifier, validateNickname } from "../shared/nickname";
 
-export function transliterate(text: string): string {
-  const mapping: Record<string, string> = {
+/**
+ * Реэкспорт уже импортированных выше помощников: другие модули обращаются к ним
+ * как к `db.createUserPasswordHash` и `db.validateProfileValues`, и без этих строк
+ * вызовы падали с "is not a function" (ломало auth.completeOnboarding и
+ * superAdminUsers.resetPassword).
+ */
+export { createUserPasswordHash, validateProfileValues };
+
+/**
+ * Криптостойкий одноразовый пароль (24 символа base64url, без символов, требующих
+ * экранирования в .env и в URL). Выдаётся только в ответе создателю учётной записи
+ * и никогда не попадает в логи и в аудит.
+ */
+export function generateTemporaryPassword(): string {
+  return randomBytes(18).toString("base64url");
+}
+
+export function transliterate(text: string): string {  const mapping: Record<string, string> = {
     'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
     'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
     'ا': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh', 'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y', 'ء': 'a', 'ى': 'a', 'ة': 't',
@@ -62,87 +92,46 @@ export async function getDb() {
 }
 
 // In-Memory Data Store Fallbacks (active when DATABASE_URL is unconfigured or offline)
-export const inMemoryStore = {
-  users: [
+
+/**
+ * Учётные записи в памяти.
+ *
+ * Единственная допустимая запись — основатель, и только если
+ * FOUNDER_PASSWORD_HASH задан и прошёл проверку формата. Никаких паролей
+ * по умолчанию, никаких «сервисных» аккаунтов с общим паролем и никаких
+ * хешей, посчитанных от литеральной строки в коде, здесь больше нет.
+ *
+ * Если переменная не задана — список пуст, и вход в систему невозможен
+ * ни для кого. Это осознанный fail closed.
+ */
+function initialMemoryUsers(): User[] {
+  if (!isFounderAuthConfigured()) return [];
+  const stamp = new Date("2026-01-01");
+  return [
     {
       id: 1,
-      openId: "founder:lektor@gmail.com",
+      openId: `founder:${FOUNDER_EMAIL}`,
       name: "Founder",
-      email: "lektor@gmail.com",
-      passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
-      role: "founder" as const,
+      email: FOUNDER_EMAIL,
+      passwordHash: process.env.FOUNDER_PASSWORD_HASH as string,
+      role: "founder",
       isActive: true,
       loginMethod: "email_password",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
+      createdAt: stamp,
+      updatedAt: stamp,
+      lastSignedIn: stamp,
+      sessionVersion: 1,
+      isOtp: false,
+      otpCreatedAt: null,
+      failedAttempts: 0,
     },
-    {
-      id: 2,
-      openId: "issued:superadmin",
-      name: "Super Admin",
-      email: "superadmin@bilc.my",
-      passwordHash: createUserPasswordHash("lektor07xumoyun"),
-      role: "super_admin" as const,
-      isActive: true,
-      loginMethod: "issued_by_founder",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 3,
-      openId: "issued:admin",
-      name: "Admin Manager",
-      email: "admin@bilc.my",
-      passwordHash: createUserPasswordHash("lektor07xumoyun"),
-      role: "admin" as const,
-      isActive: true,
-      loginMethod: "issued_by_founder",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 4,
-      openId: "issued:marketing",
-      name: "Marketing Agent",
-      email: "marketing@bilc.my",
-      passwordHash: createUserPasswordHash("lektor07xumoyun"),
-      role: "marketing" as const,
-      isActive: true,
-      loginMethod: "issued_by_founder",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 5,
-      openId: "issued:teacher",
-      name: "Teacher Speaker",
-      email: "teacher@bilc.my",
-      passwordHash: createUserPasswordHash("lektor07xumoyun"),
-      role: "teacher" as const,
-      isActive: true,
-      loginMethod: "issued_by_founder",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-    {
-      id: 6,
-      openId: "issued:student",
-      name: "Student Learner",
-      email: "student@bilc.my",
-      passwordHash: createUserPasswordHash("lektor07xumoyun"),
-      role: "student" as const,
-      isActive: true,
-      loginMethod: "issued_by_founder",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-01"),
-      lastSignedIn: new Date("2026-01-01"),
-    },
-  ] as User[],
+  ];
+}
+
+export const inMemoryStore = {
+  users: initialMemoryUsers(),
+  /** Профили студентов. Раньше содержали фиктивного сид-студента — теперь только реальные записи. */
+  studentProfiles: [] as any[],
   submissions: [] as Submission[],
   registrationSubmissions: [] as RegistrationSubmission[],
   registrationSubmissionValues: [] as RegistrationSubmissionValue[],
@@ -230,6 +219,9 @@ export const inMemoryStore = {
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) throw new Error("User openId is required for upsert");
+  // Политика: роль founder выдаётся только точному FOUNDER_EMAIL / его openId.
+  // Любая попытка выдать её другому адресу отклоняется с записью в аудит.
+  await enforceFounderIdentity({ path: "auth.upsertUser", actor: null }, { email: user.email, openId: user.openId });
   const db = await getDb();
   if (db) {
     const values: InsertUser = { openId: user.openId, lastSignedIn: user.lastSignedIn ?? new Date() };
@@ -266,6 +258,10 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       createdAt: now,
       updatedAt: now,
       lastSignedIn: user.lastSignedIn ?? now,
+      sessionVersion: 1,
+      isOtp: false,
+      otpCreatedAt: null,
+      failedAttempts: 0,
     });
   }
 }
@@ -607,7 +603,11 @@ async function validatedProfileRows(values: UserProfileValuesInput) {
   return Object.entries(validateProfileValues(fields, values)).map(([fieldId, value]) => ({ fieldId: Number(fieldId), value }));
 }
 
-export async function createManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+export async function createManagedUser(
+  input: { name?: string; nickname?: string; email?: string; password?: string; role?: FounderManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput },
+  actor?: PolicyActor,
+  policyPath = "users.create",
+) {
   const database = await getDb();
   const systemFields = await getUserSystemFields();
   
@@ -648,6 +648,11 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
     finalEmail = generatedLogin;
     finalNickname = generatedLogin.split("@")[0];
   }
+
+  // Политика учётных записей: основателя нельзя создать, адрес основателя зарезервирован,
+  // дубликат адреса без учёта регистра отклоняется. Проверка идёт ПЕРВОЙ, чтобы попытка
+  // занять адрес основателя получила обезличенное сообщение, а не «такой e-mail занят».
+  await enforceCreateUser({ path: policyPath, actor }, { role: input.role ?? "student", email: finalEmail });
 
   const existing = await getUserByEmail(finalEmail);
   if (existing) {
@@ -735,12 +740,20 @@ export async function createManagedUser(input: { name?: string; nickname?: strin
   return { ...created, generatedEmail: finalEmail, nickname: finalNickname, tempPassword: password };
 }
 
-export async function createSuperAdminManagedUser(input: { name?: string; nickname?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput }) {
+export async function createSuperAdminManagedUser(
+  input: { name?: string; nickname?: string; email?: string; password?: string; role?: SuperAdminManagedRole; isActive?: boolean; profileValues?: UserProfileValuesInput },
+  actor?: PolicyActor,
+) {
   if (input.role && !superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
-  return createManagedUser(input);
+  return createManagedUser(input, actor, "superAdminUsers.create");
 }
 
-export async function updateManagedUser(id: number, input: { name: string; nickname?: string; email?: string; password?: string; role: FounderManagedRole; isActive: boolean }) {
+export async function updateManagedUser(
+  id: number,
+  input: { name: string; nickname?: string; email?: string; password?: string; role: FounderManagedRole; isActive: boolean },
+  actor?: PolicyActor,
+  policyPath = "users.update",
+) {
   const database = await getDb();
   const existing = await getManagedUser(id);
   if (!existing) throw new Error("Account not found.");
@@ -760,8 +773,17 @@ export async function updateManagedUser(id: number, input: { name: string; nickn
     }
   }
 
+  // Политика: основателя нельзя изменить, понизить, заблокировать или переименовать;
+  // назначить роль founder сменой роли нельзя; дубликат адреса отклоняется.
+  // Проверка идёт ПЕРВОЙ, чтобы попытка занять адрес основателя получила обезличенное сообщение.
+  await enforceUpdateUser(
+    { path: policyPath, actor },
+    { targetId: id, nextRole: input.role, nextEmail: email, nextIsActive: input.isActive },
+  );
+
   const matchingEmail = await getUserByEmail(email);
   if (matchingEmail && matchingEmail.id !== id) throw new Error(`An account with this email/nickname (${email}) already exists.`);
+
   const values: Partial<InsertUser> = { name: input.name.trim(), email, role: input.role, isActive: input.isActive };
   if (input.password) values.passwordHash = createUserPasswordHash(input.password);
   
@@ -785,34 +807,124 @@ export async function updateManagedUser(id: number, input: { name: string; nickn
   return { ...updated, generatedEmail: email };
 }
 
-export async function updateSuperAdminManagedUser(id: number, input: { name: string; nickname?: string; email?: string; password?: string; role: SuperAdminManagedRole; isActive: boolean }) {
+export async function updateSuperAdminManagedUser(
+  id: number,
+  input: { name: string; nickname?: string; email?: string; password?: string; role: SuperAdminManagedRole; isActive: boolean },
+  actor?: PolicyActor,
+) {
   if (!superAdminManagedRoles.includes(input.role)) throw new Error("This user type is unavailable.");
   if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
-  return updateManagedUser(id, input);
+  return updateManagedUser(id, input, actor, "superAdminUsers.update");
 }
 
-export async function deleteManagedUser(id: number) {
+/**
+ * Считает зависимые строки пользователя. Внешних ключей в схеме нет, поэтому
+ * проверяем кодом по списку DEPENDENT_COLUMNS. Работает и без БД (inMemoryStore).
+ * exclude — ключи вида "table.column", которые не считаем (собственные строки профиля).
+ */
+export async function countUserDependencies(userId: number, exclude: readonly string[] = []): Promise<DependencyCounts> {
+  const database = await getDb();
+  const skip = new Set(exclude);
+  const perTable: Record<string, number> = {};
+
+  const memoryRows: Record<string, Array<Record<string, unknown>>> = {
+    studentProfiles: inMemoryStore.studentProfiles as Array<Record<string, unknown>>,
+    userProfileValues: inMemoryStore.userProfileValues as Array<Record<string, unknown>>,
+    applications: inMemoryStore.applications as Array<Record<string, unknown>>,
+    enrollments: inMemoryStore.enrollments as Array<Record<string, unknown>>,
+    placementTestAttempts: inMemoryStore.placementTestAttempts as Array<Record<string, unknown>>,
+    payments: (inMemoryStore as unknown as { payments?: Array<Record<string, unknown>> }).payments ?? [],
+  };
+
+  for (const { table, column } of DEPENDENT_COLUMNS) {
+    const key = `${table}.${column}`;
+    if (skip.has(key)) continue;
+    let count = 0;
+    if (database) {
+      const result = (await database.execute(
+        sql`SELECT COUNT(*) AS n FROM \`${sql.raw(table)}\`
+            WHERE \`${sql.raw(column)}\` = ${userId}`,
+      )) as unknown;
+      const list = Array.isArray(result) ? (Array.isArray(result[0]) ? (result[0] as { n: number }[]) : (result as { n: number }[])) : [];
+      count = Number(list[0]?.n ?? 0);
+    } else {
+      const rows = memoryRows[table] ?? [];
+      count = rows.filter(row => Number(row[column]) === userId).length;
+    }
+    if (count > 0) perTable[key] = count;
+  }
+
+  const total = Object.values(perTable).reduce((sum, value) => sum + value, 0);
+  return { perTable, total };
+}
+
+/** Деактивирует учётную запись вместо удаления: связанные данные не трогаем. */
+async function deactivateUser(id: number): Promise<void> {
+  const database = await getDb();
+  if (database) {
+    await database.update(users).set({ isActive: false, updatedAt: new Date() }).where(eq(users.id, id));
+    return;
+  }
+  const row = inMemoryStore.users.find(user => user.id === id);
+  if (row) {
+    row.isActive = false;
+    row.updatedAt = new Date();
+  }
+}
+
+export type DeleteUserOutcome = {
+  success: true;
+  mode: "deleted" | "deactivated";
+  userId: number;
+  dependents?: Record<string, number>;
+  dependentTotal?: number;
+  message?: string;
+};
+
+export async function deleteManagedUser(id: number, actor?: PolicyActor, policyPath = "users.remove"): Promise<DeleteUserOutcome> {
+  // Политика проверяется ПЕРВОЙ: основатель отклоняется обезличенным сообщением,
+  // а не «Account not found» из выборки, которая основателя вообще не показывает.
+  await enforceDeleteUser({ path: policyPath, actor }, { targetId: id });
+
   const database = await getDb();
   const existing = await getManagedUser(id);
   if (!existing) throw new Error("Account not found.");
   if (existing.role === "founder") throw new Error("Founder accounts cannot be deleted in Users.");
-  
+
+  // Жёсткое удаление разрешено только без зависимых строк. Иначе — отказ и деактивация.
+  const dependents = await countUserDependencies(id);
+  const decision = decideDeletion({ dependents });
+  if (decision.action === "deactivate") {
+    await deactivateUser(id);
+    console.warn(
+      `[userPolicy] Удаление отклонено: у учётной записи ${id} есть зависимые строки (${decision.total} в ${Object.keys(decision.perTable).length} таблицах). Учётная запись деактивирована.`,
+    );
+    return {
+      success: true,
+      mode: "deactivated",
+      userId: id,
+      dependents: decision.perTable,
+      dependentTotal: decision.total,
+      message: decision.message,
+    };
+  }
+
   if (database) {
     await database.transaction(async tx => {
       await tx.delete(userProfileValues).where(eq(userProfileValues.userId, id));
       await tx.delete(users).where(eq(users.id, id));
     });
-    return { success: true } as const;
+    return { success: true, mode: "deleted", userId: id };
   }
 
   inMemoryStore.userProfileValues = inMemoryStore.userProfileValues.filter(p => p.userId !== id);
   inMemoryStore.users = inMemoryStore.users.filter(u => u.id !== id);
-  return { success: true } as const;
+  return { success: true, mode: "deleted", userId: id };
 }
 
-export async function deleteSuperAdminManagedUser(id: number) {
+export async function deleteSuperAdminManagedUser(id: number, actor?: PolicyActor): Promise<DeleteUserOutcome> {
   if (!await getSuperAdminManagedUser(id)) throw new Error("Account not found.");
-  return deleteManagedUser(id);
+  return deleteManagedUser(id, actor, "superAdminUsers.remove");
 }
 
 export type SubmissionInput = {
@@ -1309,88 +1421,86 @@ export async function deleteAnnouncement(id: number) {
   return { success: true };
 }
 
+/**
+ * Идемпотентно обеспечивает существование единственной учётной записи —
+ * основателя. Аккаунты с общим паролем (super_admin, admin, marketing,
+ * teacher, student) больше не создаются: их выдают через API по требованию.
+ *
+ * Хеш берётся ТОЛЬКО из FOUNDER_PASSWORD_HASH. Если переменная не задана или
+ * повреждена — не создаётся ничего, и в лог уходит сообщение без значений.
+ */
 export async function seedDatabaseDefaultUsers() {
-  const db = await getDb();
-  if (!db) return;
-
-  const defaultUsers = [
-    {
-      openId: "issued:superadmin",
-      name: "Super Admin",
-      email: "superadmin@bilc.my",
-      role: "super_admin" as const,
-    },
-    {
-      openId: "issued:admin",
-      name: "Admin Manager",
-      email: "admin@bilc.my",
-      role: "admin" as const,
-    },
-    {
-      openId: "issued:marketing",
-      name: "Marketing Agent",
-      email: "marketing@bilc.my",
-      role: "marketing" as const,
-    },
-    {
-      openId: "issued:teacher",
-      name: "Teacher Speaker",
-      email: "teacher@bilc.my",
-      role: "teacher" as const,
-    },
-    {
-      openId: "issued:student",
-      name: "Student Learner",
-      email: "student@bilc.my",
-      role: "student" as const,
-    },
-  ];
-
-  for (const item of defaultUsers) {
-    try {
-      const existing = await db.select().from(users).where(eq(users.email, item.email)).limit(1);
-      if (!existing.length) {
-        const created = await db.insert(users).values({
-          openId: item.openId,
-          name: item.name,
-          email: item.email,
-          passwordHash: createUserPasswordHash("lektor07xumoyun"),
-          role: item.role,
-          isActive: true,
-          loginMethod: "issued_by_founder",
-          lastSignedIn: new Date(),
-        });
-        
-        // If it's a student, also create a student profile
-        if (item.role === "student") {
-          const userId = Number(created[0].insertId);
-          const { studentProfiles: spTable } = await import("../drizzle/schema");
-          const existingProfile = await db.select().from(spTable).where(eq(spTable.userId, userId)).limit(1);
-          if (!existingProfile.length) {
-            await db.insert(spTable).values({
-              userId,
-              guardianName: "Parent Learner",
-              guardianPhone: "+60123456789",
-              contactEmail: "guardian@bilc.my",
-              dateOfBirth: new Date("2010-05-15"),
-              address: "123 Learning Street, Kuala Lumpur",
-              notes: "Requires intermediate grammar support.",
-              attendedSessions: 18,
-              totalSessions: 20,
-              currentLevel: "Intermediate",
-              courseName: "General English",
-              courseCode: "GEN-ENG",
-              courseStartDate: new Date("2026-01-10"),
-              courseEndDate: new Date("2026-06-30"),
-            });
-          }
-        }
-        console.log(`[Seed] Created user in database: ${item.email}`);
-      }
-    } catch (e) {
-      console.error(`[Seed] Error seeding user ${item.email}:`, e);
-    }
+  if (!isFounderAuthConfigured()) {
+    console.warn(
+      "[Seed] FOUNDER_PASSWORD_HASH не задан или имеет неверный формат — учётная запись основателя не создаётся. " +
+        "Сгенерируйте хеш командой `pnpm founder:hash` и положите его в .env.",
+    );
+    return;
   }
+
+  const passwordHash = process.env.FOUNDER_PASSWORD_HASH as string;
+  const openId = `founder:${FOUNDER_EMAIL}`;
+  // Сид из окружения — единственный путь, которому позволено создать основателя.
+  enforceSeedFounder({ email: FOUNDER_EMAIL, role: "founder" });
+  const db = await getDb();
+
+  if (db) {
+    const existing = await db.select().from(users).where(eq(users.email, FOUNDER_EMAIL)).limit(1);
+    if (existing.length) {
+      await db
+        .update(users)
+        .set({ passwordHash, role: "founder", isActive: true, loginMethod: "email_password" })
+        .where(eq(users.id, existing[0].id));
+      return;
+    }
+    await db.insert(users).values({
+      openId,
+      name: "Founder",
+      email: FOUNDER_EMAIL,
+      passwordHash,
+      role: "founder",
+      isActive: true,
+      loginMethod: "email_password",
+      lastSignedIn: new Date(),
+      sessionVersion: 1,
+      isOtp: false,
+      otpCreatedAt: null,
+      failedAttempts: 0,
+    });
+    console.log("[Seed] Учётная запись основателя создана.");
+    return;
+  }
+
+  const existing = inMemoryStore.users.find(
+    user => user.email?.trim().toLowerCase() === FOUNDER_EMAIL,
+  );
+  if (existing) {
+    existing.passwordHash = passwordHash;
+    existing.role = "founder";
+    existing.isActive = true;
+    existing.loginMethod = "email_password";
+    existing.updatedAt = new Date();
+    return;
+  }
+  const stamp = new Date();
+  inMemoryStore.users.push({
+    id: inMemoryStore.nextId++,
+    openId,
+    name: "Founder",
+    email: FOUNDER_EMAIL,
+    passwordHash,
+    role: "founder",
+    isActive: true,
+    loginMethod: "email_password",
+    createdAt: stamp,
+    updatedAt: stamp,
+    lastSignedIn: stamp,
+    sessionVersion: 1,
+    isOtp: false,
+    otpCreatedAt: null,
+    failedAttempts: 0,
+  });
+  console.log("[Seed] Учётная запись основателя создана.");
 }
 
 // ==========================================
@@ -1967,7 +2077,7 @@ export async function createClientAccountAndEnrollment(input: {
   submissionId?: number | null;
   registrationSubmissionId?: number | null;
   notes?: string;
-}) {
+}, actor?: PolicyActor) {
   const database = await getDb();
   
   // 1. Validate that forms have their respective submission links as required
@@ -1984,8 +2094,14 @@ export async function createClientAccountAndEnrollment(input: {
   // Generate unique Latin login identifier e.g. ivansidorov102026@bilc.my
   const loginEmail = await generateUniqueUserLogin(input.name, new Date());
 
-  // Generate a random temporary password OTP
-  const tempPassword = "BILC$Student$" + randomUUID().slice(0, 8);
+  // Политика: этот путь создаёт только роль student, адрес основателя зарезервирован.
+  await enforceCreateUser(
+    { path: "enrollments.createClientAccountAndEnrollment", actor },
+    { role: "student", email: loginEmail },
+  );
+
+  // Криптостойкий одноразовый пароль (>= 16 символов).
+  const tempPassword = generateTemporaryPassword();
   const passwordHash = createUserPasswordHash(tempPassword);
 
   let userId: number;
@@ -2153,7 +2269,9 @@ export async function getContactEmailForUser(userId: number, role: string, defau
   return defaultEmail || "";
 }
 
-export async function resetUserPasswordAndSession(userId: number, passwordHash: string): Promise<void> {
+export async function resetUserPasswordAndSession(userId: number, passwordHash: string, actor?: PolicyActor): Promise<void> {
+  // Политика: сброс пароля и выпуск OTP на учётной записи основателя запрещён.
+  await enforcePasswordReset({ path: "superAdminUsers.resetPassword", actor }, { targetId: userId });
   const database = await getDb();
   if (database) {
     await database.update(users).set({

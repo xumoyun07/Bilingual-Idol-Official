@@ -1,8 +1,12 @@
+﻿import { randomBytes } from "node:crypto";
 import { TRPCError } from "@trpc/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { TrpcContext } from "./_core/context";
 import * as db from "./db";
 import { appRouter } from "./routers";
+
+/** Пароль для входа в схему генерируется в рантайме: литералов секретов нет. */
+const anyPassword = () => randomBytes(18).toString("base64url");
 
 vi.mock("./audit", async importOriginal => {
   const actual = await importOriginal<typeof import("./audit")>();
@@ -61,9 +65,9 @@ describe("Users router", () => {
   it("allows Founder to create only issued, non-Founder roles", async () => {
     const create = vi.spyOn(db, "createManagedUser").mockResolvedValue(account);
     const caller = appRouter.createCaller(context("founder"));
-    await expect(caller.users.create({ name: "Ari Student", email: "ari@example.test", password: "sufficient-password", role: "student", isActive: true })).resolves.toEqual(account);
-    expect(create).toHaveBeenCalledWith(expect.objectContaining({ role: "student" }));
-    await expect(caller.users.create({ name: "Invalid Founder", email: "founder@example.test", password: "sufficient-password", role: "founder" as never, isActive: true })).rejects.toBeInstanceOf(TRPCError);
+    await expect(caller.users.create({ name: "Ari Student", email: "ari@example.test", password: anyPassword(), role: "student", isActive: true })).resolves.toEqual(account);
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ role: "student" }), expect.objectContaining({ role: "founder" }));
+    await expect(caller.users.create({ name: "Invalid Founder", email: "founder@example.test", password: anyPassword(), role: "founder" as never, isActive: true })).rejects.toBeInstanceOf(TRPCError);
   });
 
   it("keeps Field Builder schema and metadata actions Founder-only", async () => {
@@ -89,7 +93,7 @@ describe("Users router", () => {
     expect(update).toHaveBeenCalledWith(fields);
     const create = vi.spyOn(db, "createManagedUser").mockResolvedValue(account);
     await expect(appRouter.createCaller(context("founder")).users.create({})).resolves.toEqual(account);
-    expect(create).toHaveBeenCalledWith(expect.objectContaining({ profileValues: {} }));
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ profileValues: {} }), expect.objectContaining({ role: "founder" }));
   });
 
   it("allows only Founder to persist a complete dynamic field order", async () => {

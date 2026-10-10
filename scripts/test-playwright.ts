@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 import fs from "fs";
 import path from "path";
+import { createTestAccounts } from "../server/testing/accounts";
 
 async function run() {
   console.log("[Playwright Test] Starting E2E test for promotional action button...");
@@ -114,13 +115,16 @@ async function run() {
 
   // Test 4: Disable promotional offer and verify button is gone
   console.log("\n[Test 4] Logging in as Founder to disable promo_active setting...");
+  // Учётные данные основателя выдаёт общий helper: пароль генерируется в рантайме
+  // и в файле не хранится. Требуется запущенный сервер и TEST_FIXTURES=1.
+  const accounts = await createTestAccounts({ mode: "http", roles: [] });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("http://localhost:3000/login");
   await page.waitForTimeout(1000);
 
   // Fill credentials and log in
-  await page.fill('input[type="email"], input[placeholder*="email"], input[name="email"]', "lektor@gmail.com");
-  await page.fill('input[type="password"], input[placeholder*="password"], input[name="password"]', "Lektor$07$xumoyun");
+  await page.fill('input[type="email"], input[placeholder*="email"], input[name="email"]', accounts.founder.email);
+  await page.fill('input[type="password"], input[placeholder*="password"], input[name="password"]', accounts.founder.password);
   await page.click('button[type="submit"]');
   await page.waitForTimeout(2000);
 
@@ -180,6 +184,7 @@ async function run() {
   });
   console.log("-> Restored setting promo_active = true");
 
+  await accounts.cleanup();
   await browser.close();
   console.log("\n[Playwright Test] All E2E tests and screenshot collection completed successfully!");
 }

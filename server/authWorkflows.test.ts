@@ -1,48 +1,87 @@
-import { describe, expect, it, beforeEach } from "vitest";
-import { generateUniqueUserLogin, transliterate, inMemoryStore, getUserByEmail, resetUserPasswordAndSession } from "./db";
-import { verifyUserPasswordHash, createUserPasswordHash } from "./userAuth";
+﻿import { randomBytes } from "node:crypto";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { generateUniqueUserLogin, getUserByEmail, inMemoryStore, resetUserPasswordAndSession, transliterate } from "./db";
+import { createUserPasswordHash } from "./userAuth";
 import { appRouter } from "./routers";
-import { createSessionToken, authenticateRequest } from "./_core/sdk";
+import { FOUNDER_EMAIL } from "./founderIdentity";
+import { createTestAccounts, type TestAccounts } from "./testing/accounts";
+
+/**
+ * Пароли в этом файле генерируются в рантайме: литералов секретов нет.
+ * Учётные записи для сквозных проверок входа выдаёт общий helper
+ * server/testing/accounts.ts.
+ */
+
+function runtimePassword(): string {
+  return randomBytes(18).toString("base64url");
+}
+
+function anonymousCaller() {
+  return appRouter.createCaller({
+    user: null,
+    req: { headers: {}, protocol: "http" } as any,
+    res: {
+      cookie: () => {},
+      clearCookie: () => {},
+    } as any,
+  });
+}
+
+type CraftedUser = {
+  id: number;
+  email: string;
+  password: string;
+  role?: "student" | "teacher";
+  isOtp?: boolean;
+  otpCreatedAt?: Date | null;
+  createdAt?: Date;
+};
+
+function pushUser(user: CraftedUser) {
+  const createdAt = user.createdAt ?? new Date();
+  inMemoryStore.users.push({
+    id: user.id,
+    openId: `issued:crafted-${user.id}`,
+    name: `Crafted ${user.id}`,
+    email: user.email,
+    passwordHash: createUserPasswordHash(user.password),
+    role: user.role ?? "student",
+    isActive: true,
+    createdAt,
+    updatedAt: createdAt,
+    lastSignedIn: createdAt,
+    failedAttempts: 0,
+    sessionVersion: 1,
+    isOtp: user.isOtp ?? false,
+    otpCreatedAt: user.otpCreatedAt ?? null,
+  } as any);
+}
 
 describe("BILC Secure Auth Workflows", () => {
   beforeEach(() => {
-    // Reset in-memory users list to standard fallback
-    inMemoryStore.users = [
-      {
-        id: 1,
-        openId: "founder:lektor@gmail.com",
-        name: "Founder",
-        email: "lektor@gmail.com",
-        passwordHash: createUserPasswordHash("Lektor$07$xumoyun"),
-        role: "founder" as const,
-        isActive: true,
-        loginMethod: "email_password",
-        createdAt: new Date("2026-01-01"),
-        updatedAt: new Date("2026-01-01"),
-        lastSignedIn: new Date("2026-01-01"),
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: false,
-      },
-      {
-        id: 2,
-        openId: "issued:superadmin",
-        name: "Super Admin",
-        email: "superadmin@bilc.my",
-        passwordHash: createUserPasswordHash("lektor07xumoyun"),
-        role: "super_admin" as const,
-        isActive: true,
-        loginMethod: "issued_by_founder",
-        createdAt: new Date("2026-01-01"),
-        updatedAt: new Date("2026-01-01"),
-        lastSignedIn: new Date("2026-01-01"),
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: false,
-      },
-    ] as any[];
+    // Пустое хранилище: каждый тест создаёт ровно те учётные записи, которые ему нужны.
+    inMemoryStore.users = [];
     inMemoryStore.studentProfiles = [];
     inMemoryStore.enrollments = [];
+    // Инвариант политики: ровно одна учётная запись founder, как в продакшене.
+    // Без неё управление пользователями закрыто (fail closed).
+    inMemoryStore.users.push({
+      id: 1,
+      openId: `founder:${FOUNDER_EMAIL}`,
+      name: "Founder",
+      email: FOUNDER_EMAIL,
+      passwordHash: null,
+      role: "founder",
+      isActive: true,
+      loginMethod: "email_password",
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      lastSignedIn: new Date("2026-01-01"),
+      sessionVersion: 1,
+      isOtp: false,
+      otpCreatedAt: null,
+      failedAttempts: 0,
+    } as any);
   });
 
   describe("1. Login Generation & Transliteration", () => {
@@ -59,22 +98,7 @@ describe("BILC Secure Auth Workflows", () => {
 
     it("resolves uniqueness collision using sequential suffixes", async () => {
       const creationDate = new Date("2026-10-04T12:00:00.000Z");
-      // Add first user directly
-      inMemoryStore.users.push({
-        id: 10,
-        openId: "issued:alex_1",
-        name: "Aleksey Petrov",
-        email: "alekseypetrov102026@bilc.my",
-        passwordHash: createUserPasswordHash("some-password"),
-        role: "student",
-        isActive: true,
-        createdAt: creationDate,
-        updatedAt: creationDate,
-        lastSignedIn: creationDate,
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: false,
-      } as any);
+      pushUser({ id: 10, email: "alekseypetrov102026@bilc.my", password: runtimePassword(), createdAt: creationDate });
 
       // Generate for same name and date, should get suffix _1
       const email2 = await generateUniqueUserLogin("Алексей Петров", creationDate);
@@ -84,74 +108,29 @@ describe("BILC Secure Auth Workflows", () => {
 
   describe("2. OTP Atomic Burn & deactivation", () => {
     it("locks account after 5 incorrect password attempts", async () => {
-      // Create user with OTP password
       const userEmail = "alex102026@bilc.my";
-      const otp = "tempOTP123";
-      inMemoryStore.users.push({
-        id: 20,
-        openId: "issued:alex_otp",
-        name: "Alex",
-        email: userEmail,
-        passwordHash: createUserPasswordHash(otp),
-        role: "student",
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastSignedIn: new Date(),
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: true,
-        otpCreatedAt: new Date(),
-      } as any);
+      const otp = runtimePassword();
+      pushUser({ id: 20, email: userEmail, password: otp, isOtp: true, otpCreatedAt: new Date() });
 
-      const caller = appRouter.createCaller({
-        user: null,
-        req: { headers: {}, protocol: "http" } as any,
-        res: {
-          cookie: () => {},
-          clearCookie: () => {},
-        } as any,
-      });
+      const caller = anonymousCaller();
 
       // 5 failed login attempts
       for (let i = 0; i < 5; i++) {
-        await expect(caller.auth.login({ email: userEmail, password: "wrong-password" }))
-          .rejects.toThrow();
+        await expect(caller.auth.login({ email: userEmail, password: runtimePassword() })).rejects.toThrow();
       }
 
       // 6th attempt with correct password should be locked
-      await expect(caller.auth.login({ email: userEmail, password: otp }))
-        .rejects.toThrow("This account is temporarily locked");
+      await expect(caller.auth.login({ email: userEmail, password: otp })).rejects.toThrow(
+        "This account is temporarily locked",
+      );
     });
 
     it("atomically burns OTP upon successful login", async () => {
       const userEmail = "alex102026@bilc.my";
-      const otp = "tempOTP123";
-      inMemoryStore.users.push({
-        id: 20,
-        openId: "issued:alex_otp",
-        name: "Alex",
-        email: userEmail,
-        passwordHash: createUserPasswordHash(otp),
-        role: "student",
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastSignedIn: new Date(),
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: true,
-        otpCreatedAt: new Date(),
-      } as any);
+      const otp = runtimePassword();
+      pushUser({ id: 20, email: userEmail, password: otp, isOtp: true, otpCreatedAt: new Date() });
 
-      const caller = appRouter.createCaller({
-        user: null,
-        req: { headers: {}, protocol: "http" } as any,
-        res: {
-          cookie: () => {},
-          clearCookie: () => {},
-        } as any,
-      });
+      const caller = anonymousCaller();
 
       // First login with OTP is successful
       const response = await caller.auth.login({ email: userEmail, password: otp });
@@ -164,68 +143,30 @@ describe("BILC Secure Auth Workflows", () => {
       expect(updatedUser?.passwordHash).toBeNull();
 
       // Second attempt to login with the same OTP fails
-      await expect(caller.auth.login({ email: userEmail, password: otp }))
-        .rejects.toThrow("Invalid login or password.");
+      await expect(caller.auth.login({ email: userEmail, password: otp })).rejects.toThrow("Invalid login or password.");
     });
   });
 
   describe("3. Expiration limits", () => {
     it("rejects OTP if older than 7 days", async () => {
       const userEmail = "expired102026@bilc.my";
-      const otp = "tempOTP123";
+      const otp = runtimePassword();
       const eightDaysAgo = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
-      inMemoryStore.users.push({
-        id: 30,
-        openId: "issued:expired",
-        name: "Expired User",
-        email: userEmail,
-        passwordHash: createUserPasswordHash(otp),
-        role: "student",
-        isActive: true,
-        createdAt: eightDaysAgo,
-        updatedAt: eightDaysAgo,
-        lastSignedIn: eightDaysAgo,
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: true,
-        otpCreatedAt: eightDaysAgo,
-      } as any);
+      pushUser({ id: 30, email: userEmail, password: otp, isOtp: true, otpCreatedAt: eightDaysAgo, createdAt: eightDaysAgo });
 
-      const caller = appRouter.createCaller({
-        user: null,
-        req: { headers: {}, protocol: "http" } as any,
-        res: {
-          cookie: () => {},
-          clearCookie: () => {},
-        } as any,
-      });
-
-      await expect(caller.auth.login({ email: userEmail, password: otp }))
-        .rejects.toThrow("This temporary password has expired");
+      await expect(anonymousCaller().auth.login({ email: userEmail, password: otp })).rejects.toThrow(
+        "This temporary password has expired",
+      );
     });
   });
 
   describe("4. Administrative Password Reset", () => {
     it("increments sessionVersion to invalidate other active sessions and flags as OTP", async () => {
       const studentId = 40;
-      inMemoryStore.users.push({
-        id: studentId,
-        openId: "issued:student40",
-        name: "Student 40",
-        email: "student40@bilc.my",
-        passwordHash: createUserPasswordHash("permanent123"),
-        role: "student",
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastSignedIn: new Date(),
-        failedAttempts: 0,
-        sessionVersion: 1,
-        isOtp: false,
-      } as any);
+      pushUser({ id: studentId, email: "student40@bilc.my", password: runtimePassword() });
 
       // Perform admin password reset
-      const newHash = createUserPasswordHash("newTempOTP");
+      const newHash = createUserPasswordHash(runtimePassword());
       await resetUserPasswordAndSession(studentId, newHash);
 
       const updatedUser = inMemoryStore.users.find(u => u.id === studentId);
@@ -233,5 +174,31 @@ describe("BILC Secure Auth Workflows", () => {
       expect(updatedUser?.isOtp).toBe(true);
       expect(updatedUser?.failedAttempts).toBe(0);
     });
+  });
+
+  describe("5. Accounts issued through the real API", () => {
+    let accounts: TestAccounts | null = null;
+
+    afterEach(async () => {
+      if (accounts) {
+        await accounts.cleanup();
+        accounts = null;
+      }
+    });
+
+    it("signs in every managed role with credentials generated at runtime", async () => {
+      accounts = await createTestAccounts();
+
+      for (const role of ["super_admin", "admin", "marketing", "teacher", "student"] as const) {
+        const session = await accounts.login(role);
+        expect(session.user.role, `роль сессии для ${role}`).toBe(role);
+        expect(session.user.email).toBe(accounts.get(role).email);
+        expect(session.user.isActive).toBe(true);
+      }
+
+      const founderSession = await accounts.login("founder");
+      expect(founderSession.user.role).toBe("founder");
+      expect(founderSession.user.email).toBe("lektor@bilc.my");
+    }, 60_000);
   });
 });

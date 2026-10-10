@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { TrpcContext } from "./_core/context";
 import * as audit from "./audit";
@@ -24,7 +25,7 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("Audit logs security and contract", () => {
   it("removes credential-shaped metadata recursively and keeps values bounded", () => {
-    const metadata = audit.sanitiseAuditMetadata({ password: "do-not-store", token: "abc", nested: { authorization: "Bearer x", safe: "visible" }, profileValues: { personal: "private" } });
+    const metadata = audit.sanitiseAuditMetadata({ password: randomBytes(18).toString("base64url"), token: "abc", nested: { authorization: "Bearer x", safe: "visible" }, profileValues: { personal: "private" } });
     expect(metadata).toContain('"password":"[redacted]"');
     expect(metadata).toContain('"token":"[redacted]"');
     expect(metadata).toContain('"authorization":"[redacted]"');

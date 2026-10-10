@@ -9,20 +9,14 @@ const WHITELIST = [
   "IELTS",
   "MOHE",
   "WhatsApp",
-  "info@bilingualidol.edu.my",
-  "guardian@bilc.my",
-  "student@bilc.my",
-  "lektor@gmail.com",
-  "superadmin@bilc.my",
-  "admin@bilc.my",
-  "marketing@bilc.my",
-  "teacher@bilc.my",
   "Merdeka Special Discount",
   "MERDEKA2026",
   "WELCOME50",
   "RM",
   "OTP"
 ];
+// Адреса электронной почты отдельно перечислять не нужно: строки с "@"
+// пропускаются правилом ниже. Сид-учётки из server/db.ts отсюда удалены.
 
 function isWhitelisted(text: string): boolean {
   const t = text.trim();

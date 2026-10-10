@@ -1,7 +1,11 @@
+﻿import { randomBytes } from "node:crypto";
 import { describe, expect, it, vi, afterEach } from "vitest";
 import type { TrpcContext } from "./_core/context";
 import * as db from "./db";
 import { appRouter } from "./routers";
+
+/** Пароль для входа в схему генерируется в рантайме: литералов секретов нет. */
+const anyPassword = () => randomBytes(18).toString("base64url");
 
 vi.mock("./audit", async importOriginal => {
   const actual = await importOriginal<typeof import("./audit")>();
@@ -32,9 +36,9 @@ describe("Super admin Users router", () => {
   it("rejects peer Super admin creation and delegates permitted account creation", async () => {
     const create = vi.spyOn(db, "createSuperAdminManagedUser").mockResolvedValue(account);
     const caller = appRouter.createCaller(context("super_admin"));
-    await expect(caller.superAdminUsers.create({ name: "Ari Student", email: "ari@example.test", password: "sufficient-password", role: "student", isActive: true })).resolves.toEqual(account);
-    expect(create).toHaveBeenCalledWith(expect.objectContaining({ role: "student" }));
-    await expect(caller.superAdminUsers.create({ name: "Peer", email: "peer@example.test", password: "sufficient-password", role: "super_admin" as never, isActive: true })).rejects.toBeDefined();
+    await expect(caller.superAdminUsers.create({ name: "Ari Student", email: "ari@example.test", password: anyPassword(), role: "student", isActive: true })).resolves.toEqual(account);
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ role: "student" }), expect.objectContaining({ role: "super_admin" }));
+    await expect(caller.superAdminUsers.create({ name: "Peer", email: "peer@example.test", password: anyPassword(), role: "super_admin" as never, isActive: true })).rejects.toBeDefined();
   });
 
   it("does not expose a Field Builder mutation surface", () => {
