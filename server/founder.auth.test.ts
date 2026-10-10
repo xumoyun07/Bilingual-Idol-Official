@@ -70,7 +70,7 @@ describe("Founder Authentication & Access", () => {
 
     expect(result.success).toBe(true);
     expect(result.role).toBe("founder");
-    expect(result.redirectTo).toBe("/admin");
+    expect(result.redirectTo).toBe("/founder");
     expect(result.token).toBeDefined();
     expect(typeof result.token).toBe("string");
 
