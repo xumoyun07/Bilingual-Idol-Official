@@ -14,7 +14,7 @@ If the dashboard looks stale: stop the dev server, `pnpm build`, `npm run dev`, 
 
 ## Steps 1-6
 
-### STEP 1 — sheet proof unblock: DONE (code committed in this step)
+### STEP 1 — sheet proof unblock: DONE — OWNER RESULT: sheet proof PASS for admin and student, 0 failures, 0 temp accounts left
 Done:
 - `docs/OPERATING_RULES.md` saved verbatim.
 - Fixed the real cause of "trigger found 0 times": `data-testid="mobile-shell-trigger"` was **never added**. Commit `2cf573d` added the other four ids but silently dropped that one because of a PowerShell array-concatenation bug in my edit; `git show 2cf573d` proves it. The button already carried the English `aria-label="Toggle menu"` in ms and ar, so my earlier "translated label" theory was wrong.
@@ -24,11 +24,27 @@ Done:
 - `/first-login` handled: if a fixture lands there, the proof opens the role route directly and prints the final URL.
 - `npm run e2e:sheet-all` → `e2e/run-sheet-all.ts` runs the proof with `SHEET_ROLE=admin` then `SHEET_ROLE=student` via `process.env` in a tsx wrapper (no shell-specific syntax).
 
-Not done (OWNER RUNS): the proof has never executed. vitest, tsx, docker and browsers fail with EPERM in my sandbox, so no proof value and no screenshot has been seen. The six screenshots are expected at `e2e/screenshots/sheet-{en,ms,ar}-{top,bottom}.png` and are gitignored.
+OWNER RESULT: `$env:TEST_FIXTURES="1"; npm run e2e:sheet-all` -> PASS for admin and student, 0 failures, 0 temporary accounts left. Screenshots at `e2e/screenshots/sheet-{en,ms,ar}-{top,bottom}.png` (gitignored).
 
-Next sub-item: run `$env:TEST_FIXTURES="1"; npm run e2e:sheet-all`, then read the six screenshots.
+Next sub-item: STEP 2 (role-based console).
 
-### STEP 2 — NOT STARTED
+### STEP 2 — IN PROGRESS (role-based console; R8 corrected: the SERVER decides who sees what)
+
+Done (2.1, 2.2):
+- `docs/CONSOLE_MATRIX.md` — the role x module x authorizing procedure table, derived from `server/_core/trpc.ts`, with today's landing route per role.
+- `shared/console.ts` — pure module, no React: `resolveConsole(sessionRole)`, `resolveHomeRoute(sessionRole)`, `routeRoleOf(path)`, `isAuthorizedFor(sessionRole, routeRole)`, plus `CONSOLE_MODULES` mapping each module to its authorizing procedure.
+- `server/console.test.ts` — unit tests for every role, the null console for unknown roles, the module sets (founder has users+audit; admin has neither; super_admin has audit but not users), home routes, route detection, and redirect idempotence for every role.
+
+Restrictive calls recorded per R8:
+- `superAdminUsers.*` is guarded by `adminProcedure`, which also admits `admin`, but the founder console's User Accounts module is `users.*` = `founderProcedure`. The more restrictive set wins, so User Accounts stays founder-only.
+- `auditProcedure` is exactly `["founder","super_admin"]`, so **admin gets no Audit & Security**.
+- Legacy `user` resolves to a console with no modules (empty state) and keeps `/dashboard`; `isAuthorizedFor("user","student")` is true so the redirect cannot loop.
+
+Not done: 2.3 wiring, 2.4 redirect rewrite, 2.5 translations, 2.6 e2e/console-roles.ts.
+
+Next sub-item: 2.3 — wire DashboardLayout (displayed role, badge, account chip, console title, breadcrumbs, module list) to `resolveConsole(user.role)`, remove the `role = "founder"` default, and stop `Admin.tsx` from forcing the founder console on admin sessions.
+
+Owner commands: `npx vitest run`; `$env:TEST_FIXTURES="1"; npm run e2e:console` (not yet written — do not run it until 2.6 lands).
 ### STEP 3 — NOT STARTED
 ### STEP 4 — NOT STARTED
 ### STEP 5 — NOT STARTED
