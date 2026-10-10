@@ -213,6 +213,23 @@ try {
     console.log("\n########## " + lang + " @390 ##########");
     await step(lang + ": вход", async () => {
       await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+      // G6-fix: явное ожидание поля входа с диагностикой, если его нет.
+      try {
+        await page.waitForSelector("#sign-in-email", { timeout: 15000 });
+      } catch (error) {
+        log("  ВХОД НЕДОСТУПЕН: #sign-in-email не появился за 15000ms");
+        try {
+          const d = await evalJson<any>(page, "(function(){var btns=Array.prototype.slice.call(document.querySelectorAll('button')).map(function(b){return (b.getAttribute('aria-label')||'')+' | '+(b.textContent||'').replace(/\\s+/g,' ').trim().slice(0,30);});return JSON.stringify({url:location.href,title:document.title,body:(document.body.innerText||'').replace(/\\s+/g,' ').trim().slice(0,300),buttons:btns.slice(0,8)});})()", "login diagnostics");
+          log("  итоговый URL: " + d.url);
+          log("  document.title: " + d.title);
+          log("  текст страницы: " + d.body);
+          log("  кнопки: " + JSON.stringify(d.buttons));
+        } catch (inner) {
+          log("  диагностика не удалась: " + (inner instanceof Error ? inner.message : String(inner)));
+        }
+        log("  ПРЕДПОСЫЛКА: dev-сервер должен работать (npm run dev в отдельном терминале).");
+        throw new Error("Login form not found: #sign-in-email did not appear");
+      }
       await page.fill("#sign-in-email", email);
       await page.fill("#sign-in-password", password);
       await page.click('button[type="submit"]');
