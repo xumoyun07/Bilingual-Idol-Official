@@ -3,6 +3,7 @@ import type { TrpcContext } from "./_core/context";
 import { appRouter } from "./routers";
 import { inMemoryStore } from "./db";
 import { nextApplicationStatus, APPLICATION_STATUS_CHAIN } from "./services/applicationPipeline";
+import { FOUNDER_EMAIL } from "./founderIdentity";
 
 /**
  * Application Pipeline (A2/S3/F2): очередь, назначение, одобрение, отклонение,
@@ -11,7 +12,9 @@ import { nextApplicationStatus, APPLICATION_STATUS_CHAIN } from "./services/appl
  * internationalStudent; откат — только founder; студент видит только своё.
  */
 
-const FOUNDER = { id: 1, email: "founder@example.test", role: "founder" };
+// Инвариант основателя требует ровно одну founder-запись с адресом FOUNDER_EMAIL,
+// иначе управление пользователями fail-closed. Фикстура использует реальный адрес.
+const FOUNDER = { id: 1, email: FOUNDER_EMAIL, role: "founder" };
 const ADMIN = { id: 2, email: "admin@example.test", role: "admin" };
 const TEACHER = { id: 3, email: "teacher@example.test", role: "teacher" };
 const STUDENT_LOCAL = { id: 4, email: "local@example.test", role: "student" };
