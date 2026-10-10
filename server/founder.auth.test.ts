@@ -1,23 +1,49 @@
-import { describe, it, expect } from "vitest";
+import { randomBytes, scryptSync } from "node:crypto";
+import { afterEach, beforeEach, describe, it, expect } from "vitest";
 import { appRouter } from "./routers";
-import { isFounderEmail, shouldGrantFounderRole } from "./founderIdentity";
+import { FOUNDER_EMAIL, isFounderEmail, shouldGrantFounderRole } from "./founderIdentity";
 import { verifyFounderCredentials } from "./founderAuth";
 import { sdk } from "./_core/sdk";
 
+/**
+ * Вход основателя. Пароль генерируется в рантайме, хеш — тоже:
+ * в файле нет ни одного секрета.
+ */
+
+const ORIGINAL_HASH = process.env.FOUNDER_PASSWORD_HASH;
+
+function makeHash(password: string): string {
+  const salt = randomBytes(16).toString("hex");
+  return `scrypt:${salt}:${scryptSync(password, salt, 64).toString("hex")}`;
+}
+
 describe("Founder Authentication & Access", () => {
+  const password = randomBytes(18).toString("base64url");
+
+  beforeEach(() => {
+    process.env.FOUNDER_PASSWORD_HASH = makeHash(password);
+  });
+
+  afterEach(() => {
+    if (ORIGINAL_HASH === undefined) delete process.env.FOUNDER_PASSWORD_HASH;
+    else process.env.FOUNDER_PASSWORD_HASH = ORIGINAL_HASH;
+  });
+
   it("recognizes founder email and credentials", () => {
-    expect(isFounderEmail("lektor@gmail.com")).toBe(true);
-    expect(isFounderEmail("LEKTOR@GMAIL.COM ")).toBe(true);
+    expect(isFounderEmail(FOUNDER_EMAIL)).toBe(true);
+    expect(isFounderEmail(` ${FOUNDER_EMAIL.toUpperCase()} `)).toBe(true);
     expect(isFounderEmail("tryingreal761@gmail.com")).toBe(false);
     expect(isFounderEmail("other@example.com")).toBe(false);
+    // Прежний адрес основателем больше не считается
+    expect(isFounderEmail("lektor@gmail.com")).toBe(false);
 
-    expect(verifyFounderCredentials("lektor@gmail.com", "Lektor$07$xumoyun")).toBe(true);
-    expect(verifyFounderCredentials("tryingreal761@gmail.com", "Lektor$07$xumoyun")).toBe(false);
-    expect(verifyFounderCredentials("lektor@gmail.com", "wrongpassword")).toBe(false);
+    expect(verifyFounderCredentials(FOUNDER_EMAIL, password)).toBe(true);
+    expect(verifyFounderCredentials("tryingreal761@gmail.com", password)).toBe(false);
+    expect(verifyFounderCredentials(FOUNDER_EMAIL, randomBytes(18).toString("base64url"))).toBe(false);
   });
 
   it("grants founder role accurately", () => {
-    expect(shouldGrantFounderRole({ email: "lektor@gmail.com", openId: "founder:lektor@gmail.com" })).toBe(true);
+    expect(shouldGrantFounderRole({ email: FOUNDER_EMAIL, openId: `founder:${FOUNDER_EMAIL}` })).toBe(true);
     expect(shouldGrantFounderRole({ email: "tryingreal761@gmail.com", openId: "founder:tryingreal761@gmail.com" })).toBe(false);
     expect(shouldGrantFounderRole({ email: "student@example.com", openId: "student:123" })).toBe(false);
   });
@@ -38,8 +64,8 @@ describe("Founder Authentication & Access", () => {
     });
 
     const result = await caller.auth.login({
-      email: "lektor@gmail.com",
-      password: "Lektor$07$xumoyun",
+      email: FOUNDER_EMAIL,
+      password,
     });
 
     expect(result.success).toBe(true);
@@ -59,6 +85,6 @@ describe("Founder Authentication & Access", () => {
     const me = await authCaller.auth.me();
     expect(me).toBeDefined();
     expect(me?.role).toBe("founder");
-    expect(me?.email).toBe("lektor@gmail.com");
+    expect(me?.email).toBe(FOUNDER_EMAIL);
   });
 });
