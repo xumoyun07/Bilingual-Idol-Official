@@ -14,6 +14,9 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+# Шаблоны без секретов — должны попадать в репозиторий (в них только плейсхолдеры)
+!.env.example
+!.env.docker.example
 
 # IDE and editor files
 .vscode/
@@ -108,6 +111,9 @@ uploads/
 *.db
 *.sqlite
 *.sqlite3
+
+# Дампы базы данных: содержат персональные данные и хеши паролей — в git не попадают
+backups/
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
