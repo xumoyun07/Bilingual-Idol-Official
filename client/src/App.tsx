@@ -18,6 +18,7 @@ import UserDashboard from "./pages/UserDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import MarketingDashboard from "./pages/MarketingDashboard";
 import Admin from "./pages/Admin";
+import Founder from "./pages/Founder";
 import SuperAdmin from "./pages/SuperAdmin";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,9 @@ function Router({ location }: { location?: string }) {
       <Route path="/dashboard" component={UserDashboard} />
       <Route path="/teacher" component={TeacherDashboard} />
       <Route path="/marketing" component={MarketingDashboard} />
+
+      {/* Founder Console — отдельный маршрут, пока отдаёт ту же консоль (C1). */}
+      <Route path="/founder" component={Founder} />
 
       {/* Admin Canonical Paths */}
       <Route path="/admin" component={Admin} />
