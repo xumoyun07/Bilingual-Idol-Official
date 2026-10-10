@@ -75,3 +75,4 @@ Owner commands: `npx vitest run`; `$env:TEST_FIXTURES="1"; npm run e2e:console` 
 Owner run confirmed: `npx vitest run` -> 334 passed, 11 skipped; `npm run e2e:console` -> "Missing script".
 
 Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console-roles.ts plus the npm script).
+- 2026-10-10 15:34: 2.3 committed in 2396e9b — displayed role/badge/title/modules from resolveConsole(sessionRole); founder default removed with a loop guard. Still open in 2.3: Admin.tsx founder wording and the new en/ms/ar keys (shell.language).
