@@ -18,220 +18,99 @@ const JOURNEY_STEPS: Step[] = [
     number: "01",
     icon: Compass,
     titles: {
-      en: "Consultation & Goal Setting",
-      ms: "Perundingan & Penetapan Matlamat",
-      ar: "الاستشارة وتحديد الأهداف",
+      en: "Form 1 — Contact & Enquiry",
+      ms: "Borang 1 — Hubungan & Pertanyaan",
+      ar: "النموذج 1 — التواصل والاستفسار",
     },
     subtitles: {
-      en: "Personalized Roadmap",
-      ms: "Pelan Hala Tuju Peribadi",
-      ar: "خطة دراسية مخصصة",
+      en: "One light contact point",
+      ms: "Satu titik hubungan ringan",
+      ar: "نقطة تواصل واحدة وخفيفة",
     },
     summaries: {
-      en: "Begin with a personalized consultation where our academic advisors analyze your linguistic goals, timeline, and career or university aspirations.",
-      ms: "Mulakan dengan sesi perundingan peribadi bersama penasihat akademik kami untuk menganalisis matlamat bahasa, tempoh masa, dan aspirasi universiti atau kerjaya anda.",
-      ar: "ابدأ بجلسة استشارية فردية مع مستشارينا الأكاديميين لتحديد أهدافك اللغوية، الجدول الزمني، وتطلعاتك الجامعية والمهنية بدقة.",
+      en: "Every visit starts with a single form: choose general, consultation or campus tour and our team responds through your preferred channel.",
+      ms: "Setiap lawatan bermula dengan satu borang: pilih umum, konsultasi atau lawatan kampus dan pasukan kami membalas melalui saluran pilihan anda.",
+      ar: "تبدأ كل زيارة بنموذج واحد: اختر استفسارًا عامًا أو استشارة أو جولة في الحرم وسيرد عليك فريقنا عبر قناتك المفضلة.",
     },
     details: {
-      en: [
-        "1-on-1 academic consultation with certified advisors",
-        "Goal-based pathway recommendation (IELTS, General English, Executive)",
-        "Clear timetable and fee breakdown with no hidden costs",
-      ],
-      ms: [
-        "Perundingan akademik 1-sama-1 bersama penasihat bertauliah",
-        "Cadangan laluan berasaskan matlamat (IELTS, Bahasa Inggeris Umum, Eksekutif)",
-        "Pecahan jadual dan yuran yang telus tanpa kos tersembunyi",
-      ],
-      ar: [
-        "استشارة أكاديمية فردية ومباشرة مع مستشارين معتمدين",
-        "توصية بمسار دراسي مخصص (آيلتس، إنجليزية عامة، برامج تنفيذية)",
-        "جدول دراسي ورسوم واضحة ومفصلة بدون أي تكاليف خفية",
-      ],
+      en: ["One shared form across the whole site", "Choose general, consultation or campus tour", "No account needed — just your name and a contact"],
+      ms: ["Satu borang dikongsi di seluruh laman", "Pilih umum, konsultasi atau lawatan kampus", "Tiada akaun diperlukan — hanya nama dan kenalan"],
+      ar: ["نموذج موحّد في كامل الموقع", "اختر عام أو استشارة أو جولة في الحرم", "لا حاجة لحساب — الاسم ووسيلة تواصل فقط"],
     },
   },
   {
     number: "02",
-    icon: FileCheck,
+    icon: Sparkles,
     titles: {
-      en: "Visa & Admission Support",
-      ms: "Sokongan Visa & Kemasukan",
-      ar: "دعم تأشيرة الطالب والقبول",
+      en: "Find Your Course & Placement Test",
+      ms: "Cari Kursus Anda & Ujian Penempatan",
+      ar: "ابحث عن دورتك واختبار تحديد المستوى",
     },
     subtitles: {
-      en: "EMGS & MOE Processing",
-      ms: "Pemprosesan EMGS & KPT",
-      ar: "إجراءات فيزا معتمدة وسريعة",
+      en: "Recommendation without contact collection",
+      ms: "Cadangan tanpa mengumpul kenalan",
+      ar: "توصية دون جمع بيانات التواصل",
     },
     summaries: {
-      en: "Experience a seamless, hassle-free visa application. Our experienced immigration liaison team handles your EMGS visa processing from start to finish.",
-      ms: "Alami proses permohonan visa yang lancar dan mudah. Pasukan perhubungan imigresen kami menguruskan pemprosesan visa EMGS anda dari awal hingga akhir.",
-      ar: "تمتع بإجراءات تأشيرة ميسرة وسريعة. يتولى فريقنا المتخصص في شؤون الهجرة استخراج تأشيرة الطالب (EMGS) من البداية وحتى استلام الجواز.",
+      en: "Take the 30-second quiz or the online placement test. Your recommended programme flows straight into the registration form.",
+      ms: "Jawab kuiz 30 saat atau ujian penempatan dalam talian. Program yang disyorkan terus diisi ke dalam borang pendaftaran.",
+      ar: "أجب عن الاختبار القصير أو اختبار تحديد المستوى عبر الإنترنت. يُملأ البرنامج الموصى به تلقائيًا في نموذج التسجيل.",
     },
     details: {
-      en: [
-        "Official acceptance letter from accredited institution (WZ10104)",
-        "Complete EMGS Student Pass processing support",
-        "Regular status updates and pre-departure checklist",
-      ],
-      ms: [
-        "Surat tawaran rasmi dari institusi bertauliah (WZ10104)",
-        "Sokongan penuh pemprosesan Pas Pelajar EMGS",
-        "Kemas kini status berkala dan senarai semak sebelum berlepas",
-      ],
-      ar: [
-        "خطاب قبول رسمي وموثق من معهد مرخص رسمياً (WZ10104)",
-        "دعم كامل لإجراءات تأشيرة الطالب عبر منظومة EMGS",
-        "متابعة دورية مستمرة وقائمة إرشادات شاملة قبل السفر",
-      ],
+      en: ["Short quiz with no contact collection", "Placement test with automatic scoring", "The recommendation pre-fills your registration"],
+      ms: ["Kuiz ringkas tanpa pengumpulan kenalan", "Ujian penempatan dengan pemarkahan automatik", "Cadangan mengisi borang pendaftaran anda"],
+      ar: ["اختبار قصير دون جمع بيانات التواصل", "اختبار تحديد المستوى بتصحيح تلقائي", "التوصية تُعبّئ نموذج التسجيل تلقائيًا"],
     },
   },
   {
     number: "03",
-    icon: Building2,
+    icon: FileCheck,
     titles: {
-      en: "Curated Luxury Accommodation",
-      ms: "Penginapan Mewah Terpilih",
-      ar: "سكن فاخر ومجهز بالكامل",
+      en: "Form 2 — Universal Registration",
+      ms: "Borang 2 — Pendaftaran Sejagat",
+      ar: "النموذج 2 — التسجيل الموحّد",
     },
     subtitles: {
-      en: "Safe & Central KL Residences",
-      ms: "Kediaman Selamat di Pusat KL",
-      ar: "أبراج سكنية راقية في قلب كوالالمبور",
+      en: "One registration for every programme",
+      ms: "Satu pendaftaran untuk semua program",
+      ar: "تسجيل واحد لكل البرامج",
     },
     summaries: {
-      en: "Settle comfortably into handpicked high-end residential suites in Kuala Lumpur, selected for 24/7 security, modern amenities, and prime proximity.",
-      ms: "Menetap dengan selesa di suite kediaman mewah terpilih di Kuala Lumpur dengan kawalan keselamatan 24/7, kemudahan moden, dan lokasi yang strategik.",
-      ar: "استقر براحة تامة في أجنحة سكنية فاخرة ومختارة بعناية بالقرب من بافيليون إمباسي، مع حراسة أمنية 24/7 ومرافق ترفيهية متكاملة.",
+      en: "A single dynamic form built from the founder's field configurator. Stage A captures the essentials; the rest is collected on your first login.",
+      ms: "Satu borang dinamik daripada konfigurasi medan pengasas. Peringkat A mengumpul maklumat penting; selebihnya dikumpul semasa log masuk pertama.",
+      ar: "نموذج ديناميكي واحد مبني على مُهيّئ الحقول الخاص بالمؤسس. المرحلة الأولى تجمع الأساسيات ويُستكمل الباقي عند أول تسجيل دخول.",
     },
     details: {
-      en: [
-        "Prime residential choices within walking distance of Pavilion Embassy",
-        "Fully furnished suites with swimming pool, gym & security access",
-        "Quiet, student-friendly environments with high-speed internet",
-      ],
-      ms: [
-        "Pilihan kediaman utama berdekatan Pavilion Embassy",
-        "Suite serba lengkap dengan kolam renang, gimnasium & akses keselamatan",
-        "Persekitaran yang tenang, mesra pelajar dengan internet pantas",
-      ],
-      ar: [
-        "خيارات سكنية مميزة على بعد خطوات مشياً من بافيليون إمباسي",
-        "شقق مؤثثة بالكامل مع مسبح ونادٍ صحي وبطاقة دخول أمنية",
-        "بيئة هادئة ومثالية للدراسة ومزودة بإنترنت فائق السرعة",
-      ],
+      en: ["One component replaces all old entry points", "Fields split into Stage A and Stage B", "International students attach visa-critical documents"],
+      ms: ["Satu komponen menggantikan semua pintu masuk lama", "Medan dibahagi kepada Peringkat A dan Peringkat B", "Pelajar antarabangsa melampirkan dokumen visa kritikal"],
+      ar: ["مكوّن واحد يحل محل جميع نقاط الدخول القديمة", "الحقول مقسمة إلى المرحلة الأولى والثانية", "الطلاب الدوليون يرفقون مستندات التأشيرة الأساسية"],
     },
   },
   {
     number: "04",
-    icon: Plane,
+    icon: ShieldCheck,
     titles: {
-      en: "VIP Airport Meet & Greet",
-      ms: "Penyambutan VIP di Lapangan Terbang",
-      ar: "استقبال VIP وتوصيل من المطار",
+      en: "Application Status Tracker",
+      ms: "Penjejak Status Permohonan",
+      ar: "متتبع حالة الطلب",
     },
     subtitles: {
-      en: "Direct Airport Transfer",
-      ms: "Pengangkutan Terus dari Lapangan Terbang",
-      ar: "خدمة استقبال وتوصيل مباشر",
+      en: "From submission to registration",
+      ms: "Dari penghantaran hingga pendaftaran",
+      ar: "من الإرسال إلى التسجيل",
     },
     summaries: {
-      en: "Arrive in Malaysia with complete peace of mind. Our dedicated representative welcomes you at KLIA airport and provides direct private transfer to your residence.",
-      ms: "Tiba di Malaysia dengan ketenangan fikiran. Wakil kami menyambut anda di lapangan terbang KLIA dan menyediakan pengangkutan peribadi terus ke tempat penginapan.",
-      ar: "صل إلى ماليزيا براحة واطمئنان كاملين. يستقبلك مندوبنا الرسمي في مطار كوالالمبور الدولي ويوفر لك نقلاً خاصاً ومباشراً إلى مقر إقامتك.",
+      en: "Follow your application step by step: submitted, documents received, under review, offer, payment, visa for internationals, and final registration.",
+      ms: "Ikuti permohonan anda langkah demi langkah: dihantar, dokumen diterima, dalam semakan, tawaran, bayaran, visa untuk pelajar antarabangsa, dan pendaftaran akhir.",
+      ar: "تابع طلبك خطوة بخطوة: تم الإرسال، استلام المستندات، قيد المراجعة، العرض، الدفع، التأشيرة للطلاب الدوليين، والتسجيل النهائي.",
     },
     details: {
-      en: [
-        "Personal greeting at Kuala Lumpur International Airport (KLIA 1/2)",
-        "Assistance with Malaysian SIM card and currency exchange",
-        "Direct private transfer to your apartment or residence",
-      ],
-      ms: [
-        "Sambutan peribadi di Lapangan Terbang Antarabangsa KL (KLIA 1/2)",
-        "Bantuan mendapatkan kad SIM Malaysia dan pertukaran mata wang",
-        "Pengangkutan peribadi terus ke apartmen kediaman anda",
-      ],
-      ar: [
-        "استقبال شخصي عند بوابة الخروج في مطار كوالالمبور (KLIA 1/2)",
-        "مساعدة فورية في شراء شريحة الاتصال المحلية وصرف العملات",
-        "توصيل خاص ومباشر إلى شقتك أو مكان إقامتك",
-      ],
-    },
-  },
-  {
-    number: "05",
-    icon: UserPlus,
-    titles: {
-      en: "Registration & Diagnostic Test",
-      ms: "Pendaftaran & Ujian Diagnostik",
-      ar: "التسجيل واختبار تحديد المستوى",
-    },
-    subtitles: {
-      en: "Accurate CEFR Placement",
-      ms: "Penempatan CEFR yang Tepat",
-      ar: "تقييم دقيق وشامل لمعايير CEFR",
-    },
-    summaries: {
-      en: "Formalize your enrollment and take our multi-skill diagnostic placement test (speaking, listening, reading, writing) to ensure precise class matching.",
-      ms: "Lengkapkan pendaftaran anda dan ambil ujian diagnostik pelbagai kemahiran (pertuturan, pendengaran, pembacaan, penulisan) untuk penempatan kelas yang tepat.",
-      ar: "أكمل إجراءات التسجيل الرسمية وخض اختبار تحديد المستوى التشخيصي الشامل (محادثة، استماع، قراءة، كتابة) لضمان انضمامك للمستوى الأنسب لك.",
-    },
-    details: {
-      en: [
-        "Comprehensive CEFR-aligned diagnostic assessment",
-        "Direct oral evaluation with senior academic director",
-        "Personalized course schedule and study materials package",
-      ],
-      ms: [
-        "Penilaian diagnostik komprehensif selaras piawaian CEFR",
-        "Penilaian lisan secara langsung bersama pengarah akademik",
-        "Jadual kursus peribadi dan pakej bahan pembelajaran rasmi",
-      ],
-      ar: [
-        "تقييم تشخيصي شامل متوافق مع الإطار الأوروبي المشترك CEFR",
-        "مقابلة شفهية مباشرة لتقييم المحادثة مع المدير الأكاديمي",
-        "جدول حصص دراسي مخصص وحقيبة المواد التعليمية الرسمية",
-      ],
-    },
-  },
-  {
-    number: "06",
-    icon: Sparkles,
-    titles: {
-      en: "First Day & Luxury Learning",
-      ms: "Hari Pertama & Pembelajaran Unggul",
-      ar: "اليوم الأول وانطلاق التجربة التعليمية",
-    },
-    subtitles: {
-      en: "Join Our Global Community",
-      ms: "Sertai Komuniti Global Kami",
-      ar: "انضم إلى مجتمع أكاديمي عالمي",
-    },
-    summaries: {
-      en: "Step into your new academic home—designer smart classrooms, inspiring international instructors, and an exclusive global community.",
-      ms: "Langkah ke persekitaran akademik baharu anda—bilik darjah pintar eksklusif, tenaga pengajar antarabangsa yang berinspirasi, dan komuniti global yang dinamik.",
-      ar: "انطلق في رحلتك التعليمية الراقية—فصول ذكية مجهزة، مدربون دوليون ملهمون، ومجتمع طلابي عالمي يعزز تطورك اللغوي والشخصي.",
-    },
-    details: {
-      en: [
-        "Campus orientation and executive lounge access",
-        "Introduction to instructors and international peers",
-        "Continuous milestone tracking and individual mentorship",
-      ],
-      ms: [
-        "Orientasi kampus dan akses ke ruang rehat eksekutif",
-        "Pengenalan kepada tenaga pengajar dan rakan antarabangsa",
-        "Penjejakan kemajuan berterusan dan bimbingan individu",
-      ],
-      ar: [
-        "جولة تعريفية في الحرم واستخدام صالة كبار الشخصيات",
-        "التعرف على المدرسين والزملاء من مختلف دول العالم",
-        "متابعة دورية دقيقة للتقدم الأكاديمي وتوجيه مستمر",
-      ],
+      en: ["Visible in your student dashboard", "Visa stage only for international applicants", "Status moves forward — you always know where you stand"],
+      ms: ["Kelihatan dalam papan pemuka pelajar", "Peringkat visa hanya untuk pemohon antarabangsa", "Status bergerak ke hadapan — anda sentiasa tahu kedudukan anda"],
+      ar: ["يظهر في لوحة الطالب", "مرحلة التأشيرة للمتقدمين الدوليين فقط", "الحالة تتقدم للأمام — تعرف موقفك دائمًا"],
     },
   },
 ];
-
 export function StudentJourneyRoadmap() {
   const [activeStep, setActiveStep] = useState<number>(0);
   const step = JOURNEY_STEPS[activeStep];
@@ -334,10 +213,10 @@ export function StudentJourneyRoadmap() {
               <div className="bilc-journey-badge-row">
                 <span className="bilc-journey-step-tag">
                   {language === "ms"
-                    ? `Langkah ${step.number} drpd 06`
+                    ? `Langkah ${step.number} drpd 04`
                     : language === "ar"
-                    ? `الخطوة ${step.number} من 06`
-                    : `Step ${step.number} of 06`}
+                    ? `الخطوة ${step.number} من 04`
+                    : `Step ${step.number} of 04`}
                 </span>
                 <span className="bilc-journey-zh-tag">{stepSubtitle}</span>
               </div>
