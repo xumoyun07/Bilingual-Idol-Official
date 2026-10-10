@@ -254,10 +254,11 @@ export async function myApplicationStatus(userId: number) {
       id: Number(latest.id),
       status: String(latest.status),
       applicantCategory: category,
-      chain: APPLICATION_STATUS_CHAIN.map(stage => ({
-        stage,
-        visible: stage !== "visaProcess" || category === INTERNATIONAL_CATEGORY,
-      })),
+      // visaProcess включается в цепочку ТОЛЬКО для международных заявителей;
+      // для остальных стадия отсутствует целиком (ST11).
+      chain: APPLICATION_STATUS_CHAIN
+        .filter(stage => stage !== "visaProcess" || category === INTERNATIONAL_CATEGORY)
+        .map(stage => ({ stage, visible: true })),
     },
   };
 }
