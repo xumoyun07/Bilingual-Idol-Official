@@ -144,3 +144,5 @@ pm run dev. Если его нет — форма входа не отренде
 - 2026-10-10 18:07: OWNER-FIX FILE1 done, committed 406fb32 — initialPassword в createManagedUser + pipeline.
 
 - 2026-10-10 18:07: OWNER-FIX FILE2 done, committed ea2a002 — visa-стадия отфильтрована для местных.
+
+- 2026-10-10 18:08: OWNER-FIX FILE2 (код) committed b33ea67 — фильтр visa в myStatus.
