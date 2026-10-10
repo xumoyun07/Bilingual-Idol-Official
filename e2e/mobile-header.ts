@@ -63,6 +63,7 @@ const db = await getDb();
 const founder = (await db!.select().from(users).where(eq(users.role, "founder")).limit(1))[0];
 const browser = await chromium.launch();
 const created: number[] = [];
+let failures = 0;
 const GAP = 16;
 try {
   for (const lang of ["en", "ar"]) {
@@ -108,7 +109,7 @@ try {
       } else { log(tag + " ПОСЛЕ SELECT: select не найден"); }
 
       const urlBefore = page.url();
-      const trigger = page.locator("header button[aria-label=""Toggle menu""], header button").first();
+      const trigger = page.locator('header button[aria-label="Toggle menu"]').first();
       let opened = false;
       if ((await trigger.count()) > 0) { await trigger.click().catch(function () { /* noop */ }); await page.waitForTimeout(2000); opened = true; }
       log(tag + " триггер шторки: " + (opened ? "нажат" : "НЕ НАЙДЕН") + " url до=" + urlBefore);
@@ -140,5 +141,5 @@ try {
   for (const id of created) { try { await deleteManagedUser(id, { id: founder.id, role: "founder" } as never); removed += 1; } catch (e) { /* noop */ } }
   const left = await db!.select().from(users).where(like(users.email, "mh-%@example.test"));
   log("удалено вызовами: " + removed + " из " + created.length + "; ОСТАЛОСЬ В БД mh-%: " + left.length);
-  process.exit(process.exitCode ? 1 : 0);
+  process.exit(process.exitCode || failures > 0 ? 1 : 0);
 }

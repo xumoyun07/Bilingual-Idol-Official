@@ -56,6 +56,7 @@ const MEASURE = [
 
 const browser = await chromium.launch();
 const created: number[] = [];
+let failures = 0;
 try {
   for (const lang of ["en", "ms", "ar"]) {
     const email = "sheet-" + lang + "-" + randomBytes(4).toString("hex") + "@example.test";
@@ -87,6 +88,7 @@ try {
     if (!found.found) { console.log("ОСТАНОВ: панель шторки не найдена (нет кнопки выхода с position:fixed предком)"); await context.close(); continue; }
 
     const m = JSON.parse(await page.evaluate(MEASURE));
+    for (const o of m.options) { if (o.clipTop || o.clipBottom || o.overlapsSignOut) failures += 1; }
     console.log("шаг 3: ПОРЯДОК СЕКЦИЙ (сверху вниз):");
     for (const k of m.order) console.log("   top=" + String(k.top).padStart(5) + " " + k.tag + "." + k.cls + " | " + k.text);
     console.log("шаг 4: опции языка:");
@@ -94,6 +96,7 @@ try {
     console.log("   Sign out: top=" + m.signOut.top + " bottom=" + m.signOut.bottom + " подпись=\"" + m.signOutLabel + "\"");
     console.log("   панель: top=" + m.panel.top + " bottom=" + m.panel.bottom + " scrollTop=" + m.scrollTop + " scrollHeight=" + m.scrollHeight + " clientHeight=" + m.clientHeight);
     const direction = m.htmlDir === "rtl" ? "RTL" : "LTR";
+    if (!gapPass) failures += 1;
     const gapPass = m.profileGap !== null && m.profileGap >= m.shellGap;
     console.log("   КАРТОЧКА ПРОФИЛЯ [" + direction + "]: top=" + m.profileTop + " ; низ шапки шторки=" + m.sheetHeaderBottom +
       (m.hasHeaderEl ? "" : " (элемента <header> в шторке нет — взят верхний край панели)") +
@@ -132,5 +135,5 @@ try {
   const left = all.filter(function (u) { return typeof u.email === "string" && (u.email.indexOf("sheet-") === 0 || u.email.indexOf("mh-") === 0 || u.email.indexOf("shell-") === 0 || u.email.indexOf("probe-") === 0); });
   console.log("\nудалено: " + removed + " из " + created.length);
   console.log("ОСТАЛОСЬ временных записей в БД (запрос через модуль db приложения, не docker): " + left.length + " — должно быть 0");
-  process.exit(process.exitCode ? 1 : 0);
+  process.exit(process.exitCode || failures > 0 ? 1 : 0);
 }

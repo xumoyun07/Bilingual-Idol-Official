@@ -72,6 +72,7 @@ log("основатель найден: " + Boolean(founder));
 const browser = await chromium.launch();
 const created: number[] = [];
 const rows: string[] = [];
+const results: { name: string; pass: boolean; detail: string }[] = [];
 try {
   for (const lang of LANGS) {
     for (const vp of VIEWPORTS) {
@@ -106,6 +107,21 @@ try {
       rows.push("  insetH=" + r.insetH + " mainH=" + r.mainH + " mainMinH=" + r.mainMinH + " colMinH=" + r.colMinH + " sbOverflowY=" + r.sbOvY);
       rows.push("  html.scroll=" + r.htmlScroll + " body.scroll=" + r.bodyScroll + " body.overflowY=" + r.bodyOvY + " body.minH=" + r.bodyMinH);
       rows.push("  ПРОКРУЧИВАЕМЫЕ=" + JSON.stringify(r.scrollables) + " documentScroller=" + r.docScroll + " scrollBehavior=" + r.docScrollBehavior);
+
+      const gapNum = parseFloat(String(r.gapVar)) || 16;
+      const n = (v: unknown) => (typeof v === "number" ? v : null);
+      const scrollList = Array.isArray(r.scrollables) ? (r.scrollables as string[]) : [];
+      const isDesktop = vp.w >= 1024;
+      if (isDesktop) {
+        results.push({ name: tag + " sbTopRaw == --shell-gap", pass: n(r.sbTopRaw) !== null && Math.abs((n(r.sbTopRaw) as number) - gapNum) <= 0.5, detail: "sbTopRaw=" + r.sbTopRaw + " gap=" + gapNum });
+        results.push({ name: tag + " tbTopRaw == --shell-gap", pass: n(r.tbTopRaw) !== null && Math.abs((n(r.tbTopRaw) as number) - gapNum) <= 0.5, detail: "tbTopRaw=" + r.tbTopRaw + " gap=" + gapNum });
+        results.push({ name: tag + " sbTopRaw == tbTopRaw", pass: n(r.sbTopRaw) !== null && n(r.tbTopRaw) !== null && Math.abs((n(r.sbTopRaw) as number) - (n(r.tbTopRaw) as number)) <= 0.5, detail: "sb=" + r.sbTopRaw + " tb=" + r.tbTopRaw });
+        results.push({ name: tag + " зазор снизу == --shell-gap", pass: n(r.sbBottomGap) !== null && Math.abs((n(r.sbBottomGap) as number) - gapNum) <= 0.5, detail: "gap снизу=" + r.sbBottomGap });
+        results.push({ name: tag + " ровно один скроллер (html)", pass: scrollList.length <= 1 && scrollList.every(function (x) { return x.indexOf("html") === 0 || x.indexOf("DOCUMENT") === 0; }), detail: JSON.stringify(scrollList) });
+      } else {
+        results.push({ name: tag + " топбара нет в DOM", pass: r.tbTopRaw === null && r.tbTop === null, detail: "tbTopRaw=" + r.tbTopRaw });
+      }
+      results.push({ name: tag + " body.scroll == 0", pass: Number(r.bodyScroll) === 0, detail: "body.scroll=" + r.bodyScroll });
       await context.close();
       log(tag + ": готово");
     }
@@ -121,5 +137,10 @@ try {
   console.log("\n================ РЕЗУЛЬТАТ ================");
   for (const line of rows) console.log(line);
   console.log("\nвремя " + Math.round((Date.now() - started) / 1000) + "s");
+  console.log("\n=== ПРОВЕРКИ diag-shell ===");
+  for (const res of results) console.log("  " + (res.pass ? "PASS" : "FAIL") + "  " + res.name.padEnd(46) + " " + res.detail);
+  const failedChecks = results.filter(function (x) { return !x.pass; }).length;
+  console.log("  итого: " + (results.length - failedChecks) + " PASS, " + failedChecks + " FAIL");
+  if (failedChecks > 0) process.exitCode = 1;
   process.exit(process.exitCode ? 1 : 0);
 }
