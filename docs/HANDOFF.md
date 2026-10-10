@@ -112,3 +112,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:25: G11 (verified conformant, no change) + G12 done, committed 8026f9b — roadmap V2 funnel (4 steps, en/ms/ar). Next: G3 remainder (advance-stage UI) and the final report.
 
 - 2026-10-10 17:26: G3 remainder done, committed eca0909 — admin console Applications section with forward-only Advance. ALL GAPS DONE: G1-G12, C1-C4, S2-S3. Next: final report and goal completion.
+
+- 2026-10-10 17:45: OWNER-FIX G1 done, committed 61a6f9a — pipeline генерирует пароль внутри.
