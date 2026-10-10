@@ -291,6 +291,20 @@ export interface TranslationDictionary {
     myDashboard: string;
     toggleSidebar: string;
     attendancePending: string;
+    /** Трекер заявки студента (G2). */
+    tracker: {
+      title: string;
+      current: string;
+      stage: {
+        submitted: string;
+        documentsReceived: string;
+        underReview: string;
+        offerIssued: string;
+        paymentCompleted: string;
+        visaProcess: string;
+        registrationCompleted: string;
+      };
+    };
     studentPortal: string;
     learningCentreAdmin: string;
   };
@@ -694,7 +708,20 @@ export const translations: Record<Language, TranslationDictionary> = {
     shell: {
       myDashboard: "My Dashboard",
       toggleSidebar: "Toggle Sidebar",
-      attendancePending: "Attendance is not available yet.",
+            attendancePending: "Attendance is not available yet.",
+      tracker: {
+        title: "Track Application",
+        current: "Current stage",
+        stage: {
+          submitted: "Submitted",
+          documentsReceived: "Documents Received",
+          underReview: "Under Review",
+          offerIssued: "Offer Issued",
+          paymentCompleted: "Payment Completed",
+          visaProcess: "Visa Process",
+          registrationCompleted: "Registration Completed",
+        },
+      },
       studentPortal: "Student Portal",
       learningCentreAdmin: "Learning Centre Admin",
     },
@@ -1089,7 +1116,20 @@ export const translations: Record<Language, TranslationDictionary> = {
     shell: {
       myDashboard: "Papan Pemuka Saya",
       toggleSidebar: "Tukar Bar Sisi",
-      attendancePending: "Kehadiran belum tersedia lagi.",
+            attendancePending: "Kehadiran belum tersedia lagi.",
+      tracker: {
+        title: "Jejaki Permohonan",
+        current: "Peringkat semasa",
+        stage: {
+          submitted: "Dihantar",
+          documentsReceived: "Dokumen Diterima",
+          underReview: "Dalam Semakan",
+          offerIssued: "Tawaran Dikeluarkan",
+          paymentCompleted: "Bayaran Selesai",
+          visaProcess: "Proses Visa",
+          registrationCompleted: "Pendaftaran Selesai",
+        },
+      },
       studentPortal: "Portal Pelajar",
       learningCentreAdmin: "Pentadbir Pusat Pembelajaran",
     },
@@ -1484,7 +1524,20 @@ export const translations: Record<Language, TranslationDictionary> = {
     shell: {
       myDashboard: "لوحتي",
       toggleSidebar: "إظهار الشريط الجانبي",
-      attendancePending: "سجل الحضور غير متاح بعد.",
+            attendancePending: "سجل الحضور غير متاح بعد.",
+      tracker: {
+        title: "تتبع الطلب",
+        current: "المرحلة الحالية",
+        stage: {
+          submitted: "تم الإرسال",
+          documentsReceived: "تم استلام المستندات",
+          underReview: "قيد المراجعة",
+          offerIssued: "تم إصدار العرض",
+          paymentCompleted: "اكتمل الدفع",
+          visaProcess: "معالجة التأشيرة",
+          registrationCompleted: "اكتمل التسجيل",
+        },
+      },
       studentPortal: "بوابة الطالب",
       learningCentreAdmin: "إدارة المركز التعليمي",
     },

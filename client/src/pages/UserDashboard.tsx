@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard } from "lucide-react";
+import { ApplicationStatusTracker } from "@/components/ApplicationStatusTracker";
 
 export default function UserDashboard() {
   const { user, loading } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/login" });
@@ -43,6 +44,7 @@ export default function UserDashboard() {
           {user.name ? <bdi>{user.name}</bdi> : null}
           {greetingParts[1] ?? ""}
         </h2>
+        <ApplicationStatusTracker />
         <p className="text-sm text-[#53657a] max-w-sm leading-relaxed">
           {t("userDashboard.placeholderText")}
         </p>
