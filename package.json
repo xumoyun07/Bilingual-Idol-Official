@@ -19,6 +19,7 @@
     "i18n:sync": "tsx scripts/i18n-sync.ts",
     "founder:hash": "tsx scripts/founder-hash.ts",
     "check:e2e": "tsc -p tsconfig.e2e.json",
+    "e2e:console": "tsx e2e/console-roles.ts",
     "e2e:sheet-all": "tsx e2e/run-sheet-all.ts",
     "e2e:shell": "tsx e2e/diag-shell.ts && tsx e2e/mobile-header.ts && tsx e2e/sheet-proof.ts"
   },
