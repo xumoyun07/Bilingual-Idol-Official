@@ -146,7 +146,9 @@ describe("minimal frontend rewrite", () => {
     expect(personal).toContain("member-page");
     expect(personal).toContain("blue-member-page");
     expect(personal).toContain('redirectPath: "/login"');
-    expect(admin).toContain("workspace-page founder-command");
+    // C2: Admin.tsx — отдельная админ-консоль (очередь заявок); founder-command ушёл в Founder.tsx.
+    expect(admin).toContain('data-page="admin"');
+    expect(admin).toContain("Administrator Console");
     expect(superAdmin).toContain("workspace-page founder-command");
     expect(audit).toContain("workspace-page founder-command");
     expect(students).toContain("workspace-page founder-command");
