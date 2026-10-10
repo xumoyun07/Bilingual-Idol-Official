@@ -1,139 +1,223 @@
+/**
+ * Item 4 proof: бургер-шторка и языковой блок.
+ *
+ * Все пробы — СТРОКИ, возвращающие JSON.stringify(...). Читаются ОДНИМ помощником
+ * evalJson: если результат строка — парсим, если уже объект — берём как есть.
+ * Поэтому JSON.parse к результату page.evaluate больше нигде не применяется.
+ */
 import "dotenv/config";
 import { randomBytes } from "node:crypto";
-import { chromium } from "playwright";
+import fs from "node:fs";
+import { chromium, type Page } from "playwright";
 import { eq } from "drizzle-orm";
 import { createManagedUser, deleteManagedUser, getDb } from "../server/db";
 import { users } from "../drizzle/schema";
-import fs from "node:fs";
 
-const BASE = "http://127.0.0.1:3000";
-process.env.DATABASE_URL = (process.env.DATABASE_URL ?? "").replace(/@db:/, "@127.0.0.1:3307:");
-const db = await getDb();
-const founder = (await db!.select().from(users).where(eq(users.role, "founder")).limit(1))[0];
+const BASE = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
+const STEP = 20000;
+const PANEL_SELECTOR = "[data-testid=mobile-shell-panel]";
+const started = Date.now();
+function log(m: string) { console.log("[" + (Math.round((Date.now() - started) / 100) / 10) + "s] " + m); }
+const kill = setTimeout(function () { log("ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, 180000);
+kill.unref();
+let failures = 0;
 
-const FIND_SHEET = [
+async function evalJson<T>(page: Page, expr: string, label: string): Promise<T> {
+  const raw: unknown = await page.evaluate(expr);
+  if (typeof raw === "string") {
+    try { return JSON.parse(raw) as T; }
+    catch (error) { throw new Error(label + ": результат не является JSON — " + (error instanceof Error ? error.message : String(error))); }
+  }
+  return raw as T;
+}
+
+async function step<T>(name: string, fn: () => Promise<T>): Promise<T> {
+  log("ШАГ: " + name);
+  try { return await fn(); }
+  catch (error) {
+    const err = error as Error;
+    log("  ОШИБКА на шаге: " + name);
+    log("  сообщение: " + (err && err.message ? err.message : String(error)));
+    const stack = (err && err.stack ? err.stack : "").split("\n").slice(0, 3);
+    for (const line of stack) log("  " + line.trim());
+    throw error;
+  }
+}
+
+const FIXED_DUMP = [
   "(function(){",
-  "var SIGNS = ['sign out','log keluar','تسجيل الخروج','keluar'];",
-  "var btns = Array.prototype.slice.call(document.querySelectorAll('button'));",
-  "var target = null;",
-  "for (var i=0;i<btns.length;i++){ var t=(btns[i].textContent||'').toLowerCase();",
-  "  for (var j=0;j<SIGNS.length;j++){ if (t.indexOf(SIGNS[j])>=0){ target=btns[i]; break; } } if (target) break; }",
-  "if (!target) return { found: false };",
-  "var node = target;",
-  "",
-  "return { found: true, panel: true };",
+  "var out=[];",
+  "document.querySelectorAll('*').forEach(function(e){",
+  "  if (getComputedStyle(e).position === 'fixed') {",
+  "    var r=e.getBoundingClientRect();",
+  "    out.push(e.tagName.toLowerCase() + ' cls=' + String(e.className).slice(0,50) + ' top=' + Math.round(r.top) + ' h=' + Math.round(r.height) + ' text=\"' + (e.textContent||'').replace(/\\s+/g,' ').trim().slice(0,40) + '\"');",
+  "  }",
+  "});",
+  "return JSON.stringify(out);",
   "})()",
 ].join("\n");
+
+async function dumpFixed(page: Page) {
+  try {
+    const list = await evalJson<string[]>(page, FIXED_DUMP, "дамп fixed-элементов");
+    log("  fixed-элементы на странице (" + list.length + "):");
+    for (const line of list) log("    " + line);
+  } catch (error) {
+    log("  дамп fixed-элементов не удался: " + (error instanceof Error ? error.message : String(error)));
+  }
+}
+
+async function openPanel(page: Page, tag: string): Promise<boolean> {
+  const trigger = page.locator("[data-testid=mobile-shell-trigger]").first();
+  log("  триггер найден: " + (await trigger.count()));
+  if ((await trigger.count()) === 0) { failures += 1; return false; }
+  await trigger.click();
+  try {
+    await page.waitForSelector(PANEL_SELECTOR, { timeout: 3000 });
+    log("  панель появилась");
+    return true;
+  } catch {
+    log("  ПАНЕЛЬ НЕ ПОЯВИЛАСЬ за 3000ms (" + tag + ")");
+    failures += 1;
+    await dumpFixed(page);
+    return false;
+  }
+}
+
+async function shot(page: Page, name: string) {
+  const dir = "e2e/screenshots";
+  fs.mkdirSync(dir, { recursive: true });
+  const file = dir + "/" + name + ".png";
+  await page.screenshot({ path: file });
+  log("  скриншот сохранён: " + file + " (" + fs.statSync(file).size + " байт)");
+}
 
 const MEASURE = [
   "(function(){",
-  "var rr=function(el){var r=el.getBoundingClientRect();return{top:Math.round(r.top*100)/100,bottom:Math.round(r.bottom*100)/100,left:Math.round(r.left*100)/100,right:Math.round(r.right*100)/100,h:Math.round(r.height*100)/100};};",
-  "var SIGNS=['sign out','log keluar','تسجيل الخروج','keluar'];",
-  "var btns=Array.prototype.slice.call(document.querySelectorAll('button'));",
-  "var signOut=null;",
-  "for(var i=0;i<btns.length;i++){var t=(btns[i].textContent||'').toLowerCase();for(var j=0;j<SIGNS.length;j++){if(t.indexOf(SIGNS[j])>=0){signOut=btns[i];break;}}if(signOut)break;}",
-  "if(!signOut) return { found:false };",
   "var panel=document.querySelector('[data-testid=mobile-shell-panel]');",
-  "",
-  "var pb=rr(panel); var sb=rr(signOut);",
+  "if(!panel) return JSON.stringify({found:false});",
+  "var rr=function(el){var r=el.getBoundingClientRect();return{top:Math.round(r.top*100)/100,bottom:Math.round(r.bottom*100)/100,left:Math.round(r.left*100)/100,right:Math.round(r.right*100)/100,h:Math.round(r.height*100)/100};};",
+  "var signOut=document.querySelector('[data-testid=sheet-sign-out]');",
+  "var profile=document.querySelector('[data-testid=sheet-profile-card]');",
+  "var langBlock=document.querySelector('[data-testid=sheet-language-block]');",
+  "var opts=Array.prototype.slice.call(document.querySelectorAll('[data-testid^=\"language-option-\"]'));",
+  "var pb=rr(panel); var sb=signOut?rr(signOut):null; var pr=profile?rr(profile):null;",
+  "var lb=langBlock?rr(langBlock):null;",
   "var headerEl=panel.querySelector('header');",
-  "var profile=null;",
-  "var kidsAll=Array.prototype.slice.call(panel.children);",
-  "for(var q=0;q<kidsAll.length;q++){ if(kidsAll[q].getBoundingClientRect().height>40){ profile=kidsAll[q]; break; } }",
   "var sheetHeaderBottom=headerEl?rr(headerEl).bottom:pb.top;",
-  "var profileTop=profile?rr(profile).top:null;",
-  "var profileGap=(profileTop!==null)?Math.round((profileTop-sheetHeaderBottom)*100)/100:null;",
-  "var shellGap=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--shell-gap'))||16;",
-  "var opts=Array.prototype.slice.call(panel.querySelectorAll('[role=\"group\"] button'));",
-  "var optData=opts.map(function(b){var r=rr(b);return{text:(b.textContent||'').replace(/\\s+/g,' ').trim(),pressed:b.getAttribute('aria-pressed'),top:r.top,bottom:r.bottom,h:r.h,clipTop:r.top<pb.top-0.5,clipBottom:r.bottom>pb.bottom+0.5,overlapsSignOut:!(r.bottom<=sb.top||r.top>=sb.bottom||r.right<=sb.left||r.left>=sb.right)};});",
-  "var kids=Array.prototype.slice.call(panel.children).filter(function(c){return c.getBoundingClientRect().height>8;}).map(function(c){return{tag:c.tagName.toLowerCase(),cls:String(c.className).slice(0,42),top:Math.round(c.getBoundingClientRect().top),text:(c.textContent||'').replace(/\\s+/g,' ').trim().slice(0,58)};});",
-  "return { found:true, panel:pb, scrollTop:panel.scrollTop, scrollHeight:panel.scrollHeight, clientHeight:panel.clientHeight,",
-  "  signOut:sb, options:optData, order:kids, htmlLang:document.documentElement.lang, htmlDir:document.documentElement.dir,",
-  "  hasHeaderEl:!!headerEl, sheetHeaderBottom:sheetHeaderBottom, profileTop:profileTop, profileGap:profileGap, shellGap:shellGap,",
-  "  signOutLabel:(signOut.textContent||'').replace(/\\s+/g,' ').trim(), navLabel:(function(){var b=panel.querySelector('[role=\"group\"]');var first=panel.querySelector('button');return first?(first.textContent||'').replace(/\\s+/g,' ').trim().slice(0,40):null;})() };",
+  "var direction=document.documentElement.dir==='rtl'?'RTL':'LTR';",
+  "return JSON.stringify({",
+  "  found:true, dir:direction, htmlLang:document.documentElement.lang,",
+  "  panel:pb, signOut:sb, profile:pr, languageBlock:lb,",
+  "  hasHeaderEl:!!headerEl, sheetHeaderBottom:sheetHeaderBottom,",
+  "  profileGap:(pr!==null)?Math.round((pr.top-sheetHeaderBottom)*100)/100:null,",
+  "  shellGap:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--shell-gap'))||16,",
+  "  scrollTop:panel.scrollTop, scrollHeight:panel.scrollHeight, clientHeight:panel.clientHeight,",
+  "  signOutLabel:signOut?(signOut.textContent||'').replace(/\\s+/g,' ').trim():null,",
+  "  order:Array.prototype.slice.call(panel.children).filter(function(c){return c.getBoundingClientRect().height>8;}).map(function(c){return{tag:c.tagName.toLowerCase(),cls:String(c.className).slice(0,42),top:Math.round(c.getBoundingClientRect().top),text:(c.textContent||'').replace(/\\s+/g,' ').trim().slice(0,58)};}),",
+  "  options:opts.map(function(b){var r=rr(b);return{id:b.getAttribute('data-testid'),text:(b.textContent||'').replace(/\\s+/g,' ').trim(),pressed:b.getAttribute('aria-pressed'),h:r.h,top:r.top,bottom:r.bottom,clipTop:r.top<pb.top-0.5,clipBottom:r.bottom>pb.bottom+0.5,overlapsSignOut:sb?!(r.bottom<=sb.top||r.top>=sb.bottom||r.right<=sb.left||r.left>=sb.right):null};})",
+  "});",
   "})()",
 ].join("\n");
 
+process.env.DATABASE_URL = (process.env.DATABASE_URL || "").replace(/@db:/, "@127.0.0.1:3307:");
+const db = await getDb();
+if (!db) { log("НЕТ соединения с БД"); process.exit(1); }
+const founder = (await db.select().from(users).where(eq(users.role, "founder")).limit(1))[0];
 const browser = await chromium.launch();
 const created: number[] = [];
-let failures = 0;
 try {
   for (const lang of ["en", "ms", "ar"]) {
     const email = "sheet-" + lang + "-" + randomBytes(4).toString("hex") + "@example.test";
     const password = "Diag-" + randomBytes(12).toString("base64url") + "!7";
-    const made: any = await createManagedUser({ email, name: "Sheet " + lang, role: "admin", password } as any, { id: founder.id, role: "founder" } as any);
-    if (made.id !== undefined) created.push(made.id);
+    await step(lang + ": создать временную учётную запись", async () => {
+      const made = (await createManagedUser(
+        { email, name: "Sheet " + lang, role: "admin", password } as never,
+        { id: founder.id, role: "founder" } as never,
+      )) as unknown as { id?: number };
+      if (made.id !== undefined) created.push(made.id);
+      log("  id создан: " + (made.id !== undefined));
+    });
 
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const page = await context.newPage();
-    page.setDefaultTimeout(20000);
-    page.setDefaultNavigationTimeout(20000);
-    await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
-    await page.fill("#sign-in-email", email);
-    await page.fill("#sign-in-password", password);
-    await page.click('button[type="submit"]');
-    await page.waitForTimeout(2500);
-    await page.evaluate("(function(l){try{localStorage.setItem('bilc_language',l);}catch(e){}document.cookie='bilc_language='+l+'; path=/';})('" + lang + "')");
-    await page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(3000);
+    page.setDefaultTimeout(STEP);
+    page.setDefaultNavigationTimeout(STEP);
 
     console.log("\n########## " + lang + " @390 ##########");
-    const trigger = page.locator('header button[aria-label="Toggle menu"]');
-    console.log("шаг 1: триггер найден: " + (await trigger.count()));
-    if ((await trigger.count()) === 0) { console.log("ОСТАНОВ: триггер header button[aria-label=\"Toggle menu\"] не найден"); await context.close(); continue; }
-    await trigger.first().click();
-    await page.waitForTimeout(2500);
-    const found = JSON.parse(await page.evaluate(FIND_SHEET));
-    console.log("шаг 2: шторка найдена: " + JSON.stringify(found));
-    if (!found.found) { console.log("ОСТАНОВ: панель шторки не найдена (нет кнопки выхода с position:fixed предком)"); await context.close(); continue; }
+    await step(lang + ": вход", async () => {
+      await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+      await page.fill("#sign-in-email", email);
+      await page.fill("#sign-in-password", password);
+      await page.click('button[type="submit"]');
+      await page.waitForTimeout(2500);
+    });
+    await step(lang + ": выставить язык " + lang + " и открыть /dashboard", async () => {
+      await page.evaluate("(function(l){try{localStorage.setItem('bilc_language',l);}catch(e){}document.cookie='bilc_language='+l+'; path=/';})(" + JSON.stringify(lang) + ")");
+      await page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" });
+      await page.waitForTimeout(3000);
+    });
 
-    const m = JSON.parse(await page.evaluate(MEASURE));
-    for (const o of m.options) { if (o.clipTop || o.clipBottom || o.overlapsSignOut) failures += 1; }
-    console.log("шаг 3: ПОРЯДОК СЕКЦИЙ (сверху вниз):");
-    for (const k of m.order) console.log("   top=" + String(k.top).padStart(5) + " " + k.tag + "." + k.cls + " | " + k.text);
-    console.log("шаг 4: опции языка:");
-    for (const o of m.options) console.log("   \"" + o.text + "\" top=" + o.top + " bottom=" + o.bottom + " h=" + o.h + " pressed=" + o.pressed + " clipTop=" + o.clipTop + " clipBottom=" + o.clipBottom + " overlapsSignOut=" + o.overlapsSignOut);
-    console.log("   Sign out: top=" + m.signOut.top + " bottom=" + m.signOut.bottom + " подпись=\"" + m.signOutLabel + "\"");
-    console.log("   панель: top=" + m.panel.top + " bottom=" + m.panel.bottom + " scrollTop=" + m.scrollTop + " scrollHeight=" + m.scrollHeight + " clientHeight=" + m.clientHeight);
-    const direction = m.htmlDir === "rtl" ? "RTL" : "LTR";
-    const gapPass = m.profileGap !== null && m.profileGap >= m.shellGap;
-    if (!gapPass) failures += 1;
-    console.log("   КАРТОЧКА ПРОФИЛЯ [" + direction + "]: top=" + m.profileTop + " ; низ шапки шторки=" + m.sheetHeaderBottom +
-      (m.hasHeaderEl ? "" : " (элемента <header> в шторке нет — взят верхний край панели)") +
-      " ; зазор=" + m.profileGap + " ; --shell-gap=" + m.shellGap +
-      " ; нужно profile top >= sheetHeaderBottom + --shell-gap => " + (gapPass ? "PASS" : "FAIL"));
+    const opened = await step(lang + ": открыть шторку через mobile-shell-trigger", async () => openPanel(page, lang));
+    if (!opened) { await context.close(); continue; }
 
-    fs.mkdirSync("e2e/screenshots", { recursive: true });
-    await page.screenshot({ path: "e2e/screenshots/sheet-" + lang + "-top.png" });
+    const m = await step(lang + ": измерить панель", async () => evalJson<any>(page, MEASURE, lang + " MEASURE"));
+    await step(lang + ": порядок секций, опции, зазор профиля", async () => {
+      log("  ПОРЯДОК СЕКЦИЙ (сверху вниз), dir=" + m.dir + ":");
+      for (const k of m.order) log("    top=" + String(k.top).padStart(5) + " " + k.tag + "." + k.cls + " | " + k.text);
+      log("  ОПЦИИ ЯЗЫКА:");
+      for (const o of m.options) {
+        log("    " + o.id + " \"" + o.text + "\" h=" + o.h + " pressed=" + o.pressed + " clipTop=" + o.clipTop + " clipBottom=" + o.clipBottom + " overlapsSignOut=" + o.overlapsSignOut);
+        if (o.h < 44) { log("      FAIL: высота меньше 44px"); failures += 1; }
+        if (o.clipTop || o.clipBottom) { log("      FAIL: опция обрезана панелью"); failures += 1; }
+        if (o.overlapsSignOut) { log("      FAIL: опция пересекает Sign out"); failures += 1; }
+      }
+      log("  Sign out: top=" + (m.signOut ? m.signOut.top : null) + " подпись=\"" + m.signOutLabel + "\"");
+      log("  КАРТОЧКА ПРОФИЛЯ [" + m.dir + "]: top=" + (m.profile ? m.profile.top : null) + " ; низ шапки шторки=" + m.sheetHeaderBottom +
+        (m.hasHeaderEl ? "" : " (элемента <header> в шторке нет — взят верхний край панели)") +
+        " ; зазор=" + m.profileGap + " ; --shell-gap=" + m.shellGap + " => " + (m.profileGap !== null && m.profileGap >= m.shellGap ? "PASS" : "FAIL"));
+      if (!(m.profileGap !== null && m.profileGap >= m.shellGap)) failures += 1;
+      if (m.options.length !== 3) { log("  FAIL: опций " + m.options.length + ", ожидалось 3"); failures += 1; }
+    });
 
-    console.log("шаг 5: клики по языкам:");
-    const names = ["English", "Bahasa Melayu", "العربية"];
-    for (const name of names) {
-      const btn = page.locator('[role="group"] button', { hasText: name }).first();
-      if ((await btn.count()) === 0) { console.log("   \"" + name + "\": кнопка не найдена"); continue; }
-      await btn.click();
-      await page.waitForTimeout(1200);
-      const st = JSON.parse(await page.evaluate("(function(){return JSON.stringify({lang:document.documentElement.lang,dir:document.documentElement.dir,url:location.href});})()"));
-      const label = JSON.parse(await page.evaluate(MEASURE));
-      console.log("   клик \"" + name + "\": html lang=" + st.lang + " dir=" + st.dir + " | подпись выхода=\"" + label.signOutLabel + "\" | шторка открыта=" + label.found);
-    }
-    const after = JSON.parse(await page.evaluate(MEASURE));
-    await page.evaluate("(function(){var SIGNS=['sign out','log keluar','تسجيل الخروج','keluar'];var btns=Array.prototype.slice.call(document.querySelectorAll('button'));var s=null;for(var i=0;i<btns.length;i++){var t=(btns[i].textContent||'').toLowerCase();for(var j=0;j<SIGNS.length;j++){if(t.indexOf(SIGNS[j])>=0){s=btns[i];break;}}if(s)break;}var p=s;while(p.parentElement&&!(getComputedStyle(p).position==='fixed'&&p.getBoundingClientRect().height>250))p=p.parentElement;p.scrollTop=p.scrollHeight;})()");
-    await page.waitForTimeout(900);
-    await page.screenshot({ path: "e2e/screenshots/sheet-" + lang + "-bottom.png" });
-    console.log("шаг 6: финальный html lang=" + after.htmlLang + " dir=" + after.htmlDir + "; скриншоты сохранены (top, bottom)");
+    await step(lang + ": скриншот шторки сверху", async () => shot(page, "sheet-" + lang + "-top"));
+
+    await step(lang + ": клик по каждому языку", async () => {
+      for (const code of ["en", "ms", "ar"]) {
+        const btn = page.locator("[data-testid=language-option-" + code + "]").first();
+        if ((await btn.count()) === 0) { log("  " + code + ": кнопка не найдена"); failures += 1; continue; }
+        await btn.click();
+        await page.waitForTimeout(1200);
+        const st = await evalJson<{ lang: string; dir: string; open: boolean }>(
+          page,
+          "(function(){return JSON.stringify({lang:document.documentElement.lang,dir:document.documentElement.dir,open:!!document.querySelector('[data-testid=mobile-shell-panel]')});})()",
+          code + " state",
+        );
+        const lbl = await evalJson<any>(page, MEASURE, code + " MEASURE after click");
+        log("  клик " + code + ": html lang=" + st.lang + " dir=" + st.dir + " шторка открыта=" + st.open + " подпись выхода=\"" + lbl.signOutLabel + "\"");
+        if (!st.open) { log("    FAIL: шторка закрылась после выбора языка"); failures += 1; }
+      }
+    });
+
+    await step(lang + ": прокрутить шторку вниз и снять скриншот", async () => {
+      await page.evaluate("(function(){var p=document.querySelector('[data-testid=mobile-shell-panel]');if(p)p.scrollTop=p.scrollHeight;})()");
+      await page.waitForTimeout(900);
+      await shot(page, "sheet-" + lang + "-bottom");
+    });
     await context.close();
   }
 } catch (error) {
-  console.log("ОШИБКА: " + (error instanceof Error ? error.message : String(error)));
+  const err = error as Error;
+  log("ОСТАНОВ: " + (err && err.message ? err.message : String(error)));
   process.exitCode = 1;
 } finally {
   await browser.close();
   let removed = 0;
-  for (const id of created) { try { await deleteManagedUser(id, { id: founder.id, role: "founder" } as any); removed += 1; } catch (e) { /* noop */ } }
-  const all = await db!.select().from(users);
+  for (const id of created) { try { await deleteManagedUser(id, { id: founder.id, role: "founder" } as never); removed += 1; } catch { /* noop */ } }
+  const all = await db.select().from(users);
   const left = all.filter(function (u) { return typeof u.email === "string" && (u.email.indexOf("sheet-") === 0 || u.email.indexOf("mh-") === 0 || u.email.indexOf("shell-") === 0 || u.email.indexOf("probe-") === 0); });
-  console.log("\nудалено: " + removed + " из " + created.length);
-  console.log("ОСТАЛОСЬ временных записей в БД (запрос через модуль db приложения, не docker): " + left.length + " — должно быть 0");
+  log("удалено: " + removed + " из " + created.length);
+  log("ОСТАЛОСЬ временных записей в БД (запрос через модуль db приложения): " + left.length + " — должно быть 0");
+  log("провалов проверок: " + failures);
   process.exit(process.exitCode || failures > 0 ? 1 : 0);
 }

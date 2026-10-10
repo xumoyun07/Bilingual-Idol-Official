@@ -112,6 +112,10 @@ try {
       const trigger = page.locator('[data-testid=mobile-shell-trigger]').first();
       let opened = false;
       if ((await trigger.count()) > 0) { await trigger.click().catch(function () { /* noop */ }); await page.waitForTimeout(2000); opened = true; }
+        try { await page.waitForSelector("[data-testid=mobile-shell-panel]", { timeout: 3000 }); log(tag + "   панель появилась"); }
+        catch (err) { log(tag + "   ПАНЕЛЬ НЕ ПОЯВИЛАСЬ за 3000ms — дамп fixed-элементов:"); failures += 1;
+          try { const d = await page.evaluate("(function(){var o=[];document.querySelectorAll(String.fromCharCode(42)).forEach(function(el){if(getComputedStyle(el).position==='fixed'){var r=el.getBoundingClientRect();o.push(el.tagName.toLowerCase()+\" top=\"+Math.round(r.top)+\" h=\"+Math.round(r.height)+\" text=\"+(el.textContent||\"\").replace(/\\s+/g,\" \").trim().slice(0,40));}});return JSON.stringify(o);})()");
+            const list = typeof d === "string" ? JSON.parse(d) : d; for (const line of list) log(tag + "     " + line); } catch (e2) { log(tag + "     дамп не удался"); } }
       log(tag + " триггер шторки: " + (opened ? "нажат" : "НЕ НАЙДЕН") + " url до=" + urlBefore);
       const sheet = (await page.evaluate(SHEET)) as Record<string, any>;
       log(tag + " ШТОРКА: " + JSON.stringify(sheet));
