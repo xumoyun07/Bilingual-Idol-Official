@@ -44,7 +44,7 @@ Not done: 2.3 wiring, 2.4 redirect rewrite, 2.5 translations, 2.6 e2e/console-ro
 
 Next sub-item: 2.3 — wire DashboardLayout (displayed role, badge, account chip, console title, breadcrumbs, module list) to `resolveConsole(user.role)`, remove the `role = "founder"` default, and stop `Admin.tsx` from forcing the founder console on admin sessions.
 
-Owner commands: `npx vitest run`; `$env:TEST_FIXTURES="1"; npm run e2e:console` (not yet written — do not run it until 2.6 lands).
+Owner commands: `npx vitest run`; `$env:TEST_FIXTURES="1"; npm run e2e:console` (script missing until 2.6 lands).
 ### STEP 3 — NOT STARTED
 ### STEP 4 — NOT STARTED
 ### STEP 5 — NOT STARTED
@@ -59,3 +59,19 @@ Owner commands: `npx vitest run`; `$env:TEST_FIXTURES="1"; npm run e2e:console` 
 5. Sidebar still carries several `!important` declarations and the `nth-of-type` dropdown chain at `index.css:10488`; deliberately left.
 6. `e2e/run-shell-checks.ts` needs `TEST_FOUNDER_PASSWORD` and is not part of `e2e:shell`.
 7. Dev serves source through Vite middleware (`server/_core/index.ts:165`), so `dist/public` (built 10:14) being older than the source edits is irrelevant in dev; it would only matter for a production build.
+## STEP 2 STATUS BY EVIDENCE (read-only check)
+
+| Sub-item | Status | Proof |
+|---|---|---|
+| 2.1 decision table | DONE | `docs/CONSOLE_MATRIX.md` exists; committed in a8c68a9 |
+| 2.2 pure module | DONE | `shared/console.ts` exists; committed in a8c68a9 |
+| 2.3 wire the layout | **NOT DONE** | grep `role = "founder"` still matches in DashboardLayout.tsx, and `FounderConsole` still matches in Admin.tsx; nothing calls resolveConsole |
+| 2.4 loop-free redirect | **NOT DONE** | DashboardLayout.tsx 84-108 untouched; idempotence is proven only for the pure functions in server/console.test.ts |
+| 2.5 translations | **NOT DONE** | no `shell.language` key in locales or translations.ts; "Founder Dashboard", "ACTIVE MODULE" and "Platform & Governance" still appear in translations.ts; the sheet heading still uses `td("Language")` |
+| 2.6 tests | **PARTIAL** | unit tests exist (server/console.test.ts, owner ran vitest: 334 passed | 11 skipped). `e2e/console-roles.ts` does NOT exist and `npm run e2e:console` is missing, so the browser part and the source-level tests are not done |
+| 2.7 fallbacks | not needed yet | no redirect loop observed in code review; nothing recorded |
+| 2.8 checks and tag | **PARTIAL** | `npx tsc --noEmit` = 4 and `npm run check:e2e` = 0 errors after each commit. `step-2-done` NOT tagged because step 2 is not done |
+
+Owner run confirmed: `npx vitest run` -> 334 passed, 11 skipped; `npm run e2e:console` -> "Missing script".
+
+Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console-roles.ts plus the npm script).
