@@ -69,9 +69,11 @@ export function LanguageSwitcher({
   const isDashboard = className.includes("dashboard-lang-switcher");
 
   if (variant === "inline") {
+    // Все три варианта видны сразу, вертикальным списком: при 390px они не
+    // переносятся, не обрезаются и не наезжают на «Выйти». Каждый не ниже 44px.
     return (
       <div
-        className={`flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#eef3ff] border border-[#d9e2f1] ${className}`}
+        className={`flex w-full flex-col gap-1.5 p-1 rounded-xl bg-[#eef3ff] border border-[#d9e2f1] ${className}`}
         role="group"
         aria-label={language === "ar" ? "اختيار اللغة" : language === "ms" ? "Pilihan bahasa" : "Language selection"}
       >
@@ -81,16 +83,17 @@ export function LanguageSwitcher({
             <button
               key={item.code}
               type="button"
-              onClick={() => handleSelect(item.code)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
+              onClick={() => setLanguage(item.code)}
+              className={`flex w-full items-center gap-2.5 px-3 min-h-[44px] rounded-lg text-xs font-bold text-start transition-all ${
                 isSelected
                   ? "bg-[#173fad] text-white shadow-sm"
                   : "text-[#445d80] hover:bg-white hover:text-[#173fad]"
               }`}
               aria-pressed={isSelected}
             >
-              <span className="text-sm leading-none">{item.flag}</span>
-              <span>{item.nativeName}</span>
+              <span className="text-base leading-none" aria-hidden="true">{item.flag}</span>
+              <span className="flex-1">{item.nativeName}</span>
+              {isSelected && <Check size={14} className="shrink-0" aria-hidden="true" />}
             </button>
           );
         })}

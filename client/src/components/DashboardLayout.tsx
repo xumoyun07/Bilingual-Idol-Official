@@ -515,17 +515,22 @@ function DashboardShell({
               </div>
             </div>
 
+            {/* Язык идёт сразу после карточки профиля и ДО навигации.
+                Раньше здесь был popover внизу шторки: он обрезался и накрывал
+                кнопку выхода, поэтому теперь это встроенный список из трёх
+                вариантов, а нижний ряд языка убран целиком. */}
+            <div className="rounded-2xl border border-slate-100 bg-white p-2.5 shadow-sm">
+              <span className="mb-2 block px-1 text-xs font-bold text-[#566983]">{td("Language")}</span>
+              <LanguageSwitcher variant="inline" className="dashboard-lang-inline" />
+            </div>
+
             {/* Mobile Navigation Links */}
             <div className="flex-1 space-y-3">
               {renderNavigationLinks(true)}
             </div>
 
-            {/* Consolidated Footer Actions inside Mobile Menu with Language Selector */}
+            {/* Sign out pinned to the bottom of the sheet */}
             <div className="pt-4 border-t border-[#edf2f5] mt-auto flex flex-col gap-3">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-bold text-[#566983]">{td("Language")}</span>
-                <LanguageSwitcher variant="dropdown" className="dashboard-lang-switcher" />
-              </div>
               <button
                 type="button"
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-xs font-bold text-rose-600 border border-rose-100 bg-rose-50/20 hover:bg-rose-50 hover:border-rose-200 transition-all duration-200 shadow-sm"
