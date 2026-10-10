@@ -43,6 +43,7 @@ import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { BackgroundCircleField } from "@/components/BackgroundCircleField";
 import { Button } from "./ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { resolveConsole } from "@shared/console";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   PlatformUserType,
@@ -70,7 +71,7 @@ const STRATEGIC_PORTFOLIOS = [
 
 export default function DashboardLayout({
   children,
-  role = "founder",
+  role,
   activeTab,
   setActiveTab,
 }: {
@@ -81,8 +82,17 @@ export default function DashboardLayout({
 }) {
   const { loading, user } = useAuth();
 
+  // Отображаемая роль и консоль берутся ТОЛЬКО из реальной роли сессии (ctx.user.role).
+  // Проп role остаётся ролью МАРШРУТА: он нужен проверке доступа и навигации,
+  // но никогда не используется для подписи роли, заголовка или списка модулей.
+  const sessionRole = user?.role ?? null;
+  const consoleDef = resolveConsole(sessionRole);
+
   const isRoleAuthorized = () => {
     if (!user) return false;
+    // Маршрут без ограничения пропом (например /admin) авторизацию не навязывает:
+    // иначе admin получил бы скелет и бесконечный редирект на тот же /admin.
+    if (!role) return true;
     if (user.role === role) return true;
     if (role === "founder" && user.role === "admin") return true;
     if (role === "marketing" && ["founder", "super_admin", "admin"].includes(user.role)) return true;
@@ -114,7 +124,7 @@ export default function DashboardLayout({
       className="blue-workspace"
       style={{ "--sidebar-width": "18.5rem" } as React.CSSProperties}
     >
-      <DashboardShell role={role} activeTab={activeTab} setActiveTab={setActiveTab}>{children}</DashboardShell>
+      <DashboardShell role={role ?? "student"} sessionRole={sessionRole} consoleKey={consoleDef ? consoleDef.consoleKey : null} activeTab={activeTab} setActiveTab={setActiveTab}>{children}</DashboardShell>
     </SidebarProvider>
   );
 }
@@ -143,11 +153,15 @@ function DashboardSignIn() {
 function DashboardShell({
   children,
   role,
+  sessionRole,
+  consoleKey,
   activeTab: externalActiveTab,
   setActiveTab: externalSetActiveTab,
 }: {
   children: React.ReactNode;
   role: DashboardRole;
+  sessionRole?: string | null;
+  consoleKey?: string | null;
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
 }) {
@@ -157,7 +171,10 @@ function DashboardShell({
   // Роль и чип статуса идут через локали, а не через сырое значение из БД
   // и не через склейку строк.
   const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
-  const roleText = roleLabel(role, enumT);
+  // Подпись роли — из реальной сессии, а не из пропа маршрута:
+  // admin не должен видеть Founder.
+  const displayedRole = (sessionRole ?? role) as DashboardRole;
+  const roleText = roleLabel(displayedRole as never, enumT) as string;
   const accountStatusLabel = t("account.status", { role: roleText });
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -184,7 +201,7 @@ function DashboardShell({
       }
     };
 
-    if (role === "founder") {
+    if (consoleKey === "founder") {
       return (
         <div className="space-y-2.5">
           {STRATEGIC_PORTFOLIOS.map((section) => {
@@ -335,7 +352,8 @@ function DashboardShell({
 
   // Header Title
   const getHeaderTitle = () => {
-    if (role === "founder") {
+    if ((sessionRole ?? role) === "admin") return td("Platform Control Centre");
+    if ((sessionRole ?? role) === "founder") {
       for (const section of STRATEGIC_PORTFOLIOS) {
         const mod = section.modules.find((m) => m.id === activeTab);
         if (mod) return `${td(section.label)} · ${td(mod.title)}`;
