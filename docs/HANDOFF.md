@@ -102,3 +102,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:12: C4 done, committed 1ea0e34 — effect on resolveRedirect, legacy rule removed, consoleSource.test.ts added.
 
 - 2026-10-10 17:15: S2 done, committed 0e0b2f4 — shell.language + role console wording keys; founder console strings translated via keys. Key parity red until owner npm run i18n:sync. Next: S3 e2e/console-roles.ts + e2e:console + step-2-done, then G9/G10/G11/G12.
+
+- 2026-10-10 17:16: S3 done, committed 9c1f830 — e2e/console-roles.ts + npm run e2e:console; tag step-2-done создан. OWNER RUNS: `$env:TEST_FIXTURES="1"; npm run e2e:console`, npx vitest run, npm run i18n:sync.
