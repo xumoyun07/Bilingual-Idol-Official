@@ -12,17 +12,17 @@ const ONLY = process.env.ONLY || "";
 const started = Date.now();
 function t0() { return "[" + (Math.round((Date.now() - started) / 100) / 10) + "s]"; }
 function log(m: string) { console.log(t0() + " " + m); }
-const deadline = setTimeout(function () { console.log(t0() + " ЖЁСТКИЙ ПРЕДЕЛ 3 МИНУТЫ — аварийный выход"); process.exit(3); }, RUN_MS);
+const deadline = setTimeout(function () { console.log(t0() + " ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, RUN_MS);
 deadline.unref();
 
-const ALL = [{ n: "1440", w: 1440, h: 900 }, { n: "390", w: 390, h: 844 }];
+const ALL = [{ n: "1440", w: 1440, h: 900 }, { n: "412", w: 412, h: 915 }, { n: "390", w: 390, h: 844 }, { n: "360", w: 360, h: 800 }];
 const VIEWPORTS = ONLY ? ALL.filter(function (v) { return v.n === ONLY; }) : ALL;
 const LANGS = (process.env.LANGS || "en,ar").split(",");
 
 const PROBE = [
   "(function(){",
-  "var box = function(el){ if(!el) return null; var b = el.getBoundingClientRect();",
-  "  return { top: Math.round(b.top*100)/100, bottom: Math.round(b.bottom*100)/100, h: Math.round(b.height*100)/100 }; };",
+  "var box = function(el){ if(!el) return null; var b = el.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, h: b.height }; };",
+  "var rr = function(v){ return (v === null || v === undefined) ? null : Math.round(v*100)/100; };",
   "var tb = document.querySelector('header.bilc-floating-header');",
   "var sb = document.querySelector('.bilc-floating-sidebar');",
   "var main = document.querySelector('main');",
@@ -34,21 +34,22 @@ const PROBE = [
   "    scrollables.push(e.tagName.toLowerCase() + ':+' + (e.scrollHeight - e.clientHeight)); });",
   "var de = document.scrollingElement; var docScroll = !!(de && de.scrollHeight > de.clientHeight + 1);",
   "var first = main ? main.firstElementChild : null;",
-  "return { tbTop: tb ? box(tb).top : null, tbBottom: tb ? box(tb).bottom : null, sbTop: sb ? box(sb).top : null,",
-  "  sbBottomGap: sb ? Math.round((window.innerHeight - box(sb).bottom)*100)/100 : null,
-  sbTopRaw: sb ? box(sb).top : null, tbTopRaw: tb ? box(tb).top : null, sbBottomRaw: sb ? box(sb).bottom : null,
-  scrollY: Math.round(window.scrollY*1000)/1000, remPx: getComputedStyle(document.documentElement).fontSize, docClientH: document.documentElement.clientHeight, innerH: window.innerHeight,",
-  "  colTop: col ? box(col).top : null, insetH: inset ? box(inset).h : null, mainH: main ? box(main).h : null,",
-  "  firstBlockTop: first ? box(first).top : null,",
-  "  scrollables: scrollables, docScroll: docScroll, vh: window.innerHeight, dir: document.documentElement.dir,",
+  "var sbb = sb ? box(sb) : null; var tbb = tb ? box(tb) : null;",
+  "return { tbTop: tbb ? rr(tbb.top) : null, tbBottom: tbb ? rr(tbb.bottom) : null,",
+  "  tbTopRaw: tbb ? tbb.top : null, sbTopRaw: sbb ? sbb.top : null, sbBottomRaw: sbb ? sbb.bottom : null,",
+  "  sbTop: sbb ? rr(sbb.top) : null, sbBottomGap: sbb ? rr(window.innerHeight - sbb.bottom) : null,",
+  "  colTop: col ? rr(box(col).top) : null, insetH: inset ? rr(box(inset).h) : null, mainH: main ? rr(box(main).h) : null,",
+  "  firstBlockTop: first ? rr(box(first).top) : null,",
+  "  scrollY: window.scrollY, remPx: getComputedStyle(document.documentElement).fontSize,",
+  "  htmlClientH: document.documentElement.clientHeight, innerH: window.innerHeight,",
+  "  scrollables: scrollables, docScroll: docScroll, dir: document.documentElement.dir,",
   "  htmlScroll: document.documentElement.scrollHeight - document.documentElement.clientHeight,",
   "  bodyScroll: document.body.scrollHeight - document.body.clientHeight,",
   "  bodyOvY: getComputedStyle(document.body).overflowY, bodyH: getComputedStyle(document.body).height, bodyMinH: getComputedStyle(document.body).minHeight,",
   "  sbOvY: sb ? getComputedStyle(sb).overflowY : null, sbH: sb ? getComputedStyle(sb).height : null,",
   "  docScrollBehavior: getComputedStyle(document.documentElement).scrollBehavior, scrollPadTop: getComputedStyle(document.documentElement).scrollPaddingTop,",
   "  mainPadTop: main ? getComputedStyle(main).paddingTop : null, colPadTop: col ? getComputedStyle(col).paddingTop : null,",
-  "  mainMinH: main ? getComputedStyle(main).minHeight : null, colMinH: col ? getComputedStyle(col).minHeight : null,",
-  "  headerVar: getComputedStyle(document.documentElement).getPropertyValue('--shell-header-h') };",
+  "  mainMinH: main ? getComputedStyle(main).minHeight : null, colMinH: col ? getComputedStyle(col).minHeight : null };",
   "})()",
 ].join("\n");
 
@@ -56,7 +57,7 @@ async function withTimeout<T>(label: string, promise: Promise<T>, ms?: number): 
   const limit = ms || STEP_MS;
   let timer: NodeJS.Timeout | undefined;
   const guard = new Promise<never>(function (_resolve, reject) {
-    timer = setTimeout(function () { reject(new Error("ТАЙМАУТ " + limit + "ms на шаге: " + label)); }, limit);
+    timer = setTimeout(function () { reject(new Error("ТАЙМАУТ " + limit + "ms: " + label)); }, limit);
   });
   try { return await Promise.race([promise, guard]); } finally { if (timer) clearTimeout(timer); }
 }
@@ -75,56 +76,36 @@ try {
   for (const lang of LANGS) {
     for (const vp of VIEWPORTS) {
       const tag = lang + "@" + vp.n;
-      log(tag + ": создаю временную запись…");
       const email = "shell-" + lang + "-" + vp.n + "-" + randomBytes(4).toString("hex") + "@example.test";
       const password = "Diag-" + randomBytes(12).toString("base64url") + "!7";
-      const made = (await withTimeout(tag + " createManagedUser", createManagedUser(
+      log(tag + ": создаю запись…");
+      const made = (await withTimeout(tag + " create", createManagedUser(
         { email: email, name: "Diag " + tag, role: "admin", password: password } as never,
         { id: founder.id, role: "founder" } as never,
       ) as never)) as { user?: { id: number }; id?: number };
       const id = made.user ? made.user.id : made.id;
       if (id) created.push(id);
-      log(tag + ": запись " + (id ? "создана" : "НЕ создана"));
 
       const context = await browser.newContext({ viewport: { width: vp.w, height: vp.h } });
       const page = await context.newPage();
       page.setDefaultTimeout(STEP_MS);
       page.setDefaultNavigationTimeout(STEP_MS);
-      log(tag + ": открываю /login");
-      await withTimeout(tag + " goto login", page.goto(BASE + "/login", { waitUntil: "domcontentloaded" }));
-      await withTimeout(tag + " fill email", page.fill("#sign-in-email", email));
-      await withTimeout(tag + " fill password", page.fill("#sign-in-password", password));
-      log(tag + ": отправляю форму");
+      await withTimeout(tag + " login page", page.goto(BASE + "/login", { waitUntil: "domcontentloaded" }));
+      await withTimeout(tag + " email", page.fill("#sign-in-email", email));
+      await withTimeout(tag + " pass", page.fill("#sign-in-password", password));
       await withTimeout(tag + " submit", page.click('button[type="submit"]'));
       await page.waitForTimeout(2500);
-      log(tag + ": язык " + lang + ", url после входа = " + page.url());
       await page.evaluate(function (l) { try { localStorage.setItem("bilc_language", l); } catch (e) { /* noop */ } document.cookie = "bilc_language=" + l + "; path=/"; }, lang);
-      await withTimeout(tag + " goto /dashboard", page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" }));
+      await withTimeout(tag + " dashboard", page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" }));
       await page.waitForTimeout(3000);
-      log(tag + ": измеряю (url=" + page.url() + ")");
       const r = (await withTimeout(tag + " probe", page.evaluate(PROBE) as never)) as Record<string, unknown>;
-      rows.push("---- " + tag + " dir=" + r.dir + " vh=" + r.vh + " " + page.url());
-      rows.push("  сайдбар top=" + r.sbTop + "  зазор снизу=" + r.sbBottomGap + "  высота=" + r.sbH + " overflowY=" + r.sbOvY);
-      rows.push("  топбар top=" + r.tbTop + " bottom=" + r.tbBottom + "  content-column top=" + r.colTop + "  первый блок top=" + r.firstBlockTop);
-      rows.push("  insetH=" + r.insetH + " mainH=" + r.mainH + " mainMinH=" + r.mainMinH + " colMinH=" + r.colMinH + " mainPadTop=" + r.mainPadTop + " colPadTop=" + r.colPadTop);
-      rows.push("  --shell-header-h=" + String(r.headerVar).trim() + "  scrollPaddingTop=" + r.scrollPadTop + "  scrollBehavior=" + r.docScrollBehavior);
-      rows.push("  html.scroll=" + r.htmlScroll + " body.scroll=" + r.bodyScroll + " body.overflowY=" + r.bodyOvY + " body.height=" + r.bodyH + " body.minHeight=" + r.bodyMinH);
-      rows.push("  ПРОКРУЧИВАЕМЫЕ=" + JSON.stringify(r.scrollables) + "  documentScroller=" + r.docScroll);
-      if (process.env.SHOT) {
-        await page.evaluate(function () {
-          var tall = document.createElement("div");
-          tall.id = "shell-diag-tall";
-          tall.style.height = "2600px";
-          tall.style.background = "repeating-linear-gradient(180deg,#eef2ff 0 40px,#ffffff 40px 80px)";
-          if (document.body) document.body.appendChild(tall);
-        });
-        await page.waitForTimeout(700);
-        var fs = await import("node:fs");
-        if (!fs.existsSync("e2e/screenshots")) fs.mkdirSync("e2e/screenshots", { recursive: true });
-        await page.screenshot({ path: "e2e/screenshots/item2-" + tag + ".png" });
-        log(tag + ": скриншот сохранён");
-      }
-      rows.push("  RAW sbTop=" + r.sbTopRaw + " tbTop=" + r.tbTopRaw + " sbBottom=" + r.sbBottomRaw + " scrollY=" + r.scrollY + " rem=" + r.remPx + " htmlClientH=" + r.docClientH + " innerH=" + r.innerH);
+      rows.push("---- " + tag + " dir=" + r.dir + " vh=" + r.innerH + " " + page.url());
+      rows.push("  ТОЧНО: sbTopRaw=" + r.sbTopRaw + " tbTopRaw=" + r.tbTopRaw + " sbBottomRaw=" + r.sbBottomRaw + " scrollY=" + r.scrollY + " rem=" + r.remPx + " htmlClientH=" + r.htmlClientH + " innerH=" + r.innerH);
+      rows.push("  ОКРУГЛ: сайдбар top=" + r.sbTop + " зазор снизу=" + r.sbBottomGap + " топбар top=" + r.tbTop + " bottom=" + r.tbBottom + " высота сайдбара=" + r.sbH);
+      rows.push("  первый блок top=" + r.firstBlockTop + " content-column top=" + r.colTop + " colPadTop=" + r.colPadTop + " mainPadTop=" + r.mainPadTop + " scrollPaddingTop=" + r.scrollPadTop);
+      rows.push("  insetH=" + r.insetH + " mainH=" + r.mainH + " mainMinH=" + r.mainMinH + " colMinH=" + r.colMinH + " sbOverflowY=" + r.sbOvY);
+      rows.push("  html.scroll=" + r.htmlScroll + " body.scroll=" + r.bodyScroll + " body.overflowY=" + r.bodyOvY + " body.minH=" + r.bodyMinH);
+      rows.push("  ПРОКРУЧИВАЕМЫЕ=" + JSON.stringify(r.scrollables) + " documentScroller=" + r.docScroll + " scrollBehavior=" + r.docScrollBehavior);
       await context.close();
       log(tag + ": готово");
     }
