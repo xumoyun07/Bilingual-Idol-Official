@@ -108,3 +108,5 @@ Next sub-item: 2.3 wiring, then 2.4, then 2.5, then the rest of 2.6 (e2e/console
 - 2026-10-10 17:18: G9 done, committed 7aada9d — resolveRecommendedProgram + recommendedProgramId в submitAttempt + тесты; миграция 2026-placement-recommended-program.sql (OWNER: применить после дампа, команда в файле HANDOFF). Next: G10 уведомления, G11 формы, G12 roadmap.
 
 - 2026-10-10 17:22: G10 done, committed 5a1af25 — notification engine (enquiry/payment/promo-expiring) + scheduled endpoint + tests. Next: G11 form conformance, G12 roadmap.
+
+- 2026-10-10 17:25: G11 (verified conformant, no change) + G12 done, committed 8026f9b — roadmap V2 funnel (4 steps, en/ms/ar). Next: G3 remainder (advance-stage UI) and the final report.
