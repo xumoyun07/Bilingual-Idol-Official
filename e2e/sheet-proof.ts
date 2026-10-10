@@ -16,6 +16,11 @@ import { users } from "../drizzle/schema";
 const BASE = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
 const STEP = 20000;
 const PANEL_SELECTOR = "[data-testid=mobile-shell-panel]";
+// Для admin-фикстуры оболочку рендерит /admin (Admin.tsx:88 -> DashboardLayout).
+// /dashboard у admin-сессии даёт DashboardLayoutSkeleton и жёсткий редирект
+// window.location.replace("/admin") (DashboardLayout.tsx:97-98), где триггера нет.
+const ROLE = process.env.SHEET_ROLE === "student" ? "student" : "admin";
+const ROUTE = ROLE === "student" ? "/dashboard" : "/admin";
 const started = Date.now();
 function log(m: string) { console.log("[" + (Math.round((Date.now() - started) / 100) / 10) + "s] " + m); }
 const kill = setTimeout(function () { log("ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, 180000);
@@ -67,10 +72,36 @@ async function dumpFixed(page: Page) {
   }
 }
 
+const DIAG = [
+  "(function(){",
+  "var btns=Array.prototype.slice.call(document.querySelectorAll('button')).map(function(b){return (b.getAttribute('aria-label')||'(no aria-label)')+' | testid='+(b.getAttribute('data-testid')||'-')+' | text='+(b.textContent||'').replace(/\\s+/g,' ').trim().slice(0,30);});",
+  "return JSON.stringify({url:location.href,title:document.title,bodyStart:(document.body.innerText||'').replace(/\\s+/g,' ').trim().slice(0,300),buttons:btns});",
+  "})()",
+].join("\n");
+
+async function dumpPage(page: Page) {
+  try {
+    const d = await evalJson<{ url: string; title: string; bodyStart: string; buttons: string[] }>(page, DIAG, "диагностика страницы");
+    log("  ИТОГОВЫЙ URL: " + d.url);
+    log("  document.title: " + d.title);
+    log("  первые 300 символов текста: " + d.bodyStart);
+    log("  кнопки (" + d.buttons.length + "):");
+    for (const b of d.buttons) log("    " + b);
+  } catch (error) {
+    log("  диагностика страницы не удалась: " + (error instanceof Error ? error.message : String(error)));
+  }
+}
 async function openPanel(page: Page, tag: string): Promise<boolean> {
   const trigger = page.locator("[data-testid=mobile-shell-trigger]").first();
-  log("  триггер найден: " + (await trigger.count()));
-  if ((await trigger.count()) === 0) { failures += 1; return false; }
+  try {
+    await page.waitForSelector("[data-testid=mobile-shell-trigger]", { timeout: 5000 });
+    log("  триггер найден: " + (await trigger.count()));
+  } catch {
+    log("  ТРИГГЕР НЕ НАЙДЕН за 5000ms (роль=" + ROLE + ", маршрут=" + ROUTE + ")");
+    failures += 1;
+    await dumpPage(page);
+    return false;
+  }
   await trigger.click();
   try {
     await page.waitForSelector(PANEL_SELECTOR, { timeout: 3000 });
@@ -132,7 +163,7 @@ try {
     const password = "Diag-" + randomBytes(12).toString("base64url") + "!7";
     await step(lang + ": создать временную учётную запись", async () => {
       const made = (await createManagedUser(
-        { email, name: "Sheet " + lang, role: "admin", password } as never,
+        { email, name: "Sheet " + lang, role: ROLE, password } as never,
         { id: founder.id, role: "founder" } as never,
       )) as unknown as { id?: number };
       if (made.id !== undefined) created.push(made.id);
@@ -152,9 +183,9 @@ try {
       await page.click('button[type="submit"]');
       await page.waitForTimeout(2500);
     });
-    await step(lang + ": выставить язык " + lang + " и открыть /dashboard", async () => {
+    await step(lang + ": выставить язык " + lang + " и открыть " + ROUTE, async () => {
       await page.evaluate("(function(l){try{localStorage.setItem('bilc_language',l);}catch(e){}document.cookie='bilc_language='+l+'; path=/';})(" + JSON.stringify(lang) + ")");
-      await page.goto(BASE + "/dashboard", { waitUntil: "domcontentloaded" });
+      await page.goto(BASE + ROUTE, { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(3000);
     });
 
