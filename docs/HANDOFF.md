@@ -169,3 +169,5 @@ pm run dev. Если его нет — форма входа не отренде
 - 2026-10-10 19:30: AGENT RAN vitest: 390 passed, 11 skipped, 0 failed; tsc = 0 in-scope (2 baseline errors remain in R2-forbidden files BackgroundCircleField.tsx and PublicLayout.tsx); check:e2e = 0. Commits: 4fa06a6 (pipeline approve), 2dcad5f (Admin JSX), edbb87c (client types), e2e type fix.
 
 - 2026-10-10 20:06: AGENT RAN i18n:sync (y) — 1 строка в Azure, квота 242; ms-перевод совпал с исходником (proper noun), файлы без изменений; parity 7/7. e2e:console фикстура получила пароль, committed 8858e5a.
+
+- 2026-10-10 20:40: AGENT RAN the owner final sequence: i18n:sync (y) OK (квота 242, parity 7/7); e2e:console 0 failures (24 контекста); e2e:sheet-all exit 0 (обе роли, 0 провалов). Корень #root-таймаута: первый потомок #root — невидимая aria-live-секция, поэтому ждать visible бессмысленно; ждём attached + прогрев Vite. Committed c351883.
