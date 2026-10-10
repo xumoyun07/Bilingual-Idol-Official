@@ -9653,30 +9653,11 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > header:nth-
   }
 }
 
-/* 3. Sidebar Container and Sub-sections: Perfect dimension flow */
-@media (min-width: 1024px) {
-  .bilc-floating-sidebar {
-    width: 270px !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    z-index: 40 !important;
-    background-color: #ffffff !important;
-    border-right: 1px solid rgba(16, 37, 62, 0.06) !important;
-    box-shadow: 4px 0 24px rgba(16, 37, 62, 0.02) !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  html[dir="rtl"] .bilc-floating-sidebar {
-    right: 0 !important;
-    left: auto !important;
-    border-right: none !important;
-    border-left: 1px solid rgba(16, 37, 62, 0.06) !important;
-    box-shadow: -4px 0 24px rgba(16, 37, 62, 0.02) !important;
-  }
-}
+/* 3. Sidebar Container and Sub-sections.
+   Прежние правила с top/bottom/height и физическими left/right УДАЛЕНЫ:
+   они перебивали плавающую раскладку через !important, а RTL-правило
+   `right: 0 !important` дополнительно прижимало сайдбар к краю экрана.
+   Раскладка оболочки теперь описана ниже, в блоке .bilc-content-column. */
 
 /* 3b. Sidebar Footer Area Wrap - Expanded */
 .bilc-floating-sidebar .minimal-sidebar-footer {
@@ -10321,36 +10302,82 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   background: transparent !important;
 }
 
-/* Floating Sidebar island - desktop / tablet full state */
-.blue-workspace .bilc-floating-sidebar {
-  position: fixed;
-  top: 1rem;
-  bottom: 1rem;
-  inset-inline-start: 1rem;
-  height: calc(100vh - 2rem);
-  width: var(--dashboard-sidebar-width);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 4px 20px -2px rgba(16, 37, 62, 0.05);
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 45;
+/* ─── Оболочка дашборда ──────────────────────────────────────────────────
+   Единственный источник внешних отступов — переменная --shell-gap.
+   Топбар и карточка контента лежат в одной колонке .bilc-content-column,
+   поэтому их левый и правый края совпадают ПО ПОСТРОЕНИЮ, без магических
+   чисел. Все отступы заданы логическими свойствами (inline-start/end),
+   поэтому LTR и RTL раскладываются одинаково и в арабском сайдбар
+   не прилипает к правому краю и не задевает полосу прокрутки. */
+.blue-workspace {
+  --shell-gap: 1rem;
+  --shell-sidebar-w: var(--dashboard-sidebar-width, 18.5rem);
+  /* Без этого вставка контента центрировалась по вертикали: корень выше
+     на pb-12, чем её min-height, и вся колонка «плыла» вниз на ~25px,
+     из-за чего верхний зазор топбара не совпадал с зазором сайдбара.
+     Задаём оба выравнивания: корень ведёт себя и как строка, и как колонка. */
+  align-items: stretch !important;
+  justify-content: flex-start !important;
 }
 
-/* Floating Header island */
+/* Плавающий сайдбар: зазор сверху равен зазору снизу и равен --shell-gap,
+   зазор до ближайшего края окна — тоже --shell-gap в обеих раскладках. */
+@media (min-width: 1024px) {
+  .blue-workspace .bilc-floating-sidebar {
+    position: fixed !important;
+    inset-block-start: var(--shell-gap) !important;
+    inset-block-end: var(--shell-gap) !important;
+    inset-inline-start: var(--shell-gap) !important;
+    inset-inline-end: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    width: var(--shell-sidebar-w) !important;
+    border-radius: 1rem !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.85) !important;
+    box-shadow: 0 4px 20px -2px rgba(16, 37, 62, 0.05) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 45 !important;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* Колонка контента. Топбар и карточка — её дети, поэтому их края
+   совпадают автоматически. Зазор между ними даёт gap колонки. */
+.blue-workspace .bilc-content-column {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--shell-gap);
+  padding-block: var(--shell-gap);
+  margin-inline-start: var(--shell-gap);
+  margin-inline-end: var(--shell-gap);
+}
+
+@media (min-width: 1024px) {
+  .blue-workspace .bilc-content-column {
+    /* сайдбар + зазор с каждой стороны */
+    margin-inline-start: calc(var(--shell-sidebar-w) + var(--shell-gap) * 2);
+  }
+}
+
+/* Топбар: липкий, поэтому остаётся на виду при прокрутке.
+   Собственных горизонтальных отступов не имеет — за них отвечает колонка. */
 .blue-workspace .bilc-floating-header {
-  position: fixed;
-  top: 1rem;
-  inset-inline-start: calc(var(--dashboard-sidebar-width) + 2rem);
-  inset-inline-end: 1rem;
+  position: sticky;
+  inset-block-start: var(--shell-gap);
   height: 4.5rem;
+  width: auto;
+  margin: 0;
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(226, 232, 240, 0.85);
   box-shadow: 0 4px 20px -2px rgba(16, 37, 62, 0.05);
-  transition: inset-inline-start 0.3s cubic-bezier(0.16, 1, 0.3, 1), inset-inline-end 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 40;
   display: flex;
   align-items: center;
@@ -10358,39 +10385,28 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   padding-inline: 1.5rem;
 }
 
-/* Main Content Area flow on desktop */
+/* Основная область не задаёт собственных горизонтальных отступов,
+   иначе карточка перестала бы совпадать краями с топбаром. */
+/* Прижимаем вставку к верху: без этого она центрировалась по вертикали
+   (высота корня 948 при min-height:100vh у вставки) и вся колонка
+   контента уезжала вниз на ~24px — верхний зазор топбара не совпадал
+   с зазором сайдбара. */
+.blue-workspace > .minimal-dashboard-inset {
+  align-self: flex-start;
+}
 .blue-workspace .bilc-dashboard-main {
-  padding-top: 6.5rem;
-  padding-inline-start: calc(var(--dashboard-sidebar-width) + 2rem);
-  padding-inline-end: 1rem;
-  padding-bottom: 2rem;
-  transition: padding-inline-start 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
   box-sizing: border-box;
 }
 
-/* Responsive constraints on mobile drawer and spacing */
-@media (max-width: 1024px) {
-  .blue-workspace .bilc-floating-sidebar {
-    top: 0;
-    bottom: 0;
-    inset-inline-start: 0;
-    height: 100vh;
-    border-radius: 0;
-    width: 18.5rem;
-  }
-  
-  .blue-workspace .bilc-floating-header {
-    inset-inline-start: 1rem;
-    inset-inline-end: 1rem;
-  }
-  
-  .blue-workspace .bilc-dashboard-main {
-    padding-inline-start: 1rem;
-    padding-inline-end: 1rem;
-    padding-top: 5.5rem;
-    padding-bottom: 3rem;
-  }
+/* Длинное меню прокручивается внутри сайдбара, а не растягивает его. */
+.blue-workspace .bilc-floating-sidebar .minimal-sidebar-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Mobile-only overrides as requested by User and Element Selection */
@@ -10460,16 +10476,13 @@ div#root:nth-of-type(1) > div:nth-of-type(1) > main#main-content:nth-of-type(1) 
   padding-bottom: 20px !important;
 }
 
-/* Specific desktop header width correction keeping layout and floating positioning intact */
-@media (min-width: 1024px) {
-  header.bilc-floating-header {
-    width: 1080px !important;
-    inset-inline-start: calc(var(--dashboard-sidebar-width) + 2rem) !important;
-    inset-inline-end: 2rem !important;
-    margin-inline: auto !important;
-    max-width: calc(100% - var(--dashboard-sidebar-width) - 4rem) !important;
-  }
-}
+/* Прежняя «коррекция ширины» топбара УДАЛЕНА.
+   Правило задавало width: 1080px, inset-inline-start, inset-inline-end: 2rem
+   и margin-inline: auto через !important. Из-за него топбар переставал быть
+   обычным блоком колонки контента: его края не совпадали с карточкой
+   (на 1440 начало 508 вместо 328), а в арабском на 1024 он уходил
+   за пределы экрана. Края теперь совпадают по построению — см.
+   .blue-workspace .bilc-content-column. */
 
 /* Premium styling directly targeting the user's selected CSS Selector for the dropdown menu window */
 header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
@@ -10901,13 +10914,8 @@ header.bilc-floating-header > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-
   transition: opacity 0.3s ease !important;
 }
 
-/* Vertical centering and height adjustment for the sidebar container as requested by the user */
-@media (min-width: 1024px) {
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) {
-    height: 792px !important;
-    top: 50% !important;
-    bottom: auto !important;
-    margin-top: -396px !important;
-  }
-}
+/* Вертикальное центрирование сайдбара через хрупкий nth-of-type УДАЛЕНО.
+   Правило задавало height: 792px, top: 50% и margin-top: -396px, из-за чего
+   сайдбар начинался на y=54 вместо --shell-gap и вылезал за оба края
+   окна (на 1024 это давало top=-12 при высоте окна 768). */
 

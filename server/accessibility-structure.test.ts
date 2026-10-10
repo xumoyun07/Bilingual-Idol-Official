@@ -39,7 +39,9 @@ describe("public accessibility structure", () => {
     expect(login).toContain('role="alert"');
     expect(login).toContain("login.isPending");
     expect(dashboard).toContain('redirectPath: "/login"');
-    expect(dashboard).toContain("Attendance is not available yet.");
+    // Текст берётся из локали, а не хардкодится: английский литерал в исходнике
+    // означал бы непереведённую строку на ms и ar.
+    expect(dashboard).toContain('t("shell.attendancePending")');
     expect(dashboard).toContain("attendanceSummary");
   });
 });

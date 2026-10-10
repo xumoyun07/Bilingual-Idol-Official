@@ -13,6 +13,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { roleLabel } from "@/lib/enumLabels";
 import {
   CalendarDays,
   ChevronDown,
@@ -152,6 +153,12 @@ function DashboardShell({
 }) {
   const { user, logout } = useAuth();
   const { t, td, isRTL } = useLanguage();
+
+  // Роль и чип статуса идут через локали, а не через сырое значение из БД
+  // и не через склейку строк.
+  const enumT = (key: string, fallback: string) => t(key, undefined, fallback);
+  const roleText = roleLabel(role, enumT);
+  const accountStatusLabel = t("account.status", { role: roleText });
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openPortfolios, setOpenPortfolios] = useState<Record<string, boolean>>({
@@ -269,7 +276,7 @@ function DashboardShell({
             className={`minimal-nav-item w-full ${location === "/super-admin" ? "is-active font-semibold" : ""}`}
           >
             <LayoutDashboard size={18} />
-            <span>{td("My Dashboard")}</span>
+            <span>{t("shell.myDashboard")}</span>
           </button>
         </div>
       );
@@ -286,7 +293,7 @@ function DashboardShell({
             className={`minimal-nav-item w-full ${location === "/marketing" ? "is-active font-semibold" : ""}`}
           >
             <LayoutDashboard size={18} />
-            <span>{td("My Dashboard")}</span>
+            <span>{t("shell.myDashboard")}</span>
           </button>
         </div>
       );
@@ -307,7 +314,7 @@ function DashboardShell({
             }`}
           >
             <LayoutDashboard size={18} />
-            <span>{td("My Dashboard")}</span>
+            <span>{t("shell.myDashboard")}</span>
           </button>
         </div>
       );
@@ -341,13 +348,7 @@ function DashboardShell({
     return td("Student Portal");
   };
 
-  const getSessionBadgeLabel = () => {
-    if (role === "super_admin") return td("Super Admin");
-    if (role === "founder") return td("Founder Session");
-    if (role === "teacher") return td("Teacher Session");
-    if (role === "marketing") return td("Marketing Session");
-    return td("Student Account");
-  };
+  const getSessionBadgeLabel = () => accountStatusLabel;
 
   const getFallbackInitials = () => {
     if (user?.name) return user.name.slice(0, 1).toUpperCase();
@@ -417,14 +418,16 @@ function DashboardShell({
               </Avatar>
               <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden text-start">
                 <p className="truncate text-xs font-bold text-[#10253e] flex items-center gap-1.5 leading-none mb-1">
-                  {getDefaultName()}
+                  <bdi>{getDefaultName()}</bdi>
                 </p>
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="truncate text-[10px] text-[#566983] font-semibold leading-none">
+                  {/* dir="ltr" держит "@" в начале строки даже в арабском RTL.
+                      Полный адрес доступен во всплывающей подсказке. */}
+                  <bdi dir="ltr" title={getDefaultEmail()} className="truncate text-[10px] text-[#566983] font-semibold leading-none">
                     @{getDefaultEmail()?.split('@')[0] || 'user'}
-                  </span>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad] tracking-wider shrink-0 leading-none">
-                    {role}
+                  </bdi>
+                  <span dir="auto" className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#e8eeff] text-[#173fad] tracking-wider shrink-0 leading-none">
+                    {roleText}
                   </span>
                 </div>
               </div>
@@ -546,10 +549,17 @@ function DashboardShell({
           </div>
         )}
 
-        {/* Desktop Header - Floating Style */}
-        <header className="bilc-floating-header minimal-dashboard-header hidden lg:flex">
+        {/* Колонка контента: топбар и карточка — её дети, поэтому их края
+            совпадают по построению, а зазор между ними задаёт gap колонки. */}
+        <div className="bilc-content-column">
+        {/* Топбар рендерится только вне мобильного брейкпоинта (768px).
+            Раньше он прятался через hidden lg:flex, но оставался в DOM:
+            на телефоне его чип статуса и переключатель языка выглядывали
+            из-под мобильной шапки, а переключатель был недоступен. */}
+        {!isMobile && (
+        <header className="bilc-floating-header minimal-dashboard-header hidden md:flex">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <SidebarTrigger className="minimal-mobile-trigger shrink-0" aria-label={td("Open menu")}>
+            <SidebarTrigger className="minimal-mobile-trigger shrink-0" aria-label={t("shell.toggleSidebar")} label={t("shell.toggleSidebar")}>
               <Menu className="size-5" />
             </SidebarTrigger>
             <div className="min-w-0 text-start">
@@ -566,11 +576,13 @@ function DashboardShell({
             </span>
           </div>
         </header>
+        )}
 
         {/* Dashboard Main Content Area */}
         <main className="bilc-dashboard-main">
           <DashboardContentArea>{children}</DashboardContentArea>
         </main>
+        </div>
       </SidebarInset>
     </div>
   );

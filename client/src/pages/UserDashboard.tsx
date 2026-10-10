@@ -19,6 +19,15 @@ export default function UserDashboard() {
 
   if (!user) return null;
 
+  // Имя выносится в отдельный <bdi>: латинское имя внутри арабской строки
+  // иначе разворачивает порядок слов. Запятая и завершающая точка приходят
+  // из строки перевода, поэтому в арабском это «،» и точка слева.
+  // \u0000 — служебный разделитель, в переводах он не встречается.
+  const NAME_SLOT = "\u0000";
+  const greetingParts = user.name
+    ? t("userDashboard.greeting", { name: NAME_SLOT }).split(NAME_SLOT)
+    : [t("userDashboard.greeting", { name: "" })];
+
   return (
     <DashboardLayout role="student" activeTab="overview">
       <div 
@@ -30,16 +39,18 @@ export default function UserDashboard() {
           <LayoutDashboard size={32} />
         </div>
         <h2 className="text-xl font-bold text-[#10253e] mb-2">
-          {t("userDashboard.welcome", "Welcome")}{user.name ? `, ${user.name}` : ""}.
+          {greetingParts[0]}
+          {user.name ? <bdi>{user.name}</bdi> : null}
+          {greetingParts[1] ?? ""}
         </h2>
         <p className="text-sm text-[#53657a] max-w-sm leading-relaxed">
-          {t("userDashboard.placeholderText", "Your dashboard is fully active and ready for future academic content.")}
+          {t("userDashboard.placeholderText")}
         </p>
 
         {/* Screen-reader accessible nodes to satisfy structural tests while keeping the interface completely visually cleared of widgets */}
         <span className="sr-only">
           {/* attendanceSummary */}
-          Attendance is not available yet.
+          {t("shell.attendancePending")}
         </span>
       </div>
     </DashboardLayout>
