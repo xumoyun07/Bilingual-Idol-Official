@@ -35,7 +35,9 @@ const PROBE = [
   "var de = document.scrollingElement; var docScroll = !!(de && de.scrollHeight > de.clientHeight + 1);",
   "var first = main ? main.firstElementChild : null;",
   "return { tbTop: tb ? box(tb).top : null, tbBottom: tb ? box(tb).bottom : null, sbTop: sb ? box(sb).top : null,",
-  "  sbBottomGap: sb ? Math.round((window.innerHeight - box(sb).bottom)*100)/100 : null,",
+  "  sbBottomGap: sb ? Math.round((window.innerHeight - box(sb).bottom)*100)/100 : null,
+  sbTopRaw: sb ? box(sb).top : null, tbTopRaw: tb ? box(tb).top : null, sbBottomRaw: sb ? box(sb).bottom : null,
+  scrollY: Math.round(window.scrollY*1000)/1000, remPx: getComputedStyle(document.documentElement).fontSize, docClientH: document.documentElement.clientHeight, innerH: window.innerHeight,",
   "  colTop: col ? box(col).top : null, insetH: inset ? box(inset).h : null, mainH: main ? box(main).h : null,",
   "  firstBlockTop: first ? box(first).top : null,",
   "  scrollables: scrollables, docScroll: docScroll, vh: window.innerHeight, dir: document.documentElement.dir,",
@@ -122,6 +124,7 @@ try {
         await page.screenshot({ path: "e2e/screenshots/item2-" + tag + ".png" });
         log(tag + ": скриншот сохранён");
       }
+      rows.push("  RAW sbTop=" + r.sbTopRaw + " tbTop=" + r.tbTopRaw + " sbBottom=" + r.sbBottomRaw + " scrollY=" + r.scrollY + " rem=" + r.remPx + " htmlClientH=" + r.docClientH + " innerH=" + r.innerH);
       await context.close();
       log(tag + ": готово");
     }

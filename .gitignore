@@ -124,3 +124,6 @@ client/public/__manus__/version.json
 .translator_usage.json
 .temp_translator_usage_test.json
 *.temp_translator_usage_test.json
+
+e2e/screenshots/
+
