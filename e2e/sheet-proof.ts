@@ -25,9 +25,24 @@ const PANEL_SELECTOR = "[data-testid=mobile-shell-panel]";
 // window.location.replace("/admin") (DashboardLayout.tsx:97-98), где триггера нет.
 const ROLE = process.env.SHEET_ROLE === "student" ? "student" : "admin";
 const ROUTE = ROLE === "student" ? "/dashboard" : "/admin";
+async function warmUpLogin(browser: typeof chromium extends never ? never : Awaited<ReturnType<typeof chromium.launch>>) {
+  // Прогрев Vite: первый заход на /login компилирует весь клиентский граф
+  // (после перезапуска dev-сервера это может занять десятки секунд), поэтому
+  // первый контекст отрабатывает без ограничений, а замеры идут вторым.
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const p = await ctx.newPage();
+  try {
+    await p.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+    await p.waitForSelector("#root > *", { state: "attached", timeout: 120000 });
+    log("  прогрев /login выполнен");
+  } catch (error) {
+    log("  прогрев не удался (продолжаем): " + (error instanceof Error ? error.message : String(error)));
+  }
+  await ctx.close();
+}
 const started = Date.now();
 function log(m: string) { console.log("[" + (Math.round((Date.now() - started) / 100) / 10) + "s] " + m); }
-const kill = setTimeout(function () { log("ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, 180000);
+const kill = setTimeout(function () { log("ЖЁСТКИЙ ПРЕДЕЛ — выход"); process.exit(3); }, 1200000);
 kill.unref();
 let failures = 0;
 
@@ -191,6 +206,7 @@ const db = await getDb();
 if (!db) { log("НЕТ соединения с БД"); process.exit(1); }
 const founder = (await db.select().from(users).where(eq(users.role, "founder")).limit(1))[0];
 const browser = await chromium.launch();
+await warmUpLogin(browser);
 const created: number[] = [];
 try {
   for (const lang of ["en", "ms", "ar"]) {
@@ -216,9 +232,17 @@ try {
       // прежде чем искать форму входа.
       await page.goto(BASE + "/login", { waitUntil: "networkidle" });
       try {
-        await page.waitForSelector("#root > *", { timeout: 15000 });
+        // state:"attached": первый потомок #root — невидимая aria-live-секция,
+        // поэтому ждать "visible" бессмысленно.
+        await page.waitForSelector("#root > *", { state: "attached", timeout: 30000 });
       } catch (error) {
         log("  REACT НЕ СМОНТИРОВАЛСЯ: #root пуст");
+        try {
+          const st = await evalJson<any>(page, "(function(){var root=document.getElementById('root');return JSON.stringify({url:location.href,title:document.title,rootChildren:root?root.children.length:-1,hasRoot:!!root,bodyStart:(document.body?document.body.innerHTML:'NO BODY').slice(0,400),scripts:Array.prototype.slice.call(document.querySelectorAll('script')).map(function(s){return (s.src||s.id||'inline').slice(0,90);}).slice(0,8)});})()", "root diagnostics");
+          log("  диагностика: " + JSON.stringify(st));
+        } catch (inner) {
+          log("  диагностика не удалась: " + (inner instanceof Error ? inner.message : String(inner)));
+        }
         throw new Error("React did not mount: #root is empty");
       }
       // G6-fix: явное ожидание поля входа с диагностикой, если его нет.

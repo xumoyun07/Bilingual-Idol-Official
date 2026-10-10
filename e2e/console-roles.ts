@@ -33,6 +33,21 @@ const VIEWPORTS = [
   { n: "390", w: 390, h: 844 },
 ];
 const LANGS = ["en", "ms", "ar"];
+async function warmUpLogin(browser: typeof chromium extends never ? never : Awaited<ReturnType<typeof chromium.launch>>) {
+  // Прогрев Vite: первый заход на /login компилирует весь клиентский граф
+  // (после перезапуска dev-сервера это может занять десятки секунд), поэтому
+  // первый контекст отрабатывает без ограничений, а замеры идут вторым.
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const p = await ctx.newPage();
+  try {
+    await p.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+    await p.waitForSelector("#root > *", { timeout: 180000 });
+    log("  прогрев /login выполнен");
+  } catch (error) {
+    log("  прогрев не удался (продолжаем): " + (error instanceof Error ? error.message : String(error)));
+  }
+  await ctx.close();
+}
 const started = Date.now();
 let failures = 0;
 function log(m: string) { console.log("[" + (Math.round((Date.now() - started) / 100) / 10) + "s] " + m); }
@@ -82,6 +97,7 @@ if (!db) { log("НЕТ соединения с БД"); process.exit(1); }
 const founder = (await db.select().from(users).where(eq(users.role, "founder")).limit(1))[0];
 const created: number[] = [];
 const browser = await chromium.launch();
+await warmUpLogin(browser);
 
 try {
   for (const spec of ROLES) {
